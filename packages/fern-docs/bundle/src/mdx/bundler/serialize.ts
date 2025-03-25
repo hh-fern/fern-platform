@@ -14,6 +14,7 @@ import remarkGemoji from "remark-gemoji";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
+import remarkShikiTwoslash from "remark-shiki-twoslash";
 import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
 import { noop } from "ts-essentials";
@@ -154,6 +155,7 @@ async function serializeMdxImpl(
         remarkSmartypants,
         remarkMath,
         remarkGemoji,
+        [remarkShikiTwoslash, {}],
       ];
 
       const rehypePlugins: PluggableList = [
