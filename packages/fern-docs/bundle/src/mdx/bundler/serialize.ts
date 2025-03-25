@@ -1,17 +1,7 @@
 import "server-only";
 
-import { RehypeShikiOptions } from "@shikijs/rehype";
-import {
-  transformerNotationDiff,
-  transformerNotationFocus,
-  transformerNotationHighlight,
-  transformerNotationWordHighlight,
-} from "@shikijs/transformers";
-import {
-  defaultTwoslashOptions as defaultTwoslashOptions_,
-  rendererRich,
-  transformerTwoslash,
-} from "@shikijs/twoslash";
+import rehypeShiki, { RehypeShikiOptions } from "@shikijs/rehype";
+import { transformerTwoslash } from "@shikijs/twoslash";
 import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
 import { gracefulify } from "graceful-fs";
@@ -24,7 +14,6 @@ import remarkGemoji from "remark-gemoji";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
-import remarkShikiTwoslash from "remark-shiki-twoslash";
 import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
 import { noop } from "ts-essentials";
@@ -67,6 +56,7 @@ import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
 import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
+import { rehypeTwoSlash } from "../plugins/rehype-twoslash";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
 import { remarkTwoslash } from "../plugins/remark-twoslash";
 import { transformerEmptyLine } from "./shiki/transformerEmptyLine";
@@ -146,7 +136,17 @@ async function serializeMdxImpl(
     return filename;
   });
 
-  const fsMap = createTwoslashFsMap(files, remoteFiles);
+  // console.log("I FOUND ONIGURUMA", fs.existsSync(""))
+
+  // setWasm(
+  //   path.join(
+  //     process.cwd(),
+  //     "node_modules",
+  //     "vscode-oniguruma",
+  //     "release",
+  //     "onig.wasm"
+  //   )
+  // );
 
   const bundled = await bundleMDX({
     source: content,
@@ -178,13 +178,24 @@ async function serializeMdxImpl(
         remarkSmartypants,
         remarkMath,
         remarkGemoji,
-        [remarkShikiTwoslash, {}],
+        // [remarkShikiTwoslash, {}],
       ];
 
       const rehypePlugins: PluggableList = [
         rehypeKatex,
         [rehypeFiles, { files: remoteFiles }],
         rehypeMdxClassStyle,
+        [
+          rehypeShiki,
+          {
+            themes: {
+              light: "vitesse-light",
+              dark: "vitesse-dark",
+            },
+            transformers: [transformerTwoslash({})],
+          } satisfies RehypeShikiOptions,
+        ],
+        rehypeTwoSlash,
         rehypeCodeBlock,
         [
           conditionalRehypeShiki,
