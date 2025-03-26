@@ -77,7 +77,7 @@ export const rehypeCodeBlock: Unified.Plugin<[], Hast.Root> = () => {
 
       // for now, rehypeShiki will process twoslash + shiki
       if (codeNode.data?.meta?.includes("twoslash")) {
-        // Remove the parent CodeGroup node
+        // remove the parent CodeGroup node
         if (parent && index != null) {
           parent.children.splice(index, 1);
           return [SKIP, index];

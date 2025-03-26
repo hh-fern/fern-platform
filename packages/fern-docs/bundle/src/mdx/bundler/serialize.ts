@@ -66,7 +66,6 @@ import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
 import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
-import { rehypeTwoSlash } from "../plugins/rehype-twoslash";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
 import { remarkTwoslash } from "../plugins/remark-twoslash";
 import { transformerEmptyLine } from "./shiki/transformerEmptyLine";
@@ -185,14 +184,20 @@ async function serializeMdxImpl(
         rehypeKatex,
         [rehypeFiles, { files: remoteFiles }],
         rehypeMdxClassStyle,
+        rehypeCodeBlock,
         [
           rehypeShiki,
           {
             themes: {
-              light: "vitesse-light",
-              dark: "vitesse-dark",
+              light: "min-light",
+              dark: "material-theme-darker",
             },
-            transformers: [transformerTwoslash({})],
+            transformers: [
+              transformerTwoslash({
+                explicitTrigger: true,
+                renderer: rendererRich(),
+              }),
+            ],
           } satisfies RehypeShikiOptions,
         ],
         rehypeTwoSlash,
