@@ -1,7 +1,7 @@
 import "server-only";
 
 import rehypeShiki, { RehypeShikiOptions } from "@shikijs/rehype";
-import { transformerTwoslash } from "@shikijs/twoslash";
+import { rendererRich, transformerTwoslash } from "@shikijs/twoslash";
 import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
 import { gracefulify } from "graceful-fs";
@@ -56,7 +56,6 @@ import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
 import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
-import { rehypeTwoSlash } from "../plugins/rehype-twoslash";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
 import { remarkTwoslash } from "../plugins/remark-twoslash";
 import { transformerEmptyLine } from "./shiki/transformerEmptyLine";
@@ -136,18 +135,6 @@ async function serializeMdxImpl(
     return filename;
   });
 
-  // console.log("I FOUND ONIGURUMA", fs.existsSync(""))
-
-  // setWasm(
-  //   path.join(
-  //     process.cwd(),
-  //     "node_modules",
-  //     "vscode-oniguruma",
-  //     "release",
-  //     "onig.wasm"
-  //   )
-  // );
-
   const bundled = await bundleMDX({
     source: content,
     files,
@@ -178,66 +165,24 @@ async function serializeMdxImpl(
         remarkSmartypants,
         remarkMath,
         remarkGemoji,
-        // [remarkShikiTwoslash, {}],
       ];
 
       const rehypePlugins: PluggableList = [
         rehypeKatex,
         [rehypeFiles, { files: remoteFiles }],
         rehypeMdxClassStyle,
-        [
-          rehypeShiki,
-          {
-            themes: {
-              light: "vitesse-light",
-              dark: "vitesse-dark",
-            },
-            transformers: [transformerTwoslash({})],
-          } satisfies RehypeShikiOptions,
-        ],
-        rehypeTwoSlash,
         rehypeCodeBlock,
         [
-          conditionalRehypeShiki,
+          rehypeShiki,
           {
             themes: {
               light: "min-light",
               dark: "material-theme-darker",
             },
             transformers: [
-              transformerLineNumbers(),
-              transformerNotationDiff(),
-              transformerNotationFocus(),
-              transformerNotationHighlight(),
-              transformerNotationWordHighlight(),
-              transformerNotationInclude({ rootDir: process.cwd() }),
-              transformerEmptyLine(),
-              transformerTagLine(),
-              transformerTitle(),
               transformerTwoslash({
                 explicitTrigger: true,
-                twoslasher: twoslasher(),
-                twoslashOptions: {
-                  customTags: [
-                    "allowErrors",
-                    ...(defaultTwoslashOptions.customTags ?? []),
-                  ],
-                  compilerOptions: {
-                    module: ts.ModuleKind.NodeNext,
-                    moduleResolution: ts.ModuleResolutionKind.NodeNext,
-                    esModuleInterop: true,
-                  },
-                  fsMap,
-                },
-                renderer: rendererRich({
-                  renderMarkdown: function (markdown) {
-                    const { hast } = toTree(markdown, {
-                      format: "md",
-                      sanitize: false,
-                    });
-                    return hast.children as ElementContent[];
-                  },
-                }),
+                renderer: rendererRich(),
               }),
             ],
           } satisfies RehypeShikiOptions,
