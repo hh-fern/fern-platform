@@ -210,7 +210,7 @@ const nextConfig: NextConfig = {
     })),
     path: cdnUri != null ? `${cdnUri.href}_next/image` : undefined,
   },
-  serverExternalPackages: ["vscode-oniguruma", "esbuild", "@typescript/vfs"],
+  serverExternalPackages: ["esbuild", "@typescript/vfs"],
   webpack: (config, { isServer }) => {
     // config.optimization = {
     //   ...config.optimization,
@@ -219,7 +219,6 @@ const nextConfig: NextConfig = {
     if (isServer) {
       config.externals = config.externals || [];
       config.externals.push("esbuild");
-      config.externals.push("vscode-oniguruma");
       config.externals.push("@typescript/vfs");
     }
     config.resolve.fallback = {
