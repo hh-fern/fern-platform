@@ -991,9 +991,9 @@ importers:
       graceful-fs:
         specifier: ^4.2.11
         version: 4.2.11
-      hast:
-        specifier: ^1.0.0
-        version: 1.0.0
+      hast-util-from-html:
+        specifier: ^2.0.3
+        version: 2.0.3
       hast-util-properties-to-mdx-jsx-attributes:
         specifier: ^1.0.0
         version: 1.0.0
@@ -1105,6 +1105,9 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
+      showdown:
+        specifier: ^2.1.0
+        version: 2.1.0
       styled-jsx:
         specifier: ^5.1.2
         version: 5.1.6(@babel/core@7.26.9)(react@19.0.0)
@@ -1211,6 +1214,9 @@ importers:
       '@types/react-dom':
         specifier: 19.0.4
         version: 19.0.4(@types/react@19.0.10)
+      '@types/showdown':
+        specifier: ^2.0.6
+        version: 2.0.6
       '@types/three':
         specifier: ^0.173.0
         version: 0.173.0
@@ -1232,6 +1238,9 @@ importers:
       glslify-loader:
         specifier: ^2.0.0
         version: 2.0.0
+      hast:
+        specifier: ^1.0.0
+        version: 1.0.0
       jsdom:
         specifier: ^24.0.0
         version: 24.0.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -8075,6 +8084,9 @@ packages:
 
   '@types/shimmer@1.2.0':
     resolution: {integrity: sha512-UE7oxhQLLd9gub6JKIAhDq06T0F6FnztwMNRvYgjeQSBeMc1ZG/tA47EwfduvkuQS8apbkM/lpLpWsaCeYsXVg==}
+
+  '@types/showdown@2.0.6':
+    resolution: {integrity: sha512-pTvD/0CIeqe4x23+YJWlX2gArHa8G0J0Oh6GKaVXV7TAeickpkkZiNOgFcFcmLQ5lB/K0qBJL1FtRYltBfbGCQ==}
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
@@ -16234,6 +16246,10 @@ packages:
 
   shimmer@1.2.1:
     resolution: {integrity: sha512-sQTKC1Re/rM6XyFM6fIAGHRPVGvyXfgzIDvzoq608vM+jeyVD0Tu1E6Np0Kc2zAIFWIj963V2800iF/9LPieQw==}
+
+  showdown@2.1.0:
+    resolution: {integrity: sha512-/6NVYu4U819R2pUIk79n67SYgJHWCce0a5xTP979WbNp0FL9MN1I1QK662IDU1b6JzKTvmhgI7T7JYIxBi3kMQ==}
+    hasBin: true
 
   side-channel-list@1.0.0:
     resolution: {integrity: sha512-FCLHtRD/gnpCiCHEiJLOwdmFP+wzCmDEkc9y7NsYxeF4u7Btsn1ZuwgwJGxImImHicJArLP4R0yX4c2KCrMrTA==}
@@ -26554,6 +26570,8 @@ snapshots:
       '@types/send': 0.17.4
 
   '@types/shimmer@1.2.0': {}
+
+  '@types/showdown@2.0.6': {}
 
   '@types/stack-utils@2.0.3': {}
 
@@ -37528,6 +37546,10 @@ snapshots:
       '@types/hast': 3.0.4
 
   shimmer@1.2.1: {}
+
+  showdown@2.1.0:
+    dependencies:
+      commander: 9.5.0
 
   side-channel-list@1.0.0:
     dependencies:
