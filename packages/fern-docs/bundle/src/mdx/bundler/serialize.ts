@@ -6,7 +6,6 @@ import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
 import { gracefulify } from "graceful-fs";
 import type { ElementContent } from "hast";
-import { fromHtml } from "hast-util-from-html";
 import { bundleMDX } from "mdx-bundler";
 import path from "path";
 import rehypeKatex from "rehype-katex";
@@ -17,7 +16,6 @@ import remarkMath from "remark-math";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
-import Showdown from "showdown";
 import { noop } from "ts-essentials";
 
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
@@ -175,10 +173,11 @@ async function serializeMdxImpl(
                 explicitTrigger: true,
                 renderer: rendererRich({
                   renderMarkdown: function (markdown) {
-                    const converter = new Showdown.Converter();
-                    const html = converter.makeHtml(markdown);
-                    const tree = fromHtml(html, { fragment: true });
-                    return tree.children as ElementContent[];
+                    const { hast } = toTree(markdown, {
+                      format: "md",
+                      sanitize: false,
+                    });
+                    return hast.children as ElementContent[];
                   },
                 }),
               }),
