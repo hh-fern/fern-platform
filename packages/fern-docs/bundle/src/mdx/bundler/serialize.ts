@@ -26,7 +26,6 @@ import remarkMath from "remark-math";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
-import Showdown from "showdown";
 import { noop } from "ts-essentials";
 import ts from "typescript";
 
@@ -198,10 +197,11 @@ async function serializeMdxImpl(
                 explicitTrigger: true,
                 renderer: rendererRich({
                   renderMarkdown: function (markdown) {
-                    const converter = new Showdown.Converter();
-                    const html = converter.makeHtml(markdown);
-                    const tree = fromHtml(html, { fragment: true });
-                    return tree.children as ElementContent[];
+                    const { hast } = toTree(markdown, {
+                      format: "md",
+                      sanitize: false,
+                    });
+                    return hast.children as ElementContent[];
                   },
                 }),
               }),

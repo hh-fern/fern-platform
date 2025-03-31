@@ -123,6 +123,10 @@ html.dark .shiki span {
   font-size: inherit;
 }
 
+.twoslash .twoslash-popup-docs code {
+  font-size: inherit;
+}
+
 .twoslash .twoslash-popup-error {
   color: var(--twoslash-error-color);
   background-color: var(--twoslash-error-bg);
