@@ -26,6 +26,9 @@ importers:
 
   .:
     dependencies:
+      '@typescript/vfs':
+        specifier: ^1.6.1
+        version: 1.6.1(typescript@5.7.3)
       fern-api:
         specifier: 0.41.16
         version: 0.41.16
