@@ -1,6 +1,6 @@
 import "server-only";
 
-import rehypeShiki, { RehypeShikiOptions } from "@shikijs/rehype";
+import { RehypeShikiOptions } from "@shikijs/rehype";
 import { rendererRich, transformerTwoslash } from "@shikijs/twoslash";
 import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
@@ -173,7 +173,7 @@ async function serializeMdxImpl(
         rehypeMdxClassStyle,
         rehypeCodeBlock,
         [
-          rehypeShiki,
+          conditionalRehypeShiki,
           {
             themes: {
               light: "min-light",
