@@ -186,7 +186,7 @@ async function serializeMdxImpl(
         rehypeMdxClassStyle,
         rehypeCodeBlock,
         [
-          rehypeShiki,
+          conditionalRehypeShiki,
           {
             themes: {
               light: "min-light",

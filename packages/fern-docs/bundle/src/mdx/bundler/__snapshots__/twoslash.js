@@ -3279,4 +3279,4 @@ var Component = (() => {
   }
   return __toCommonJS(mdx_bundler_entry_point__random_uuid__exports);
 })();
-;return Component;
+; return Component;
