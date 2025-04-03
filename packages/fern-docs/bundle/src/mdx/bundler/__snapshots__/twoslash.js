@@ -341,9 +341,7 @@ var Component = (() => {
                 children: ";"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -532,9 +530,7 @@ var Component = (() => {
                 children: ";"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -1359,9 +1355,7 @@ var Component = (() => {
                 children: "'"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             }), "\n", (0, import_jsx_runtime.jsxs)(_components.span, {
               className: "line",
               children: [(0, import_jsx_runtime.jsx)(_components.span, {
@@ -2021,9 +2015,7 @@ var Component = (() => {
                 children: ";"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -2765,9 +2757,7 @@ var Component = (() => {
                 children: " {};"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -2842,9 +2832,7 @@ var Component = (() => {
                 children: ";"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -3152,4 +3140,4 @@ var Component = (() => {
   }
   return __toCommonJS(mdx_bundler_entry_point__random_uuid__exports);
 })();
-; return Component;
+;return Component;

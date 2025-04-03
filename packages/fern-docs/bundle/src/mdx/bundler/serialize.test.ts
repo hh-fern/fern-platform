@@ -184,4 +184,4 @@ it("should serialize twoslash.mdx", async () => {
   await expect(deterministic(result?.code)).toMatchFileSnapshot(
     join(__dirname, "__snapshots__", "twoslash.js")
   );
-}, 50000);
+});
