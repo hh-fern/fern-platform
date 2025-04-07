@@ -42,12 +42,10 @@ export class AlgoliaServiceImpl implements AlgoliaService {
   }
 
   public async generateSearchRecords({
-    url,
     docsDefinition,
     apiDefinitionsById,
     configSegmentTuples,
   }: {
-    url: string;
     docsDefinition: DocsV1Db.DocsDefinitionDb;
     apiDefinitionsById: Record<string, APIV1Db.DbApiDefinition>;
     configSegmentTuples: ConfigSegmentTuple[];
