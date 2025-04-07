@@ -119,7 +119,7 @@ const nextConfig: NextConfig = {
    *
    * Note that local development should not set the CDN_URI to ensure that the assets are served from the local server.
    */
-  assetPrefix: cdnUri != null ? cdnUri.href : undefined,
+  // assetPrefix: cdnUri != null ? cdnUri.href : undefined,
   compiler: {
     // Note: i think this removes console logs in server-side code?
     // removeConsole:
