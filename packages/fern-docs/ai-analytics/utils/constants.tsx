@@ -5,6 +5,7 @@ export const SONNET35_OUTPUT_COST_PER_MIL_TOKENS = 15;
 
 // TODO: need to figure out the extensions for some of these domains
 export const DOMAINS = [
+  "getzep.com",
   "docs.koywe.com",
   "lakera.docs.buildwithfern.com",
   "auth0",
