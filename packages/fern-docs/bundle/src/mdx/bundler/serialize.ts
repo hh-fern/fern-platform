@@ -165,6 +165,8 @@ async function serializeMdxImpl(
         remarkTwoslash,
       ];
 
+      console.log(defaultTwoslashOptions.compilerOptions);
+
       const rehypePlugins: PluggableList = [
         rehypeKatex,
         [rehypeFiles, { files: remoteFiles }],
@@ -191,10 +193,10 @@ async function serializeMdxImpl(
                   compilerOptions: {
                     module: ts.ModuleKind.NodeNext,
                     moduleResolution: ts.ModuleResolutionKind.NodeNext,
-                    ...defaultTwoslashOptions.compilerOptions,
+                    // ...defaultTwoslashOptions.compilerOptions,
                   },
                 },
-                renderer: twoslashRenderer(),
+                // renderer: twoslashRenderer(),
               }),
             ],
           } satisfies RehypeShikiOptions,
