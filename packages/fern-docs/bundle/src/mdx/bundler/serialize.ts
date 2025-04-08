@@ -196,7 +196,7 @@ async function serializeMdxImpl(
                     // ...defaultTwoslashOptions.compilerOptions,
                   },
                 },
-                // renderer: twoslashRenderer(),
+                renderer: twoslashRenderer(),
               }),
             ],
           } satisfies RehypeShikiOptions,
