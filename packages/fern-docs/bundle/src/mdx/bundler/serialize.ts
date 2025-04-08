@@ -1,11 +1,13 @@
 import "server-only";
 
-import { RehypeShikiOptions } from "@shikijs/rehype";
-import { rendererRich, transformerTwoslash } from "@shikijs/twoslash";
+import rehypeShiki, { RehypeShikiOptions } from "@shikijs/rehype";
+import {
+  defaultTwoslashOptions as defaultTwoslashOptions_,
+  transformerTwoslash,
+} from "@shikijs/twoslash";
 import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
 import { gracefulify } from "graceful-fs";
-import type { ElementContent } from "hast";
 import { bundleMDX } from "mdx-bundler";
 import path from "path";
 import rehypeKatex from "rehype-katex";
@@ -17,6 +19,7 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
 import { noop } from "ts-essentials";
+import ts from "typescript";
 
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
 import {
@@ -25,7 +28,6 @@ import {
   customHeadingHandler,
   sanitizeBreaks,
   sanitizeMdxExpression,
-  toTree,
 } from "@fern-docs/mdx";
 import {
   rehypeAcornErrorBoundary,
@@ -52,10 +54,16 @@ import { rehypeExtractAsides } from "../plugins/rehype-extract-asides";
 import { rehypeFiles } from "../plugins/rehype-files";
 import { RehypeLinksOptions, rehypeLinks } from "../plugins/rehype-links";
 import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
-import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
+// import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
+import { remarkTwoslash } from "../plugins/remark-twoslash";
+import { transformerNotationInclude } from "./shiki/transformerNotationInclude";
+import { twoslasher } from "./shiki/twoslash";
+import { twoslashRenderer } from "./shiki/twoslashRenderer";
+
+const defaultTwoslashOptions = defaultTwoslashOptions_();
 
 // gracefulify fs to avoid EMFILE errors on Vercel
 gracefulify(fs);
@@ -154,6 +162,7 @@ async function serializeMdxImpl(
         remarkSmartypants,
         remarkMath,
         remarkGemoji,
+        remarkTwoslash,
       ];
 
       const rehypePlugins: PluggableList = [
@@ -162,24 +171,30 @@ async function serializeMdxImpl(
         rehypeMdxClassStyle,
         rehypeCodeBlock,
         [
-          conditionalRehypeShiki,
+          rehypeShiki,
           {
             themes: {
               light: "min-light",
               dark: "material-theme-darker",
             },
             transformers: [
+              transformerNotationInclude({ rootDir: process.cwd() }),
               transformerTwoslash({
                 explicitTrigger: true,
-                renderer: rendererRich({
-                  renderMarkdown: function (markdown) {
-                    const { hast } = toTree(markdown, {
-                      format: "md",
-                      sanitize: false,
-                    });
-                    return hast.children as ElementContent[];
+                twoslasher: twoslasher(),
+                twoslashOptions: {
+                  customTags: [
+                    "allowErrors",
+                    ...(defaultTwoslashOptions.customTags ?? []),
+                    // ...(twoslash.customTags ?? []),
+                  ],
+                  compilerOptions: {
+                    module: ts.ModuleKind.NodeNext,
+                    moduleResolution: ts.ModuleResolutionKind.NodeNext,
+                    ...defaultTwoslashOptions.compilerOptions,
                   },
-                }),
+                },
+                renderer: twoslashRenderer(),
               }),
             ],
           } satisfies RehypeShikiOptions,
@@ -251,7 +266,7 @@ async function serializeMdxImpl(
       o.minify = process.env.NODE_ENV === "production";
       o.sourcemap = false;
 
-      o.logLevel = "error"; // Reduce logging overhead
+      o.logLevel = "debug"; // Reduce logging overhead
 
       o.logLimit = 0; // Disable logging to reduce file operations
       o.metafile = false; // Don't generate metafile (reduces file operations)
