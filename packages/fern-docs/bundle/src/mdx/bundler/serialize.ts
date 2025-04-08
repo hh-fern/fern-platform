@@ -2,6 +2,12 @@ import "server-only";
 
 import rehypeShiki, { RehypeShikiOptions } from "@shikijs/rehype";
 import {
+  transformerNotationDiff,
+  transformerNotationFocus,
+  transformerNotationHighlight,
+  transformerNotationWordHighlight,
+} from "@shikijs/transformers";
+import {
   defaultTwoslashOptions as defaultTwoslashOptions_,
   transformerTwoslash,
 } from "@shikijs/twoslash";
@@ -59,7 +65,11 @@ import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
 import { remarkTwoslash } from "../plugins/remark-twoslash";
+import { transformerEmptyLine } from "./shiki/transformerEmptyLine";
+import { transformerLineNumbers } from "./shiki/transformerLineNumbers";
 import { transformerNotationInclude } from "./shiki/transformerNotationInclude";
+import { transformerTagLine } from "./shiki/transformerTagLine";
+import { transformerTitle } from "./shiki/transformerTitle";
 import { twoslasher } from "./shiki/twoslash";
 import { twoslashRenderer } from "./shiki/twoslashRenderer";
 
@@ -180,7 +190,15 @@ async function serializeMdxImpl(
               dark: "material-theme-darker",
             },
             transformers: [
+              transformerLineNumbers(),
+              transformerNotationDiff(),
+              transformerNotationFocus(),
+              transformerNotationHighlight(),
+              transformerNotationWordHighlight(),
               transformerNotationInclude({ rootDir: process.cwd() }),
+              transformerEmptyLine(),
+              transformerTagLine(),
+              transformerTitle(),
               transformerTwoslash({
                 explicitTrigger: true,
                 twoslasher: twoslasher(),
