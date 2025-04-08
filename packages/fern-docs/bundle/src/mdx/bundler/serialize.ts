@@ -222,6 +222,7 @@ async function serializeMdxImpl(
                     moduleResolution: ts.ModuleResolutionKind.NodeNext,
                     // ...defaultTwoslashOptions.compilerOptions,
                   },
+                  fsMap: createTwoslashFsMap(files, remoteFiles),
                 },
                 renderer: rendererRich({
                   renderMarkdown: function (markdown) {
