@@ -209,7 +209,7 @@ const nextConfig: NextConfig = {
     })),
     path: cdnUri != null ? `${cdnUri.href}_next/image` : undefined,
   },
-  serverExternalPackages: ["esbuild", "@typescript/vfs", "@account-kit/infra"],
+  serverExternalPackages: ["esbuild", "@typescript/vfs"],
   webpack: (config, { isServer }) => {
     // config.optimization = {
     //   ...config.optimization,
@@ -219,7 +219,6 @@ const nextConfig: NextConfig = {
       config.externals = config.externals || [];
       config.externals.push("esbuild");
       config.externals.push("@typescript/vfs");
-      config.externals.push("@account-kit/infra");
     }
     config.resolve.fallback = {
       ...config.resolve.fallback,
