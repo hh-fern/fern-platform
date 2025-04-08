@@ -1,76 +1,82 @@
 // inpsire by the vocs twoslash integration
 import type { TwoslashRenderer } from "@shikijs/twoslash";
-import type { Element } from "hast";
-import { defaultHandlers, toHast } from "mdast-util-to-hast";
+import type { Element, ElementContent } from "hast";
+// import { defaultHandlers, toHast } from "mdast-util-to-hast";
 import type { ShikiTransformerContextCommon } from "shiki";
-
-import { mdastFromMarkdown } from "@fern-docs/mdx";
+// import { mdastFromMarkdown } from "@fern-docs/mdx";
+import { NodeHover } from "twoslash";
+import { NodeQuery } from "twoslash";
 
 // import { transformerShrinkIndent } from './transformerShrinkIndent.ts'
 
 export function twoslashRenderer(): TwoslashRenderer {
-  function hightlightPopupContent(
-    codeToHast: ShikiTransformerContextCommon["codeToHast"],
-    shikiOptions: ShikiTransformerContextCommon["options"],
-    info: { text?: string; docs?: string }
-  ) {
-    if (!info.text) return [];
+  // function hightlightPopupContent(
+  //   codeToHast: ShikiTransformerContextCommon["codeToHast"],
+  //   shikiOptions: ShikiTransformerContextCommon["options"],
+  //   info: { text?: string; docs?: string }
+  // ) {
+  //   if (!info.text) return [];
 
-    const text = processHoverInfo(info.text) ?? info.text;
-    if (!text.trim()) return [];
+  //   const text = processHoverInfo(info.text) ?? info.text;
+  //   if (!text.trim()) return [];
 
-    const themedContent = (
-      (
-        codeToHast(text, {
-          ...shikiOptions,
-        }).children[0] as Element
-      ).children[0] as Element
-    ).children;
+  //   const themedContent = (
+  //     (
+  //       codeToHast(text, {
+  //         ...shikiOptions,
+  //       }).children[0] as Element
+  //     ).children[0] as Element
+  //   ).children;
 
-    if (info.docs) {
-      const santized = info.docs
-        .replace(/\n?{(@.*)?\s*\n?/g, "")
-        .replace(/\s*}\n?/g, "")
-        .replace(/(.)\n(.)/g, "$1 $2")
-        .replace(/\n?-\s/g, "\n");
-      const mdast = mdastFromMarkdown(santized, "mdx");
-      const hast = toHast(mdast, {
-        handlers: {
-          code: (
-            state: any,
-            node: { type: "code"; lang?: string; value: string }
-          ) => {
-            const lang = node.lang || "";
-            if (lang) {
-              return codeToHast(node.value, {
-                ...shikiOptions,
-                transformers: [],
-                lang,
-              }).children[0] as Element;
-            }
-            return defaultHandlers.code(state, node) as any;
-          },
-        },
-      }) as Element;
-      if (info.docs) {
-        themedContent.push({
-          type: "element",
-          tagName: "div",
-          properties: { class: "twoslash-popup-jsdoc" },
-          children: hast.children,
-        });
-      }
-    }
+  //   if (info.docs) {
+  //     const santized = info.docs
+  //       .replace(/\n?{(@.*)?\s*\n?/g, "")
+  //       .replace(/\s*}\n?/g, "")
+  //       .replace(/(.)\n(.)/g, "$1 $2")
+  //       .replace(/\n?-\s/g, "\n");
+  //     const mdast = mdastFromMarkdown(santized, "mdx");
+  //     const hast = toHast(mdast, {
+  //       handlers: {
+  //         code: (
+  //           state: any,
+  //           node: { type: "code"; lang?: string; value: string }
+  //         ) => {
+  //           const lang = node.lang || "";
+  //           if (lang) {
+  //             return codeToHast(node.value, {
+  //               ...shikiOptions,
+  //               transformers: [],
+  //               lang,
+  //             }).children[0] as Element;
+  //           }
+  //           return defaultHandlers.code(state, node) as any;
+  //         },
+  //       },
+  //     }) as Element;
+  //     if (info.docs) {
+  //       themedContent.push({
+  //         type: "element",
+  //         tagName: "div",
+  //         properties: { class: "twoslash-popup-jsdoc" },
+  //         children: hast.children,
+  //       });
+  //     }
+  //   }
 
-    return themedContent;
-  }
+  //   return themedContent;
+  // }
 
   return {
     nodeStaticInfo(info, node) {
       try {
-        const themedContent = hightlightPopupContent(
-          this.codeToHast,
-          this.options,
+        // const themedContent = hightlightPopupContent(
+        //   this.codeToHast,
+        //   this.options,
+        //   info
+        // );
+
+        const themedContent = renderRichHighlightPopupContentfunction.call(
+          this,
           info
         );
 
@@ -323,16 +329,16 @@ export function twoslashRenderer(): TwoslashRenderer {
   };
 }
 
-const regexType = /^[A-Z][a-zA-Z0-9_]*(<[^>]*>)?:/;
-const regexFunction = /^[a-zA-Z0-9_]*\(/;
+const regexType = /^[A-Z]\w*(<[^>]*>)?:/;
+const regexFunction = /^\w*\(/;
 
 /**
  * The default hover info processor, which will do some basic cleanup
  */
-export function processHoverInfo(type: string) {
+export function processHoverInfo(type: string): string {
   let content = type
     // remove leading `(property)` or `(method)` on each line
-    .replace(/^\(([\w-]+?)\)\s+/gm, "")
+    .replace(/^\(([\w-]+)\)\s+/gm, "")
     // remove import statement
     .replace(/\nimport .*$/, "")
     // remove interface or namespace lines with only the name
@@ -344,4 +350,106 @@ export function processHoverInfo(type: string) {
   else if (content.match(regexFunction)) content = `function ${content}`;
 
   return content;
+}
+
+function renderMarkdownPassThrough(markdown: string): ElementContent[] {
+  return [
+    {
+      type: "text",
+      value: markdown,
+    },
+  ];
+}
+
+function renderRichHighlightPopupContentfunction(
+  this: ShikiTransformerContextCommon,
+  info: NodeHover | NodeQuery
+): ElementContent[] {
+  if (!info.text) return [];
+  const content = processHoverInfo(info.text);
+  if (!content || content === "any") return [];
+
+  const popupContents: ElementContent[] = [];
+
+  const typeCode: Element = {
+    type: "element",
+    tagName: "code",
+    properties: {},
+    children: this.codeToHast(content, {
+      ...this.options,
+      meta: {},
+      transformers: [],
+      lang:
+        this.options.lang === "tsx" || this.options.lang === "jsx"
+          ? "tsx"
+          : "ts",
+      structure: content.trim().includes("\n") ? "classic" : "inline",
+    }).children as ElementContent[],
+  };
+  typeCode.properties.class = "twoslash-popup-code";
+
+  popupContents.push(typeCode);
+
+  if (info.docs) {
+    // const docs = processHoverDocs(info.docs) ?? info.docs;
+    const docs = processHoverInfo(info.docs) ?? info.docs;
+    if (docs) {
+      const children = renderMarkdownPassThrough.call(this, docs);
+      popupContents.push({
+        type: "element",
+        tagName: "div",
+        properties: { class: "twoslash-popup-docs" },
+        children,
+      });
+    }
+  }
+
+  if (info.tags?.length) {
+    popupContents.push({
+      type: "element",
+      tagName: "div",
+      properties: {
+        class: "twoslash-popup-docs twoslash-popup-docs-tags",
+      },
+      children: info.tags.map(
+        (tag) =>
+          ({
+            type: "element",
+            tagName: "span",
+            properties: {
+              class: `twoslash-popup-docs-tag`,
+            },
+            children: [
+              {
+                type: "element",
+                tagName: "span",
+                properties: {
+                  class: "twoslash-popup-docs-tag-name",
+                },
+                children: [
+                  {
+                    type: "text",
+                    value: `@${tag[0]}`,
+                  },
+                ],
+              },
+              ...(tag[1]
+                ? [
+                    {
+                      type: "element",
+                      tagName: "span",
+                      properties: {
+                        class: "twoslash-popup-docs-tag-value",
+                      },
+                      children: renderMarkdownPassThrough.call(this, tag[1]),
+                    } as Element,
+                  ]
+                : []),
+            ],
+          }) as Element
+      ),
+    });
+  }
+
+  return popupContents;
 }
