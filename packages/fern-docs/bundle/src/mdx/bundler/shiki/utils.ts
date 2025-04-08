@@ -179,6 +179,12 @@ export function createTwoslashFsMap(
   `
   );
 
+  console.log("File map created with", fsMap.size, "entries.");
+  console.log("File map contents:");
+  fsMap.forEach((value, key) => {
+    console.log(`Path: ${key}, Content: ${value.substring(0, 100)}...`); // Log first 100 characters of content
+  });
+
   return fsMap;
 }
 
