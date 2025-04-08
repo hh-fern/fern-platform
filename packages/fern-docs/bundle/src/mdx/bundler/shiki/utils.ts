@@ -13,15 +13,59 @@ const COMMON_DEPENDENCIES = [
   "@account-kit/core",
   "@account-kit/infra",
   "@account-kit/smart-contracts",
-  "@account-kit/react",
-  "@account-kit/react-native",
-  "@account-kit/signer",
-  "@tanstack/react-query",
-  "next",
-  "viem",
-  "react",
   // Add other common packages used in your documentation examples
 ];
+
+// Type for the cache key
+type FsMapCacheKey = string;
+
+// Cache for FSMaps
+const fsMapCache = new Map<FsMapCacheKey, Map<string, string>>();
+
+/**
+ * Generate a cache key for the FSMap
+ */
+function generateFsMapCacheKey(
+  files: Record<string, string>,
+  remoteFiles: Record<string, FileData>
+): FsMapCacheKey {
+  // Create a key based on the file paths
+  const filesKey = Object.keys(files).sort().join(",");
+  const remoteFilesKey = Object.keys(remoteFiles).sort().join(",");
+
+  return `${filesKey}|${remoteFilesKey}`;
+}
+
+/**
+ * Create or retrieve a cached fsMap for twoslash
+ */
+export function getOrCreateTwoslashFsMap(
+  files: Record<string, string>,
+  remoteFiles: Record<string, FileData>,
+  options?: {
+    additionalDependencies?: string[];
+    rootDir?: string;
+    forceRefresh?: boolean;
+  }
+): Map<string, string> {
+  const cacheKey = generateFsMapCacheKey(files, remoteFiles);
+
+  // If we have a cached version and don't need to refresh, return it
+  if (!options?.forceRefresh && fsMapCache.has(cacheKey)) {
+    const cachedMap = fsMapCache.get(cacheKey);
+    if (cachedMap) {
+      return cachedMap;
+    }
+  }
+
+  // Otherwise, create a new fsMap
+  const fsMap = createTwoslashFsMap(files, remoteFiles, options);
+
+  // Cache it for future use
+  fsMapCache.set(cacheKey, fsMap);
+
+  return fsMap;
+}
 
 /**
  * Create an fsMap for twoslash that includes local files, remote files,
@@ -145,6 +189,9 @@ export function createTwoslashFsMap(
   fsMap.set(
     "custom.d.ts",
     `
+    // Custom type declarations for documentation examples
+    
+    // Declare image imports
     declare module '*.png' {
       const value: string;
       export default value;
@@ -171,11 +218,14 @@ export function createTwoslashFsMap(
       const content: Record<string, string>;
       export default content;
     }
-      
+    
+    // Declare JSON imports
     declare module '*.json' {
       const value: any;
       export default value;
     }
+    
+    // Add other declarations as needed
   `
   );
 

@@ -74,6 +74,7 @@ import { transformerNotationInclude } from "./shiki/transformerNotationInclude";
 import { transformerTagLine } from "./shiki/transformerTagLine";
 import { transformerTitle } from "./shiki/transformerTitle";
 import { twoslasher } from "./shiki/twoslash";
+import { createTwoslashFsMap } from "./shiki/utils";
 
 const defaultTwoslashOptions = defaultTwoslashOptions_();
 
@@ -213,6 +214,7 @@ async function serializeMdxImpl(
                     moduleResolution: ts.ModuleResolutionKind.NodeNext,
                     // ...defaultTwoslashOptions.compilerOptions,
                   },
+                  fsMap: createTwoslashFsMap(files, remoteFiles),
                 },
                 renderer: rendererRich({
                   renderMarkdown: function (markdown) {
