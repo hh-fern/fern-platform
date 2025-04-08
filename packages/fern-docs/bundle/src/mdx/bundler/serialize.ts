@@ -1,6 +1,6 @@
 import "server-only";
 
-import rehypeShiki, { RehypeShikiOptions } from "@shikijs/rehype";
+import { RehypeShikiOptions } from "@shikijs/rehype";
 import {
   transformerNotationDiff,
   transformerNotationFocus,
@@ -9,11 +9,13 @@ import {
 } from "@shikijs/transformers";
 import {
   defaultTwoslashOptions as defaultTwoslashOptions_,
+  rendererRich,
   transformerTwoslash,
 } from "@shikijs/twoslash";
 import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
 import { gracefulify } from "graceful-fs";
+import { ElementContent } from "hast";
 import { bundleMDX } from "mdx-bundler";
 import path from "path";
 import rehypeKatex from "rehype-katex";
@@ -34,6 +36,7 @@ import {
   customHeadingHandler,
   sanitizeBreaks,
   sanitizeMdxExpression,
+  toTree,
 } from "@fern-docs/mdx";
 import {
   rehypeAcornErrorBoundary,
@@ -60,7 +63,7 @@ import { rehypeExtractAsides } from "../plugins/rehype-extract-asides";
 import { rehypeFiles } from "../plugins/rehype-files";
 import { RehypeLinksOptions, rehypeLinks } from "../plugins/rehype-links";
 import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
-// import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
+import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
@@ -71,7 +74,6 @@ import { transformerNotationInclude } from "./shiki/transformerNotationInclude";
 import { transformerTagLine } from "./shiki/transformerTagLine";
 import { transformerTitle } from "./shiki/transformerTitle";
 import { twoslasher } from "./shiki/twoslash";
-import { twoslashRenderer } from "./shiki/twoslashRenderer";
 
 const defaultTwoslashOptions = defaultTwoslashOptions_();
 
@@ -175,15 +177,13 @@ async function serializeMdxImpl(
         remarkTwoslash,
       ];
 
-      console.log(defaultTwoslashOptions.compilerOptions);
-
       const rehypePlugins: PluggableList = [
         rehypeKatex,
         [rehypeFiles, { files: remoteFiles }],
         rehypeMdxClassStyle,
         rehypeCodeBlock,
         [
-          rehypeShiki,
+          conditionalRehypeShiki,
           {
             themes: {
               light: "min-light",
@@ -214,7 +214,15 @@ async function serializeMdxImpl(
                     // ...defaultTwoslashOptions.compilerOptions,
                   },
                 },
-                renderer: twoslashRenderer(),
+                renderer: rendererRich({
+                  renderMarkdown: function (markdown) {
+                    const { hast } = toTree(markdown, {
+                      format: "md",
+                      sanitize: false,
+                    });
+                    return hast.children as ElementContent[];
+                  },
+                }),
               }),
             ],
           } satisfies RehypeShikiOptions,
