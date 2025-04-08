@@ -42,6 +42,7 @@ import {
   customHeadingHandler,
   sanitizeBreaks,
   sanitizeMdxExpression,
+  toTree,
 } from "@fern-docs/mdx";
 import {
   rehypeAcornErrorBoundary,
@@ -68,7 +69,7 @@ import { rehypeExtractAsides } from "../plugins/rehype-extract-asides";
 import { rehypeFiles } from "../plugins/rehype-files";
 import { RehypeLinksOptions, rehypeLinks } from "../plugins/rehype-links";
 import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
-// import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
+import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
@@ -185,15 +186,13 @@ async function serializeMdxImpl(
         remarkTwoslash,
       ];
 
-      console.log(defaultTwoslashOptions.compilerOptions);
-
       const rehypePlugins: PluggableList = [
         rehypeKatex,
         [rehypeFiles, { files: remoteFiles }],
         rehypeMdxClassStyle,
         rehypeCodeBlock,
         [
-          rehypeShiki,
+          conditionalRehypeShiki,
           {
             themes: {
               light: "min-light",
@@ -224,7 +223,15 @@ async function serializeMdxImpl(
                     // ...defaultTwoslashOptions.compilerOptions,
                   },
                 },
-                renderer: twoslashRenderer(),
+                renderer: rendererRich({
+                  renderMarkdown: function (markdown) {
+                    const { hast } = toTree(markdown, {
+                      format: "md",
+                      sanitize: false,
+                    });
+                    return hast.children as ElementContent[];
+                  },
+                }),
               }),
             ],
           } satisfies RehypeShikiOptions,
