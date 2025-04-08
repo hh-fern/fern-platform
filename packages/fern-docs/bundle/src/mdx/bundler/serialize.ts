@@ -103,6 +103,9 @@ async function serializeMdxImpl(
     replaceHref?: RehypeLinksOptions["replaceHref"];
   } = {}
 ): Promise<SerializeMdxResponse> {
+  // Print the current working directory to help with debugging
+  console.log("Current working directory:", process.cwd());
+
   content = sanitizeBreaks(content);
   content = sanitizeMdxExpression(content)[0];
 
@@ -144,6 +147,8 @@ async function serializeMdxImpl(
     }
     return filename;
   });
+
+  const fsMap = createTwoslashFsMap(files, remoteFiles);
 
   const bundled = await bundleMDX({
     source: content,
@@ -212,9 +217,10 @@ async function serializeMdxImpl(
                   compilerOptions: {
                     module: ts.ModuleKind.NodeNext,
                     moduleResolution: ts.ModuleResolutionKind.NodeNext,
+                    esModuleInterop: true,
                     // ...defaultTwoslashOptions.compilerOptions,
                   },
-                  fsMap: createTwoslashFsMap(files, remoteFiles),
+                  fsMap,
                 },
                 renderer: rendererRich({
                   renderMarkdown: function (markdown) {
