@@ -8,6 +8,7 @@
     "directory": "packages/fern-docs/bundle"
   },
   "sideEffects": false,
+  "type": "module",
   "browser": {
     "crypto": false
   },
