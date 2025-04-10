@@ -200,6 +200,10 @@ async function serializeMdxImpl(
             },
             transformers: [
               transformerLineNumbers(),
+              transformerNotationDiff(),
+              transformerNotationFocus(),
+              transformerNotationHighlight(),
+              transformerNotationWordHighlight(),
               transformerNotationInclude({ rootDir: process.cwd() }),
               transformerEmptyLine(),
               transformerTagLine(),
