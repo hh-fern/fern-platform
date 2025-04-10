@@ -20,7 +20,12 @@
     "glslify-import",
     "glslify-loader",
     "raw-loader",
-    "tailwindcss"
+    "tailwindcss",
+    "@aa-sdk/core",
+    "@account-kit/core",
+    "@account-kit/infra",
+    "@account-kit/smart-contracts",
+    "viem"
   ],
   "ignore-patterns": ["dist"]
 }

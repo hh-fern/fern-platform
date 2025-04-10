@@ -904,9 +904,6 @@ importers:
       '@shikijs/rehype':
         specifier: ^3.2.1
         version: 3.2.1
-      '@shikijs/transformers':
-        specifier: ^3.2.1
-        version: 3.2.1
       '@shikijs/twoslash':
         specifier: ^3.2.1
         version: 3.2.1(typescript@5.7.3)
@@ -979,6 +976,9 @@ importers:
       graceful-fs:
         specifier: ^4.2.11
         version: 4.2.11
+      hast:
+        specifier: ^1.0.0
+        version: 1.0.0
       hast-util-properties-to-mdx-jsx-attributes:
         specifier: ^1.0.0
         version: 1.0.0
@@ -1006,9 +1006,6 @@ importers:
       lucide-react:
         specifier: ^0.460.0
         version: 0.460.0(react@19.0.0)
-      mdast-util-to-hast:
-        specifier: ^13.2.0
-        version: 13.2.0
       mdx-bundler:
         specifier: ^10.1.1
         version: 10.1.1(esbuild@0.25.0)
@@ -6514,9 +6511,6 @@ packages:
   '@shikijs/themes@3.2.1':
     resolution: {integrity: sha512-k5DKJUT8IldBvAm8WcrDT5+7GA7se6lLksR+2E3SvyqGTyFMzU2F9Gb7rmD+t+Pga1MKrYFxDIeyWjMZWM6uBQ==}
 
-  '@shikijs/transformers@3.2.1':
-    resolution: {integrity: sha512-oIT40p8LOPV/6XLnUrVPeRtJtbu0Mpl+BjGFuMXw870eX9zTSQlidg7CsksFDVyUiSAOC/CH1RQm+ldZp0/6eQ==}
-
   '@shikijs/twoslash@3.2.1':
     resolution: {integrity: sha512-2ZiL9xXY8JRXHG5BdJXE9KoIeSsyH9/yK+YTN90/SUIKkq7Nf5dWqXp5wJ6+4SL0FQO8mq2HUutwqU+gamOgOA==}
     peerDependencies:
@@ -11853,6 +11847,10 @@ packages:
 
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
+
+  hast@1.0.0:
+    resolution: {integrity: sha512-vFUqlRV5C+xqP76Wwq2SrM0kipnmpxJm7OfvVXpB35Fp+Fn4MV+ozr+JZr5qFvyR1q/U+Foim2x+3P+x9S1PLA==}
+    deprecated: Renamed to rehype
 
   hastscript@8.0.0:
     resolution: {integrity: sha512-dMOtzCEd3ABUeSIISmrETiKuyydk1w0pa+gE/uormcTpSYuaNJPbX1NU3JLyscSLjwAQM8bWMhhIlnCqnRvDTw==}
@@ -23693,11 +23691,6 @@ snapshots:
     dependencies:
       '@shikijs/types': 3.2.1
 
-  '@shikijs/transformers@3.2.1':
-    dependencies:
-      '@shikijs/core': 3.2.1
-      '@shikijs/types': 3.2.1
-
   '@shikijs/twoslash@3.2.1(typescript@5.7.3)':
     dependencies:
       '@shikijs/core': 3.2.1
@@ -31133,6 +31126,8 @@ snapshots:
   hast-util-whitespace@3.0.0:
     dependencies:
       '@types/hast': 3.0.4
+
+  hast@1.0.0: {}
 
   hastscript@8.0.0:
     dependencies:
