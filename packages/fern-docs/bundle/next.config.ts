@@ -238,6 +238,7 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  output: 'standalone',
 };
 
 function withVercelEnv(config: NextConfig): NextConfig {
