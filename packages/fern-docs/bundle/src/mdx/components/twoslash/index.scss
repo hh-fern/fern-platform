@@ -65,6 +65,8 @@ html.dark .shiki span {
   user-select: none;
   text-align: left;
   box-shadow: var(--twoslash-popup-shadow);
+  max-width: var(--content-width);
+  overflow: scroll;
 }
 
 .twoslash .twoslash-query-presisted .twoslash-popup-container {

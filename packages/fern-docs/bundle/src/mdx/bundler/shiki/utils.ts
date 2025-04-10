@@ -13,6 +13,13 @@ const COMMON_DEPENDENCIES = [
   "@account-kit/core",
   "@account-kit/infra",
   "@account-kit/smart-contracts",
+  "@account-kit/react",
+  "@account-kit/react-native",
+  "@account-kit/signer",
+  "@tanstack/react-query",
+  "next",
+  "viem",
+  "react",
   // Add other common packages used in your documentation examples
 ];
 
@@ -171,12 +178,6 @@ export function createTwoslashFsMap(
     }
   `
   );
-
-  console.log("File map created with", fsMap.size, "entries.");
-  console.log("File map contents:");
-  fsMap.forEach((value, key) => {
-    console.log(`Path: ${key}, Content: ${value.substring(0, 100)}...`); // Log first 100 characters of content
-  });
 
   return fsMap;
 }
