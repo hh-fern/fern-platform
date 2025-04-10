@@ -21,7 +21,7 @@ it("should serialize mdx", async () => {
   await expect(deterministic(result?.code)).toMatchFileSnapshot(
     join(__dirname, "__snapshots__", "hello-world.js")
   );
-}, 30000);
+});
 
 it("should serialize mdx with frontmatter", async () => {
   const result = await serializeMdx(

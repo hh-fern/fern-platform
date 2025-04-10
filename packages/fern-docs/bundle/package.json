@@ -128,7 +128,6 @@
     "jsonpath-plus": "10.3.0",
     "launchdarkly-react-client-sdk": "^3.6.0",
     "lucide-react": "^0.460.0",
-    "mdast-util-to-hast": "^13.2.0",
     "mdx-bundler": "^10.1.1",
     "mermaid": "^11.6.0",
     "motion": "^12.4.7",
