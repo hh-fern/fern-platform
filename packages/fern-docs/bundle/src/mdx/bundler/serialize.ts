@@ -2,6 +2,12 @@ import "server-only";
 
 import { RehypeShikiOptions } from "@shikijs/rehype";
 import {
+  transformerNotationDiff,
+  transformerNotationFocus,
+  transformerNotationHighlight,
+  transformerNotationWordHighlight,
+} from "@shikijs/transformers";
+import {
   defaultTwoslashOptions as defaultTwoslashOptions_,
   rendererRich,
   transformerTwoslash,
@@ -188,6 +194,10 @@ async function serializeMdxImpl(
             },
             transformers: [
               transformerLineNumbers(),
+              transformerNotationDiff(),
+              transformerNotationFocus(),
+              transformerNotationHighlight(),
+              transformerNotationWordHighlight(),
               transformerNotationInclude({ rootDir: process.cwd() }),
               transformerEmptyLine(),
               transformerTagLine(),
