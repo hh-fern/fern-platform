@@ -1,23 +1,7 @@
 import "server-only";
 
 import { RehypeShikiOptions } from "@shikijs/rehype";
-import {
-  transformerNotationDiff,
-  transformerNotationFocus,
-  transformerNotationHighlight,
-  transformerNotationWordHighlight,
-} from "@shikijs/transformers";
-import {
-  transformerNotationDiff,
-  transformerNotationFocus,
-  transformerNotationHighlight,
-  transformerNotationWordHighlight,
-} from "@shikijs/transformers";
-import {
-  defaultTwoslashOptions as defaultTwoslashOptions_,
-  rendererRich,
-  transformerTwoslash,
-} from "@shikijs/twoslash";
+import { rendererRich, transformerTwoslash } from "@shikijs/twoslash";
 import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
 import { gracefulify } from "graceful-fs";
@@ -33,7 +17,6 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
 import { noop } from "ts-essentials";
-import ts from "typescript";
 
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
 import {
@@ -73,16 +56,6 @@ import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
-import { remarkTwoslash } from "../plugins/remark-twoslash";
-import { transformerEmptyLine } from "./shiki/transformerEmptyLine";
-import { transformerLineNumbers } from "./shiki/transformerLineNumbers";
-import { transformerNotationInclude } from "./shiki/transformerNotationInclude";
-import { transformerTagLine } from "./shiki/transformerTagLine";
-import { transformerTitle } from "./shiki/transformerTitle";
-import { twoslasher } from "./shiki/twoslash";
-import { createTwoslashFsMap } from "./shiki/utils";
-
-const defaultTwoslashOptions = defaultTwoslashOptions_();
 
 // gracefulify fs to avoid EMFILE errors on Vercel
 gracefulify(fs);
@@ -151,8 +124,6 @@ async function serializeMdxImpl(
     return filename;
   });
 
-  const fsMap = createTwoslashFsMap(files, remoteFiles);
-
   const bundled = await bundleMDX({
     source: content,
     files,
@@ -183,7 +154,6 @@ async function serializeMdxImpl(
         remarkSmartypants,
         remarkMath,
         remarkGemoji,
-        remarkTwoslash,
       ];
 
       const rehypePlugins: PluggableList = [
@@ -199,77 +169,8 @@ async function serializeMdxImpl(
               dark: "material-theme-darker",
             },
             transformers: [
-              transformerLineNumbers(),
-              transformerNotationDiff(),
-              transformerNotationFocus(),
-              transformerNotationHighlight(),
-              transformerNotationWordHighlight(),
-              transformerNotationInclude({ rootDir: process.cwd() }),
-              transformerEmptyLine(),
-              transformerTagLine(),
-              transformerTitle(),
               transformerTwoslash({
                 explicitTrigger: true,
-                twoslasher: twoslasher(),
-                twoslashOptions: {
-                  customTags: [
-                    "allowErrors",
-                    ...(defaultTwoslashOptions.customTags ?? []),
-                  ],
-                  compilerOptions: {
-                    module: ts.ModuleKind.NodeNext,
-                    moduleResolution: ts.ModuleResolutionKind.NodeNext,
-                    esModuleInterop: true,
-                  },
-                  fsMap,
-                },
-                renderer: rendererRich({
-                  renderMarkdown: function (markdown) {
-                    const { hast } = toTree(markdown, {
-                      format: "md",
-                      sanitize: false,
-                    });
-                    return hast.children as ElementContent[];
-                  },
-                }),
-              }),
-            ],
-          } satisfies RehypeShikiOptions,
-        ],
-        rehypeTwoSlash,
-        rehypeCodeBlock,
-        [
-          conditionalRehypeShiki,
-          {
-            themes: {
-              light: "min-light",
-              dark: "material-theme-darker",
-            },
-            transformers: [
-              transformerLineNumbers(),
-              transformerNotationDiff(),
-              transformerNotationFocus(),
-              transformerNotationHighlight(),
-              transformerNotationWordHighlight(),
-              transformerNotationInclude({ rootDir: process.cwd() }),
-              transformerEmptyLine(),
-              transformerTagLine(),
-              transformerTitle(),
-              transformerTwoslash({
-                explicitTrigger: true,
-                twoslasher: twoslasher(),
-                twoslashOptions: {
-                  customTags: [
-                    "allowErrors",
-                    ...(defaultTwoslashOptions.customTags ?? []),
-                  ],
-                  compilerOptions: {
-                    module: ts.ModuleKind.NodeNext,
-                    moduleResolution: ts.ModuleResolutionKind.NodeNext,
-                    esModuleInterop: true,
-                  },
-                  fsMap,
-                },
                 renderer: rendererRich({
                   renderMarkdown: function (markdown) {
                     const { hast } = toTree(markdown, {
