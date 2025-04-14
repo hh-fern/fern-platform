@@ -341,9 +341,7 @@ var Component = (() => {
                 children: ";"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -532,9 +530,7 @@ var Component = (() => {
                 children: ";"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -1359,9 +1355,7 @@ var Component = (() => {
                 children: "'"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             }), "\n", (0, import_jsx_runtime.jsxs)(_components.span, {
               className: "line",
               children: [(0, import_jsx_runtime.jsx)(_components.span, {
@@ -2021,9 +2015,7 @@ var Component = (() => {
                 children: ";"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -2454,18 +2446,6 @@ var Component = (() => {
           children: (0, import_jsx_runtime.jsxs)(_components.code, {
             children: [(0, import_jsx_runtime.jsx)(_components.span, {
               className: "line",
-              "data-empty-line": true,
-              children: " "
-            }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
-            }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
-            }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
               children: (0, import_jsx_runtime.jsx)(_components.span, {
                 style: {
                   color: "#C2C3C5",
@@ -2718,138 +2698,6 @@ var Component = (() => {
               className: "line",
               children: [(0, import_jsx_runtime.jsx)(_components.span, {
                 style: {
-                  color: "#22863A",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: '"'
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#22863A",
-                  "--shiki-dark": "#C3E88D"
-                },
-                children: "use strict"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#22863A",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: '"'
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#24292EFF",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: ";"
-              })]
-            }), "\n", (0, import_jsx_runtime.jsxs)(_components.span, {
-              className: "line",
-              children: [(0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#1976D2",
-                  "--shiki-dark": "#EEFFFF"
-                },
-                children: "Object"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#6F42C1",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: "."
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#6F42C1",
-                  "--shiki-dark": "#82AAFF"
-                },
-                children: "defineProperty"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#24292EFF",
-                  "--shiki-dark": "#EEFFFF"
-                },
-                children: "("
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#1976D2",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: "exports"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#212121",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: ","
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#22863A",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: ' "'
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#22863A",
-                  "--shiki-dark": "#C3E88D"
-                },
-                children: "__esModule"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#22863A",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: '"'
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#212121",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: ","
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#24292EFF",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: " {"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#24292EFF",
-                  "--shiki-dark": "#F07178"
-                },
-                children: " value"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#D32F2F",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: ":"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#1976D2",
-                  "--shiki-dark": "#FF9CAC"
-                },
-                children: " true"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#24292EFF",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: " }"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#24292EFF",
-                  "--shiki-dark": "#EEFFFF"
-                },
-                children: ")"
-              }), (0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
-                  color: "#24292EFF",
-                  "--shiki-dark": "#89DDFF"
-                },
-                children: ";"
-              })]
-            }), "\n", (0, import_jsx_runtime.jsxs)(_components.span, {
-              className: "line",
-              children: [(0, import_jsx_runtime.jsx)(_components.span, {
-                style: {
                   color: "#D32F2F",
                   "--shiki-dark": "#C792EA"
                 },
@@ -2891,10 +2739,25 @@ var Component = (() => {
                 },
                 children: ";"
               })]
-            }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
+            }), "\n", (0, import_jsx_runtime.jsxs)(_components.span, {
               className: "line",
-              "data-empty-line": true,
-              children: " "
+              children: [(0, import_jsx_runtime.jsx)(_components.span, {
+                style: {
+                  color: "#D32F2F",
+                  fontStyle: "inherit",
+                  "--shiki-dark": "#89DDFF",
+                  "--shiki-dark-font-style": "italic"
+                },
+                children: "export"
+              }), (0, import_jsx_runtime.jsx)(_components.span, {
+                style: {
+                  color: "#24292EFF",
+                  "--shiki-dark": "#89DDFF"
+                },
+                children: " {};"
+              })]
+            }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
+              className: "line"
             })]
           })
         })
@@ -2969,9 +2832,7 @@ var Component = (() => {
                 children: ";"
               })]
             }), "\n", (0, import_jsx_runtime.jsx)(_components.span, {
-              className: "line",
-              "data-empty-line": true,
-              children: " "
+              className: "line"
             })]
           })
         })
@@ -3279,4 +3140,4 @@ var Component = (() => {
   }
   return __toCommonJS(mdx_bundler_entry_point__random_uuid__exports);
 })();
-; return Component;
+;return Component;
