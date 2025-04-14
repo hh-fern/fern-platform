@@ -5,7 +5,6 @@ import {
   transformerNotationDiff,
   transformerNotationFocus,
   transformerNotationHighlight,
-  transformerNotationWordHighlight,
 } from "@shikijs/transformers";
 import { rendererRich, transformerTwoslash } from "@shikijs/twoslash";
 import { mapKeys } from "es-toolkit/object";
@@ -175,15 +174,9 @@ async function serializeMdxImpl(
               dark: "material-theme-darker",
             },
             transformers: [
-              transformerLineNumbers(),
               transformerNotationDiff(),
               transformerNotationFocus(),
               transformerNotationHighlight(),
-              transformerNotationWordHighlight(),
-              transformerNotationInclude({ rootDir: process.cwd() }),
-              transformerEmptyLine(),
-              transformerTagLine(),
-              transformerTitle(),
               transformerTwoslash({
                 explicitTrigger: true,
                 renderer: rendererRich({
