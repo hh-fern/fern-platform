@@ -1,6 +1,11 @@
 import "server-only";
 
 import { RehypeShikiOptions } from "@shikijs/rehype";
+import {
+  transformerNotationDiff,
+  transformerNotationFocus,
+  transformerNotationHighlight,
+} from "@shikijs/transformers";
 import { rendererRich, transformerTwoslash } from "@shikijs/twoslash";
 import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
@@ -169,6 +174,9 @@ async function serializeMdxImpl(
               dark: "material-theme-darker",
             },
             transformers: [
+              transformerNotationDiff(),
+              transformerNotationFocus(),
+              transformerNotationHighlight(),
               transformerTwoslash({
                 explicitTrigger: true,
                 renderer: rendererRich({
