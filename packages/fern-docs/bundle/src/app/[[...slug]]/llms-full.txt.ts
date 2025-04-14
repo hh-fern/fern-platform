@@ -11,6 +11,8 @@ import { uniqBy } from "es-toolkit/array";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 300;
+
 export async function handleLLMSFullTxt(
   req: NextRequest,
   { params }: { params: { slug?: string[] } }
