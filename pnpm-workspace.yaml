@@ -4,6 +4,7 @@ packages:
   - "packages/**"
   - "playwright/**"
   - "!packages/**/lib"
+  - "!packages/**/.next"
   - "!packages/**/dist"
   - "!packages/**/generated"
   - "!servers/**/lib"
