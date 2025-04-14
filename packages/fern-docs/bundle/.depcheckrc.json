@@ -29,7 +29,10 @@
     "@account-kit/smart-contracts",
     "@account-kit/signer",
     "@tanstack/react-query",
-    "viem"
+    "viem",
+    "react-native",
+    "qrcode.react",
+    "next/font/google"
   ],
   "ignore-patterns": ["dist"]
 }
