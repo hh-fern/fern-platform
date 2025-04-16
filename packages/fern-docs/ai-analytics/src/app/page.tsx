@@ -20,7 +20,9 @@ interface ChatLog {
 async function fetchChatLogs(
   projectId: string,
   apiKey: string,
-  threshold: Date
+  threshold: Date,
+  fromDate?: string,
+  toDate?: string
 ) {
   const url = "https://api.braintrust.dev/btql";
   const headers = {
@@ -32,10 +34,15 @@ async function fetchChatLogs(
   let cursor: string | null = null;
   let continueLoading = true;
 
+  let query = `select: * | from: project_logs('${projectId}') | limit: 300`;
+  if (fromDate && toDate) {
+    query += ` | filter: created >= '${fromDate}' and created <= '${toDate}'`;
+  }
+
   while (continueLoading) {
     const cursorClause: string = cursor ? ` | cursor: '${cursor}'` : "";
     const body = {
-      query: `select: * | from: project_logs('${projectId}') | limit: 300${cursorClause}`,
+      query: `${query}${cursorClause}`,
     };
 
     const response = await fetch(url, {
@@ -88,10 +95,14 @@ export default async function Home({
   const params = await searchParams;
   const daysBack = params.daysBack ? parseInt(params.daysBack) : 1;
   const thresholdDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * daysBack);
+  const fromDate = params.fromDate;
+  const toDate = params.toDate;
   const chatLogs = await fetchChatLogs(
     BRAINTRUST_PROJECT_ID,
     process.env.BRAINTRUST_API_KEY || "",
-    thresholdDate
+    thresholdDate,
+    fromDate,
+    toDate
   );
 
   const processedData: Conversation[] = [];
@@ -160,10 +171,14 @@ export default async function Home({
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-bold">
-            Showing conversations since {thresholdDate.toLocaleDateString()}
+            {fromDate && toDate
+              ? `Showing conversations from ${fromDate} to ${toDate}`
+              : `Showing conversations since ${thresholdDate.toLocaleDateString()}`}
           </h1>
           <h6>
             To modify the date range, add <code>?daysBack=X</code> to the URL.
+            <br />
+            Alternatively, add <code>?fromDate=X&toDate=X</code> to the URL.
           </h6>
           <br />
         </div>
