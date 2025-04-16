@@ -57,22 +57,26 @@ async function fetchChatLogs(
       break;
     }
 
-    // Check if any results are before our threshold date
-    const hasPreThresholdResults = jsonData.data.some((item: ChatLog) => {
-      const date = new Date(item.created);
-      return date < threshold;
-    });
-
-    // If we found pre-threshold results, filter them out and stop
-    if (hasPreThresholdResults) {
-      const filteredResults = jsonData.data.filter((item: ChatLog) => {
-        const date = new Date(item.created);
-        return date >= threshold;
-      });
-      allResults = [...allResults, ...filteredResults];
-      continueLoading = false;
-    } else {
+    if (fromDate && toDate) {
       allResults = [...allResults, ...jsonData.data];
+    } else {
+      // Check if any results are before our threshold date
+      const hasPreThresholdResults = jsonData.data.some((item: ChatLog) => {
+        const date = new Date(item.created);
+        return date < threshold;
+      });
+
+      // If we found pre-threshold results, filter them out and stop
+      if (hasPreThresholdResults) {
+        const filteredResults = jsonData.data.filter((item: ChatLog) => {
+          const date = new Date(item.created);
+          return date >= threshold;
+        });
+        allResults = [...allResults, ...filteredResults];
+        continueLoading = false;
+      } else {
+        allResults = [...allResults, ...jsonData.data];
+      }
     }
 
     // Update cursor for next iteration
