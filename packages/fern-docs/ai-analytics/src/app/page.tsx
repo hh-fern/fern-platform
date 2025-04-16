@@ -36,7 +36,7 @@ async function fetchChatLogs(
 
   let query = `select: * | from: project_logs('${projectId}') | limit: 300`;
   if (fromDate && toDate) {
-    query += ` | filter: created >= '${fromDate}' and created <= '${toDate}'`;
+    query = `select: * | from: project_logs('${projectId}') | filter: created >= '${fromDate}' and created <= '${toDate}' | limit: 300`;
   }
 
   while (continueLoading) {
