@@ -14,18 +14,25 @@ export const exportToCSV = (data: Conversation[]) => {
     "Domain,Conversation Id,Input,Output,Created,Time to First Token,Conversation Duration,Prompt Tokens,Completion Tokens,Cost"
   );
   data.forEach((item) => {
-    for (let i = 0; i < item.content.length - 1; i++) {
-      const message = item.content[i];
-      if (message.role === "user") {
-        let assistantMessage = item.content[i + 1].content;
-        while (item.content[i + 1] && item.content[i + 1].role == "assistant") {
-          assistantMessage += item.content[i + 1].content;
-          i++;
+    try {
+      for (let i = 0; i < item.content.length - 1; i++) {
+        const message = item.content[i];
+        if (message.role === "user") {
+          let assistantMessage = item.content[i + 1].content;
+          while (
+            item.content[i + 1] &&
+            item.content[i + 1].role == "assistant"
+          ) {
+            assistantMessage += item.content[i + 1].content;
+            i++;
+          }
+          csvContent.push(
+            `${item.domain},${item.conversationId},${removeCommas(JSON.stringify(message.content))},${removeCommas(JSON.stringify(assistantMessage))},${item.created.toISOString()},${item.timeToFirstToken},${item.conversationDuration},${item.promptTokens},${item.completionTokens},${(SONNET35_INPUT_COST_PER_MIL_TOKENS * item.promptTokens) / 1000000.0 + (SONNET35_OUTPUT_COST_PER_MIL_TOKENS * item.completionTokens) / 1000000.0}`
+          );
         }
-        csvContent.push(
-          `${item.domain},${item.conversationId},${removeCommas(JSON.stringify(message.content))},${removeCommas(JSON.stringify(assistantMessage))},${item.created.toISOString()},${item.timeToFirstToken},${item.conversationDuration},${item.promptTokens},${item.completionTokens},${(SONNET35_INPUT_COST_PER_MIL_TOKENS * item.promptTokens) / 1000000.0 + (SONNET35_OUTPUT_COST_PER_MIL_TOKENS * item.completionTokens) / 1000000.0}`
-        );
       }
+    } catch (e) {
+      console.error(e);
     }
   });
   const blob = new Blob([csvContent.join("\n")], {

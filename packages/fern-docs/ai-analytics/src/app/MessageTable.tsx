@@ -102,7 +102,9 @@ export function MessageTableClient({
               <Select.Item value="show-all-domains">
                 Show all domains
               </Select.Item>
-              {DOMAINS.map((domain) => (
+              {DOMAINS.filter((domain) => {
+                return domain in countByDomain && countByDomain[domain] > 0;
+              }).map((domain) => (
                 <Select.Item key={domain} value={domain}>
                   {domain} ({countByDomain[domain] || 0} conversations)
                 </Select.Item>

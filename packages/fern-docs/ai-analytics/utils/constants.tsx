@@ -10,7 +10,9 @@ export const DOMAINS = [
   "lakera.docs.buildwithfern.com",
   "auth0",
   "elevenlabs.io",
+  "elevenlabs.docs.buildwithfern.com",
   "https://buildwithfern.com",
+  "vapi.ai",
   "openrouter.ai",
   "accelbooks.ai",
   //   "fern.docs.buildwithfern.com",
@@ -34,4 +36,6 @@ export const DOMAINS = [
   "explorium",
   "hume",
   "vellum",
+  "cohere-ai.docs.buildwithfern.com",
+  "unknown",
 ];
