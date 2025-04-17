@@ -16,7 +16,7 @@ import { getS3KeyForV1DocsDefinition } from "@fern-api/fdr-sdk/docs";
 import { v4 as uuidv4 } from "uuid";
 import { Cache } from "../../Cache";
 import { FernRegistry } from "../../api/generated";
-import type { FdrConfig } from "../../app";
+import type { FdrApplication, FdrConfig } from "../../app";
 
 const ONE_WEEK_IN_SECONDS = 604800;
 
@@ -94,7 +94,10 @@ export class S3ServiceImpl implements S3Service {
     ONE_WEEK_IN_SECONDS
   );
 
-  constructor(private readonly config: FdrConfig) {
+  constructor(
+    private readonly config: FdrConfig,
+    private readonly app: FdrApplication
+  ) {
     this.publicDocsCDNUrl = config.cdnPublicDocsUrl;
     this.publicDocsS3 = new S3Client({
       ...(config.publicDocsS3.urlOverride != null
@@ -150,7 +153,22 @@ export class S3ServiceImpl implements S3Service {
       Key: getS3KeyForV1DocsDefinition(domain),
       Body: JSON.stringify(readDocsDefinition),
     });
-    return await this.dbDocsDefinitionS3.send(command);
+    try {
+      const response = await this.dbDocsDefinitionS3.send(command);
+      return response;
+    } catch (error) {
+      this.app.logger.error(
+        `Failed to write docs definition to S3 for domain ${domain}`,
+        error
+      );
+      // Send a slack notification about the failure
+      await this.app.services.slack.notify({
+        message: `Fail to store docs for ${domain} in s3!`,
+        err: error,
+      });
+
+      throw error;
+    }
   }
 
   async getPresignedDocsAssetsDownloadUrl({
