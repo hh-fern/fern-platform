@@ -26,7 +26,7 @@ export const DOMAINS = [
   "cohere-test",
   "payroc",
   "aai-try-ai",
-  "explo",
+  "explo.docs.buildwithfern.com",
   "ava-labs",
   "taxcloud",
   "anduril",
