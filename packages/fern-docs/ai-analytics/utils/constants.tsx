@@ -12,7 +12,7 @@ export const DOMAINS = [
   "elevenlabs.io",
   "elevenlabs.docs.buildwithfern.com",
   "https://buildwithfern.com",
-  "vapi.ai",
+  "vapi-ai.docs.buildwithfern.com",
   "openrouter.ai",
   "accelbooks.ai",
   //   "fern.docs.buildwithfern.com",
