@@ -37,6 +37,8 @@ export const DOMAINS = [
   "hume",
   "vellum",
   "cohere-ai.docs.buildwithfern.com",
-  "docs.boundaryml.com"
+  "docs.boundaryml.com",
+  "composio.docs.buildwithfern.com",
+  "hubspot.docs.buildwithfern.com",
   "unknown",
 ];
