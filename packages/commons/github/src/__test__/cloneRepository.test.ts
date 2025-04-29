@@ -3,7 +3,7 @@ import { cloneRepository } from "../cloneRepository";
 describe("cloneRepository", () => {
   it("fern-api/docs-starter-openapi", async () => {
     const repository = await cloneRepository({
-      githubRepository: "github.com/fern-api/docs-starter-openapi",
+      githubRepository: "github.com/fern-api/docs-starter",
       installationToken: undefined,
     });
     const readme = await repository.getReadme();
