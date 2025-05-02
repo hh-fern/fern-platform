@@ -119,20 +119,22 @@ const UnmemoizedEndpointContentLeft: React.FC<EndpointContentLeft.Props> = ({
     authHeader = visitDiscriminatedUnion(
       auth
     )._visit<ApiDefinition.ObjectProperty>({
-      basicAuth: () => {
+      basicAuth: (auth) => {
         return {
           key: ApiDefinition.PropertyKey("Authorization"),
           description:
+            auth.description ??
             "Basic authentication of the form Basic <username:password>.",
           hidden: false,
           valueShape: stringShape,
           availability: undefined,
         };
       },
-      bearerAuth: () => {
+      bearerAuth: (auth) => {
         return {
           key: ApiDefinition.PropertyKey("Authorization"),
           description:
+            auth.description ??
             "Bearer authentication of the form Bearer <token>, where token is your auth token.",
           hidden: false,
           valueShape: stringShape,
@@ -143,7 +145,7 @@ const UnmemoizedEndpointContentLeft: React.FC<EndpointContentLeft.Props> = ({
         return {
           key: ApiDefinition.PropertyKey(value.headerWireValue),
           description:
-            value.prefix != null
+            (value.description ?? value.prefix != null)
               ? `Header authentication of the form ${value.prefix} <token>`
               : undefined,
           hidden: false,
@@ -158,11 +160,13 @@ const UnmemoizedEndpointContentLeft: React.FC<EndpointContentLeft.Props> = ({
               clientCredentialsValue.value,
               "type"
             )._visit({
-              referencedEndpoint: () => ({
+              referencedEndpoint: (endpoint) => ({
                 key: ApiDefinition.PropertyKey(
                   clientCredentialsValue.value.headerName || "Authorization"
                 ),
-                description: `OAuth authentication of the form ${clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix ?? "Bearer"} ` : ""}<token>.`,
+                description:
+                  endpoint.description ??
+                  `OAuth authentication of the form ${clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix ?? "Bearer"} ` : ""}<token>.`,
                 hidden: false,
                 valueShape: stringShape,
                 availability: undefined,
