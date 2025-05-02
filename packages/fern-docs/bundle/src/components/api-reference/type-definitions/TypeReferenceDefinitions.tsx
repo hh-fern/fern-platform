@@ -1,13 +1,9 @@
-import "server-only";
-
 import React from "react";
 
 import { UnreachableCaseError } from "ts-essentials";
 
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
-
-import { MdxSerializer } from "@/server/mdx-serializer";
 
 import { InternalTypeDefinition } from "./InternalTypeDefinition";
 import { TypeDefinitionPathPart } from "./TypeDefinitionContext";
@@ -59,14 +55,13 @@ export function hasInternalTypeReference(
 }
 
 export function TypeReferenceDefinitions({
-  serialize,
   shape,
   types,
 }: {
-  serialize: MdxSerializer;
   shape: ApiDefinition.TypeShapeOrReference;
   types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
 }) {
+  console.log("TypeReferenceDefinitions", shape, types);
   switch (shape.type) {
     case "id":
       return <TypeDefinitionSlot id={shape.id} />;
@@ -75,60 +70,30 @@ export function TypeReferenceDefinitions({
     case "primitive":
     case "undiscriminatedUnion":
     case "discriminatedUnion":
-      return (
-        <InternalTypeDefinition
-          serialize={serialize}
-          shape={shape}
-          types={types}
-        />
-      );
+      return <InternalTypeDefinition shape={shape} types={types} />;
     case "list":
     case "set":
       return (
         <TypeDefinitionPathPart part={{ type: "listItem" }}>
-          <TypeReferenceDefinitions
-            serialize={serialize}
-            shape={shape.itemShape}
-            types={types}
-          />
+          <TypeReferenceDefinitions shape={shape.itemShape} types={types} />
         </TypeDefinitionPathPart>
       );
     case "map":
       return (
         <TypeDefinitionPathPart part={{ type: "objectProperty" }}>
-          <TypeReferenceDefinitions
-            serialize={serialize}
-            shape={shape.keyShape}
-            types={types}
-          />
-          <TypeReferenceDefinitions
-            serialize={serialize}
-            shape={shape.valueShape}
-            types={types}
-          />
+          <TypeReferenceDefinitions shape={shape.keyShape} types={types} />
+          <TypeReferenceDefinitions shape={shape.valueShape} types={types} />
         </TypeDefinitionPathPart>
       );
     case "literal":
     case "unknown":
       return null;
     case "alias": {
-      return (
-        <TypeReferenceDefinitions
-          serialize={serialize}
-          shape={shape.value}
-          types={types}
-        />
-      );
+      return <TypeReferenceDefinitions shape={shape.value} types={types} />;
     }
     case "optional":
     case "nullable": {
-      return (
-        <TypeReferenceDefinitions
-          serialize={serialize}
-          shape={shape.shape}
-          types={types}
-        />
-      );
+      return <TypeReferenceDefinitions shape={shape.shape} types={types} />;
     }
     default:
       throw new UnreachableCaseError(shape);

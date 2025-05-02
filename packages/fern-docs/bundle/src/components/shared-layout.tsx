@@ -41,6 +41,7 @@ export default async function SharedLayout({
   const announcementText = config.announcement?.text;
 
   return (
+    // <MdxSerializerProvider serialize={serialize}>
     <ThemedDocs
       theme={theme}
       isSidebarFixed={
@@ -125,5 +126,6 @@ export default async function SharedLayout({
     >
       {children}
     </ThemedDocs>
+    // </MdxSerializerProvider>
   );
 }

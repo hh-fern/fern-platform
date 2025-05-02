@@ -52,7 +52,8 @@ import { rehypeButtons } from "../plugins/rehype-buttons";
 import { rehypeCards } from "../plugins/rehype-cards";
 import { rehypeCodeBlock } from "../plugins/rehype-code-block";
 import { rehypeCollectJsx } from "../plugins/rehype-collect-jsx";
-import { rehypeEndpointSnippets } from "../plugins/rehype-endpoint-snippets";
+import { rehypeEndpointExampleSnippets } from "../plugins/rehype-endpoint-example-snippets";
+import { rehypeEndpointSchemaSnippets } from "../plugins/rehype-endpoint-schema-snippet";
 import { rehypeExtractAsides } from "../plugins/rehype-extract-asides";
 import { rehypeFiles } from "../plugins/rehype-files";
 import { RehypeLinksOptions, rehypeLinks } from "../plugins/rehype-links";
@@ -148,6 +149,7 @@ async function serializeMdxImpl(
 
       o.providerImportSource = "@mdx-js/react";
 
+      // Process the markdown content
       const remarkPlugins: PluggableList = [
         remarkFrontmatter,
         remarkExtractTitle,
@@ -155,17 +157,18 @@ async function serializeMdxImpl(
         remarkSqueezeParagraphs,
         [remarkInjectEsm, { scope }],
         [remarkSanitizeAcorn],
-        remarkGfm,
+        remarkGfm, // GitHub Flavored Markdown
         remarkSmartypants,
         remarkMath,
         remarkGemoji,
       ];
 
+      // Transform the HTML AST (Abstract Syntax Tree)
       const rehypePlugins: PluggableList = [
-        rehypeKatex,
+        rehypeKatex, // Math equation support
         [rehypeFiles, { files: remoteFiles }],
         rehypeMdxClassStyle,
-        rehypeCodeBlock,
+        rehypeCodeBlock, // Code block formatting
         // [
         //   conditionalRehypeShiki,
         //   {
@@ -213,7 +216,8 @@ async function serializeMdxImpl(
           },
         ],
         rehypeButtons,
-        [rehypeEndpointSnippets, { loader }],
+        [rehypeEndpointExampleSnippets, { loader }],
+        [rehypeEndpointSchemaSnippets, { loader }],
         [
           rehypeMigrateJsx,
           {

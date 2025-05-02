@@ -10,7 +10,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { FooterLayout } from "@/components/layouts/FooterLayout";
 import { ReferenceLayout } from "@/components/layouts/ReferenceLayout";
 import { PlaygroundKeyboardTrigger } from "@/components/playground/PlaygroundKeyboardTrigger";
-import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
 import { MdxSerializer } from "@/server/mdx-serializer";
 
 import { TypeDefinitionRoot } from "../type-definitions/TypeDefinitionContext";
@@ -75,7 +74,6 @@ export async function EndpointContent({
           <TypeDefinitionRoot types={types} slug={node.slug}>
             <TypeDefinitionSlotsServer types={types} serialize={serialize}>
               <EndpointContentLeft
-                serialize={serialize}
                 context={context}
                 showAuth={showAuth}
                 showErrors={showErrors}
@@ -86,10 +84,7 @@ export async function EndpointContent({
         footer={<FooterLayout bottomNavigation={bottomNavigation} />}
       >
         <PlaygroundKeyboardTrigger />
-        <MdxServerComponentProseSuspense
-          serialize={serialize}
-          mdx={endpoint.description}
-        />
+        {/* <MdxServerComponentProseSuspense mdx={endpoint.description} /> */}
       </ReferenceLayout>
     </EndpointContextProvider>
   );

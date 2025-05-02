@@ -31,6 +31,7 @@ export const TypeDefinitionContext = createContext<
 });
 
 export function useTypeDefinitionContext(): TypeDefinitionContextValue {
+  console.log("useTypeDefinitionContext");
   return useContext(TypeDefinitionContext)();
 }
 
@@ -71,6 +72,7 @@ export function TypeDefinitionPathPart({
   children: React.ReactNode;
   part: JsonPropertyPathPart;
 }) {
+  console.log("TypeDefinitionPathPart", part);
   const parent = useTypeDefinitionContext();
   const contextValue = React.useRef(() => ({
     ...parent,

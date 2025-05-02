@@ -1,14 +1,9 @@
-import "server-only";
-
 import React from "react";
 
 import { compact } from "es-toolkit/array";
 
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { AvailabilityBadge } from "@fern-docs/components/badges";
-
-import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
-import { MdxSerializer } from "@/server/mdx-serializer";
 
 import {
   PropertyContainer,
@@ -23,41 +18,38 @@ import { TypeReferenceDefinitions } from "./TypeReferenceDefinitions";
 import { TypeShorthand } from "./TypeShorthand";
 
 export function ObjectProperty({
-  serialize,
   property,
   types,
 }: {
-  serialize: MdxSerializer;
   property: ApiDefinition.ObjectProperty;
   types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
 }) {
   const unwrapped = ApiDefinition.unwrapReference(property.valueShape, types);
+  console.log("AHHHObjectProperty", property, unwrapped);
   const description = compact([
     property.description,
     ...unwrapped.descriptions,
   ])[0];
 
   return (
-    <PropertyWithShape
-      serialize={serialize}
-      name={property.key}
-      availability={property.availability}
-      description={description}
-      shape={property.valueShape}
-      types={types}
-    />
+    <p>AHHH {description}</p>
+    // <PropertyWithShape
+    //   name={property.key}
+    //   availability={property.availability}
+    //   description={description}
+    //   shape={property.valueShape}
+    //   types={types}
+    // />
   );
 }
 
 export function PropertyWithShape({
-  serialize,
   name,
   description,
   shape,
   availability,
   types,
 }: {
-  serialize: MdxSerializer;
   icon?: React.ReactNode;
   name?: string;
   description: string | undefined;
@@ -67,23 +59,17 @@ export function PropertyWithShape({
 }) {
   return (
     <PropertyRenderer
-      serialize={serialize}
       name={name}
       description={description}
       typeShorthand={<TypeShorthand shape={shape} />}
       availability={availability}
     >
-      <TypeReferenceDefinitions
-        serialize={serialize}
-        shape={shape}
-        types={types}
-      />
+      <TypeReferenceDefinitions shape={shape} types={types} />
     </PropertyRenderer>
   );
 }
 
 export function PropertyRenderer({
-  serialize,
   icon,
   name,
   availability,
@@ -96,9 +82,17 @@ export function PropertyRenderer({
   description: string | undefined;
   typeShorthand: React.ReactNode;
   availability: ApiDefinition.Availability | null | undefined;
-  serialize: MdxSerializer;
   children?: React.ReactNode;
 }) {
+  console.log(
+    "PropertyRenderer",
+    icon,
+    name,
+    availability,
+    description,
+    typeShorthand,
+    children
+  );
   const child = (
     <PropertyContainer>
       <TypeDefinitionAnchor sideOffset={6}>
@@ -112,12 +106,11 @@ export function PropertyRenderer({
         )}
       </TypeDefinitionAnchor>
 
-      <MdxServerComponentProseSuspense
-        serialize={serialize}
+      {/* <MdxServerComponentProseSuspense
         mdx={description}
         size="sm"
         className="text-(color:--grayscale-a11)"
-      />
+      /> */}
 
       <TypeDefinitionCollapsible>{children}</TypeDefinitionCollapsible>
     </PropertyContainer>

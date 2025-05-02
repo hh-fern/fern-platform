@@ -228,6 +228,7 @@ export default async function SharedPage({
         versionIsDefault={found.isCurrentVersionDefault}
       />
       <SetIsLandingPage value={found.node.type === "landingPage"} />
+      {/* <MdxSerializerProvider serialize={serialize}> */}
       <DocsMainContent
         loader={loader}
         serialize={serialize}
@@ -236,6 +237,7 @@ export default async function SharedPage({
         neighbors={await neighborsPromise}
         breadcrumb={found.breadcrumb}
       />
+      {/* </MdxSerializerProvider> */}
     </FeedbackPopoverProvider>
   );
 }
