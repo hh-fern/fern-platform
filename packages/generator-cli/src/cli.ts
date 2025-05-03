@@ -96,6 +96,83 @@ void yargs(hideBin(process.argv))
       process.exit(0);
     }
   )
+  .command(
+    "github",
+    "GitHub operations",
+    (yargs) => {
+      return yargs
+        .command(
+          "push",
+          "Push changes to GitHub",
+          (subYargs) => {
+            return subYargs.option("config", {
+              string: true,
+              required: true,
+              description: "Path to configuration file",
+            });
+          },
+          async (argv) => {
+            if (argv.config == null) {
+              process.stderr.write(
+                "missing required arguments; please specify the --config flag\n"
+              );
+              process.exit(1);
+            }
+            const wd = cwd();
+            // Implementation for github push command
+            process.stderr.write(`Pushing to GitHub with config: ${resolve(wd, argv.config)}\n`);
+            process.exit(0);
+          }
+        )
+        .command(
+          "pr",
+          "Create a pull request on GitHub",
+          (subYargs) => {
+            return subYargs.option("config", {
+              string: true,
+              required: true,
+              description: "Path to configuration file",
+            });
+          },
+          async (argv) => {
+            if (argv.config == null) {
+              process.stderr.write(
+                "missing required arguments; please specify the --config flag\n"
+              );
+              process.exit(1);
+            }
+            const wd = cwd();
+            // Implementation for github pr command
+            process.stderr.write(`Creating PR on GitHub with config: ${resolve(wd, argv.config)}\n`);
+            process.exit(0);
+          }
+        )
+        .command(
+          "release",
+          "Create a release on GitHub",
+          (subYargs) => {
+            return subYargs.option("config", {
+              string: true,
+              required: true,
+              description: "Path to configuration file",
+            });
+          },
+          async (argv) => {
+            if (argv.config == null) {
+              process.stderr.write(
+                "missing required arguments; please specify the --config flag\n"
+              );
+              process.exit(1);
+            }
+            const wd = cwd();
+            // Implementation for github release command
+            process.stderr.write(`Creating release on GitHub with config: ${resolve(wd, argv.config)}\n`);
+            process.exit(0);
+          }
+        )
+        .demandCommand();
+    }
+  )
   .demandCommand()
   .showHelpOnFail(true)
   .parse();
