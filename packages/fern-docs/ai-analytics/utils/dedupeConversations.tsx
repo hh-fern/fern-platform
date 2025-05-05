@@ -16,13 +16,13 @@ export function deduplicateConversation(
 
     // Check if this conversation is contained within any retained message
     const isContained = retainedMessages.some((retained) => {
-      // Only compare if within 5 minute window
+      // Only compare if within 1 hour
       const timeDiff = Math.abs(
         retained.created.getTime() - currentMsg.created.getTime()
       );
-      const fiveMinutesInMs = 5 * 60 * 1000;
+      const oneHourInMs = 60 * 60 * 1000;
 
-      if (timeDiff > fiveMinutesInMs) {
+      if (timeDiff > oneHourInMs) {
         return false;
       }
 
