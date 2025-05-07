@@ -1,7 +1,7 @@
 import { createTwoslasher } from "twoslash";
 
 const twoslasher_ = createTwoslasher({
-  vfsRoot: "/tmp",
+  // vfsRoot: "/tmp",
 });
 
 export function twoslasher() {

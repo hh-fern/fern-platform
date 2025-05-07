@@ -5,12 +5,12 @@ import {
   transformerNotationHighlight,
 } from "@shikijs/transformers";
 import { transformerTwoslash } from "@shikijs/twoslash";
-import { exec } from "child_process";
-import fs from "fs";
+// import { exec } from "child_process";
 import { bundleMDX } from "mdx-bundler";
 import path from "path";
 import ts from "typescript";
-import { promisify } from "util";
+
+// import { promisify } from "util";
 
 import { isNonNullish } from "@fern-api/ui-core-utils";
 // import rehypeKatex from "rehype-katex";
@@ -71,7 +71,7 @@ export interface SerializeMdxResponse {
   jsxElements: string[];
 }
 
-const execPromise = promisify(exec);
+// const execPromise = promisify(exec);
 
 async function serializeTwoslashImpl(
   content: string
@@ -108,70 +108,79 @@ async function serializeTwoslashImpl(
   const hasTwoslash = content.includes("twoslash");
 
   // Try to download package.json and install dependencies if twoslash is used and node_modules doesn't exist
-  if (hasTwoslash && !fs.existsSync("/tmp/node_modules")) {
-    try {
-      const dependencies: Record<string, string> = {
-        "@aa-sdk/core": "^4.31.0",
-        "@account-kit/core": "^4.31.0",
-        "@account-kit/infra": "^4.31.0",
-        "@account-kit/react": "^4.31.0",
-        "@account-kit/react-native": "^4.31.0",
-        "@account-kit/signer": "^4.31.0",
-        "@account-kit/smart-contracts": "^4.31.0",
-        "@account-kit/react-native-signer": "^4.31.0",
-        react: "^19.0.0",
-        "react-dom": "^19.0.0",
-        viem: "2.22.6",
-      };
-      const devDependencies: Record<string, string> = {
-        "@types/react": "^19.0.10",
-        "@types/react-dom": "^19.0.4",
-        typescript: "^5.0.0",
-      };
+  // if (hasTwoslash && !fs.existsSync("/tmp/node_modules")) {
+  //   try {
+  //     const dependencies: Record<string, string> = {
+  //       "@aa-sdk/core": "^4.31.2",
+  //       "@account-kit/core": "^4.31.2",
+  //       "@account-kit/infra": "^4.31.2",
+  //       "@account-kit/react": "^4.31.2",
+  //       "@account-kit/react-native": "^4.31.2",
+  //       "@account-kit/react-native-signer": "^4.31.2",
+  //       "@account-kit/signer": "^4.31.2",
+  //       "@account-kit/smart-contracts": "^4.31.2",
+  //       "@tanstack/react-query": "^5.71.1",
+  //       "@types/hast": "^3.0.4",
+  //       "@typescript/vfs": "^1.6.1",
+  //       react: "^19.0.0",
+  //       "react-dom": "^19.0.0",
+  //       viem: "2.22.6",
+  //       google: "link:next/font/google",
+  //       "parse-numeric-range": "^1.3.0",
+  //       "qrcode.react": "^4.2.0",
+  //       "react-native": "^0.79.2",
+  //     };
+  //     const devDependencies: Record<string, string> = {
+  //       "@types/node": "^20.17.32",
+  //       "@types/react": "^19.0.10",
+  //       "@types/react-dom": "^19.0.4",
+  //       tsx: "^4.7.1",
+  //       typescript: "^5.0.0",
+  //     };
 
-      // Filter dependencies to only include those mentioned in the content
-      const filteredDependencies: Record<string, string> = {};
-      for (const [key, value] of Object.entries(dependencies)) {
-        if (content.includes(key)) {
-          filteredDependencies[key] = value;
-        }
-      }
+  //     // Filter dependencies to only include those mentioned in the content
+  //     const filteredDependencies: Record<string, string> = {};
+  //     for (const [key, value] of Object.entries(dependencies)) {
+  //       if (content.includes(key)) {
+  //         filteredDependencies[key] = value;
+  //       }
+  //     }
 
-      console.log("Attempting to create package.json for twoslash...");
+  //     console.log("Attempting to create package.json for twoslash...");
 
-      const packageJsonPath = path.join("/tmp", "package.json");
+  //     const packageJsonPath = path.join("/tmp", "package.json");
 
-      // Write the package.json file directly
-      await fs.promises.writeFile(
-        packageJsonPath,
-        JSON.stringify(
-          {
-            name: "docs",
-            private: true,
-            version: "3.8.2-alpha.1",
-            type: "module",
-            dependencies: filteredDependencies,
-            devDependencies,
-          },
-          null,
-          2
-        )
-      );
+  //     // Write the package.json file directly
+  //     await fs.promises.writeFile(
+  //       packageJsonPath,
+  //       JSON.stringify(
+  //         {
+  //           name: "docs",
+  //           private: true,
+  //           version: "3.8.2-alpha.1",
+  //           type: "module",
+  //           dependencies: filteredDependencies,
+  //           devDependencies,
+  //         },
+  //         null,
+  //         2
+  //       )
+  //     );
 
-      console.log(`Created package.json at ${packageJsonPath}`);
-      // Run npm install in the tmp directory
-      console.log("Running npm install in /tmp...");
-      await execPromise("pnpm install", {
-        cwd: "/tmp",
-      });
-      console.log("Successfully installed dependencies in /tmp");
-    } catch (error) {
-      console.error(
-        "Error creating package.json or installing dependencies:",
-        error
-      );
-    }
-  }
+  //     console.log(`Created package.json at ${packageJsonPath}`);
+  //     // Run npm install in the tmp directory
+  //     console.log("Running npm install in /tmp...");
+  //     await execPromise("pnpm install", {
+  //       cwd: "/tmp",
+  //     });
+  //     console.log("Successfully installed dependencies in /tmp");
+  //   } catch (error) {
+  //     console.error(
+  //       "Error creating package.json or installing dependencies:",
+  //       error
+  //     );
+  //   }
+  // }
 
   // let files: Record<string, string> = {};
   // let remoteFiles: Record<string, FileData> = {};
@@ -242,7 +251,7 @@ async function serializeTwoslashImpl(
                         //   lib: ["dom", "esnext"],
                         //   skipLibCheck: true,
                       },
-                      vfsRoot: "/tmp",
+                      // vfsRoot: "/tmp",
                     },
                   })
                 : null,
