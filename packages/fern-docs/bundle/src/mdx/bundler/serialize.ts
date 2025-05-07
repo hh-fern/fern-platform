@@ -107,6 +107,82 @@ async function serializeMdxImpl(
     );
   }
 
+  if (
+    content.includes("```ts twoslash") ||
+    content.includes("```tsx twoslash")
+  ) {
+    // Store the original content for comparison
+    const originalContent = content;
+
+    // Extract all twoslash code blocks
+    const twoslashRegex =
+      /```(?:ts|tsx) twoslash(?:[^`\n]*?)\n([\s\S]*?)\n```/g;
+    const twoslashBlocks: { fullMatch: string; codeContent: string }[] = [];
+
+    let match;
+    while ((match = twoslashRegex.exec(originalContent)) != null) {
+      if (match[0] && match[1]) {
+        // Find the actual end of this code block
+        const fullMatch = match[0];
+        const codeContent = match[1].trim();
+
+        // Ensure we're not including content from other code blocks
+        const endIndex = fullMatch.lastIndexOf("```");
+        const actualFullMatch = fullMatch.substring(0, endIndex + 3);
+
+        twoslashBlocks.push({
+          fullMatch: actualFullMatch,
+          codeContent,
+        });
+      }
+    }
+
+    if (twoslashBlocks.length > 0) {
+      // Process each block individually
+      for (const block of twoslashBlocks) {
+        const ignoreErrors = block.codeContent.includes("noErrors")
+          ? ""
+          : "// @noErrors\n";
+
+        const serviceContent = `\`\`\`${block.fullMatch.includes("tsx") ? "tsx" : "ts"} twoslash\n${ignoreErrors}${block.codeContent}\n\`\`\``;
+
+        try {
+          const response = await fetch(
+            "https://mdx-bundler-dev2.buildwithfern.com/serialize",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ code: serviceContent }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              `Failed to serialize TwoSlash: ${response.statusText}`
+            );
+          }
+
+          const result = await response.json();
+
+          // Replace only this specific block
+          const twoSlashContent = {
+            code: result.code,
+            jsxElements: result.jsxElements || [],
+          };
+          content = content.replace(
+            block.fullMatch,
+            `<TwoSlash content={${JSON.stringify(twoSlashContent)}} />`
+          );
+        } catch (error) {
+          console.error("Error processing twoslash block:", error);
+          // If there's an error, we keep the original content for this block
+        }
+      }
+    }
+  }
+
   let files: Record<string, string> = {};
   let remoteFiles: Record<string, FileData> = {};
   const jsxElements: string[] = [];

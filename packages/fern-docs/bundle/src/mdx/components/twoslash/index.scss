@@ -50,7 +50,7 @@ html.dark .shiki span {
 }
 
 .twoslash .twoslash-popup-info-hover {
-  position: fixed;
+  position: absolute;
   opacity: 0;
   display: inline-flex;
   flex-direction: column;
