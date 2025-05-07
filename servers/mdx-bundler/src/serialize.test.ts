@@ -114,3 +114,15 @@ it("should serialize twoslash-js.mdx", async () => {
     join(__dirname, "__snapshots__", "twoslash-js.js")
   );
 });
+
+it("should serialize twoslash-alchemy-react.mdx", async () => {
+  const result = await serializeTwoslash(
+    readFileSync(
+      join(__dirname, "fixtures", "twoslash-alchemy-react.mdx"),
+      "utf-8"
+    )
+  );
+  await expect(deterministic(result?.code)).toMatchFileSnapshot(
+    join(__dirname, "__snapshots__", "twoslash-alchemy-react.js")
+  );
+});
