@@ -18,7 +18,6 @@ import {
 import { isLocal } from "@/server/isLocal";
 import { postToEngineeringNotifs } from "@/server/slack";
 import { Gate, withBasicTokenAnonymous } from "@/server/withRbac";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 export const maxDuration = 800; // 13 minutes
 
@@ -33,8 +32,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const openai = createOpenAI({ apiKey: openaiApiKey() });
   const embeddingModel = openai.embedding("text-embedding-3-large");
 
-  const host = req.nextUrl.host;
-  const domain = getDocsDomainEdge(req);
+  // const host = req.nextUrl.host;
+  const host = "alchemy.com";
+  // const domain = getDocsDomainEdge(req);
+  const domain = "alchemy.com";
   const deleteExisting =
     req.nextUrl.searchParams.get("deleteExisting") === "true";
   const namespace = `${withoutStaging(domain)}_${embeddingModel.modelId}`;
