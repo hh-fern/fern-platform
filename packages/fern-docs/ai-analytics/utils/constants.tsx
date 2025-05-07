@@ -20,7 +20,7 @@ export const DOMAINS = [
   "alchemy",
   "adobe",
   "firefly",
-  "webflow-ai",
+  "developers.webflow.com",
   "openledger.com",
   "flagright.com",
   "cohere-test",
