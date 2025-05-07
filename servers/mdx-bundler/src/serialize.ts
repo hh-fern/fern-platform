@@ -1,3 +1,16 @@
+// uncomment this to log the tree to the console in localhost only (DO NOT COMMIT)
+// function rehypeLog() {
+//   return (_tree: Hast.Root) => {
+//     // console.debug(JSON.stringify(tree));
+//   };
+// }
+import { LocalAccountSigner } from "@aa-sdk/core";
+import {
+  alchemy,
+  createAlchemySmartAccountClient,
+  sepolia,
+} from "@account-kit/infra";
+import { createLightAccount } from "@account-kit/smart-contracts";
 import { RehypeShikiOptions } from "@shikijs/rehype";
 import {
   transformerNotationDiff,
@@ -5,24 +18,12 @@ import {
   transformerNotationHighlight,
 } from "@shikijs/transformers";
 import { transformerTwoslash } from "@shikijs/twoslash";
-// import { exec } from "child_process";
 import { bundleMDX } from "mdx-bundler";
 import path from "path";
 import ts from "typescript";
-
-// import { promisify } from "util";
+import { generatePrivateKey } from "viem/accounts";
 
 import { isNonNullish } from "@fern-api/ui-core-utils";
-// import rehypeKatex from "rehype-katex";
-// import remarkFrontmatter from "remark-frontmatter";
-// import remarkGemoji from "remark-gemoji";
-// import remarkGfm from "remark-gfm";
-// import remarkMath from "remark-math";
-// import remarkMdxFrontmatter from "remark-mdx-frontmatter";
-// import remarkSmartypants from "remark-smartypants";
-// import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
-// import { noop } from "ts-essentials";
-
 import {
   type PluggableList,
   sanitizeBreaks,
@@ -31,32 +32,6 @@ import {
 } from "@fern-docs/mdx";
 
 import { rehypeShikiDisplayNotation } from "./plugins/display-shiki-notation";
-// import {
-//   rehypeAcornErrorBoundary,
-//   rehypeExpressionToMd,
-//   rehypeMdxClassStyle,
-//   rehypeSlug,
-//   rehypeToc,
-//   remarkInjectEsm,
-//   remarkSanitizeAcorn,
-// } from "@fern-docs/mdx/plugins";
-
-// import { DocsLoader } from "./docs-loader";
-// import { rehypeAccordionNestedHeaders } from "./plugins/rehype-accordion-nested-headers";
-// import { rehypeAccordions } from "./plugins/rehype-accordions";
-// import { rehypeButtons } from "./plugins/rehype-buttons";
-// import { rehypeCards } from "./plugins/rehype-cards";
-// import { rehypeCodeBlock } from "./plugins/rehype-code-block";
-// import { rehypeCollectJsx } from "./plugins/rehype-collect-jsx";
-// import { rehypeEndpointSnippets } from "../plugins/rehype-endpoint-snippets";
-// import { rehypeExtractAsides } from "../plugins/rehype-extract-asides";
-// import { rehypeFiles } from "../plugins/rehype-files";
-// import { RehypeLinksOptions } from "./plugins/rehype-links";
-// import { rehypeMigrateJsx } from "./plugins/rehype-migrate-jsx";
-// import { conditionalRehypeShiki } from "../plugins/rehype-shiki-twoslash";
-// import { rehypeSteps } from "./plugins/rehype-steps";
-// import { rehypeTabs } from "./plugins/rehype-tabs";
-// import { remarkExtractTitle } from "./plugins/remark-extract-title";
 import { conditionalRehypeShiki } from "./plugins/rehype-shiki-twoslash";
 import { twoslashRenderer } from "./plugins/twoslashRenderer";
 import { twoslasher } from "./plugins/twoslasher";
@@ -86,7 +61,6 @@ async function serializeTwoslashImpl(
   //   } catch {
   //     console.error("Failed to get cwd from filename", filename);
   //   }
-  // }
 
   if (process.platform === "win32") {
     process.env.ESBUILD_BINARY_PATH = path.join(
@@ -228,15 +202,6 @@ async function serializeTwoslashImpl(
               transformerNotationHighlight(),
               hasTwoslash
                 ? transformerTwoslash({
-                    onTwoslashError: (
-                      error: unknown,
-                      code: string,
-                      lang: string
-                    ) => {
-                      console.error("Twoslash error occurred:", error);
-                      console.error("Code:", code);
-                      console.error("Language:", lang);
-                    },
                     explicitTrigger: true,
                     throws: false,
                     twoslasher: twoslasher(),
@@ -244,14 +209,30 @@ async function serializeTwoslashImpl(
                     twoslashOptions: {
                       customTags: ["allowErrors"],
                       compilerOptions: {
+                        target: ts.ScriptTarget.ES2020,
+                        module: ts.ModuleKind.ESNext,
+                        moduleResolution: ts.ModuleResolutionKind.Node10,
+                        esModuleInterop: true,
                         jsx: ts.JsxEmit.ReactJSX,
-                        //   module: ts.ModuleKind.NodeNext,
-                        //   moduleResolution: ts.ModuleResolutionKind.NodeNext,
-                        //   esModuleInterop: true,
-                        //   lib: ["dom", "esnext"],
-                        //   skipLibCheck: true,
+                        lib: ["dom", "dom.iterable", "esnext"],
+                        skipLibCheck: true,
+                        allowJs: true,
+                        resolveJsonModule: true,
+                        isolatedModules: true,
+                        noEmit: true,
+                        strict: true,
+                        forceConsistentCasingInFileNames: true,
+                        allowSyntheticDefaultImports: true,
+                        moduleDetection: ts.ModuleDetectionKind.Force,
+                        verbatimModuleSyntax: true,
+                        baseUrl: process.cwd(),
+                        paths: {
+                          "@aa-sdk/*": ["node_modules/@aa-sdk/*"],
+                          "@account-kit/*": ["node_modules/@account-kit/*"],
+                          "viem/*": ["node_modules/viem/*"],
+                        },
                       },
-                      // vfsRoot: "/tmp",
+                      vfsRoot: process.cwd(),
                     },
                   })
                 : null,
@@ -342,9 +323,43 @@ export function serializeTwoslash(
   });
 }
 
-// uncomment this to log the tree to the console in localhost only (DO NOT COMMIT)
-// function rehypeLog() {
-//   return (_tree: Hast.Root) => {
-//     // console.debug(JSON.stringify(tree));
-//   };
 // }
+
+// eslint-disable-next-line unused-imports/no-unused-vars
+const doNotRun = async () => {
+  // with account hoisting
+  const transport = alchemy({ apiKey: "your-api-key" });
+  const hoistedClient = createAlchemySmartAccountClient({
+    transport,
+    chain: sepolia,
+    account: await createLightAccount({
+      signer:
+        LocalAccountSigner.privateKeyToAccountSigner(generatePrivateKey()),
+      chain: sepolia,
+      transport,
+    }),
+  });
+
+  const signature = await hoistedClient.signMessage({
+    message: "Hello world! ",
+  });
+  console.log(signature);
+
+  // without account hoisting
+  const nonHoistedClient = createAlchemySmartAccountClient({
+    transport,
+    chain: sepolia,
+  });
+
+  const lightAccount = await createLightAccount({
+    signer: LocalAccountSigner.privateKeyToAccountSigner(generatePrivateKey()),
+    chain: sepolia,
+    transport,
+  });
+
+  const signature2 = await nonHoistedClient.signMessage({
+    message: "Hello world! ",
+    account: lightAccount,
+  });
+  console.log(signature2);
+};
