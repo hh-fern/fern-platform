@@ -9,7 +9,11 @@ import { EnumTypeDefinition } from "./EnumTypeDefinition";
 import { EnumValue } from "./EnumValue";
 import { FernCollapseWithButtonUncontrolled } from "./FernCollapseWithButtonUncontrolled";
 import { ObjectProperty } from "./ObjectProperty";
-import { TypeDefinitionContextValue, TypeDefinitionPathPart, useTypeDefinitionContext } from "./TypeDefinitionContext";
+import {
+  TypeDefinitionContextValue,
+  TypeDefinitionPathPart,
+  useTypeDefinitionContext,
+} from "./TypeDefinitionContext";
 import { WithSeparator } from "./TypeDefinitionDetails";
 import { UndiscriminatedUnionVariant } from "./UndiscriminatedUnionVariant";
 
@@ -86,7 +90,7 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
         shape,
         types
       ).properties;
-      const filteredProperties = properties.filter(property => 
+      const filteredProperties = properties.filter((property) =>
         shouldIncludeObjectProperty(property, typeDefinitionContext)
       );
       return (
@@ -114,8 +118,19 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
   }
 });
 
-export const shouldIncludeObjectProperty = (property: ApiDefinition.ObjectProperty, typeDefinitionContext: TypeDefinitionContextValue) => {
-  if (typeDefinitionContext.isRequest && property.propertyAccess === "READ_ONLY") return false;
-  if (typeDefinitionContext.isResponse && property.propertyAccess === "WRITE_ONLY") return false;
+export const shouldIncludeObjectProperty = (
+  property: ApiDefinition.ObjectProperty,
+  typeDefinitionContext: TypeDefinitionContextValue
+) => {
+  if (
+    typeDefinitionContext.isRequest &&
+    property.propertyAccess === "READ_ONLY"
+  )
+    return false;
+  if (
+    typeDefinitionContext.isResponse &&
+    property.propertyAccess === "WRITE_ONLY"
+  )
+    return false;
   return true;
-}
+};

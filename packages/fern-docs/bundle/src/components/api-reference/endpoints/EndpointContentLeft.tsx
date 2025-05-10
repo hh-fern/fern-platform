@@ -9,8 +9,8 @@ import { MdxServerComponentProseSuspense } from "@/mdx/components/server-compone
 import { ObjectProperty } from "../type-definitions/ObjectProperty";
 import {
   TypeDefinitionAnchorPart,
+  TypeDefinitionRequest,
   TypeDefinitionResponse,
-  TypeDefinitionRequest
 } from "../type-definitions/TypeDefinitionContext";
 import { WithSeparator } from "../type-definitions/TypeDefinitionDetails";
 import { EndpointErrorGroup } from "./EndpointErrorGroup";
