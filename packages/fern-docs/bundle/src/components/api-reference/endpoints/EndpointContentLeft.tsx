@@ -10,6 +10,7 @@ import { ObjectProperty } from "../type-definitions/ObjectProperty";
 import {
   TypeDefinitionAnchorPart,
   TypeDefinitionResponse,
+  TypeDefinitionRequest
 } from "../type-definitions/TypeDefinitionContext";
 import { WithSeparator } from "../type-definitions/TypeDefinitionDetails";
 import { EndpointErrorGroup } from "./EndpointErrorGroup";
@@ -62,6 +63,7 @@ export async function EndpointContentLeft({
           hidden: false,
           valueShape: stringShape,
           availability: undefined,
+          propertyAccess: undefined,
         };
       },
       bearerAuth: (bearerAuth) => {
@@ -73,6 +75,7 @@ export async function EndpointContentLeft({
           hidden: false,
           valueShape: stringShape,
           availability: undefined,
+          propertyAccess: undefined,
         };
       },
       header: (value) => {
@@ -85,6 +88,7 @@ export async function EndpointContentLeft({
           hidden: false,
           valueShape: stringShape,
           availability: undefined,
+          propertyAccess: undefined,
         };
       },
       oAuth: (value) => {
@@ -104,6 +108,7 @@ export async function EndpointContentLeft({
                 hidden: false,
                 valueShape: stringShape,
                 availability: undefined,
+                propertyAccess: undefined,
               }),
             }),
         });
@@ -188,27 +193,29 @@ export async function EndpointContentLeft({
           </TypeDefinitionAnchorPart>
         )}
         {endpoint.requests?.[0] != null && (
-          <EndpointSection
-            title="Request"
-            description={
-              <MdxServerComponentProseSuspense
-                size="sm"
-                className="text-(color:--grayscale-a11)"
-                mdx={endpoint.requests[0].description}
-                fallback={createEndpointRequestDescriptionFallback(
-                  endpoint.requests[0],
-                  types
-                )}
-              />
-            }
-          >
-            <TypeDefinitionAnchorPart part="body">
-              <EndpointRequestSection
-                request={endpoint.requests[0]}
-                types={types}
-              />
-            </TypeDefinitionAnchorPart>
-          </EndpointSection>
+          <TypeDefinitionRequest>
+            <EndpointSection
+              title="Request"
+              description={
+                <MdxServerComponentProseSuspense
+                  size="sm"
+                  className="text-(color:--grayscale-a11)"
+                  mdx={endpoint.requests[0].description}
+                  fallback={createEndpointRequestDescriptionFallback(
+                    endpoint.requests[0],
+                    types
+                  )}
+                />
+              }
+            >
+              <TypeDefinitionAnchorPart part="body">
+                <EndpointRequestSection
+                  request={endpoint.requests[0]}
+                  types={types}
+                />
+              </TypeDefinitionAnchorPart>
+            </EndpointSection>
+          </TypeDefinitionRequest>
         )}
       </TypeDefinitionAnchorPart>
       <TypeDefinitionResponse>

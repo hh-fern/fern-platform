@@ -14,11 +14,12 @@ import { useCurrentPathname } from "@/hooks/use-current-pathname";
 import { JsonPropertyPath } from "../examples/JsonPropertyPath";
 import { JsonPropertyPathPart } from "../examples/JsonPropertyPath";
 
-interface TypeDefinitionContextValue {
+export interface TypeDefinitionContextValue {
   types: Record<string, TypeDefinition>;
   isRootTypeDefinition: boolean;
   jsonPropertyPath: JsonPropertyPath;
   isResponse: boolean | undefined;
+  isRequest: boolean | undefined;
   slug: string;
   anchorIdParts: readonly string[];
   collapsible: boolean;
@@ -47,6 +48,7 @@ export function TypeDefinitionRoot({
     isRootTypeDefinition: true,
     jsonPropertyPath: [],
     isResponse: undefined,
+    isRequest: undefined,
     types,
     slug,
     anchorIdParts: [],
@@ -115,6 +117,24 @@ export function TypeDefinitionResponse({
   const contextValue = React.useRef(() => ({
     ...parent,
     isResponse: true,
+  }));
+
+  return (
+    <TypeDefinitionContext.Provider value={contextValue.current}>
+      {children}
+    </TypeDefinitionContext.Provider>
+  );
+}
+
+export function TypeDefinitionRequest({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const parent = useTypeDefinitionContext();
+  const contextValue = React.useRef(() => ({
+    ...parent,
+    isRequest: true,
   }));
 
   return (

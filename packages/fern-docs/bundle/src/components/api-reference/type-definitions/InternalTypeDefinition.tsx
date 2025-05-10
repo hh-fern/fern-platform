@@ -9,7 +9,7 @@ import { EnumTypeDefinition } from "./EnumTypeDefinition";
 import { EnumValue } from "./EnumValue";
 import { FernCollapseWithButtonUncontrolled } from "./FernCollapseWithButtonUncontrolled";
 import { ObjectProperty } from "./ObjectProperty";
-import { TypeDefinitionPathPart } from "./TypeDefinitionContext";
+import { TypeDefinitionContextValue, TypeDefinitionPathPart, useTypeDefinitionContext } from "./TypeDefinitionContext";
 import { WithSeparator } from "./TypeDefinitionDetails";
 import { UndiscriminatedUnionVariant } from "./UndiscriminatedUnionVariant";
 
@@ -32,6 +32,8 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
     | ApiDefinition.TypeReference.Primitive;
   types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
 }) {
+  const typeDefinitionContext = useTypeDefinitionContext();
+
   switch (shape.type) {
     case "enum": {
       return (
@@ -84,13 +86,16 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
         shape,
         types
       ).properties;
+      const filteredProperties = properties.filter(property => 
+        shouldIncludeObjectProperty(property, typeDefinitionContext)
+      );
       return (
         <FernCollapseWithButtonUncontrolled
           showText={`Show ${properties.length} properties`}
           hideText={`Hide ${properties.length} properties`}
         >
           <WithSeparator>
-            {properties.map((property) => (
+            {filteredProperties.map((property) => (
               <TypeDefinitionPathPart
                 key={property.key}
                 part={{ type: "objectProperty", propertyName: property.key }}
@@ -108,3 +113,9 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
       throw new UnreachableCaseError(shape);
   }
 });
+
+export const shouldIncludeObjectProperty = (property: ApiDefinition.ObjectProperty, typeDefinitionContext: TypeDefinitionContextValue) => {
+  if (typeDefinitionContext.isRequest && property.propertyAccess === "READ_ONLY") return false;
+  if (typeDefinitionContext.isResponse && property.propertyAccess === "WRITE_ONLY") return false;
+  return true;
+}
