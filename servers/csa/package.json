@@ -14,7 +14,7 @@
     "docker:run": "docker run -v $(pwd)/fixtures:/app/fixtures csa -- simple-multiple.mdx"
   },
   "dependencies": {
-    "tsx": "^4.19.3"
+    "tsx": "^4.7.1"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",
