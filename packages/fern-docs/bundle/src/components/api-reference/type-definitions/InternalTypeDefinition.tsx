@@ -10,9 +10,8 @@ import { EnumValue } from "./EnumValue";
 import { FernCollapseWithButtonUncontrolled } from "./FernCollapseWithButtonUncontrolled";
 import { ObjectProperty } from "./ObjectProperty";
 import {
-  TypeDefinitionContextValue,
-  TypeDefinitionPathPart,
-  useTypeDefinitionContext,
+  IncludeObjectProperty,
+  TypeDefinitionPathPart
 } from "./TypeDefinitionContext";
 import { WithSeparator } from "./TypeDefinitionDetails";
 import { UndiscriminatedUnionVariant } from "./UndiscriminatedUnionVariant";
@@ -36,7 +35,6 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
     | ApiDefinition.TypeReference.Primitive;
   types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
 }) {
-  const typeDefinitionContext = useTypeDefinitionContext();
 
   switch (shape.type) {
     case "enum": {
@@ -86,26 +84,32 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
         </FernCollapseWithButtonUncontrolled>
       );
     case "object": {
+      console.log("SHAPE");
+      console.log(JSON.stringify(shape, null, 2));
       const properties = ApiDefinition.unwrapObjectType(
         shape,
         types
       ).properties;
-      const filteredProperties = properties.filter((property) =>
-        shouldIncludeObjectProperty(property, typeDefinitionContext)
-      );
+      console.log("PROPERTIES");
+      console.log(JSON.stringify(properties, null, 2));
       return (
         <FernCollapseWithButtonUncontrolled
           showText={`Show ${properties.length} properties`}
           hideText={`Hide ${properties.length} properties`}
         >
           <WithSeparator>
-            {filteredProperties.map((property) => (
-              <TypeDefinitionPathPart
+            {properties.map((property) => (
+              <IncludeObjectProperty
                 key={property.key}
-                part={{ type: "objectProperty", propertyName: property.key }}
+                property={property}
               >
-                <ObjectProperty property={property} types={types} />
-              </TypeDefinitionPathPart>
+                <TypeDefinitionPathPart
+                  key={property.key}
+                  part={{ type: "objectProperty", propertyName: property.key }}
+                >
+                  <ObjectProperty property={property} types={types} />
+                </TypeDefinitionPathPart>
+              </IncludeObjectProperty>
             ))}
           </WithSeparator>
         </FernCollapseWithButtonUncontrolled>
@@ -117,20 +121,3 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
       throw new UnreachableCaseError(shape);
   }
 });
-
-export const shouldIncludeObjectProperty = (
-  property: ApiDefinition.ObjectProperty,
-  typeDefinitionContext: TypeDefinitionContextValue
-) => {
-  if (
-    typeDefinitionContext.isRequest &&
-    property.propertyAccess === "READ_ONLY"
-  )
-    return false;
-  if (
-    typeDefinitionContext.isResponse &&
-    property.propertyAccess === "WRITE_ONLY"
-  )
-    return false;
-  return true;
-};
