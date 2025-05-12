@@ -1,0 +1,23 @@
+{
+  "name": "@fern-platform/csa",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "audit": "node dist/src/index.js",
+    "build": "tsc --build",
+    "clean": "rm -rf ./dist && tsc --build --clean",
+    "docker:build": "docker build -t csa .",
+    "docker:run": "docker run -v $(pwd)/fixtures:/app/fixtures csa -- simple-multiple.mdx"
+  },
+  "dependencies": {
+    "tsx": "^4.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3"
+  }
+}
