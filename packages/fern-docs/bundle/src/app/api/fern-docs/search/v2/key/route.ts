@@ -13,7 +13,6 @@ import { COOKIE_FERN_TOKEN, withoutStaging } from "@fern-docs/utils";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "edge";
 export const maxDuration = 10;
 export const dynamic = "force-dynamic";
 
