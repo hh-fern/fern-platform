@@ -159,7 +159,9 @@ export default async function Home({
           domain,
           content: cleanedInput,
           created: new Date(convo.created),
-          conversationId: convo.id,
+          conversationId: convo.conversationId
+            ? convo.conversationId
+            : convo.id,
           timeToFirstToken: convo.metrics.time_to_first_token,
           conversationDuration: convo.metrics.end - convo.metrics.start,
           promptTokens: convo.metrics.prompt_tokens,
