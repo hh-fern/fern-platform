@@ -59,14 +59,29 @@ export const OpenAISearchOption = (): FernDropdown.ValueOption => {
   } as FernDropdown.ValueOption;
 };
 
-export const OpenLLMSTxtOption = (): FernDropdown.ValueOption => {
+const resolveParam = (param: ParamValue): string => {
+  if (typeof param === "string") {
+    return decodeURIComponent(param);
+  } else if (Array.isArray(param)) {
+    return decodeURIComponent(param.join("/"));
+  } else {
+    return "";
+  }
+};
+
+export const OpenLLMSTxtOption = ({
+  domain,
+}: {
+  domain: ParamValue;
+}): FernDropdown.ValueOption => {
+  const decodedDomain = resolveParam(domain);
   return {
     type: "value",
     value: "open-llms-txt",
     label: "LLM?",
     helperText: "Read llms.txt",
     icon: <TextIcon key="llms-txt-logo" />,
-    href: `/llms.txt`,
+    href: `https://${decodedDomain}/llms.txt`,
   } as FernDropdown.ValueOption;
 };
 
@@ -81,16 +96,6 @@ export const OpenWithLLM = ({
   slug: ParamValue;
   llm: LLM_OPTIONS;
 }): FernDropdown.ValueOption => {
-  const resolveParam = (param: ParamValue): string => {
-    if (typeof param === "string") {
-      return decodeURIComponent(param);
-    } else if (Array.isArray(param)) {
-      return decodeURIComponent(param.join("/"));
-    } else {
-      return "";
-    }
-  };
-
   const decodedDomain = resolveParam(domain);
   const decodedSlug = resolveParam(slug);
 
