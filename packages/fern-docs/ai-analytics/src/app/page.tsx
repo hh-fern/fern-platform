@@ -161,7 +161,7 @@ export default async function Home({
           created: new Date(convo.created),
           conversationId: convo.conversationId
             ? convo.conversationId
-            : convo.id,
+            : undefined,
           timeToFirstToken: convo.metrics.time_to_first_token,
           conversationDuration: convo.metrics.end - convo.metrics.start,
           promptTokens: convo.metrics.prompt_tokens,
