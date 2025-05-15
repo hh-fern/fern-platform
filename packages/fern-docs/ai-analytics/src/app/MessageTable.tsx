@@ -137,15 +137,15 @@ export function MessageTableClient({
                 <Table.Cell>
                   <Button
                     color="gray"
-                    onClick={() => toggleRow(item.conversationId)}
+                    onClick={() => toggleRow(item.braintrustId)}
                     className="flex items-center justify-center"
                     aria-label={
-                      expandedRows[item.conversationId]
+                      expandedRows[item.braintrustId]
                         ? "Collapse row"
                         : "Expand row"
                     }
                   >
-                    {expandedRows[item.conversationId] ? (
+                    {expandedRows[item.braintrustId] ? (
                       <ChevronDown className="h-4 w-4" />
                     ) : (
                       <ChevronRight className="h-4 w-4" />
@@ -156,7 +156,7 @@ export function MessageTableClient({
                   {item.domain}
                 </Table.Cell>
                 <Table.Cell className="border border-gray-200 p-4">
-                  {expandedRows[item.conversationId] ? (
+                  {expandedRows[item.braintrustId] ? (
                     <div style={{ padding: "10px" }}>
                       {item.content.map((message, msgIndex) => (
                         <Card

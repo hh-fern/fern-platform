@@ -157,6 +157,7 @@ export default async function Home({
         cleanedInput.push(convo.output.message);
         processedData.push({
           domain,
+          braintrustId: convo.id,
           content: cleanedInput,
           created: new Date(convo.created),
           conversationId: convo.metadata.conversationId
