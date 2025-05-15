@@ -101,7 +101,7 @@ export default async function Home({
   const thresholdDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * daysBack);
   const fromDate = params.fromDate;
   const toDate = params.toDate;
-  const chatLogs = await fetchChatLogs(
+  const chatLogs: ChatLog[] = await fetchChatLogs(
     BRAINTRUST_PROJECT_ID,
     process.env.BRAINTRUST_API_KEY || "",
     thresholdDate,
@@ -115,20 +115,24 @@ export default async function Home({
     if (convo.input !== null && convo.output !== null) {
       try {
         let domain = "";
-        convo.input.forEach((msg: APIMessage) => {
-          // find domain from preamble
-          if (msg.role === "system") {
-            if (typeof msg.content === "string") {
-              for (const _domain of DOMAINS) {
-                if (msg.content && msg.content.includes(_domain)) {
-                  domain = _domain;
-                  break;
+        if (convo.domain) {
+          domain = convo.domain;
+        } else {
+          convo.input.forEach((msg: APIMessage) => {
+            // find domain from preamble
+            if (msg.role === "system") {
+              if (typeof msg.content === "string") {
+                for (const _domain of DOMAINS) {
+                  if (msg.content && msg.content.includes(_domain)) {
+                    domain = _domain;
+                    break;
+                  }
                 }
+                if (domain === "") domain = "unknown";
               }
-              if (domain === "") domain = "unknown";
             }
-          }
-        });
+          });
+        }
 
         const cleanedInput = convo.input
           .map((msg: APIMessage) => {

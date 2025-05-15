@@ -3,8 +3,27 @@ import { Conversation, Message } from "./types";
 export function deduplicateConversation(
   messages: Conversation[]
 ): Conversation[] {
+  // filter into two buckets and handle separately - conversations with conversationId and those without
+  const withConversationId = messages.filter((msg) => msg.conversationId);
+  const withoutConversationId = messages.filter((msg) => !msg.conversationId);
+
+  // for those with conversationId, return latest conversationId
+  const conversationIdMap = new Map<string, Conversation>();
+  withConversationId.forEach((msg) => {
+    if (!conversationIdMap.has(msg.conversationId)) {
+      conversationIdMap.set(msg.conversationId, msg);
+    } else {
+      const existingDate =
+        conversationIdMap.get(msg.conversationId) || new Date("1970-01-01");
+      if (msg.created > existingDate) {
+        conversationIdMap.set(msg.conversationId, msg);
+      }
+    }
+  });
+  const conversationsWithIds = Array.from(conversationIdMap.values());
+
   // Sort messages by length (descending) to process longer conversations first
-  const sortedMessages = [...messages].sort(
+  const sortedMessages = [...withoutConversationId].sort(
     (a, b) => b.content.length - a.content.length
   );
 
@@ -36,7 +55,13 @@ export function deduplicateConversation(
     }
   });
 
-  return retainedMessages;
+  const dedupedUnsortedMessages = [
+    ...conversationsWithIds,
+    ...retainedMessages,
+  ];
+  return dedupedUnsortedMessages.sort(
+    (a, b) => a.created.getTime() - b.created.getTime()
+  );
 }
 
 function createConversationSignature(messages: Message[]): string[] {
