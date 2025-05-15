@@ -115,7 +115,7 @@ export default async function Home({
     if (convo.input !== null && convo.output !== null) {
       try {
         let domain = "";
-        if (convo.domain) {
+        if (convo.metadata.domain) {
           domain = convo.domain;
         } else {
           convo.input.forEach((msg: APIMessage) => {
@@ -159,8 +159,8 @@ export default async function Home({
           domain,
           content: cleanedInput,
           created: new Date(convo.created),
-          conversationId: convo.conversationId
-            ? convo.conversationId
+          conversationId: convo.metadata.conversationId
+            ? convo.metadata.conversationId
             : undefined,
           timeToFirstToken: convo.metrics.time_to_first_token,
           conversationDuration: convo.metrics.end - convo.metrics.start,
