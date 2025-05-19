@@ -58,6 +58,25 @@ export function convertAPIDefinitionToDb(
     },
     types: Object.fromEntries(
       Object.entries(writeShape.types).map(([typeId, typeDefinition]) => {
+        if (typeDefinition.shape.type === "undiscriminatedUnion") {
+          typeDefinition.shape.variants = typeDefinition.shape.variants.map(
+            (variant) => {
+              let displayName: string | undefined;
+              if (variant.typeName != null) {
+                const type =
+                  writeShape.types[variant.typeName as APIV1Write.TypeId];
+                if (type != null) {
+                  displayName = type.displayName;
+                }
+              }
+              return {
+                ...variant,
+                displayName,
+              };
+            }
+          );
+        }
+
         return [
           typeId,
           transformTypeDefinition({ writeShape: typeDefinition }),
@@ -726,7 +745,9 @@ function transformDiscriminatedVariant({
 function transformUnDiscriminatedVariant({
   writeShape,
 }: {
-  writeShape: APIV1Write.UndiscriminatedUnionVariant;
+  writeShape: APIV1Write.UndiscriminatedUnionVariant & {
+    displayName?: string;
+  };
 }): FdrAPI.api.v1.read.UndiscriminatedUnionVariant {
   // const htmlDescription = getHtmlDescription(writeShape.description);
   return {
@@ -735,7 +756,10 @@ function transformUnDiscriminatedVariant({
     // htmlDescription,
     type: writeShape.type,
     displayName:
-      writeShape.typeName != null ? titleCase(writeShape.typeName) : undefined,
+      writeShape.displayName ??
+      (writeShape.typeName != null
+        ? titleCase(writeShape.typeName)
+        : undefined),
     // descriptionContainsMarkdown: true,
   };
 }
