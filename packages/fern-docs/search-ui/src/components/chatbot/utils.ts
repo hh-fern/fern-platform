@@ -81,6 +81,7 @@ export function combineSearchResults(
   messages: SqueezedMessage[]
 ): AlgoliaRecordHit[] {
   return (
+    console.log(messages),
     messages
       .flatMap((message) => message.toolInvocations ?? [])
       .flatMap((invocation) =>

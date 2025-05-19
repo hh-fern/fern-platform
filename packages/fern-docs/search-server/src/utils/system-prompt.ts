@@ -29,12 +29,6 @@ Use [^1] at the end of a sentence to link to a footnote. Then at the end, provid
 [^1]: https://{{domain}}/<path>
 
 {{promptTemplate}}
-
----
-
-Use the following documents to answer the user's question:
-
-{{documents}}
 `,
     { interpolate: /{{([^}]+)}}/g }
   )(data);
