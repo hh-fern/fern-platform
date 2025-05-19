@@ -763,7 +763,9 @@ const AskAICommandItems = memo<{
                         {isLoading &&
                           (!message.toolInvocations ||
                             message.toolInvocations.some(
-                              (invocation) => invocation.state !== "result"
+                              (invocation) =>
+                                invocation.type === "tool-invocation" &&
+                                invocation.toolInvocation.state !== "result"
                             )) && (
                             <p className="text-(color:--grayscale-a10) thinking-dots">
                               Thinking

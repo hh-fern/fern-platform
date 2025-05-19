@@ -1,4 +1,3 @@
-import { ToolInvocation } from "ai";
 import { Message } from "ai/react";
 import { z } from "zod";
 
@@ -27,7 +26,7 @@ export interface SqueezedMessage {
     createdAt?: Date;
     content: string;
   };
-  toolInvocations?: ToolInvocation[];
+  toolInvocations?: Message["parts"];
 }
 
 export function squeezeMessages(messages: Message[]): SqueezedMessage[] {
@@ -43,7 +42,9 @@ export function squeezeMessages(messages: Message[]): SqueezedMessage[] {
           createdAt: message.createdAt,
           content: message.content,
         },
-        toolInvocations: message.toolInvocations,
+        toolInvocations: message.parts?.filter(
+          (part) => part.type === "tool-invocation"
+        ),
       });
     } else if (message.role === "assistant") {
       if (lastMessage == null) {
@@ -67,7 +68,8 @@ export function squeezeMessages(messages: Message[]): SqueezedMessage[] {
 
       lastMessage.toolInvocations = [
         ...(lastMessage.toolInvocations ?? []),
-        ...(message.toolInvocations ?? []),
+        ...(message.parts?.filter((part) => part.type === "tool-invocation") ??
+          []),
       ];
     }
   }
@@ -82,10 +84,11 @@ export function combineSearchResults(
     messages
       .flatMap((message) => message.toolInvocations ?? [])
       .flatMap((invocation) =>
-        invocation.state === "result" &&
-        invocation.toolName === "search" &&
-        Array.isArray(invocation.result)
-          ? invocation.result
+        invocation.type === "tool-invocation" &&
+        invocation.toolInvocation.state === "result" &&
+        invocation.toolInvocation.toolName === "search" &&
+        Array.isArray(invocation.toolInvocation.result)
+          ? invocation.toolInvocation.result
           : []
       )
       // .map((result) => SearchResult.safeParse(result).data)
