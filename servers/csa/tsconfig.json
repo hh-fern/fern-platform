@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "isolatedModules": false,
+    "allowJs": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "jsx": "preserve",
+    "lib": ["esnext", "dom", "dom.iterable", "webworker"],
+    "allowSyntheticDefaultImports": true,
+    "types": ["node"],
+    "target": "es2020",
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*"]
+}

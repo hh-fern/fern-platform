@@ -1,0 +1,28 @@
+{
+  "name": "@fern-platform/csa",
+  "version": "0.1.0",
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "audit": "node dist/src/index.js fixtures/mongo",
+    "build": "tsc --build",
+    "clean": "rm -rf ./dist && tsc --build --clean",
+    "docker:build": "docker build -t csa .",
+    "docker:run": "docker run -v $(pwd)/fixtures:/app/fixtures csa -- simple-multiple.mdx"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.51.0",
+    "chalk": "^4.1.2",
+    "corporate-ipsum": "^1.0.1",
+    "diff": "^8.0.1",
+    "dotenv": "^16.4.7",
+    "tsx": "^4.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}

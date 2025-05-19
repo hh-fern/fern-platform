@@ -1,0 +1,219 @@
+.. _pymongo-get-started:
+
+========================
+How to Use Facets with Atlas Search {+driver-short+}
+========================
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+.. facet::
+   :name: genre
+   :values: tutorial
+ 
+.. meta::
+   :description: Learn how to create an app to connect to MongoDB deployment by using the PyMongo driver.
+   :keywords: quick start, tutorial, basics
+
+Overview
+--------
+
+This tutorial describes how to create an index with a facet definition on string, date, and numeric fields in the sample_mflix.movies collection. It shows how to run an Atlas Search query against those fields for results grouped by values for the string field and by ranges for the date and numeric fields, including the count for each of those groups. It takes you through the following steps:
+
+Set up an Atlas Search index with facet definition on the genres, released, and year fields in the sample_mflix.movies collection.
+
+Run Atlas Search query against the released field in the sample_mflix.movies collection for results grouped by values for the genres field and by ranges for the year field.
+
+Prerequisites
+To complete these tutorials, in addition to the prerequisites listed in the Prerequisites, you must have an Atlas cluster running one of the following versions:
+
+MongoDB 5.0.4+
+
+MongoDB 6.0+
+
+MongoDB 7.0+
+
+Create the Atlas Search Index for Facet
+In this section, you will create an Atlas Search index on the genres, year, and released fields in the sample_mflix.movies collection.
+
+1
+In Atlas, go to the Clusters page for your project.
+Warning
+Navigation Improvements In Progress
+We're currently rolling out a new and improved navigation experience. If the following steps don't match your view in the Atlas UI, see the preview documentation.
+
+If it's not already displayed, select the organization that contains your desired project from the  Organizations menu in the navigation bar.
+
+If it's not already displayed, select your desired project from the Projects menu in the navigation bar.
+
+If it's not already displayed, click Clusters in the sidebar.
+
+The Clusters page displays.
+
+2
+Go to the Atlas Search page for your cluster.
+You can go the Atlas Search page from the sidebar, the Data Explorer, or your cluster details page.
+
+
+In the sidebar, click Atlas Search under the Services heading.
+
+If you have no clusters, click Create cluster to create one. To learn more, see Create a Cluster.
+
+If your project has multiple clusters, select the cluster you want to use from the Select cluster dropdown, then click Go to Atlas Search.
+
+The Atlas Search page displays.
+3
+Click Create Search Index.
+4
+Start your index configuration.
+Make the following selections on the page and then click Next.
+
+Search Type
+
+Select the Atlas Search index type.
+
+Index Name and Data Source
+
+Specify the following information:
+
+Index Name: facet-tutorial
+
+Database and Collection:
+
+sample_mflix database
+
+movies collection
+
+Configuration Method
+
+For a guided experience, select Visual Editor.
+
+To edit the raw index definition, select JSON Editor.
+
+Note
+Your Atlas Search index is named default by default. If you keep this name, then your index will be the default Search index for any Atlas Search query that does not specify a different index option in its operators. If you are creating multiple indexes, we recommend that you maintain a consistent, descriptive naming convention across your indexes.
+
+5
+Specify an index definition.
+You can create an Atlas Search index that uses dynamic mappings or static mappings. To learn more about dynamic and static mappings, see Static and Dynamic Mappings.
+
+The following index definition statically indexes the genres field as stringFacet type and dynamically indexes the other fields of supported types in each document in the movies collection. You can use the Atlas Search Visual Editor or the Atlas Search JSON Editor in the Atlas user interface to create the index.
+
+Click Next, then click Review Your Index.
+
+Click Add Field Mapping under Field Mappings section.
+
+Click Customized Configuration and select the following from the dropdowns:
+
+Field Name
+
+genres
+
+Data Type
+
+StringFacet
+
+Click Add, then click Save Changes.
+
+6
+Click Create Search Index.
+7
+Close the You're All Set! Modal Window.
+A modal window appears to let you know your index is building. Click the Close button.
+
+8
+Wait for the index to finish building.
+The index should take about one minute to build. While it is building, the Status column reads Build in Progress. When it is finished building, the Status column reads Active.
+
+
+Search the Collection
+➤ Use the Select your language drop-down menu to set the language of the examples in this section.
+
+You can use facet in queries that use the $search and $searchMeta stages. In this section, connect to your Atlas cluster and the run the sample query against the sample_mflix.movies collection using the $searchMeta or $search stage to group the genre and year fields into buckets. To optimize performance:
+
+Use $searchMeta stage if you only need the facet metadata.
+
+Use $search stage if you want to retrieve both the query results and the facet metadata.
+
+1
+Set up the file to run an Atlas Search facet query."
+Create a file named facet-query.py.
+
+Copy and paste the following code into the facet-query.py file.
+
+The following code example:
+
+Imports pymongo, MongoDB's Python driver, and the dns module, which is required to connect pymongo to Atlas using a DNS seed list connection string.
+
+Creates an instance of the MongoClient class to establish a connection to your Atlas cluster.
+
+Uses the following to query the collection:
+
+near to search for movies released with a pivot distance from origin of approximately three months from November 11, 1921
+
+facets to request the number of movies in each genre in the genres string array field and the number of movies in the years 1910 to 1939, inclusive
+
+Iterates over the cursor to print the documents that match the query.
+
+You can run this query using $searchMeta or using $search with the SEARCH_META aggregation variable.
+
+.. io-code-block::
+   :copyable: true
+
+   .. input::
+      :language: python
+      
+      import pymongo
+      import datetime
+
+      # connect to your Atlas cluster
+      client = pymongo.MongoClient('<connection-string>')
+
+      # define pipeline
+      pipeline = [{"$searchMeta": { 
+          "index": "facet-tutorial",
+          "facet": {
+              "operator": {
+                "near": {"path": "released", "origin": datetime.datetime(1921, 11, 1, 0, 0, 0, 0), "pivot": 7776000000}
+              },
+              "facets": {
+                "genresFacet": {"type": "string", "path": "genres"},
+                "yearFacet" : {"type" : "number", "path" : "year", "boundaries" : [1910,1920,1930,1940]}
+              }}}}]
+      # run pipeline
+      result = client["sample_mflix"]["movies"].aggregate(pipeline)
+
+      # print results
+      for i in result:
+          print(i)
+      
+   .. output::
+      :language: none
+      :visible: false
+      
+      {'meta':{'count': {'lowerBound': 20878}, 'facet': {'genresFacet': {'buckets': [{'_id': 'Drama', 'count': 12149}, {'_id': 'Comedy', 'count': 6436}, {'_id': 'Romance', 'count': 3274}, {'_id': 'Crime', 'count': 2429}, {'_id': 'Thriller', 'count': 2400}, {'_id': 'Action', 'count': 2349}, {'_id': 'Adventure', 'count': 1876}, {'_id': 'Documentary', 'count': 1755}, {'_id': 'Horror', 'count': 1432}, {'_id': 'Biography', 'count': 1244}]}, 'yearFacet': {'buckets': [{'_id': 1910, 'count': 14}, {'_id': 1920, 'count': 47}, {'_id': 1930, 'count': 238}]}}}}}
+      
+Before you run the sample, replace <connection-string> with your Atlas connection string. Ensure that your connection string includes your database user's credentials. To learn more, see Connect via Drivers.
+
+The results show metadata results for two types of facet search. The genresFacet document shows the number of movies in each genre and the yearFacet document shows a count of the number of movies within the boundaries:
+
+1910, inclusive lower bound the 1910 bucket
+
+1920, exclusive upper bound for the 1910 bucket and inclusive lower bound for the 1920 bucket
+
+1930, exclusive upper bound for the 1920 bucket and inclusive lower bound for the 1930 bucket
+
+Continue Learning
+You can learn more about facet in Atlas Search with our course or video.
+
+Learn with Courses
+To learn more about using facets in Atlas Search, take Unit 9 of the Intro To MongoDB Course on MongoDB University. The 1.5 hour unit includes an overview of Atlas Search and lessons on creating Atlas Search indexes, running $search queries using compound operators, and grouping results using facet.
+
+Learn by Watching
+Follow along with this video to learn about how you can create and use a numeric and string facet in your query to group results and retrieve a count of the results in the groups.
+
+Duration: 11 Minutes
+      

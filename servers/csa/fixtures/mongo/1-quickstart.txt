@@ -1,0 +1,349 @@
+.. _pymongo-get-started:
+
+========================
+Get Started with {+driver-short+}
+========================
+
+.. contents:: On this page
+   :local:
+   :backlinks: none
+   :depth: 2
+   :class: singlecol
+
+.. facet::
+   :name: genre
+   :values: tutorial
+ 
+.. meta::
+   :description: Learn how to create an app to connect to MongoDB deployment by using the PyMongo driver.
+   :keywords: quick start, tutorial, basics
+
+Overview
+--------
+
+Atlas Search is an embedded full-text search in MongoDB Atlas that gives you a seamless, scalable experience for building relevance-based app features. This quick start describes how to get started in the following steps:
+
+Create an Atlas Search index on a sample collection.
+
+Build an Atlas Search query to search the collection. You will learn how to:
+
+Run a basic query to search for a term in a field
+
+Use an operator to refine your search
+
+Add a search option to process your results
+
+Time required: 15 minutes
+
+Note
+This tutorial includes examples for a selection of clients. For all supported clients, see the Indexes and Queries pages.
+
+What is an Atlas Search Index?
+
+1
+Set up your Atlas cluster.
+Create a free Atlas account or sign in to an existing account.
+
+If you don't yet have an Atlas cluster, create a free M0 cluster. To learn more about creating an Atlas cluster, see Create a Cluster.
+
+Note
+If you are working with an existing cluster, you must have Project Data Access Admin or higher access to your Atlas project.
+
+If you create a new cluster, you have the necessary permissions by default.
+
+You can create only one M0 Free cluster per project.
+
+If you haven't yet loaded the sample dataset for this quick start onto your cluster, load the sample_mflix sample database onto your cluster.
+
+If you already loaded the sample_mflix dataset, check that the sample_mflix database contains the embedded_movies collection. If it doesn't, drop the sample_mflix database and reload the sample_mflix dataset.
+
+Loading the sample dataset can take several minutes to complete.
+
+In the left sidebar, click Atlas Search. Choose your cluster from the Select data source menu and click Go to Atlas Search.
+
+2
+Create the Atlas Search index.
+➤ Use the Select your language drop-down menu to set the client for this tutorial.
+
+Install the MongoDB Python Driver.
+
+.. code-block:: bash
+
+   pip install pymongo
+   
+For detailed installation instructions, see MongoDB Python Driver (PyMongo).
+
+Define the index.
+
+Paste the following code into a file named create_index.py.
+
+.. io-code-block::
+   :copyable: true
+
+   .. input::
+      :language: python
+      
+      from pymongo import MongoClient
+      from pymongo.operations import SearchIndexModel
+      # connect to your Atlas deployment
+      uri = "<connection-string>"
+      client = MongoClient(uri)
+      # set namespace
+      database = client["sample_mflix"]
+      collection = database["movies"]
+      # define your Atlas Search index
+      search_index_model = SearchIndexModel(
+          definition={
+              "mappings": {
+                  "dynamic": True
+              },
+          },
+          name="default",
+      )
+      # create the index
+      result = collection.create_search_index(model=search_index_model)
+      print(result)
+   .. output::
+      :language: none
+      :visible: false
+      
+      default
+      
+Your connection string should use the following format:
+
+mongodb+srv://<db_username>:<db_password>@<clusterName>.<hostname>.mongodb.net
+
+Note
+Ensure that your connection string includes your database user's credentials. To learn more about finding your connection string, see Connect via Drivers.
+
+Build an Atlas Search Query
+What are Atlas Search queries?
+
+
+
+
+In this section, you run queries against the indexed collection.
+
+1
+Run a basic query.
+Run a basic $search query by using the text operator.
+
+Create a new file named run_query.py and paste the following code.
+
+This query has the following search criteria:
+
+The plot field must contain the word baseball.
+
+$limit and $project stages to return only 3 documents and the title and plot fields.
+      
+.. io-code-block::
+   :copyable: true
+
+   .. input::
+      :language: python
+      
+      import pymongo
+
+      client = pymongo.MongoClient('<connection-string>')
+      result = client['sample_mflix']['movies'].aggregate([
+        {
+          '$search': 
+          {
+              'text': {
+                'query': 'baseball',
+                'path': 'plot'
+              }
+          }
+        }, 
+        {
+          '$limit': 3
+        }, 
+        {
+          '$project': {
+            '_id': 0,
+            'title': 1,
+            'plot': 1
+          }
+        }
+      ])
+
+      for i in result:
+          print(i)
+
+   .. output::
+      :language: none
+      :visible: false
+      {'plot': 'A trio of guys try and make up for missed opportunities in childhood by forming a three-player baseball team to compete against standard children baseball squads.', 'title': 'The Benchwarmers'}
+      {'plot': 'A young boy is bequeathed the ownership of a professional baseball team.', 'title': 'Little Big League'}
+      {'plot': 'A trained chimpanzee plays third base for a minor-league baseball team.', 'title': 'Ed'}
+      
+2
+Refine your search.
+Atlas Search provides several operators that you can use to build complex queries and retrieve more specific results for your use case. Update your $search query to use the compound operator to combine multiple operators into a single query.
+
+Modify run_query.py to use the compound query.
+
+This query has the following search criteria:
+
+The plot field must contain the word baseball.
+
+The genres field must not contain either Comedy or Romance.
+
+$limit and $project stages to return only 3 documents and the title, plot, and genres fields.
+      
+.. io-code-block::
+   :copyable: true
+
+   .. input::
+      :language: python
+      
+      import pymongo
+
+      client = pymongo.MongoClient('<connection-string>')
+      result = client['sample_mflix']['movies'].aggregate([
+        {
+          '$search': {
+            'compound': {
+              'must': [
+                {
+                  'text': {
+                    'query': 'baseball',
+                    'path': 'plot'
+                  }
+                }
+              ],
+              'mustNot': [
+                {
+                  'text': {
+                    'query': ['Comedy', 'Romance'],
+                    'path': 'genres'
+                  }
+                }
+              ]
+            }
+          }
+        }, 
+        {
+          '$limit': 3
+        },
+        {
+          '$project': {
+            '_id': 0,           
+            'title': 1,
+            'plot': 1,
+            'genres': 1
+          }
+        }
+      ])
+
+      for i in result:
+          print(i)
+
+
+   .. output::
+      :language: none
+      :visible: false
+      {'plot': 'The story of the life and career of the famed baseball player, Lou Gehrig.', 'genres': ['Biography', 'Drama', 'Family'], 'title': 'The Pride of the Yankees'}
+      {'plot': 'Babe Ruth becomes a baseball legend but is unheroic to those who know him.', 'genres': ['Biography', 'Drama', 'Sport'], 'title': 'The Babe'}
+      {'plot': 'Dominican baseball star Miguel "Sugar" Santos is recruited to play in the U.S. minor-leagues.', 'genres': ['Drama', 'Sport'], 'title': 'Sugar'}
+      
+3
+Process your results.
+Atlas Search provides several search options that you can use to further process your Atlas Search query results. Add the sort option to your query to display the results in a specific order.
+
+Modify run_query.py to add the sort option.
+
+This query has the following search criteria:
+
+The plot field must contain the word baseball.
+
+The genres field must not contain either Comedy or Romance.
+
+Sort the results by the released date field in descending order. Atlas Search returns the most recent movies first.
+
+$limit and $project stages to return only 3 documents and the title, plot, genres, and released fields.
+
+.. io-code-block::
+   :copyable: true
+
+   .. input::
+      :language: python
+      
+      import pymongo
+
+      client = pymongo.MongoClient('<connection-string>')
+      result = client['sample_mflix']['movies'].aggregate([
+        {
+          '$search': {
+            'compound': {
+              'must': [
+                {
+                  'text': {
+                    'query': 'baseball',
+                    'path': 'plot'
+                  }
+                }
+              ],
+              'mustNot': [
+                {
+                  'text': {
+                    'query': ['Comedy', 'Romance'],
+                    'path': 'genres'
+                  }
+                }
+              ]
+            },
+            'sort': {
+                'released': -1
+            }
+          }
+        }, 
+        {
+          '$limit': 3
+        },
+        {
+          '$project': {
+            '_id': 0,           
+            'title': 1,
+            'plot': 1,
+            'genres': 1,
+            'released': 1
+          }
+        }
+      ])
+
+      for i in result:
+          print(i)
+
+
+
+   .. output::
+      :language: none
+      :visible: false
+      {'plot': 'A sports agent stages an unconventional recruitment strategy to get talented Indian cricket players to play Major League Baseball.', 'genres': ['Biography', 'Drama', 'Sport'], 'title': 'Million Dollar Arm', 'released': datetime.datetime(2014, 5, 16, 0, 0)}
+      {'plot': 'A Taiwanese high school baseball team travels to Japan in 1931 to compete in a national tournament.', 'genres': ['Biography', 'Drama', 'History'], 'title': 'Kano', 'released': datetime.datetime(2014, 2, 27, 0, 0)}
+      {'plot': "12-year-old Josh is a mixed race boy and a promising baseball player...", 'genres': ['Drama'], 'title': 'Calloused Hands', 'released': datetime.datetime(2013, 3, 3, 0, 0)}
+      
+      
+Continue Learning
+Run Autocomplete and Partial Match Queries
+You can use Atlas Search to run autocomplete and partial queries that return results for partial words. This is useful to retrieve results with increasing accuracy as more characters are entered in your application's search field. You must index the fields as the Atlas Search autocomplete type to use the autocomplete operator.
+
+To get started, see How to Run Autocomplete and Partial Match Atlas Search Queries.
+
+Group Search Results with Facets
+You can use Atlas Search to run facet queries that group search results by string, date, or numeric values. You must create an index with a facet definition to use the facet collector.
+
+To get started, see How to Use Facets with Atlas Search.
+
+Use the Atlas Search Playground
+Atlas Search allows you to sort the results in ascending or descending order on indexed boolean, date, number, objectId and string field values. To learn more, see Sort Atlas Search Results.
+
+Learn with a Course
+To learn more about Atlas Search, you can take Unit 1 of the Atlas Search Course on MongoDB University. The 2.25 hour unit includes an overview of Atlas Search and lessons on how to create Atlas Search indexes, use $search with different operators, and generate search facets.
+
+Learn by Watching
+You can also watch the following videos to learn more about Atlas Search:
+
+Video: What is Atlas Search?
+Watch an overview of Atlas Search and how to get started.
