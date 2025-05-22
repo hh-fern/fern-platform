@@ -9,7 +9,6 @@ import { EnumTypeDefinition } from "./EnumTypeDefinition";
 import { EnumValue } from "./EnumValue";
 import { FernCollapseWithButtonUncontrolled } from "./FernCollapseWithButtonUncontrolled";
 import { FilteredObjectProperties } from "./FilteredObjectProperties";
-
 import { WithSeparator } from "./TypeDefinitionDetails";
 import { UndiscriminatedUnionVariant } from "./UndiscriminatedUnionVariant";
 
@@ -32,7 +31,6 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
     | ApiDefinition.TypeReference.Primitive;
   types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
 }) {
-
   switch (shape.type) {
     case "enum": {
       return (
@@ -86,9 +84,7 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
         types
       ).properties;
 
-      return (
-          <FilteredObjectProperties properties={properties} types={types} />
-      );
+      return <FilteredObjectProperties properties={properties} types={types} />;
     }
     case "primitive":
       return null;

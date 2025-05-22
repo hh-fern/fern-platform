@@ -3,6 +3,7 @@
 import { createContext, useContext, useMemo } from "react";
 import React from "react";
 
+import { ApiDefinition } from "@fern-api/fdr-sdk";
 import { TypeDefinition } from "@fern-api/fdr-sdk/api-definition";
 import { slugToHref } from "@fern-docs/utils";
 import { useLazyRef } from "@fern-ui/react-commons";
@@ -13,7 +14,6 @@ import { useCurrentPathname } from "@/hooks/use-current-pathname";
 
 import { JsonPropertyPath } from "../examples/JsonPropertyPath";
 import { JsonPropertyPathPart } from "../examples/JsonPropertyPath";
-import { ApiDefinition } from "@fern-api/fdr-sdk";
 
 export interface TypeDefinitionContextValue {
   types: Record<string, TypeDefinition>;
@@ -215,17 +215,9 @@ export function useIsActive(): boolean {
 export function shouldIncludeObjectProperty(
   property: ApiDefinition.ObjectProperty,
   isRequest?: boolean,
-  isResponse?: boolean,
+  isResponse?: boolean
 ) {
-  if (
-    isRequest &&
-    property.propertyAccess === "READ_ONLY"
-  )
-    return false;
-  if (
-    isResponse &&
-    property.propertyAccess === "WRITE_ONLY"
-  )
-    return false;
+  if (isRequest && property.propertyAccess === "READ_ONLY") return false;
+  if (isResponse && property.propertyAccess === "WRITE_ONLY") return false;
   return true;
-};
+}
