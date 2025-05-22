@@ -3,6 +3,9 @@ import { DOMAINS } from "../../utils/constants";
 import { Conversation, Message } from "../../utils/types";
 import { MessageTableClient } from "./MessageTable";
 
+// TODO: transitioning to pulling domains automatically instead of hardcoding
+const newDomains: string[] = [];
+
 export const maxDuration = 300;
 
 interface APIMessage {
@@ -117,6 +120,9 @@ export default async function Home({
         let domain = "";
         if (convo.metadata.domain) {
           domain = convo.domain;
+          if (!DOMAINS.includes(domain)) {
+            newDomains.push(domain);
+          }
         } else {
           convo.input.forEach((msg: APIMessage) => {
             // find domain from preamble
@@ -193,7 +199,10 @@ export default async function Home({
           </h6>
           <br />
         </div>
-        <MessageTableClient initialData={processedData} />
+        <MessageTableClient
+          initialData={processedData}
+          newDomains={newDomains}
+        />
       </div>
     </main>
   );

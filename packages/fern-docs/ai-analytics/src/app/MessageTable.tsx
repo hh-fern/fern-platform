@@ -15,8 +15,10 @@ const ITEMS_PER_PAGE = 10;
 
 export function MessageTableClient({
   initialData,
+  newDomains,
 }: {
   initialData: Conversation[];
+  newDomains: string[];
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
@@ -102,13 +104,15 @@ export function MessageTableClient({
               <Select.Item value="show-all-domains">
                 Show all domains
               </Select.Item>
-              {DOMAINS.filter((domain) => {
-                return domain in countByDomain && countByDomain[domain] > 0;
-              }).map((domain) => (
-                <Select.Item key={domain} value={domain}>
-                  {domain} ({countByDomain[domain] || 0} conversations)
-                </Select.Item>
-              ))}
+              {DOMAINS.concat(newDomains)
+                .filter((domain) => {
+                  return domain in countByDomain && countByDomain[domain] > 0;
+                })
+                .map((domain) => (
+                  <Select.Item key={domain} value={domain}>
+                    {domain} ({countByDomain[domain] || 0} conversations)
+                  </Select.Item>
+                ))}
             </Select.Content>
           </Select.Root>
         </Card>
