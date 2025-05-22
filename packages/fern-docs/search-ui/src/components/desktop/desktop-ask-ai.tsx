@@ -92,6 +92,11 @@ export const DesktopCommandWithAskAI = forwardRef<
     setInitialInput?: (initialInput: string) => void;
     children?: ReactNode;
     darkCodeEnabled?: boolean;
+    useConversationId: () => {
+      conversationId: string;
+      setConversationId: (conversationId: string) => void;
+      resetConversationId: () => void;
+    };
   }
 >(
   (
@@ -114,6 +119,7 @@ export const DesktopCommandWithAskAI = forwardRef<
       setInitialInput,
       asChild,
       darkCodeEnabled,
+      useConversationId,
       ...props
     },
     forwardedRef
@@ -189,6 +195,7 @@ export const DesktopCommandWithAskAI = forwardRef<
       >
         {askAI ? (
           <DesktopAskAIContent
+            useConversationId={useConversationId}
             api={api}
             suggestionsApi={suggestionsApi}
             body={body}
@@ -232,6 +239,11 @@ const DesktopAskAIContent = (props: {
   onReturnToSearch?: () => void;
   initialInput?: string;
   chatId?: string;
+  useConversationId: () => {
+    conversationId: string;
+    setConversationId: (conversationId: string) => void;
+    resetConversationId: () => void;
+  };
   api?: string;
   suggestionsApi?: string;
   body?: object;
@@ -275,6 +287,7 @@ const DesktopAskAIChat = ({
   onReturnToSearch,
   initialInput,
   chatId,
+  useConversationId,
   api,
   suggestionsApi,
   body,
@@ -290,6 +303,11 @@ const DesktopAskAIChat = ({
   onReturnToSearch?: () => void;
   initialInput?: string;
   chatId?: string;
+  useConversationId: () => {
+    conversationId: string;
+    setConversationId: (conversationId: string) => void;
+    resetConversationId: () => void;
+  };
   api?: string;
   suggestionsApi?: string;
   body?: object;
@@ -307,12 +325,16 @@ const DesktopAskAIChat = ({
   const [initialConversation, setInitialConversation] = useAtom(
     initialConversationAtom
   );
+  const { conversationId, resetConversationId } = useConversationId();
   const chat = useChat({
     id: chatId,
     initialInput,
     initialMessages: initialConversation,
     api,
-    body,
+    body: {
+      ...body,
+      conversationId: conversationId,
+    },
     headers,
     onFinish: useEventCallback(() => {
       setInitialConversation(chat.messages);
@@ -357,7 +379,7 @@ const DesktopAskAIChat = ({
 
   const [isScrolled, setIsScrolled] = useState(false);
 
-  let messages = useDeferredValue(chat.messages);
+  const messages = useDeferredValue(chat.messages);
 
   return (
     <>
@@ -396,7 +418,7 @@ const DesktopAskAIChat = ({
                     onClick={() => {
                       chat.setMessages([]);
                       setInitialConversation([]);
-                      messages = chat.messages;
+                      resetConversationId();
                     }}
                   >
                     <SquarePen />

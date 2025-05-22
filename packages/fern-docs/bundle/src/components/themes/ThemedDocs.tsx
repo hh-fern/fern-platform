@@ -11,9 +11,12 @@ export function ThemedDocs({
   theme = "default",
   announcement,
   header,
+  versionSelect,
+  productSelect,
   sidebar,
   children,
   tabs,
+  hasProductsOrVersions = false,
   isSidebarFixed = false,
   isHeaderDisabled = false,
   showSearchBarInTabs = false,
@@ -25,9 +28,12 @@ export function ThemedDocs({
   theme?: FernTheme;
   announcement?: React.ReactNode;
   header?: React.ReactNode;
+  versionSelect?: React.ReactNode;
+  productSelect?: React.ReactNode;
   sidebar?: React.ReactNode;
   children: React.ReactNode;
   tabs?: React.ReactNode;
+  hasProductsOrVersions?: boolean;
   isSidebarFixed?: boolean;
   isHeaderDisabled?: boolean;
   showSearchBarInTabs?: boolean;
@@ -41,8 +47,11 @@ export function ThemedDocs({
     <Docs
       announcement={announcement}
       header={header}
+      versionSelect={versionSelect}
+      productSelect={productSelect}
       sidebar={sidebar}
       tabs={tabs}
+      hasProductsOrVersions={hasProductsOrVersions}
       isSidebarFixed={isSidebarFixed}
       isHeaderDisabled={isHeaderDisabled}
       showSearchBarInTabs={showSearchBarInTabs}

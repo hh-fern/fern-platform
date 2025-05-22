@@ -12,7 +12,6 @@ import { RehypeLinksOptions } from "@/mdx/plugins/rehype-links";
 import { createCachedDocsLoader } from "@/server/docs-loader";
 
 import { cacheSeed } from "./cache-seed";
-import { postToEngineeringNotifs } from "./slack";
 
 export type MdxSerializerOptions = {
   /**
@@ -74,7 +73,7 @@ export function createCachedMdxSerializer(
 
     // this lets us key on just
     const cachedSerializer = unstable_cache(
-      async ({ filename, toc, scope, slug }: MdxSerializerOptions) => {
+      async ({ filename, toc, scope }: MdxSerializerOptions) => {
         const authState = await loader.getAuthState();
 
         try {
@@ -91,17 +90,7 @@ export function createCachedMdxSerializer(
           });
         } catch (error) {
           console.error("Error serializing mdx", error);
-
-          postToEngineeringNotifs(
-            `:rotating_light: [${domain}] \`Serialize MDX\` encountered an error: \`${String(error)}\` (url: \`https://${domain}/${slug ?? "UNKNOWN"}\`)`,
-            "serialize-mdx",
-            {
-              message: content,
-              mrkdwn: true,
-            }
-          );
-
-          return undefined;
+          return content;
         }
       },
       [domain, content, cacheSeed()],

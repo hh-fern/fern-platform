@@ -66,10 +66,11 @@ export async function generateMetadata({
   );
   const root = await loader.getRoot();
   const found = FernNavigation.utils.findNode(root, slug);
+
   if (found.type !== "found") {
     return {};
   }
   return {
-    title: `${found.node.title} (API Explorer)`,
+    title: found.node.title,
   };
 }

@@ -17,7 +17,7 @@ import {
 } from "@fern-docs/utils";
 
 import { rewritePosthog } from "@/server/analytics/rewritePosthog";
-import { MARKDOWN_PATTERN, RSS_PATTERN } from "@/server/patterns";
+import { JSON_PATTERN, MARKDOWN_PATTERN, RSS_PATTERN } from "@/server/patterns";
 import { withPathname } from "@/server/withPathname";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
@@ -165,6 +165,15 @@ export const middleware: NextMiddleware = async (request) => {
   }
 
   /**
+   * Rewrite changelog json feed
+   */
+  if (pathname.match(JSON_PATTERN)) {
+    const format = pathname.match(JSON_PATTERN)?.[1] ?? "json";
+    const slug = removeLeadingSlash(withoutEnding(JSON_PATTERN));
+    return rewrite(withDomain("/api/fern-docs/changelog"), { format, slug });
+  }
+
+  /**
    * At this point, conform the trailing slash setting or else redirect
    */
   if (isTrailingSlashEnabled() !== request.nextUrl.pathname.endsWith("/")) {
@@ -202,23 +211,11 @@ export const middleware: NextMiddleware = async (request) => {
       return NextResponse.redirect(absoluteUrl);
     }
 
-    const getResponse = () => {
-      if (request.nextUrl.searchParams.has("error")) {
-        return rewrite(
-          withDomain(
-            `/dynamic/${encodeURIComponent(conformTrailingSlash(pathname))}`
-          )
-        );
-      }
-
-      return rewrite(
-        withDomain(
-          `/static/${encodeURIComponent(conformTrailingSlash(pathname))}`
-        )
-      );
-    };
-
-    return getResponse();
+    return rewrite(
+      withDomain(
+        `/dynamic/${encodeURIComponent(conformTrailingSlash(pathname))}`
+      )
+    );
   }
 
   const { getAuthState } = await createGetAuthStateEdge(request, (token) => {

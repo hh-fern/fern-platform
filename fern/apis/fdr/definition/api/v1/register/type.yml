@@ -12,6 +12,7 @@ types:
     properties:
       name: string
       shape: TypeShape
+      displayName: optional<string>
 
   TypeShape:
     union:
@@ -169,6 +170,7 @@ types:
     properties:
       typeName: optional<string>
       type: TypeReference
+      displayName: optional<string>
 
   DiscriminatedUnionType:
     properties:

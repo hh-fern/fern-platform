@@ -20,6 +20,7 @@ export default async function SharedLayout({
   headertabs,
   sidebar,
   versionSelect,
+  productSelect,
   loader,
   logo,
 }: {
@@ -27,6 +28,7 @@ export default async function SharedLayout({
   headertabs: React.ReactNode;
   sidebar?: React.ReactNode;
   versionSelect: React.ReactNode;
+  productSelect: React.ReactNode;
   loader: DocsLoader;
   logo: React.ReactNode;
 }) {
@@ -34,14 +36,18 @@ export default async function SharedLayout({
   const serialize = createCachedMdxSerializer(loader);
   setMdxSerializer(serialize);
 
-  const [config, edgeFlags, colors, layout] = await Promise.all([
+  const [config, edgeFlags, colors, layout, root] = await Promise.all([
     loader.getConfig(),
     loader.getEdgeFlags(),
     loader.getColors(),
     loader.getLayout(),
+    loader.getRoot(),
   ]);
   const theme = edgeFlags.isCohereTheme ? "cohere" : "default";
   const announcementText = config.announcement?.text;
+
+  const hasProductsOrVersions =
+    root.child.type === "productgroup" || root.child.type === "versioned";
 
   return (
     <ThemedDocs
@@ -81,7 +87,14 @@ export default async function SharedLayout({
           className="max-w-page-width mx-auto"
           logo={<React.Suspense fallback={null}>{logo}</React.Suspense>}
           versionSelect={
-            <React.Suspense fallback={null}>{versionSelect}</React.Suspense>
+            <React.Suspense fallback={null} key="version-select-1">
+              {versionSelect}
+            </React.Suspense>
+          }
+          productSelect={
+            <React.Suspense fallback={null} key="product-select-1">
+              {productSelect}
+            </React.Suspense>
           }
           showSearchBar={layout.searchbarPlacement === "HEADER"}
           navbarLinks={<NavbarLinks loader={loader} />}
@@ -97,6 +110,11 @@ export default async function SharedLayout({
           }
         />
       }
+      productSelect={
+        <React.Suspense fallback={null} key="product-select-2">
+          {productSelect}
+        </React.Suspense>
+      }
       tabs={headertabs}
       showSearchBarInTabs={layout.searchbarPlacement === "HEADER_TABS"}
       sidebar={
@@ -104,8 +122,15 @@ export default async function SharedLayout({
           logo={<React.Suspense fallback={null}>{logo}</React.Suspense>}
           showSearchBar={layout.searchbarPlacement === "SIDEBAR"}
           showHeaderInSidebar={layout.isHeaderDisabled}
+          productSelect={
+            <React.Suspense fallback={null} key="product-select-3">
+              {productSelect}
+            </React.Suspense>
+          }
           versionSelect={
-            <React.Suspense fallback={null}>{versionSelect}</React.Suspense>
+            <React.Suspense fallback={null} key="version-select-3">
+              {versionSelect}
+            </React.Suspense>
           }
           navbarLinks={
             <React.Suspense fallback={null}>
@@ -124,6 +149,12 @@ export default async function SharedLayout({
         >
           {sidebar}
         </SidebarContainer>
+      }
+      hasProductsOrVersions={hasProductsOrVersions}
+      versionSelect={
+        <React.Suspense fallback={null} key="version-select-2">
+          {versionSelect}
+        </React.Suspense>
       }
     >
       {children}

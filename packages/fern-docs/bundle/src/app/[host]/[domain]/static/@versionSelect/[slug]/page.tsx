@@ -5,6 +5,10 @@ import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 
 import { getFernToken } from "@/app/fern-token";
 import { VersionDropdown } from "@/components/header/VersionDropdown";
+import {
+  getFallbackProduct,
+  getFallbackVersion,
+} from "@/components/util/handle-node-fallbacks";
 import { createCachedDocsLoader } from "@/server/docs-loader";
 
 export default async function VersionSelectPage({
@@ -19,29 +23,44 @@ export default async function VersionSelectPage({
     await getFernToken()
   );
 
-  const rootPromise = loader.getRoot();
-
   // preload:
-  await loader.getLayout();
-  await loader.getAuthState();
-  await loader.getEdgeFlags();
+  const [layout, _auth, _flags, root] = await Promise.all([
+    loader.getLayout(),
+    loader.getAuthState(),
+    loader.getEdgeFlags(),
+    loader.getRoot(),
+  ]);
+  const useDenseLayout = layout.isHeaderDisabled;
 
-  const foundNode = FernNavigation.utils.findNode(
-    await rootPromise,
-    slugjoin(slug)
-  );
-  if (foundNode.type !== "found") {
+  const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));
+  const collector = FernNavigation.NodeCollector.collect(root);
+  const versionNodes = collector.getVersionNodes();
+
+  if (versionNodes.length === 0) {
     return null;
   }
 
+  const currentProduct = getFallbackProduct(foundNode, root, slug);
+  const version = getFallbackVersion(foundNode, root, slug);
+
+  if (version == null) {
+    return null;
+  }
+
+  const currentNode = foundNode.type === "found" ? foundNode.node : version;
+
+  const parents =
+    foundNode.type === "found" ? Array.from(foundNode.parents) : [];
+
   return (
-    <>
-      <VersionDropdown
-        loader={loader}
-        currentNode={foundNode.node}
-        slugMap={foundNode.collector.slugMap}
-        parents={Array.from(foundNode.parents)}
-      />
-    </>
+    <VersionDropdown
+      loader={loader}
+      currentNode={currentNode}
+      currentProduct={currentProduct ?? undefined}
+      slugMap={collector.slugMap}
+      parents={parents}
+      fallbackVersion={version}
+      useDenseLayout={useDenseLayout}
+    />
   );
 }

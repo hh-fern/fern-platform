@@ -1,0 +1,57 @@
+name: Check Sites
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  up:
+    name: Check if sites are up (US)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Log location info
+        run: curl ipinfo.io
+      - uses: actions/checkout@v4
+      - name: Update domain list
+        env:
+          VERCEL_TEAM: ${{ secrets.VERCEL_TEAM }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: python get_sites.py
+      - name: Upload domain list
+        uses: actions/upload-artifact@v4
+        with:
+          name: Checked Domains
+          path: sites.csv
+      - name: Check Sites
+        env:
+          INCIDENT_API_KEY: ${{ secrets.INCIDENT_API_KEY }}
+        run: python check_sites.py US
+
+  up-eu:
+    needs: up
+    if: always()
+    name: Check if sites are up (via EU runner)
+    runs-on:
+      group: International
+      labels: eu
+    timeout-minutes: 10
+    steps:
+      - name: Log location info
+        run: curl ipinfo.io
+      - uses: actions/checkout@v4
+      - name: Update domain list
+        env:
+          VERCEL_TEAM: ${{ secrets.VERCEL_TEAM }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: python get_sites.py
+      - name: Upload domain list
+        uses: actions/upload-artifact@v4
+        with:
+          name: Checked Domains - EU
+          path: sites.csv
+      - name: Check Sites
+        env:
+          INCIDENT_API_KEY: ${{ secrets.INCIDENT_API_KEY }}
+        run: python check_sites.py EU

@@ -37,7 +37,7 @@ export async function queryTurbopuffer(
     apiKey,
     topK,
     filters,
-    mode = "semantic",
+    mode = "hybrid",
     authed = false,
     roles = [],
   }: SemanticSearchOptions
@@ -85,14 +85,14 @@ export async function queryTurbopuffer(
       ? await ns.query({
           vector,
           distance_metric: "cosine_distance",
-          top_k: topK,
+          top_k: 1, // to get a single closest match, e.g. with "changelog april 29", semantic search returns other dates
           include_attributes: true,
           filters: queryFilters,
         })
       : [];
 
   const bm25Results =
-    mode !== "semantic"
+    mode !== "semantic" && query.length < 1024
       ? await ns.query({
           top_k: topK,
           include_attributes: true,

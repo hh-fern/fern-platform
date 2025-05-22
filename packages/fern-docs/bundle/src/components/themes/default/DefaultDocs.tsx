@@ -1,10 +1,11 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import React from "react";
+import React, { Fragment } from "react";
 
 import { cn } from "@fern-docs/components";
 
+import { Separator } from "@/components/Separator";
 import { FERN_FOOTER_ID } from "@/components/constants";
 import { HeaderTabsRoot } from "@/components/header/HeaderTabsRoot";
 import { SetIsSidebarFixed } from "@/state/layout";
@@ -15,10 +16,13 @@ import { SidebarNav } from "./side-nav";
 
 export default function DefaultDocs({
   header,
+  versionSelect,
+  productSelect,
   sidebar,
   children,
   announcement,
   tabs,
+  hasProductsOrVersions = false,
   isSidebarFixed = false,
   isHeaderDisabled = false,
   showSearchBarInTabs = false,
@@ -28,10 +32,13 @@ export default function DefaultDocs({
   darkSidebarClassName,
 }: {
   header: React.ReactNode;
+  versionSelect?: React.ReactNode;
+  productSelect?: React.ReactNode;
   sidebar: React.ReactNode;
   children: React.ReactNode;
   announcement?: React.ReactNode;
   tabs?: React.ReactNode;
+  hasProductsOrVersions?: boolean;
   isSidebarFixed?: boolean;
   isHeaderDisabled?: boolean;
   showSearchBarInTabs?: boolean;
@@ -74,6 +81,20 @@ export default function DefaultDocs({
           data-theme="default"
         >
           <SidebarNav className={sidebarClassName} data-theme="default">
+            <div
+              className={cn("fern-header-switchers px-2 py-4 lg:hidden", {
+                hidden: !hasProductsOrVersions,
+              })}
+            >
+              {productSelect}
+              {versionSelect}
+            </div>
+            <Separator
+              className={cn("bg-border-concealed lg:hidden", {
+                hidden: !hasProductsOrVersions,
+              })}
+            />
+
             {sidebar}
           </SidebarNav>
           {children}

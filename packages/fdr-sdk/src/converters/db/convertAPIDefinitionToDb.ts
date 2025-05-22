@@ -614,6 +614,7 @@ function transformTypeDefinition({
     availability: writeShape.availability,
     // htmlDescription,
     name: writeShape.name,
+    displayName: writeShape.displayName,
     shape: transformShape({ writeShape: writeShape.shape }),
     // descriptionContainsMarkdown: true,
   };
@@ -733,8 +734,7 @@ function transformUnDiscriminatedVariant({
     availability: writeShape.availability,
     // htmlDescription,
     type: writeShape.type,
-    displayName:
-      writeShape.typeName != null ? titleCase(writeShape.typeName) : undefined,
+    displayName: writeShape.displayName,
     // descriptionContainsMarkdown: true,
   };
 }
