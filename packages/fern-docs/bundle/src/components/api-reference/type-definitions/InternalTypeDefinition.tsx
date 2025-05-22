@@ -8,11 +8,8 @@ import { DiscriminatedUnionVariant } from "./DiscriminatedUnionVariant";
 import { EnumTypeDefinition } from "./EnumTypeDefinition";
 import { EnumValue } from "./EnumValue";
 import { FernCollapseWithButtonUncontrolled } from "./FernCollapseWithButtonUncontrolled";
-import { ObjectProperty } from "./ObjectProperty";
-import {
-  IncludeObjectProperty,
-  TypeDefinitionPathPart
-} from "./TypeDefinitionContext";
+import { FilteredObjectProperties } from "./FilteredObjectProperties";
+
 import { WithSeparator } from "./TypeDefinitionDetails";
 import { UndiscriminatedUnionVariant } from "./UndiscriminatedUnionVariant";
 
@@ -84,35 +81,13 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
         </FernCollapseWithButtonUncontrolled>
       );
     case "object": {
-      console.log("SHAPE");
-      console.log(JSON.stringify(shape, null, 2));
       const properties = ApiDefinition.unwrapObjectType(
         shape,
         types
       ).properties;
-      console.log("PROPERTIES");
-      console.log(JSON.stringify(properties, null, 2));
+
       return (
-        <FernCollapseWithButtonUncontrolled
-          showText={`Show ${properties.length} properties`}
-          hideText={`Hide ${properties.length} properties`}
-        >
-          <WithSeparator>
-            {properties.map((property) => (
-              <IncludeObjectProperty
-                key={property.key}
-                property={property}
-              >
-                <TypeDefinitionPathPart
-                  key={property.key}
-                  part={{ type: "objectProperty", propertyName: property.key }}
-                >
-                  <ObjectProperty property={property} types={types} />
-                </TypeDefinitionPathPart>
-              </IncludeObjectProperty>
-            ))}
-          </WithSeparator>
-        </FernCollapseWithButtonUncontrolled>
+          <FilteredObjectProperties properties={properties} types={types} />
       );
     }
     case "primitive":

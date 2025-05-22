@@ -189,23 +189,6 @@ export function TypeDefinitionUncollapsible({
   );
 }
 
-export function IncludeObjectProperty({
-  property,
-  children,
-}: {
-  property: ApiDefinition.ObjectProperty;
-  children: React.ReactNode;
-}) {
-  const parent = useTypeDefinitionContext();
-  console.log("PARENT");
-  console.log(JSON.stringify(property, null, 2));
-  if (!shouldIncludeObjectProperty(property, parent)) {
-    return null;
-  }
-
-  return <>{children}</>;
-}
-
 export function useTypeDefinition(id: string) {
   const context = useTypeDefinitionContext();
   return context.types[id];
@@ -231,15 +214,16 @@ export function useIsActive(): boolean {
 
 export function shouldIncludeObjectProperty(
   property: ApiDefinition.ObjectProperty,
-  typeDefinitionContext: TypeDefinitionContextValue
+  isRequest?: boolean,
+  isResponse?: boolean,
 ) {
   if (
-    typeDefinitionContext.isRequest &&
+    isRequest &&
     property.propertyAccess === "READ_ONLY"
   )
     return false;
   if (
-    typeDefinitionContext.isResponse &&
+    isResponse &&
     property.propertyAccess === "WRITE_ONLY"
   )
     return false;
