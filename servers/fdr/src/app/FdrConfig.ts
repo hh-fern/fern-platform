@@ -38,6 +38,13 @@ const REDIS_CLUSTERING_ENABLED_ENV_VAR = "REDIS_CLUSTERING_ENABLED";
 const APPLICATION_ENVIRONMENT_ENV_VAR = "APPLICATION_ENVIRONMENT";
 const PUBLIC_DOCS_CDN_URL = "PUBLIC_DOCS_CDN_URL";
 
+
+// Self-hosted env variables
+const MINIO_USERNAME = "MINIO_USERNAME";
+const MINIO_PASSWORD = "MINIO_PASSWORD";
+const MINIO_URL = "MINIO_URL";
+const MINIO_BUCKET_NAME = "MINIO_BUCKET_NAME";
+
 export interface S3Config {
   bucketName: string;
   bucketRegion: string;
@@ -45,6 +52,7 @@ export interface S3Config {
 }
 
 export interface FdrConfig {
+  localModeOverride: boolean;
   venusUrl: string;
   awsAccessKey: string;
   awsSecretKey: string;
@@ -68,9 +76,60 @@ export interface FdrConfig {
   applicationEnvironment: string;
 }
 
-export function getConfig(): FdrConfig {
+/**function selfHostedBucketName(): string {
+  const orgName = process.env.ORG_NAME || "local";
+  return `${orgName}.docs.buildwithfern.com`;
+}**/
+
+function getSelfHostedS3Config(): S3Config {
   return {
-    venusUrl: getEnvironmentVariableOrThrow(VENUS_URL_ENV_VAR),
+    bucketName: getEnvironmentVariableOrThrow(MINIO_BUCKET_NAME),
+    bucketRegion: "global",
+    urlOverride: getEnvironmentVariableOrThrow(MINIO_URL),
+  };
+}
+
+function getConfigForLocalMode(): FdrConfig {
+  // can we use the same bucket for all S3 configs
+  const selfHostedS3Config = getSelfHostedS3Config();
+
+  return {
+    localModeOverride: true,
+    venusUrl: "",
+    awsAccessKey: getEnvironmentVariableOrThrow(MINIO_USERNAME),
+    awsSecretKey: getEnvironmentVariableOrThrow(MINIO_PASSWORD),
+    publicDocsS3: selfHostedS3Config,
+    privateDocsS3: selfHostedS3Config,
+    dbDocsDefinitionS3: selfHostedS3Config,
+    privateApiDefinitionSourceS3: selfHostedS3Config,
+    domainSuffix: "docs.buildwithfern.com",
+    algoliaAppId: "local",
+    algoliaAdminApiKey: "local",
+    algoliaSearchApiKey: "local",
+    algoliaSearchIndex: "local",
+    algoliaSearchV2Domains: ["local"],
+    slackToken: "local",
+    logLevel: "info",
+    docsCacheEndpoint: "local",
+    enableCustomerNotifications: false,
+    redisEnabled: false,
+    redisClusteringEnabled: false,
+    applicationEnvironment: "local",
+    cdnPublicDocsUrl: "local"
+  };
+}
+
+export function getConfig(): FdrConfig {
+  const localModeOverride = process.env["LOCAL_MODE_OVERRIDE"] === "true";
+  console.log(`localModeOverride: ${localModeOverride}`);
+  if (localModeOverride) {
+    console.log("entered.......");
+    return getConfigForLocalMode();
+  }
+
+  return {
+    localModeOverride: false,
+    venusUrl: "",
     awsAccessKey: getEnvironmentVariableOrThrow(AWS_ACCESS_KEY_ENV_VAR),
     awsSecretKey: getEnvironmentVariableOrThrow(AWS_SECRET_KEY_ENV_VAR),
     publicDocsS3: {
@@ -140,6 +199,7 @@ export function getConfig(): FdrConfig {
 }
 
 function getEnvironmentVariableOrThrow(environmentVariable: string): string {
+  console.log(`Environment variable ${environmentVariable}`);
   const value = process.env[environmentVariable];
   if (value == null) {
     throw new Error(`Environment variable ${environmentVariable} not found`);
