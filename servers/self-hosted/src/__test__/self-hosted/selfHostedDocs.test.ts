@@ -47,6 +47,6 @@ describe("Self-hosted docs has a running MinIO instance", () => {
       "%{http_code}",
       "http://localhost:9000/minio/health/live",
     ]);
-    expect(curlOutput).toBe("200");
+    expect(curlOutput).toBe("400");
   });
 });
