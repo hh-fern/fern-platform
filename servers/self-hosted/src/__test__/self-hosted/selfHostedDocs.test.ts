@@ -85,7 +85,6 @@ describe("Self-hosted docs has a running MinIO instance", () => {
   });
 });
 
-
 describe("FDR server is running and api endpoints are available", () => {
   it("health check passes", async () => {
     const containerId = await getContainerId();

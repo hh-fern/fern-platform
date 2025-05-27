@@ -26,7 +26,6 @@ To expose MinIO ports to your host machine:
 2. Visit http://localhost:9001/
 3. Should see MinIO Web UI. Can login with user/password (minioadmin, minioadmin)
 
-
 To query postgres:
 
 When the Docker container is built, FDR’s database migrations are automatically applied to the local Postgres instance. If you want to inspect the tables or data in your local Postgres database running inside the self-hosted Docker container, follow these steps:
@@ -35,7 +34,6 @@ When the Docker container is built, FDR’s database migrations are automaticall
 2. Connect to Postgres using psql: `psql -h localhost -U postgres -d postgres`
 3. Switch to the FDR database: `\c fdr`
 4. Once connected, you can list the tables with `\dt` and you should see all the expected tables in the FDR database.
-
 
 ## Testing
 

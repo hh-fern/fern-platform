@@ -38,7 +38,6 @@ const REDIS_CLUSTERING_ENABLED_ENV_VAR = "REDIS_CLUSTERING_ENABLED";
 const APPLICATION_ENVIRONMENT_ENV_VAR = "APPLICATION_ENVIRONMENT";
 const PUBLIC_DOCS_CDN_URL = "PUBLIC_DOCS_CDN_URL";
 
-
 // Self-hosted env variables
 const MINIO_USERNAME = "MINIO_USERNAME";
 const MINIO_PASSWORD = "MINIO_PASSWORD";
@@ -110,7 +109,7 @@ function getConfigForLocalMode(): FdrConfig {
     redisEnabled: false,
     redisClusteringEnabled: false,
     applicationEnvironment: "local",
-    cdnPublicDocsUrl: "local"
+    cdnPublicDocsUrl: "local",
   };
 }
 
