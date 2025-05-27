@@ -84,7 +84,6 @@ function getSelfHostedS3Config(): S3Config {
 }
 
 function getConfigForLocalMode(): FdrConfig {
-  // can we use the same bucket for all S3 configs
   const selfHostedS3Config = getSelfHostedS3Config();
 
   return {
@@ -114,14 +113,18 @@ function getConfigForLocalMode(): FdrConfig {
 }
 
 export function getConfig(): FdrConfig {
-  const localModeOverride = process.env["LOCAL_MODE_OVERRIDE"] === "true";
-  if (localModeOverride) {
+  const localMode = process.env["LOCAL_MODE_OVERRIDE"] ?? "false";
+  const shouldOverride = localMode === "true";
+  console.log(`localMode: ${localMode}`);
+  console.log(`shouldOverride: ${shouldOverride}`);
+  if (shouldOverride) {
+    console.log("entered local mode");
     return getConfigForLocalMode();
   }
 
   return {
     localModeOverride: false,
-    venusUrl: "",
+    venusUrl: getEnvironmentVariableOrThrow(VENUS_URL_ENV_VAR),
     awsAccessKey: getEnvironmentVariableOrThrow(AWS_ACCESS_KEY_ENV_VAR),
     awsSecretKey: getEnvironmentVariableOrThrow(AWS_SECRET_KEY_ENV_VAR),
     publicDocsS3: {
