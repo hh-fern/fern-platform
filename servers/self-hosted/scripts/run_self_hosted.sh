@@ -87,10 +87,6 @@ echo "FDR is up and running at localhost:8080"
 
 # -----------  Finish run FDR  -----------
 
-
-# hmmmm ok now we need someones files to be in here and we then use them to generate the docs
-# fern CLI was already installed in the docker image
-# need to make sure this hits the right port and that the files get inserted in our postgres db
 cd /app/
 
 if [ -d "fern" ]; then
