@@ -76,11 +76,6 @@ export interface FdrConfig {
   applicationEnvironment: string;
 }
 
-/**function selfHostedBucketName(): string {
-  const orgName = process.env.ORG_NAME || "local";
-  return `${orgName}.docs.buildwithfern.com`;
-}**/
-
 function getSelfHostedS3Config(): S3Config {
   return {
     bucketName: getEnvironmentVariableOrThrow(MINIO_BUCKET_NAME),
