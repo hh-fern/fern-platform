@@ -121,9 +121,7 @@ function getConfigForLocalMode(): FdrConfig {
 
 export function getConfig(): FdrConfig {
   const localModeOverride = process.env["LOCAL_MODE_OVERRIDE"] === "true";
-  console.log(`localModeOverride: ${localModeOverride}`);
   if (localModeOverride) {
-    console.log("entered.......");
     return getConfigForLocalMode();
   }
 
@@ -199,7 +197,6 @@ export function getConfig(): FdrConfig {
 }
 
 function getEnvironmentVariableOrThrow(environmentVariable: string): string {
-  console.log(`Environment variable ${environmentVariable}`);
   const value = process.env[environmentVariable];
   if (value == null) {
     throw new Error(`Environment variable ${environmentVariable} not found`);
