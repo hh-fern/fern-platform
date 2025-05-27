@@ -84,3 +84,24 @@ describe("Self-hosted docs has a running MinIO instance", () => {
     expect(curlOutput).toBe("200");
   });
 });
+
+
+describe("FDR server is running and api endpoints are available", () => {
+  it("health check passes", async () => {
+    const containerId = await getContainerId();
+    expect(containerId).toBeTruthy();
+
+    const { stdout: curlOutput } = await execa("docker", [
+      "exec",
+      containerId,
+      "curl",
+      "-s",
+      "-o",
+      "/dev/null",
+      "-w",
+      "%{http_code}",
+      "http://localhost:8080/health",
+    ]);
+    expect(curlOutput).toBe("200");
+  });
+});
