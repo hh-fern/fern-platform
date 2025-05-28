@@ -35,7 +35,7 @@ export function MarkdownContent({
   // cohere-demo
   let footnoteCounter = 1;
   cleanedContent = cleanedContent.replace(
-    /https?:\/\/cohere-ai[^\s\n]+/g,
+    /\nhttps?:\/\/cohere-ai[^\s\n]+\n/g,
     (match) => {
       trailingFootnoteIndicators.push(`[^${footnoteCounter}]`);
       footnoteDefinitions.push(`[^${footnoteCounter}]: ${match}`);
