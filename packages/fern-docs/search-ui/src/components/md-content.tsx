@@ -30,6 +30,19 @@ export function MarkdownContent({
       return `[^${footnoteNumber}]\n`;
     }
   );
+
+  // cohere-demo
+  let footnoteCounter = 1;
+  cleanedContent = cleanedContent.replace(
+    /https?:\/\/cohere-ai[^\s\n]+/g,
+    (match) => {
+      const footnote = `[^${footnoteCounter}]\n`;
+      footnoteDefinitions.push(`[^${footnoteCounter}]: ${match}`);
+      footnoteCounter++;
+      return footnote;
+    }
+  );
+
   if (footnoteDefinitions.length > 0) {
     cleanedContent =
       cleanedContent.trim() + "\n\n" + footnoteDefinitions.join("\n");

@@ -17,10 +17,7 @@ import { initLogger, traced, wrapAISDKModel } from "braintrust";
 import { z } from "zod";
 
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
-import {
-  createDefaultSystemPrompt,
-  createWebflowSystemPrompt,
-} from "@fern-docs/search-server";
+import { createDefaultSystemPrompt } from "@fern-docs/search-server";
 import {
   queryTurbopuffer,
   toDocuments,
@@ -78,6 +75,7 @@ export async function POST(req: NextRequest) {
   const chatSource = source ?? "chat"; // distinguish between chat and mcp server request
 
   // TODO: remove this once webflow adds model/system-prompt to docs.yml
+  console.log(url);
   const isWebflow = url.includes("webflow");
 
   const model: string = config.aiChatConfig?.model || "claude-3.5";
@@ -108,7 +106,7 @@ export async function POST(req: NextRequest) {
   const embeddingModel = openai.embedding("text-embedding-3-large");
   const namespace = `${withoutStaging(domain)}_${embeddingModel.modelId}`;
 
-  const promptTemplate = config.aiChatConfig?.systemPrompt;
+  // const promptTemplate = config.aiChatConfig?.systemPrompt;
   if (metadata == null) {
     return NextResponse.json("Not found", { status: 404 });
   }
@@ -145,16 +143,17 @@ export async function POST(req: NextRequest) {
   });
   const documents = toDocuments(searchResults).join("\n\n");
   const system = isWebflow
-    ? createWebflowSystemPrompt({
+    ? createDefaultSystemPrompt({
         domain,
         date: new Date().toDateString(),
         documents,
+        promptTemplate: "",
       })
     : createDefaultSystemPrompt({
         domain,
         date: new Date().toDateString(),
         documents,
-        promptTemplate,
+        promptTemplate: "",
       });
   return traced(async (span) => {
     span.log({
@@ -164,6 +163,7 @@ export async function POST(req: NextRequest) {
         conversationId: conversationId,
       },
     });
+    console.log(system);
     const result = streamText({
       model: languageModel,
       system,

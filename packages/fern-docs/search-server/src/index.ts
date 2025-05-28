@@ -3,5 +3,5 @@ export {
   SuggestionsSchema,
   type Suggestions,
 } from "./utils/suggestions-schema";
-export { createDefaultSystemPrompt } from "./utils/system-prompt";
-export { createWebflowSystemPrompt } from "./utils/webflow-system-prompt";
+export { createDefaultSystemPrompt } from "./utils/system-prompts/system-prompt";
+export { createWebflowSystemPrompt } from "./utils/system-prompts/webflow-system-prompt";

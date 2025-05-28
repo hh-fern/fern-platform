@@ -40,7 +40,7 @@
     "**/*.ts",
     "**/*.tsx",
     "../components/src/kbd.tsx",
-    "../search-server/src/utils/system-prompt.ts"
+    "../search-server/src/utils/system-prompts/system-prompt.ts"
   ],
   "exclude": ["node_modules", "src/server/**/*"]
 }
