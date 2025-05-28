@@ -20,6 +20,7 @@ export function MarkdownContent({
     This code will regex for improperly placed links, and then move them to the end
   */
   let cleanedContent = children;
+  const trailingFootnoteIndicators: string[] = [];
   const footnoteDefinitions: string[] = [];
   cleanedContent = cleanedContent.replace(
     /\[\^(\d+)\]:\s+([a-zA-Z][^\s]*?\.[a-zA-Z][^\s]*?)(?=\n\n|\n[^\n]|$)/g,
@@ -36,13 +37,17 @@ export function MarkdownContent({
   cleanedContent = cleanedContent.replace(
     /https?:\/\/cohere-ai[^\s\n]+/g,
     (match) => {
-      const footnote = `[^${footnoteCounter}]\n`;
+      trailingFootnoteIndicators.push(`[^${footnoteCounter}]`);
       footnoteDefinitions.push(`[^${footnoteCounter}]: ${match}`);
       footnoteCounter++;
-      return footnote;
+      return "";
     }
   );
 
+  if (trailingFootnoteIndicators.length > 0) {
+    cleanedContent =
+      cleanedContent.trim() + " " + trailingFootnoteIndicators.join(" ");
+  }
   if (footnoteDefinitions.length > 0) {
     cleanedContent =
       cleanedContent.trim() + "\n\n" + footnoteDefinitions.join("\n");
