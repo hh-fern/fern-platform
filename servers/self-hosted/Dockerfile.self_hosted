@@ -83,11 +83,6 @@ COPY turbo.json turbo.json
 COPY shared shared
 COPY fern fern
 
-# TODO im not sure COPY fern fern is correct?
-# this is a fern folder already in the fern-platform, so i wonder if we can
-# just replace it with the one from where the dockerfile is getting run
-
-
 RUN pnpm turbo --filter=@fern-api/fdr-sdk compile
 RUN pnpm turbo --filter=@fern-platform/fdr codegen
 RUN pnpm turbo --filter=@fern-platform/fdr compile

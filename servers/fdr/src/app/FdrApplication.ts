@@ -134,10 +134,9 @@ export function createFdrApplication(
   config: FdrConfig,
 ): FdrApplication {
   if (config.localModeOverride) {
-    console.log("local mode override......");
     return new FdrApplication(config, {
       auth: new LocalAuthServiceImpl({
-        orgIds: ['local', 'plantstore', 'ariel2'],
+        orgIds: process.env.ORG_IDS?.split(",") ?? [],
       }),
       algolia: new LocalAlgoliaServiceImpl(),
       slack: new LocalSlackServiceImpl(),

@@ -2,6 +2,10 @@ import { execa } from "execa";
 import { describe, expect, it } from "vitest";
 
 import { SELF_HOSTED_CONTAINER_NAME } from "./setupSelfHostedDocs";
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.join(__dirname, "../../../.env") });
 
 async function getContainerId() {
   const { stdout: containerId } = await execa("docker", [
@@ -64,20 +68,6 @@ describe("Self-hosted docs has a running Postgres instance", () => {
     expect(tableCount).toBeGreaterThan(0);
   });
 
-  it("Minio Bucket exists", async () => {
-    const containerId = await getContainerId();
-    expect(containerId).toBeTruthy();
-
-    const { stdout: minioStatus } = await execa("docker", [ 
-      "exec",
-      containerId,
-      "mc",
-      "ls",
-      "minio",
-    ]);
-    expect(minioStatus).toContain("docs.buildwithfern.com");
-  });
-
   it("Minio Bucket has docs", async () => {
     const containerId = await getContainerId();
     expect(containerId).toBeTruthy();
@@ -88,7 +78,9 @@ describe("Self-hosted docs has a running Postgres instance", () => {
         "ls",
         "minio",
       ]);
-      expect(minioStatus).toContain("docs.buildwithfern.com");
+      const orgName = process.env.ORG_NAME || "fern-internal";
+      expect(minioStatus).toContain(`${orgName}.docs.buildwithfern.com`);
+
   });
 
 });

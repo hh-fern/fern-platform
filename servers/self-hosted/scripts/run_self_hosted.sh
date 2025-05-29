@@ -5,15 +5,39 @@ if [ ! -d "/app/fern" ]; then
     echo "Fern folder not found. Please ensure you are mounting yours in."
     exit 1
 fi
-
-# --------------------------------------------
-
-echo "127.0.0.1 ariel2.docs.buildwithfern.com.localhost" >> /etc/hosts
-echo "::1 ariel2.docs.buildwithfern.com.localhost" >> /etc/hosts
-
 # --------------------------------------------
 
 source /app/servers/self-hosted/.env
+
+# --------------------------------------------
+
+# Extract org name from fern.config.json if not set
+if [ -z "${ORG_NAME:-}" ]; then
+    if [ -f "/app/fern/fern.config.json" ]; then
+        ORG_NAME=$(jq -r '.organization' /app/fern/fern.config.json)
+        echo "Extracted ORG_NAME from fern.config.json: $ORG_NAME"
+    fi
+fi
+
+# Use environment variables with defaults
+ORG_NAME=${ORG_NAME:-fern-internal}
+MINIO_USERNAME=${MINIO_USERNAME:-minioadmin}
+MINIO_PASSWORD=${MINIO_PASSWORD:-minioadmin}
+MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME:-docs.buildwithfern.com}
+MINIO_URL=${MINIO_URL:-http://localhost:9000}
+DATABASE_NAME=${DATABASE_NAME:-fdr}
+DATABASE_URL=${DATABASE_URL:-postgresql://postgres@localhost:5432/fdr}
+
+echo "127.0.0.1 $ORG_NAME.docs.buildwithfern.com.localhost" >> /etc/hosts
+echo "::1 $ORG_NAME.docs.buildwithfern.com.localhost" >> /etc/hosts
+
+echo "ORG_NAME: $ORG_NAME"
+echo "MINIO_USERNAME: $MINIO_USERNAME"
+echo "MINIO_PASSWORD: $MINIO_PASSWORD"
+echo "MINIO_BUCKET_NAME: $MINIO_BUCKET_NAME"
+echo "MINIO_URL: $MINIO_URL"
+echo "DATABASE_NAME: $DATABASE_NAME"
+echo "DATABASE_URL: $DATABASE_URL"
 
 # -----------  Start run Postgres  -----------
 
@@ -56,7 +80,7 @@ done
 echo "MinIO server is up and running"
 
 # Initialize MinIO
-mc alias set minio http://localhost:9000 minioadmin minioadmin
+mc alias set minio ${MINIO_URL} ${MINIO_USERNAME} ${MINIO_PASSWORD}
 mc mb minio/${MINIO_BUCKET_NAME}
 
 # -----------  Finish run MinIO  -----------
