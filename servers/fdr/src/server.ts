@@ -7,6 +7,7 @@ import { Agent, setGlobalDispatcher } from "undici";
 
 import { register } from "./api";
 import { FdrApplication, getConfig } from "./app";
+import { createFdrApplication } from "./app/FdrApplication";
 import { registerBackgroundTasks } from "./background";
 import { getApiLatestService } from "./controllers/api/getApiLatestService";
 import { getReadApiService } from "./controllers/api/getApiReadService";
@@ -28,7 +29,6 @@ import { getSnippetsService } from "./controllers/snippets/getSnippetsService";
 import { getTemplatesService } from "./controllers/snippets/getTemplatesService";
 import { getTokensService } from "./controllers/tokens/getTokensService";
 import { checkRedis } from "./healthchecks/checkRedis";
-import { createFdrApplication } from "./app/FdrApplication";
 
 const PORT = 8080;
 
