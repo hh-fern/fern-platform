@@ -63,6 +63,34 @@ describe("Self-hosted docs has a running Postgres instance", () => {
     const tableCount = parseInt(tableList.trim());
     expect(tableCount).toBeGreaterThan(0);
   });
+
+  it("Minio Bucket exists", async () => {
+    const containerId = await getContainerId();
+    expect(containerId).toBeTruthy();
+
+    const { stdout: minioStatus } = await execa("docker", [ 
+      "exec",
+      containerId,
+      "mc",
+      "ls",
+      "minio",
+    ]);
+    expect(minioStatus).toContain("docs.buildwithfern.com");
+  });
+
+  it("Minio Bucket has docs", async () => {
+    const containerId = await getContainerId();
+    expect(containerId).toBeTruthy();
+    const { stdout: minioStatus } = await execa("docker", [ 
+        "exec",
+        containerId,
+        "mc",
+        "ls",
+        "minio",
+      ]);
+      expect(minioStatus).toContain("docs.buildwithfern.com");
+  });
+
 });
 
 describe("Self-hosted docs has a running MinIO instance", () => {

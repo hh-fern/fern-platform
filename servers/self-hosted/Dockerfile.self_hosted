@@ -96,6 +96,11 @@ RUN pnpm turbo --filter=@fern-platform/fdr compile
 FROM base AS runner
 WORKDIR /app
 
+# Install MinIO client (mc) in the runner stage
+RUN wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
+    chmod +x mc && \
+    mv mc /usr/local/bin/
+
 RUN npm install -g prisma 
 # fern-api
 
