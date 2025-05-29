@@ -6,6 +6,13 @@ if [ ! -d "/app/fern" ]; then
     exit 1
 fi
 
+# --------------------------------------------
+
+echo "127.0.0.1 ariel2.docs.buildwithfern.com.localhost" >> /etc/hosts
+echo "::1 ariel2.docs.buildwithfern.com.localhost" >> /etc/hosts
+
+# --------------------------------------------
+
 source /app/servers/self-hosted/.env
 
 # -----------  Start run Postgres  -----------
@@ -95,7 +102,15 @@ else
     echo "fern folder NOT found in current directory"
 fi
 
-fern generate --docs
+# --------------  Generate docs and insert into MinIO via FDR --------------
+
+echo "running fern generate --docs"
+
+FERN_TOKEN=dummy DEFAULT_FDR_ORIGIN=http://localhost:8080  FERN_NO_VERSION_REDIRECTION=true FERN_AUTH_NO_VERIFY=true fern generate --docs
+
+echo " docs generated in /app/fern"
+
+# --------------  Finish generate docs --------------
 
 if [ "${RUN_MODE:-}" = "shell" ]; then
     echo "Entering shell mode..."

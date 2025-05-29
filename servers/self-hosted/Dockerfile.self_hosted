@@ -41,6 +41,18 @@ RUN mv mc /usr/local/bin/
 
 # ----------- End MINIO setup  -----------
 
+# ----------- Setup fern-cli  -----------
+
+# TODO download from latest release with NPM after we ship updates to the CLI
+RUN mkdir -p /usr/local/lib/fern
+COPY servers/self-hosted/fern-api-cli.tgz /usr/local/lib/fern/fern-cli.tar.gz
+RUN tar -xzf /usr/local/lib/fern/fern-cli.tar.gz -C /usr/local/lib/fern
+
+RUN echo '#!/bin/sh' > /usr/local/bin/fern && \
+    echo 'node /usr/local/lib/fern/package/dist/local/cli.cjs "$@"' >> /usr/local/bin/fern && \
+    chmod +x /usr/local/bin/fern
+# ----------- End fern-cli setup  -----------
+
 # ----------- Setup FDR  -----------
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
@@ -70,6 +82,12 @@ COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
 COPY shared shared
 COPY fern fern
+
+# TODO im not sure COPY fern fern is correct?
+# this is a fern folder already in the fern-platform, so i wonder if we can
+# just replace it with the one from where the dockerfile is getting run
+
+
 RUN pnpm turbo --filter=@fern-api/fdr-sdk compile
 RUN pnpm turbo --filter=@fern-platform/fdr codegen
 RUN pnpm turbo --filter=@fern-platform/fdr compile
@@ -78,7 +96,8 @@ RUN pnpm turbo --filter=@fern-platform/fdr compile
 FROM base AS runner
 WORKDIR /app
 
-RUN npm install -g prisma fern-api
+RUN npm install -g prisma 
+# fern-api
 
 # Copy the built FDR application
 COPY --from=installer /app .

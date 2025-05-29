@@ -26,6 +26,10 @@ import {
 import { type S3Service, S3ServiceImpl } from "../services/s3";
 import { SlackService, SlackServiceImpl } from "../services/slack/SlackService";
 import { type FdrConfig } from "./FdrConfig";
+import { LocalAuthServiceImpl } from "../services/auth/LocalAuthService";
+import { LocalAlgoliaServiceImpl } from "../services/algolia/LocalAlgoliaService";
+import { LocalSlackServiceImpl } from "../services/slack/LocalSlackService";
+import { LocalRevalidatorServiceImpl } from "../services/revalidator/LocalRevalidatorService";
 
 export interface FdrServices {
   readonly auth: AuthService;
@@ -124,4 +128,22 @@ export class FdrApplication {
   public async initialize(): Promise<void> {
     await this.docsDefinitionCache.initialize();
   }
+}
+
+export function createFdrApplication(
+  config: FdrConfig,
+): FdrApplication {
+  if (config.localModeOverride) {
+    console.log("local mode override......");
+    return new FdrApplication(config, {
+      auth: new LocalAuthServiceImpl({
+        orgIds: ['local', 'plantstore', 'ariel2'],
+      }),
+      algolia: new LocalAlgoliaServiceImpl(),
+      slack: new LocalSlackServiceImpl(),
+      revalidator: new LocalRevalidatorServiceImpl(),
+    });
+  }
+
+  return new FdrApplication(config);
 }

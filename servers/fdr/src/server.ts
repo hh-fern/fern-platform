@@ -28,6 +28,7 @@ import { getSnippetsService } from "./controllers/snippets/getSnippetsService";
 import { getTemplatesService } from "./controllers/snippets/getTemplatesService";
 import { getTokensService } from "./controllers/tokens/getTokensService";
 import { checkRedis } from "./healthchecks/checkRedis";
+import { createFdrApplication } from "./app/FdrApplication";
 
 const PORT = 8080;
 
@@ -67,7 +68,7 @@ expressApp.use(compression());
 
 setGlobalDispatcher(new Agent({ connect: { timeout: 5_000 } }));
 
-const app = new FdrApplication(config);
+const app = createFdrApplication(config);
 
 expressApp.get("/health", (_req, res) => {
   (async () => {
