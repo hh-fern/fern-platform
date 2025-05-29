@@ -5,39 +5,16 @@ if [ ! -d "/app/fern" ]; then
     echo "Fern folder not found. Please ensure you are mounting yours in."
     exit 1
 fi
+
 # --------------------------------------------
 
 source /app/servers/self-hosted/.env
 
 # --------------------------------------------
 
-# Extract org name from fern.config.json if not set
-if [ -z "${ORG_NAME:-}" ]; then
-    if [ -f "/app/fern/fern.config.json" ]; then
-        ORG_NAME=$(jq -r '.organization' /app/fern/fern.config.json)
-        echo "Extracted ORG_NAME from fern.config.json: $ORG_NAME"
-    fi
-fi
-
-# Use environment variables with defaults
-ORG_NAME=${ORG_NAME:-fern-internal}
-MINIO_USERNAME=${MINIO_USERNAME:-minioadmin}
-MINIO_PASSWORD=${MINIO_PASSWORD:-minioadmin}
-MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME:-docs.buildwithfern.com}
-MINIO_URL=${MINIO_URL:-http://localhost:9000}
-DATABASE_NAME=${DATABASE_NAME:-fdr}
-DATABASE_URL=${DATABASE_URL:-postgresql://postgres@localhost:5432/fdr}
-
+# map custom domain to local machine
 echo "127.0.0.1 $ORG_NAME.docs.buildwithfern.com.localhost" >> /etc/hosts
 echo "::1 $ORG_NAME.docs.buildwithfern.com.localhost" >> /etc/hosts
-
-echo "ORG_NAME: $ORG_NAME"
-echo "MINIO_USERNAME: $MINIO_USERNAME"
-echo "MINIO_PASSWORD: $MINIO_PASSWORD"
-echo "MINIO_BUCKET_NAME: $MINIO_BUCKET_NAME"
-echo "MINIO_URL: $MINIO_URL"
-echo "DATABASE_NAME: $DATABASE_NAME"
-echo "DATABASE_URL: $DATABASE_URL"
 
 # -----------  Start run Postgres  -----------
 
@@ -97,12 +74,14 @@ DATABASE_URL=${DATABASE_URL} prisma migrate deploy --schema /app/servers/fdr/pri
 
 # -----------  Start run FDR  -----------
 
+
 LOCAL_MODE_OVERRIDE=true \
 DATABASE_URL=${DATABASE_URL} \
 MINIO_USERNAME=${MINIO_USERNAME} \
 MINIO_PASSWORD=${MINIO_PASSWORD} \
 MINIO_URL=${MINIO_URL} \
 MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME} \
+ORG_NAME=${ORG_NAME} \
 node --loader /app/servers/fdr/ts-loader.js --experimental-specifier-resolution=node /app/servers/fdr/dist/server.js & fdr_pid=$!
 
 echo "Waiting for fdr to start at localhost:8080..."
@@ -132,7 +111,7 @@ echo "running fern generate --docs"
 
 FERN_TOKEN=dummy DEFAULT_FDR_ORIGIN=http://localhost:8080  FERN_NO_VERSION_REDIRECTION=true FERN_AUTH_NO_VERIFY=true fern generate --docs
 
-echo " docs generated in /app/fern"
+echo " docs generated successfully"
 
 # --------------  Finish generate docs --------------
 

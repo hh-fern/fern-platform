@@ -11,7 +11,7 @@ export class LocalAuthServiceImpl implements AuthService {
     async getOrgIdsFromAuthHeader({ authHeader, }: { authHeader: string | undefined; }): Promise<OrgIdsResponse> {
         return {
             type: "success",
-            orgIds: new Set<string>(this.orgIds), // TODO need to fix this...
+            orgIds: new Set<string>(this.orgIds),
         }
     }
 

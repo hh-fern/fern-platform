@@ -2,7 +2,7 @@ FROM node:20.18-alpine3.20 AS base
 
 # -----------  Start Postgres setup  -----------
 
-RUN apk update && apk add --no-cache postgresql curl
+RUN apk update && apk add --no-cache postgresql curl jq
 
 # Set up Postgres data directory and configuration
 RUN mkdir -p /var/lib/postgresql/data && \
