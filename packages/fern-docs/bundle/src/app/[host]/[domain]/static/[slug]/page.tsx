@@ -1,10 +1,10 @@
 import "server-only";
 
+import { notFound } from "next/navigation";
 import { Metadata } from "next/types";
 
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 
-import RootPage from "@/app/page";
 import { generateMetadataFromPage } from "@/components/seo";
 import SharedPage from "@/components/shared-page";
 import { createCachedDocsLoader } from "@/server/docs-loader";
@@ -17,8 +17,8 @@ export default async function StaticPage({
   params: Promise<{ host: string; domain: string; slug: string }>;
 }) {
   const { host, domain, slug } = await params;
-  if (slug === "index.html") {
-    return <RootPage />;
+  if (slugjoin(slug) === slugjoin("index.html")) {
+    return notFound();
   }
   const loader = await createCachedDocsLoader(host, domain);
   return <SharedPage loader={loader} slug={slugjoin(slug)} />;
