@@ -52,11 +52,16 @@ export function useShouldHideAsides() {
   const layout = useLayout();
   const emptySidebar = useAtomValue(emptySidebarAtom);
   const isLandingPage = useAtomValue(isLandingPageAtom);
+  const tocIsEmpty = useAtomValue(emptyTableOfContentsAtom);
+
+  console.log("isSidebarFixed", isSidebarFixed);
+  console.log("layout", layout);
+  console.log("emptySidebar", emptySidebar);
+  console.log("isLandingPage", isLandingPage);
 
   // only guides and overviews currently have table of contents
   const emptyTableOfContents =
-    useAtomValue(emptyTableOfContentsAtom) ||
-    (layout !== "guide" && layout !== "overview");
+    tocIsEmpty || (layout !== "guide" && layout !== "overview");
 
   // page layout should supersede a fixed sidebar
   if (layout === "custom" || layout === "page" || isLandingPage) {
