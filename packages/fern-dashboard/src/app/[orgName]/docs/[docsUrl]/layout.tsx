@@ -7,15 +7,17 @@ export default async function Layout({
   params,
   children,
 }: Readonly<{
-  params: Promise<{ docsUrl: string }>;
+  params: Promise<{ orgName: string; docsUrl: string }>;
   children: React.JSX.Element;
 }>) {
-  const docsUrl = parseDocsUrlParam(await params);
+  const { orgName, ..._params } = await params;
+  const docsUrl = parseDocsUrlParam(_params);
   const session = await getCurrentSessionOrThrow();
 
   return (
     <DocsSiteLayout
       docsUrl={docsUrl}
+      orgName={orgName}
       featureFlags={await getAllFeatureFlags(session.user.sub)}
     >
       <>{children}</>
