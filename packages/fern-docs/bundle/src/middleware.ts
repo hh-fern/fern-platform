@@ -258,7 +258,11 @@ export const config: MiddlewareConfig = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * fuzzing defense:
+     * - files ending in .js, .php, .wsf, .aspx
+     * - paths including a semicolon
+     * - paths to `static/chunk` files
      */
-    "/((?!.well-known|_next|_vercel|favicon.ico|manifest.webmanifest).*)",
+    "/((?!.well-known|_next|_vercel|favicon.ico|manifest.webmanifest|.*\\.js$|.*\\.php$|.*\\.wsf$|.*\\.aspx$|.*;.*|.*static/chunk.*).*)",
   ],
 };
