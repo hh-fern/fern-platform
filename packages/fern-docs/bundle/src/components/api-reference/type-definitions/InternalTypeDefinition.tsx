@@ -11,18 +11,23 @@ import { FernCollapseWithButtonUncontrolled } from "./FernCollapseWithButtonUnco
 import { ObjectProperty } from "./ObjectProperty";
 import { TypeDefinitionPathPart } from "./TypeDefinitionContext";
 import { WithSeparator } from "./TypeDefinitionDetails";
+import { PropertyLocation } from "./TypeReferenceDefinitions";
 import { UndiscriminatedUnionVariant } from "./UndiscriminatedUnionVariant";
 
 export declare namespace InternalTypeDefinition {
   export interface Props {
     shape: ApiDefinition.TypeShapeOrReference;
     types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    location?: PropertyLocation;
+    additionalProperties?: ApiDefinition.ObjectProperty[];
   }
 }
 
 export const InternalTypeDefinition = memo(function InternalTypeDefinition({
   shape,
   types,
+  location,
+  additionalProperties,
 }: {
   shape:
     | ApiDefinition.TypeShape.Enum
@@ -31,6 +36,8 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
     | ApiDefinition.TypeShape.Object_
     | ApiDefinition.TypeReference.Primitive;
   types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+  location?: PropertyLocation;
+  additionalProperties?: ApiDefinition.ObjectProperty[];
 }) {
   switch (shape.type) {
     case "enum": {
@@ -56,6 +63,8 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
                 unionVariant={variant}
                 idx={idx}
                 types={types}
+                location={location}
+                additionalProperties={additionalProperties}
               />
             ))}
           </WithSeparator>
@@ -74,6 +83,7 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
                 key={variant.displayName}
                 unionVariant={variant}
                 types={types}
+                location={location}
               />
             ))}
           </WithSeparator>
@@ -84,18 +94,43 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
         shape,
         types
       ).properties;
+
+      const filteredProperties = filterDuplicateObjectProperties(
+        filterObjectPropertiesByAccess(properties, location)
+      );
+
+      if (filteredProperties.length === 0) {
+        return null;
+      }
+
       return (
         <FernCollapseWithButtonUncontrolled
-          showText={`Show ${properties.length} properties`}
-          hideText={`Hide ${properties.length} properties`}
+          showText={`Show ${filteredProperties.length + (additionalProperties?.length ?? 0)} properties`}
+          hideText={`Hide ${filteredProperties.length + (additionalProperties?.length ?? 0)} properties`}
         >
           <WithSeparator>
-            {properties.map((property) => (
+            {additionalProperties?.map((property) => (
               <TypeDefinitionPathPart
                 key={property.key}
                 part={{ type: "objectProperty", propertyName: property.key }}
               >
-                <ObjectProperty property={property} types={types} />
+                <ObjectProperty
+                  property={property}
+                  types={types}
+                  location={location}
+                />
+              </TypeDefinitionPathPart>
+            ))}
+            {filteredProperties.map((property) => (
+              <TypeDefinitionPathPart
+                key={property.key}
+                part={{ type: "objectProperty", propertyName: property.key }}
+              >
+                <ObjectProperty
+                  property={property}
+                  types={types}
+                  location={location}
+                />
               </TypeDefinitionPathPart>
             ))}
           </WithSeparator>
@@ -108,3 +143,32 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
       throw new UnreachableCaseError(shape);
   }
 });
+
+const filterObjectPropertiesByAccess = (
+  properties: ApiDefinition.ObjectProperty[],
+  location: PropertyLocation | undefined
+) => {
+  if (location === undefined) {
+    return properties;
+  }
+
+  return properties.filter((property) => {
+    if (location === "request") {
+      return property.propertyAccess !== "READ_ONLY";
+    } else if (location === "response") {
+      return property.propertyAccess !== "WRITE_ONLY";
+    }
+    return true;
+  });
+};
+
+const filterDuplicateObjectProperties = (
+  properties: ApiDefinition.ObjectProperty[]
+) => {
+  return properties.reduce<ApiDefinition.ObjectProperty[]>((acc, property) => {
+    if (!acc.some((p) => p.key === property.key)) {
+      acc.push(property);
+    }
+    return acc;
+  }, []);
+};

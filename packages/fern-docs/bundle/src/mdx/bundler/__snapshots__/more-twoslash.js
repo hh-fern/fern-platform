@@ -50,7 +50,7 @@ var Component = (() => {
 
   // _mdx_bundler_entry_point-_random_uuid_.mdx
   var frontmatter = {
-    "title": "TWOSLASH PAGE"
+    "title": "Filename"
   };
   function _createMdxContent(props) {
     const { CodeBlock, ErrorBoundary } = {
@@ -62,27 +62,6 @@ var Component = (() => {
     return (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, {
       children: [(0, import_jsx_runtime.jsx)(ErrorBoundary, {
         children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: "// @noErrors\nconsole.e;\n//       ^|\n",
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: "function add(a: number, b: number) {\n  //     ^^^\n  return a + b;\n}\n",
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: 'const level: string = "Danger";\n// ---cut---\nconsole.log(level);\n',
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
           code: "// @filename: a.ts\nexport const helloWorld: string = 'Hi'\n// ---cut---\n// @filename: b.ts\nimport { helloWorld } from './a'\n\nconsole.log(helloWorld)\n",
           className: "language-ts",
           language: "ts",
@@ -90,56 +69,13 @@ var Component = (() => {
         })
       }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
         children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: 'const level: string = "Danger";\n// ---cut-before---\nconsole.log(level);\n// ---cut-after---\nconsole.log("This is not shown");\n',
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: 'const level: string = "Danger";\n// ---cut-start---\nconsole.log(level); // This is not shown.\n// ---cut-end---\nconsole.log("This is shown");\n',
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: "// @noImplicitAny: false\n// @target: esnext\n// @lib: esnext\n// This suppose to throw an error,\n// but it won't because we disabled noImplicitAny.\nconst fn = (a) => a + 1;\n",
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: '// @showEmit\nconst level: string = "Danger";\n',
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: '// @declaration\n// @showEmit\n// @showEmittedFile: index.d.ts\nexport const hello = "world";\n',
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: '// @declaration\n// @declarationMap\n// @showEmit\n// @showEmittedFile: index.d.ts.map\nexport const hello: string = "world";\n',
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: "// @noErrors\n// This is a twoslash code block\nimport { useState } from 'react';\n// ---cut---\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  return (\n    <button onClick={() => setCount(count + 1)}>\n      Count: {count}\n    </button>\n  );\n}\n",
-          className: "language-ts",
-          language: "ts",
-          twoslash: true
-        })
-      }), "\n", (0, import_jsx_runtime.jsx)(ErrorBoundary, {
-        children: (0, import_jsx_runtime.jsx)(CodeBlock, {
-          code: '// @noErrors\n// alchemy-specific twoslash code block\nimport { createAlchemySmartAccountClient } from "@account-kit/infra";\n\nconst client = createAlchemySmartAccountClient({\n  // configuration\n});\n',
+          code: `<Markdown src="./file-a.mdx" />
+// ---cut---
+// @filename: b.ts
+import { helloWorld } from './a'
+
+console.log(helloWorld)
+`,
           className: "language-ts",
           language: "ts",
           twoslash: true

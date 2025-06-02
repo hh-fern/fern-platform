@@ -6,12 +6,14 @@ import { cache } from "react";
 import { Semaphore } from "es-toolkit/compat";
 
 import { Frontmatter } from "@fern-api/fdr-sdk/docs";
+import { isDevelopment } from "@fern-docs/utils";
 
 import { serializeMdx as internalSerializeMdx } from "@/mdx/bundler/serialize";
 import { RehypeLinksOptions } from "@/mdx/plugins/rehype-links";
 import { createCachedDocsLoader } from "@/server/docs-loader";
 
 import { cacheSeed } from "./cache-seed";
+import { postToEngineeringNotifs } from "./slack";
 
 export type MdxSerializerOptions = {
   /**
@@ -87,9 +89,18 @@ export function createCachedMdxSerializer(
               ...scope,
             },
             replaceHref,
+            domain,
           });
         } catch (error) {
           console.error("Error serializing mdx", error);
+
+          if (!isDevelopment(domain)) {
+            postToEngineeringNotifs(
+              `:rotating_light: Error serializing mdx on ${domain} with the following error: ${String(error)}`,
+              "mdx-serializer"
+            );
+          }
+
           return content;
         }
       },
