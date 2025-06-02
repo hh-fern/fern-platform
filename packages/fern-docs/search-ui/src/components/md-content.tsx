@@ -1,29 +1,64 @@
 import type { Root } from "mdast";
-import { ReactElement } from "react";
 import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { visit } from "unist-util-visit";
 
 export function MarkdownContent({
   children,
-  // className,
   components,
-  // small,
 }: {
   children: string;
-  // className?: string;
   components?: Components;
-  // small?: boolean;
-}): ReactElement {
+}) {
+  /*
+    Claude 3.5 sometimes doesn't create footnote definitions correctly
+    remark-gfm requires that footnotes look like [^1] in the text
+    and then [^1]: link in the footnote, whereas Claude 3.5 will sometimes
+    create [^1]: link in the main text, which breaks the markdown rendering.
+
+    This code will regex for improperly placed links, and then move them to the end
+  */
+  let cleanedContent = children;
+  const trailingFootnoteIndicators: string[] = [];
+  const footnoteDefinitions: string[] = [];
+  cleanedContent = cleanedContent.replace(
+    /\[\^(\d+)\]:\s+([a-zA-Z][^\s]*?\.[a-zA-Z][^\s]*?)(?=\n\n|\n[^\n]|$)/g,
+    (match, footnoteNumber, link) => {
+      footnoteDefinitions.push(
+        `[^${footnoteNumber}]: ${link.startsWith("http") ? link.trim() : `https://${link.trim()}`}`
+      );
+      return `[^${footnoteNumber}]\n`;
+    }
+  );
+
+  // cohere-demo
+  let footnoteCounter = 1;
+  cleanedContent = cleanedContent.replace(
+    /\nhttps?:\/\/cohere-ai[^\s\n]+\n/g,
+    (match) => {
+      trailingFootnoteIndicators.push(`[^${footnoteCounter}]`);
+      footnoteDefinitions.push(`[^${footnoteCounter}]: ${match}`);
+      footnoteCounter++;
+      return "";
+    }
+  );
+
+  if (trailingFootnoteIndicators.length > 0) {
+    cleanedContent =
+      cleanedContent.trim() + " " + trailingFootnoteIndicators.join(" ");
+  }
+  if (footnoteDefinitions.length > 0) {
+    cleanedContent =
+      cleanedContent.trim() + "\n\n" + footnoteDefinitions.join("\n");
+  }
+
   return (
     <Markdown
       components={components}
       remarkPlugins={[remarkGfm, remarkTest]}
-      // rehypePlugins={[rehypeThinking]}
       remarkRehypeOptions={{}}
-      // className={clsx("prose dark:prose-invert", className, small && "prose-sm")}
     >
-      {children.replaceAll("```[^", "```\n[^")}
+      {cleanedContent.replaceAll("```[^", "```\n[^")}
     </Markdown>
   );
 }
