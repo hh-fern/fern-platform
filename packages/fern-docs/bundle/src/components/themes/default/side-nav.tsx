@@ -26,37 +26,29 @@ export function SidebarNav({
 }) {
   const isDesktop = useIsDesktop();
 
-  if (isDesktop) {
+  if (!isDesktop) {
     return (
-      <DesktopMenu className={cn(className, desktopClassName)} {...props}>
+      <MobileMenu className={cn(className, mobileClassName)} {...props}>
         {children}
-      </DesktopMenu>
+      </MobileMenu>
     );
   }
 
   return (
-    <MobileMenu
-      className={cn(className, mobileClassName, { hidden: isDesktop })}
-      {...props}
-    >
+    <DesktopMenu className={cn(className, desktopClassName)} {...props}>
       {children}
-    </MobileMenu>
+    </DesktopMenu>
   );
 }
 
 function DesktopMenu({
   children,
   className,
-  hidden,
 }: {
   children: React.ReactNode;
   className?: string;
-  hidden?: boolean;
 }) {
   const fixed = useIsSidebarFixed();
-  if (hidden) {
-    return null;
-  }
   return (
     <>
       <HideAsides />

@@ -1,16 +1,14 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import React from "react";
-
-import { HydrationBoundary } from "jotai-ssr";
+import React, { Fragment } from "react";
 
 import { cn } from "@fern-docs/components";
 
 import { Separator } from "@/components/Separator";
 import { FERN_FOOTER_ID } from "@/components/constants";
 import { HeaderTabsRoot } from "@/components/header/HeaderTabsRoot";
-import { isSidebarFixedAtom } from "@/state/layout";
+import { SetIsSidebarFixed } from "@/state/layout";
 
 import { FernHeader } from "./fern-header";
 import { MainCtx } from "./mobile-menu";
@@ -56,10 +54,8 @@ export default function DefaultDocs({
     resolvedTheme === "dark" ? darkSidebarClassName : lightSidebarClassName;
   const mainRef = React.useRef<HTMLDivElement>(null);
   return (
-    <HydrationBoundary
-      hydrateAtoms={[[isSidebarFixedAtom, isSidebarFixed]]}
-      options={{ enableReHydrate: true }}
-    >
+    <>
+      <SetIsSidebarFixed value={isSidebarFixed} />
       <div className="fern-background-image pointer-events-none fixed inset-0" />
       <FernHeader
         className={cn(
@@ -107,6 +103,6 @@ export default function DefaultDocs({
 
       {/* Enables footer DOM injection */}
       <footer id={FERN_FOOTER_ID} className="width-before-scroll-bar" />
-    </HydrationBoundary>
+    </>
   );
 }
