@@ -41,18 +41,6 @@ RUN mv mc /usr/local/bin/
 
 # ----------- End MINIO setup  -----------
 
-# ----------- Setup fern-cli  -----------
-
-# TODO download from latest release with NPM after we ship updates to the CLI
-# RUN mkdir -p /usr/local/lib/fern
-# COPY servers/self-hosted/fern-api-cli.tgz /usr/local/lib/fern/fern-cli.tar.gz
-#RUN tar -xzf /usr/local/lib/fern/fern-cli.tar.gz -C /usr/local/lib/fern
-
-# RUN echo '#!/bin/sh' > /usr/local/bin/fern && \
-#     echo 'node /usr/local/lib/fern/package/dist/local/cli.cjs "$@"' >> /usr/local/bin/fern && \
-#     chmod +x /usr/local/bin/fern
-# ----------- End fern-cli setup  -----------
-
 # ----------- Setup FDR  -----------
 FROM base AS builder
 RUN apk add --no-cache libc6-compat
