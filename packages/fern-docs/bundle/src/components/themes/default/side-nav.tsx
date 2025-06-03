@@ -47,16 +47,11 @@ export function SidebarNav({
 function DesktopMenu({
   children,
   className,
-  hidden,
 }: {
   children: React.ReactNode;
   className?: string;
-  hidden?: boolean;
 }) {
   const fixed = useIsSidebarFixed();
-  if (hidden) {
-    return null;
-  }
   return (
     <>
       <HideAsides />
