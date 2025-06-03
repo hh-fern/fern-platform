@@ -52,9 +52,6 @@ RUN npm install -g turbo@2.0.1
 COPY . .
 RUN turbo prune @fern-platform/fdr --docker
 
-# Copy docs bundle after pruning
-# COPY /servers/self-hosted/docs_bundle.zip /app/docs_bundle.zip
-
 # Add lockfile and package.json's
 FROM base AS installer
 RUN apk add --no-cache libc6-compat unzip
@@ -73,9 +70,6 @@ ENV FERN_TOKEN=$FERN_TOKEN
 
 # Build
 COPY --from=builder /app/out/full/ .
-# COPY --from=builder /app/docs_bundle.zip .
-# RUN unzip docs_bundle.zip -d packages/fern-docs/bundle
-
 COPY turbo.json turbo.json
 COPY shared shared
 COPY fern fern
@@ -102,8 +96,6 @@ COPY --from=installer /app .
 # Copy both FDR and self-hosted directories
 COPY servers/fdr /app/servers/fdr
 COPY servers/self-hosted /app/servers/self-hosted
-
-RUN unzip /app/servers/self-hosted/docs_bundle.zip -d /app/packages/fern-docs/bundle
 
 COPY servers/self-hosted/.env /app/servers/self-hosted/.env
 

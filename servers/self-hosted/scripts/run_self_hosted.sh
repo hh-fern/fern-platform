@@ -117,7 +117,6 @@ echo " docs generated successfully"
 
 # --------------  Start nextapp --------------
 
-# Create nextapp directory and unzip docs bundle
 echo "Creating nextapp directory and unzipping docs bundle..."
 mkdir -p /app/nextapp/
 unzip -q /app/servers/self-hosted/docs_bundle.zip -d /app/nextapp/
