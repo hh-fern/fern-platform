@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
 import { isomorphicRequestAnimationFrame } from "./request-callback";
 import { useIsomorphicLayoutEffect } from "./useIsomorphicLayoutEffect";
@@ -8,9 +8,11 @@ const DESKTOP_BREAKPOINT = 1024;
 
 export function useMinWidth(breakpoint: number): boolean {
   const [largerThanBreakpoint, setLargerThanBreakpoint] =
-    React.useState<boolean>(() =>
-      typeof window === "undefined" ? true : window.innerWidth >= breakpoint
-    );
+    useState<boolean>(true);
+
+  useEffect(() => {
+    setLargerThanBreakpoint(window.innerWidth >= breakpoint);
+  }, [breakpoint]);
 
   useIsomorphicLayoutEffect(() => {
     const cancelAnimationFrame = isomorphicRequestAnimationFrame(() => {

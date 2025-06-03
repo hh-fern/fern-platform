@@ -1,5 +1,7 @@
+import { HydrationBoundary } from "jotai-ssr";
+
 import { Prose } from "@/mdx/components/prose";
-import { SetLayout } from "@/state/layout";
+import { layoutAtom } from "@/state/layout";
 
 import { AsideAwareDiv } from "./AsideAwareDiv";
 
@@ -17,8 +19,7 @@ export function GuideLayout({
   footer,
 }: GuideLayoutProps) {
   return (
-    <>
-      <SetLayout value="guide" />
+    <HydrationBoundary hydrateAtoms={[[layoutAtom, "guide"]]}>
       {toc}
       <AsideAwareDiv className="fern-layout-guide">
         <article className="w-content-width max-w-full">
@@ -29,6 +30,6 @@ export function GuideLayout({
           {footer}
         </article>
       </AsideAwareDiv>
-    </>
+    </HydrationBoundary>
   );
 }

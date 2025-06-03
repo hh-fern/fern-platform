@@ -4,6 +4,7 @@ import React, { Fragment, ReactElement, useEffect, useMemo } from "react";
 
 import { chunk } from "es-toolkit/array";
 import { useAtomValue } from "jotai";
+import { HydrationBoundary } from "jotai-ssr";
 
 import type { FernNavigation } from "@fern-api/fdr-sdk";
 import { EMPTY_ARRAY } from "@fern-api/ui-core-utils";
@@ -15,7 +16,7 @@ import { FernLink } from "@/components/FernLink";
 import { Separator } from "@/components/Separator";
 import { HideBuiltWithFern } from "@/components/built-with-fern";
 import { useCurrentAnchor } from "@/hooks/use-anchor";
-import { SetLayout } from "@/state/layout";
+import { layoutAtom } from "@/state/layout";
 import { SCROLL_BODY_ATOM } from "@/state/viewport";
 
 import { BottomNavigationClient } from "../bottom-nav-client";
@@ -140,7 +141,7 @@ export default function ChangelogPageClient({
   }, [chunkedEntries.length, page]);
 
   return (
-    <>
+    <HydrationBoundary hydrateAtoms={[[layoutAtom, "guide"]]}>
       <TableOfContentsLayout
         tableOfContents={undefined}
         hideTableOfContents={true}
@@ -148,7 +149,6 @@ export default function ChangelogPageClient({
       {/* TODO(cd): treat as a guide for now, update for large-screen changelog */}
       <AsideAwareDiv className="fern-layout-changelog">
         <article className="max-w-full">
-          <SetLayout value="guide" />
           <HideBuiltWithFern>
             <ChangelogContentLayout as="section" className="mb-8">
               {overview}
@@ -183,6 +183,6 @@ export default function ChangelogPageClient({
           />
         </article>
       </AsideAwareDiv>
-    </>
+    </HydrationBoundary>
   );
 }

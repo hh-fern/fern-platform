@@ -2,11 +2,13 @@
 
 import React, { ComponentPropsWithoutRef } from "react";
 
+import { HydrationBoundary } from "jotai-ssr";
+
 import { cn } from "@fern-docs/components";
 import { useIsMobile } from "@fern-ui/react-commons";
 
 import { Prose } from "@/mdx/components/prose";
-import { SetLayout } from "@/state/layout";
+import { layoutAtom } from "@/state/layout";
 
 import { AsideAwareDiv } from "./AsideAwareDiv";
 
@@ -43,42 +45,45 @@ export const ReferenceLayout = React.forwardRef<
 ) {
   const isMobile = useIsMobile();
   return (
-    <AsideAwareDiv className="fern-layout-reference">
-      <SetLayout value="reference" />
-      <article
-        {...props}
-        className={cn(
-          "w-content-width md:w-endpoint-width max-w-full",
-          { "xl:w-page-width": enableFullWidth },
-          props.className
-        )}
-        ref={ref}
-      >
-        {header}
-        <div
-          className="fern-layout-reference-content"
-          data-kind={kind}
-          data-cols={aside ? "2" : "1"}
-        >
-          {!isMobile && (
-            <aside className="fern-layout-reference-aside">
-              {kind === "api" ? (
-                aside
-              ) : (
-                <Prose className="relative">{aside}</Prose>
-              )}
-            </aside>
+    <HydrationBoundary hydrateAtoms={[[layoutAtom, "reference"]]}>
+      <AsideAwareDiv className="fern-layout-reference">
+        <article
+          {...props}
+          className={cn(
+            "w-content-width md:w-endpoint-width max-w-full",
+            { "xl:w-page-width": enableFullWidth },
+            props.className
           )}
-          <Prose className="mb-12 space-y-12">
-            {children}
-            {isMobile && (
-              <section className="fern-layout-reference-aside">{aside}</section>
+          ref={ref}
+        >
+          {header}
+          <div
+            className="fern-layout-reference-content"
+            data-kind={kind}
+            data-cols={aside ? "2" : "1"}
+          >
+            {!isMobile && (
+              <aside className="fern-layout-reference-aside">
+                {kind === "api" ? (
+                  aside
+                ) : (
+                  <Prose className="relative">{aside}</Prose>
+                )}
+              </aside>
             )}
-            {reference}
-            {footer}
-          </Prose>
-        </div>
-      </article>
-    </AsideAwareDiv>
+            <Prose className="mb-12 space-y-12">
+              {children}
+              {isMobile && (
+                <section className="fern-layout-reference-aside">
+                  {aside}
+                </section>
+              )}
+              {reference}
+              {footer}
+            </Prose>
+          </div>
+        </article>
+      </AsideAwareDiv>
+    </HydrationBoundary>
   );
 });

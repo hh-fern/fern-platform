@@ -1,4 +1,6 @@
-import { HideAsides, SetLayout } from "@/state/layout";
+import { HydrationBoundary } from "jotai-ssr";
+
+import { HideAsides, layoutAtom } from "@/state/layout";
 
 interface CustomLayoutProps {
   children?: React.ReactNode;
@@ -7,11 +9,12 @@ interface CustomLayoutProps {
 
 export function CustomLayout({ children, footer }: CustomLayoutProps) {
   return (
-    <div className="width-before-scroll-bar w-screen">
-      <SetLayout value="custom" />
-      <HideAsides force />
-      {children}
-      {footer}
-    </div>
+    <HydrationBoundary hydrateAtoms={[[layoutAtom, "custom"]]}>
+      <div className="width-before-scroll-bar w-screen">
+        <HideAsides force />
+        {children}
+        {footer}
+      </div>
+    </HydrationBoundary>
   );
 }

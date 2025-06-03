@@ -56,10 +56,7 @@ export default function DefaultDocs({
     resolvedTheme === "dark" ? darkSidebarClassName : lightSidebarClassName;
   const mainRef = React.useRef<HTMLDivElement>(null);
   return (
-    <HydrationBoundary
-      hydrateAtoms={[[isSidebarFixedAtom, isSidebarFixed]]}
-      options={{ enableReHydrate: true }}
-    >
+    <HydrationBoundary hydrateAtoms={[[isSidebarFixedAtom, isSidebarFixed]]}>
       <div className="fern-background-image pointer-events-none fixed inset-0" />
       <FernHeader
         className={cn(

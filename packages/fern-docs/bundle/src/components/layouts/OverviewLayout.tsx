@@ -1,7 +1,9 @@
 import React from "react";
 
+import { HydrationBoundary } from "jotai-ssr";
+
 import { Prose } from "@/mdx/components/prose";
-import { SetLayout } from "@/state/layout";
+import { layoutAtom } from "@/state/layout";
 
 import { AsideAwareDiv } from "./AsideAwareDiv";
 
@@ -19,8 +21,7 @@ export function OverviewLayout({
   footer,
 }: OverviewLayoutProps) {
   return (
-    <>
-      <SetLayout value="overview" />
+    <HydrationBoundary hydrateAtoms={[[layoutAtom, "overview"]]}>
       {toc}
       <AsideAwareDiv className="fern-layout-overview">
         <article className="w-content-wide-width max-w-full">
@@ -31,6 +32,6 @@ export function OverviewLayout({
           {footer}
         </article>
       </AsideAwareDiv>
-    </>
+    </HydrationBoundary>
   );
 }
