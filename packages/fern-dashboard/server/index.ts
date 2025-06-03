@@ -1,18 +1,18 @@
+import { DocsWorkspaceDao } from "./daos/docs-workspace";
 import { UserDao } from "./daos/user";
-import { WorkspaceDao } from "./daos/workspace";
 import { PrismaClient } from "./generated/prisma";
 
 export class DashboardDao {
-  private workspaceDao: WorkspaceDao;
+  private workspaceDao: DocsWorkspaceDao;
   private userDao: UserDao;
-  // Add other DAOs as needed
+  // gitRepoDao: GitRepoDao;
 
   constructor(prisma: PrismaClient) {
-    this.workspaceDao = new WorkspaceDao(prisma);
+    this.workspaceDao = new DocsWorkspaceDao(prisma);
     this.userDao = new UserDao(prisma);
   }
 
-  public workspace(): WorkspaceDao {
+  public workspace(): DocsWorkspaceDao {
     return this.workspaceDao;
   }
 
