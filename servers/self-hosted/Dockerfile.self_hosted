@@ -43,7 +43,7 @@ RUN mv mc /usr/local/bin/
 
 # ----------- Setup FDR  -----------
 FROM base AS builder
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat unzip
 RUN apk update
 
 # Produce a pruned version of the monorepo
@@ -52,9 +52,12 @@ RUN npm install -g turbo@2.0.1
 COPY . .
 RUN turbo prune @fern-platform/fdr --docker
 
+# Copy docs bundle after pruning
+# COPY /servers/self-hosted/docs_bundle.zip /app/docs_bundle.zip
+
 # Add lockfile and package.json's
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat unzip
 RUN apk update
 RUN npm install -g pnpm@v9.4.0
 WORKDIR /app
@@ -65,12 +68,17 @@ COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml .
 RUN pnpm install
 
+ARG FERN_TOKEN
+ENV FERN_TOKEN=$FERN_TOKEN
+
 # Build
 COPY --from=builder /app/out/full/ .
+# COPY --from=builder /app/docs_bundle.zip .
+# RUN unzip docs_bundle.zip -d packages/fern-docs/bundle
+
 COPY turbo.json turbo.json
 COPY shared shared
 COPY fern fern
-
 RUN pnpm turbo --filter=@fern-api/fdr-sdk compile
 RUN pnpm turbo --filter=@fern-platform/fdr codegen
 RUN pnpm turbo --filter=@fern-platform/fdr compile
@@ -94,6 +102,7 @@ COPY --from=installer /app .
 COPY servers/fdr /app/servers/fdr
 COPY servers/self-hosted /app/servers/self-hosted
 
+RUN unzip /app/servers/self-hosted/docs_bundle.zip -d /app/packages/fern-docs/bundle
 
 COPY servers/self-hosted/.env /app/servers/self-hosted/.env
 
@@ -102,3 +111,5 @@ COPY --from=installer /app/servers/fdr/prisma/schema.prisma /app/servers/fdr/pri
 # ------------ End FDR setup ------------
 
 ENTRYPOINT ["/bin/sh", "/app/servers/self-hosted/scripts/run_self_hosted.sh"]
+
+
