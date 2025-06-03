@@ -17,7 +17,6 @@ export function ThemedDocs({
   children,
   tabs,
   hasProductsOrVersions = false,
-  isSidebarFixed = false,
   isHeaderDisabled = false,
   showSearchBarInTabs = false,
   lightSidebarClassName,
@@ -34,7 +33,6 @@ export function ThemedDocs({
   children: React.ReactNode;
   tabs?: React.ReactNode;
   hasProductsOrVersions?: boolean;
-  isSidebarFixed?: boolean;
   isHeaderDisabled?: boolean;
   showSearchBarInTabs?: boolean;
   lightSidebarClassName?: string;
@@ -52,7 +50,6 @@ export function ThemedDocs({
       sidebar={sidebar}
       tabs={tabs}
       hasProductsOrVersions={hasProductsOrVersions}
-      isSidebarFixed={isSidebarFixed}
       isHeaderDisabled={isHeaderDisabled}
       showSearchBarInTabs={showSearchBarInTabs}
       lightSidebarClassName={lightSidebarClassName}

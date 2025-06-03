@@ -1,7 +1,5 @@
 import "server-only";
 
-import { HydrationBoundary } from "jotai-ssr";
-
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 
@@ -11,7 +9,6 @@ import { SidebarTabsRootServer } from "@/components/sidebar/SidebarTabsRootServe
 import { SidebarRootNode } from "@/components/sidebar/nodes/SidebarRootNode";
 import { createCachedDocsLoader } from "@/server/docs-loader";
 import { createCachedMdxSerializer } from "@/server/mdx-serializer";
-import { emptySidebarAtom } from "@/state/layout";
 
 export default async function SidebarPage({
   params,
@@ -90,19 +87,20 @@ export default async function SidebarPage({
   }
 
   return (
-    <HydrationBoundary
-      hydrateAtoms={[
-        [
-          emptySidebarAtom,
-          found.sidebar?.children.length === 0 ||
-            (found.sidebar?.children.length === 1 &&
-              found.sidebar?.children[0]?.type === "sidebarGroup" &&
-              found.sidebar?.children[0].children.length === 1 &&
-              found.sidebar?.children[0].children[0]?.type === "page"),
-        ],
-      ]}
-      options={{ enableReHydrate: true }}
-    >
+    // <HydrationBoundary
+    //   hydrateAtoms={[
+    //     [
+    //       emptySidebarAtom,
+    //       found.sidebar?.children.length === 0 ||
+    //         (found.sidebar?.children.length === 1 &&
+    //           found.sidebar?.children[0]?.type === "sidebarGroup" &&
+    //           found.sidebar?.children[0].children.length === 1 &&
+    //           found.sidebar?.children[0].children[0]?.type === "page"),
+    //     ],
+    //   ]}
+    //   options={{ enableReHydrate: true }}
+    // >
+    <>
       {found.tabs && found.tabs.length > 0 && (
         <SidebarTabsRootServer loader={loader}>
           <SidebarTabsList tabs={found.tabs} />
@@ -115,6 +113,6 @@ export default async function SidebarPage({
           loader={loader}
         />
       )}
-    </HydrationBoundary>
+    </>
   );
 }
