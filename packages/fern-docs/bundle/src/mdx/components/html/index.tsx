@@ -82,4 +82,10 @@ export function A({
   );
 }
 
+export function Style({ children }: React.ComponentProps<"style">) {
+  const cssContent = typeof children === "string" ? children : "";
+
+  return <style dangerouslySetInnerHTML={{ __html: cssContent }} />;
+}
+
 export { Image } from "./image";

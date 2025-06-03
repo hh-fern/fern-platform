@@ -37,7 +37,7 @@ import { Column, ColumnGroup } from "./columns";
 import { Download } from "./download";
 import { Feature } from "./feature";
 import { Frame } from "./frame";
-import { A, HeadingRenderer, Image, Li, Ol, Strong, Ul } from "./html";
+import { A, HeadingRenderer, Image, Li, Ol, Strong, Style, Ul } from "./html";
 import { Table } from "./html-table";
 import { Icon } from "./icon/Icon";
 import { If } from "./if";
@@ -129,6 +129,7 @@ const HTML_COMPONENTS = {
   strong: Strong,
   table: Table,
   ul: Ul,
+  style: Style,
 };
 
 const ALIASED_HTML_COMPONENTS = {
