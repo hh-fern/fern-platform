@@ -29,7 +29,6 @@ ENV FERN_TOKEN=$FERN_TOKEN
 
 # Build
 COPY --from=builder /app/out/full/ .
-COPY --from=builder /app/packages/fern-docs/bundle ./packages/fern-docs/bundle
 COPY turbo.json turbo.json
 COPY shared shared
 COPY fern fern
