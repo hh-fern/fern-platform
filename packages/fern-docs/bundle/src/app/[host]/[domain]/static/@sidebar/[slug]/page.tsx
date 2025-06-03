@@ -80,20 +80,6 @@ export default async function SidebarPage({
   }
 
   return (
-    // <HydrationBoundary
-    //   hydrateAtoms={[
-    //     [
-    //       emptySidebarAtom,
-    //       found.sidebar?.children.length === 0 ||
-    //         (found.sidebar?.children.length === 1 &&
-    //           found.sidebar?.children[0]?.type === "sidebarGroup" &&
-    //           found.sidebar?.children[0].children.length === 1 &&
-    //           found.sidebar?.children[0].children[0]?.type === "page"),
-    //     ],
-    //     [isLandingPageAtom, found.node.type === "landingPage"],
-    //   ]}
-    //   options={{ enableReHydrate: true }}
-    // >
     <>
       {found.tabs && found.tabs.length > 0 && (
         <SidebarTabsRootServer loader={loader}>

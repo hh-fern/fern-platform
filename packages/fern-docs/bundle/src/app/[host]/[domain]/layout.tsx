@@ -6,6 +6,7 @@ import { preload } from "react-dom";
 
 import { getEnv } from "@vercel/functions";
 import { compact } from "es-toolkit/array";
+import { HydrationBoundary } from "jotai-ssr";
 
 import { DocsV1Read, DocsV2Read } from "@fern-api/fdr-sdk/client/types";
 import { isNonNullish } from "@fern-api/ui-core-utils";
@@ -28,6 +29,7 @@ import { DarkCode } from "@/state/dark-code";
 import { Domain } from "@/state/domain";
 import { LaunchDarklyInfo } from "@/state/feature-flags";
 import { DefaultLanguage } from "@/state/language";
+import { isSidebarFixedAtom } from "@/state/layout";
 import { SetLogoText } from "@/state/logo-text";
 import { RootNodeProvider, SetBasePath } from "@/state/navigation";
 import {
@@ -85,59 +87,71 @@ export default async function Layout({
     getSidebarRootNodeIdToChildToParentsMap(sidebarRootNodes);
 
   return (
-    <ThemeProvider
-      hasLight={Boolean(colors.light)}
-      hasDark={Boolean(colors.dark)}
-      lightThemeColor={colors.light?.themeColor}
-      darkThemeColor={colors.dark?.themeColor}
+    <HydrationBoundary
+      hydrateAtoms={[
+        [
+          isSidebarFixedAtom,
+          !!colors.dark?.sidebarBackground ||
+            !!colors.light?.sidebarBackground ||
+            layout.isHeaderDisabled,
+        ],
+      ]}
+      options={{ enableReHydrate: true }}
     >
-      <RootNodeProvider
-        sidebarRootNodesToChildToParentsMap={
-          sidebarRootNodesToChildToParentsMap
-        }
+      <ThemeProvider
+        hasLight={Boolean(colors.light)}
+        hasDark={Boolean(colors.dark)}
+        lightThemeColor={colors.light?.themeColor}
+        darkThemeColor={colors.dark?.themeColor}
       >
-        <Domain value={domain} />
-        <SetBasePath value={basePath || "/"} />
-        {/** HACKHACK: this is a hack to set the logo text to "Docs" for Cohere, this needs to be moved into docs.yml */}
-        <SetLogoText text={domain.includes("cohere") ? "Docs" : undefined} />
-        {config.defaultLanguage != null && (
-          <DefaultLanguage language={config.defaultLanguage} />
-        )}
-        <DarkCode value={edgeFlags.isDarkCodeEnabled} />
-        <Whitelabeled value={edgeFlags.isWhitelabeled} />
-        <SetColors colors={colors} />
-        <SetIsAskAiEnabled isAskAiEnabled={edgeFlags.isAskAiEnabled} />
-        <SetIsDefaultSearchFilterOff
-          isDefaultSearchFilterOff={edgeFlags.isDefaultSearchFilterOff}
-        />
-        <FernUser domain={domain} host={host} />
-        <GlobalStyles
-          domain={domain}
-          layout={layout}
-          fonts={fonts}
-          light={colors.light}
-          dark={colors.dark}
-          inlineCss={config.css?.inline}
-        />
-        <FeatureFlagProvider featureFlagsConfig={{ launchDarkly }}>
-          {children}
-        </FeatureFlagProvider>
-        <React.Suspense fallback={null}>
-          {!edgeFlags.isSearchDisabled && !isLocalEnvironment && (
-            <SearchV2 domain={domain} />
+        <RootNodeProvider
+          sidebarRootNodesToChildToParentsMap={
+            sidebarRootNodesToChildToParentsMap
+          }
+        >
+          <Domain value={domain} />
+          <SetBasePath value={basePath || "/"} />
+          {/** HACKHACK: this is a hack to set the logo text to "Docs" for Cohere, this needs to be moved into docs.yml */}
+          <SetLogoText text={domain.includes("cohere") ? "Docs" : undefined} />
+          {config.defaultLanguage != null && (
+            <DefaultLanguage language={config.defaultLanguage} />
           )}
-        </React.Suspense>
-        {jsConfig != null && <JavascriptProvider config={jsConfig} />}
-        {VERCEL_ENV === "production" && (
-          <CustomerAnalytics
-            config={mergeCustomerAnalytics(
-              deprecated_customerAnalytics,
-              config.analyticsConfig
-            )}
+          <DarkCode value={edgeFlags.isDarkCodeEnabled} />
+          <Whitelabeled value={edgeFlags.isWhitelabeled} />
+          <SetColors colors={colors} />
+          <SetIsAskAiEnabled isAskAiEnabled={edgeFlags.isAskAiEnabled} />
+          <SetIsDefaultSearchFilterOff
+            isDefaultSearchFilterOff={edgeFlags.isDefaultSearchFilterOff}
           />
-        )}
-      </RootNodeProvider>
-    </ThemeProvider>
+          <FernUser domain={domain} host={host} />
+          <GlobalStyles
+            domain={domain}
+            layout={layout}
+            fonts={fonts}
+            light={colors.light}
+            dark={colors.dark}
+            inlineCss={config.css?.inline}
+          />
+          <FeatureFlagProvider featureFlagsConfig={{ launchDarkly }}>
+            {children}
+          </FeatureFlagProvider>
+          <React.Suspense fallback={null}>
+            {!edgeFlags.isSearchDisabled && !isLocalEnvironment && (
+              <SearchV2 domain={domain} />
+            )}
+          </React.Suspense>
+          {jsConfig != null && <JavascriptProvider config={jsConfig} />}
+          {VERCEL_ENV === "production" && (
+            <CustomerAnalytics
+              config={mergeCustomerAnalytics(
+                deprecated_customerAnalytics,
+                config.analyticsConfig
+              )}
+            />
+          )}
+        </RootNodeProvider>
+      </ThemeProvider>
+    </HydrationBoundary>
   );
 }
 
