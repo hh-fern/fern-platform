@@ -109,7 +109,7 @@ fi
 
 echo "running fern generate --docs"
 
-FERN_TOKEN=dummy DEFAULT_FDR_ORIGIN=http://localhost:8080  FERN_NO_VERSION_REDIRECTION=true FERN_AUTH_NO_VERIFY=true fern generate --docs
+FERN_SELF_HOSTED=true FERN_TOKEN=dummy OVERRIDE_FDR_ORIGIN=http://localhost:8080  FERN_NO_VERSION_REDIRECTION=true fern generate --docs
 
 echo " docs generated successfully"
 

@@ -1,4 +1,4 @@
-FROM node:22.16-alpine3.20 AS base
+FROM node:20.18-alpine3.20 AS base
 
 # -----------  Start Postgres setup  -----------
 
@@ -44,13 +44,13 @@ RUN mv mc /usr/local/bin/
 # ----------- Setup fern-cli  -----------
 
 # TODO download from latest release with NPM after we ship updates to the CLI
-RUN mkdir -p /usr/local/lib/fern
-COPY servers/self-hosted/fern-api-cli.tgz /usr/local/lib/fern/fern-cli.tar.gz
-RUN tar -xzf /usr/local/lib/fern/fern-cli.tar.gz -C /usr/local/lib/fern
+# RUN mkdir -p /usr/local/lib/fern
+# COPY servers/self-hosted/fern-api-cli.tgz /usr/local/lib/fern/fern-cli.tar.gz
+#RUN tar -xzf /usr/local/lib/fern/fern-cli.tar.gz -C /usr/local/lib/fern
 
-RUN echo '#!/bin/sh' > /usr/local/bin/fern && \
-    echo 'node /usr/local/lib/fern/package/dist/local/cli.cjs "$@"' >> /usr/local/bin/fern && \
-    chmod +x /usr/local/bin/fern
+# RUN echo '#!/bin/sh' > /usr/local/bin/fern && \
+#     echo 'node /usr/local/lib/fern/package/dist/local/cli.cjs "$@"' >> /usr/local/bin/fern && \
+#     chmod +x /usr/local/bin/fern
 # ----------- End fern-cli setup  -----------
 
 # ----------- Setup FDR  -----------
@@ -68,10 +68,7 @@ RUN turbo prune @fern-platform/fdr --docker
 FROM base AS installer
 RUN apk add --no-cache libc6-compat
 RUN apk update
-# <<<<<<< HEAD
-RUN npm install -g pnpm@v10.11.0
-# =======
-# RUN npm install -g pnpm@v10.11.0 fern-api
+RUN npm install -g pnpm@v9.4.0
 WORKDIR /app
 
 # Install deps
@@ -100,7 +97,7 @@ RUN wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
     mv mc /usr/local/bin/
 
 RUN npm install -g prisma 
-# fern-api
+RUN npm install -g fern-api@latest
 
 # Copy the built FDR application
 COPY --from=installer /app .
