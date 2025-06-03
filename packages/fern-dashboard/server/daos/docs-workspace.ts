@@ -1,6 +1,6 @@
 import { DocsWorkspace, PrismaClient } from "../generated/prisma";
 
-export class WorkspaceDao {
+export class DocsWorkspaceDao {
   private prisma: PrismaClient;
 
   constructor(prisma: PrismaClient) {
