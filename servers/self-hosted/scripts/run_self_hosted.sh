@@ -115,6 +115,15 @@ echo " docs generated successfully"
 
 # --------------  Finish generate docs --------------
 
+# --------------  Start nextapp --------------
+
+# Create nextapp directory and unzip docs bundle
+echo "Creating nextapp directory and unzipping docs bundle..."
+mkdir -p /app/nextapp/
+unzip -q /app/servers/self-hosted/docs_bundle.zip -d /app/nextapp/
+
+# --------------  Finish nextapp --------------
+
 if [ "${RUN_MODE:-}" = "shell" ]; then
     echo "Entering shell mode..."
     exec /bin/sh

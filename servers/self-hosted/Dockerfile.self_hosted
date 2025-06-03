@@ -111,5 +111,3 @@ COPY --from=installer /app/servers/fdr/prisma/schema.prisma /app/servers/fdr/pri
 # ------------ End FDR setup ------------
 
 ENTRYPOINT ["/bin/sh", "/app/servers/self-hosted/scripts/run_self_hosted.sh"]
-
-
