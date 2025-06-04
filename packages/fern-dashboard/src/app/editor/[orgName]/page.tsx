@@ -13,6 +13,17 @@ export default async function Page() {
     redirect("/");
   }
 
+  const docs = await createEditableDocsLoader(
+    "https://sarah-bawabe.docs.buildwithfern.com",
+    "123",
+    session?.accessToken
+  );
+  // const docs = await getDocsFromUrl({
+  //   url: "https://sarah-bawabe.docs.buildwithfern.com",
+  //   token: session?.accessToken,
+  // });
+  // console.log(docs);
+
   return (
     <FeatureFlaggedServerSide
       flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
