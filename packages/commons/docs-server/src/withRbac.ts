@@ -1,5 +1,8 @@
 import "server-only";
 
+import type { PathnameViewerRules } from "@fern-api/docs-server";
+import { EVERYONE_ROLE } from "@fern-api/docs-server";
+import { matchPath, slugToHref } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import {
   type NavigationNode,
@@ -9,9 +12,6 @@ import {
   hasMetadata,
 } from "@fern-api/fdr-sdk/navigation";
 import { EMPTY_ARRAY } from "@fern-api/ui-core-utils";
-import type { PathnameViewerRules } from "@fern-docs/auth";
-import { EVERYONE_ROLE } from "@fern-docs/search-server";
-import { matchPath, slugToHref } from "@fern-docs/utils";
 
 import type { AuthState } from "./auth/getAuthState";
 

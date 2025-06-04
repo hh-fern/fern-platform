@@ -1,4 +1,4 @@
-import { conformTrailingSlash } from "./trailing-slash";
+import { conformTrailingSlash } from "../trailing-slash";
 
 describe("conformTrailingSlash", () => {
   it("should add trailing slash if string is empty", () => {
