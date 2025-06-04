@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import { isFeatureFlagEnabledForUser } from "@/components/posthog/feature-flags/server-side";
 
-import { getCurrentSession } from "../services/auth0/getCurrentSession";
-import { Auth0OrgName } from "../services/auth0/types";
+import { getCurrentSession } from "../../services/auth0/getCurrentSession";
+import { Auth0OrgName } from "../../services/auth0/types";
 
 export default async function Page({
   params,

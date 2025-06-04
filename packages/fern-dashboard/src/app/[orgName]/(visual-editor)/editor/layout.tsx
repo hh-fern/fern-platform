@@ -1,6 +1,5 @@
+import { Auth0OrgName } from "@/app/services/auth0/types";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-
-import { Auth0OrgName } from "../../services/auth0/types";
 
 export default async function AuthedLayout({
   params,
