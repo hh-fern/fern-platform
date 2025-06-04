@@ -106,6 +106,11 @@ RUN unzip -q /app/servers/self-hosted/docs_bundle.zip -d /app/nextapp/ && \
     cd /app/nextapp/standalone/packages/fern-docs/bundle && \
     pnpm install
 
+# Install esbuild (TODO investigate why this is needed)
+RUN cd /app/nextapp/standalone && \
+    pnpm add -w esbuild
+
+
 # ------------ End FDR setup ------------
 
 ENTRYPOINT ["/bin/sh", "/app/servers/self-hosted/scripts/run_self_hosted.sh"]
