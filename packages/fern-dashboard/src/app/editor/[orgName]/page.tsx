@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
+import { createEditableDocsLoader } from "@fern-api/docs-loader";
+
 import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
 
@@ -18,6 +20,8 @@ export default async function Page() {
     "123",
     session?.accessToken
   );
+
+  console.log("docs", docs);
   // const docs = await getDocsFromUrl({
   //   url: "https://sarah-bawabe.docs.buildwithfern.com",
   //   token: session?.accessToken,

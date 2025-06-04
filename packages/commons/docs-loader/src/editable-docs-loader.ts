@@ -118,14 +118,12 @@ class EditableDocsLoaderImpl implements EditableDocsLoader {
   }
 
   async getNavigationNode(id: string): Promise<NavigationNode> {
-    "use cache";
     return this.readOnlyDocsLoader.getNavigationNode(id);
   }
 
   async getConfig(): Promise<
     Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">
   > {
-    "use cache";
     return this.readOnlyDocsLoader.getConfig();
   }
 
@@ -148,37 +146,30 @@ class EditableDocsLoaderImpl implements EditableDocsLoader {
     light?: FernColorTheme;
     dark?: FernColorTheme;
   }> {
-    "use cache";
     return this.readOnlyDocsLoader.getColors();
   }
 
   async getFonts(): Promise<FernFonts> {
-    "use cache";
     return this.readOnlyDocsLoader.getFonts();
   }
 
   async getLayout(): Promise<FernLayoutConfig> {
-    "use cache";
     return this.readOnlyDocsLoader.getLayout();
   }
 
   async getAuthState(pathname?: string): Promise<AuthState> {
-    "use cache";
     return this.readOnlyDocsLoader.getAuthState(pathname);
   }
 
   async getEdgeFlags(): Promise<EdgeFlags> {
-    "use cache";
     return this.readOnlyDocsLoader.getEdgeFlags();
   }
 
   async getBaseUrl(): Promise<string> {
-    "use cache";
     return this.readOnlyDocsLoader.getBaseUrl();
   }
 
   async getModifiedMdxFiles(): Promise<Record<string, string>> {
-    "use cache";
     return this.modifiedMdxFiles;
   }
 }

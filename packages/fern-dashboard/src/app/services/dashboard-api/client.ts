@@ -1,5 +1,4 @@
 import { getDocsUrlOwner } from "@/app/api/get-docs-url-owner/route";
-import { getDocsFromUrl } from "@/app/api/get-my-docs-from-url/route";
 import { getMyDocsSites } from "@/app/api/get-my-docs-sites/route";
 import { getMyOrganizations } from "@/app/api/get-my-organizations/route";
 import { getOrgInvitations } from "@/app/api/get-org-invitations/route";
@@ -26,8 +25,6 @@ export const DashboardApiClient = {
     ),
   getDocsUrlOwner: (request: getDocsUrlOwner.Request) =>
     typedFetch<getDocsUrlOwner.Response>("/api/get-docs-url-owner", request),
-  getDocsFromUrl: (request: getDocsFromUrl.Request) =>
-    typedFetch<getDocsFromUrl.Response>("/api/get-docs-from-url", request),
 };
 
 async function typedFetch<T>(
