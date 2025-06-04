@@ -1,5 +1,5 @@
+import { removeTrailingSlash } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { removeTrailingSlash } from "@fern-docs/utils";
 
 import { AuthState, getWorkosRbacRoles } from "./getAuthState";
 import { preferPreview } from "./origin";

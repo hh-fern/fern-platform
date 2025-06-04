@@ -5,7 +5,7 @@ import {
   type OAuth2Ory,
   type OAuthTokenResponse,
   OAuthTokenResponseSchema,
-} from "@fern-docs/auth";
+} from "@fern-api/docs-auth";
 
 interface TokenInfo {
   access_token: string;

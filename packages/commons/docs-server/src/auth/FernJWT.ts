@@ -4,7 +4,7 @@ import {
   type AuthEdgeConfig,
   type FernUser,
   FernUserSchema,
-} from "@fern-docs/auth";
+} from "@fern-api/docs-auth";
 
 import { getJwtSecretKey } from "./workos";
 import { getSessionFromToken, toSessionUserInfo } from "./workos-session";

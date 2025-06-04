@@ -3,7 +3,12 @@ import { NextRequest } from "next/server";
 export function withPathname(
   request: NextRequest,
   pathname: string,
-  search?: string | URLSearchParams | Record<string, string> | string[][]
+  search?:
+    | string
+    | URLSearchParams
+    | Record<string, string | readonly string[]>
+    | Iterable<[string, string]>
+    | readonly [string, string][]
 ): string {
   const url = new URL(request.url);
   url.pathname = pathname;

@@ -1,18 +1,20 @@
 {
-  "name": "@fern-api/docs-loader",
+  "name": "@fern-api/docs-auth",
   "version": "0.0.0",
   "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/fern-api/fern-platform.git",
-    "directory": "packages/commons/docs-loader"
+    "directory": "packages/commons/docs-auth"
   },
   "sideEffects": false,
   "type": "module",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
-  "source": "src/index.ts",
-  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -20,6 +22,7 @@
     "clean": "rm -rf ./lib && tsc --build --clean",
     "compile": "tsc --build",
     "depcheck": "depcheck",
+    "dev": "tsc --watch",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "lint:eslint": "eslint --max-warnings 0 .",
@@ -29,22 +32,9 @@
     "test": "vitest --run --passWithNoTests --globals"
   },
   "dependencies": {
-    "@fern-api/docs-server": "workspace:*",
-    "@fern-api/docs-utils": "workspace:*",
-    "@fern-api/ui-core-utils": "0.137.1-bf050228b",
-    "@fern-docs/auth": "workspace:*",
-    "@fern-docs/components": "workspace:*",
-    "@fern-docs/edge-config": "workspace:*",
-    "@types/react": "19.0.10",
-    "@vercel/kv": "^2.0.0",
-    "es-toolkit": "^1.33.0",
-    "next": "15.3.0-canary.1",
-    "react": "19.0.0",
-    "ts-essentials": "^10.0.4",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@fern-api/fdr-sdk": "workspace:*",
     "@fern-platform/configs": "workspace:*",
     "@types/node": "^18.11.9",
     "depcheck": "^1.4.7",
