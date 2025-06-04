@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getCurrentSessionOrThrow } from "../../services/auth0/getCurrentSession";
+import { getCurrentSessionOrThrow } from "../../../services/auth0/getCurrentSession";
 
 export default async function TokenPage() {
   const session = await getCurrentSessionOrThrow();

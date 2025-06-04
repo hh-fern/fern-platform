@@ -28,11 +28,6 @@ import {
   postToEngineeringNotifs,
   pruneWithAuthState,
 } from "@fern-api/docs-server";
-// import {  } from "./cache-seed";
-// import { generateFernColorPalette } from "./generateFernColors";
-// import { FernFonts, generateFonts } from "./generateFonts";
-// import { getDocsUrlMetadata } from "./getDocsUrlMetadata";
-// import { isLocal } from "./isLocal";
 import { loadWithUrl as uncachedLoadWithUrl } from "@fern-api/docs-server";
 import {
   DEFAULT_CONTENT_WIDTH,
@@ -72,14 +67,8 @@ import {
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, isPlainObject } from "@fern-api/ui-core-utils";
 import { AuthEdgeConfig } from "@fern-docs/auth";
-// import { AuthEdgeConfig } from "@fern-docs/auth";
 import { HttpMethod } from "@fern-docs/components";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
-
-// import { postToEngineeringNotifs } from "./slack";
-// import { FernColorTheme, FernLayoutConfig, FileData } from "./types";
-// import { cleanBasePath } from "./utils/clean-base-path";
-// import { pruneWithAuthState } from "./withRbac";
 
 const loadWithUrl = uncachedLoadWithUrl;
 
@@ -606,12 +595,14 @@ const getRoot = async (
   authState: AuthState,
   authConfig: AuthEdgeConfig | undefined
 ) => {
+  console.log("[6] getRoot");
   let root = await unsafe_getRootCached(domain);
 
   if (authConfig) {
     root = pruneWithAuthState(authState, authConfig, root);
   }
 
+  console.log("[7] mutableUpdatePointsTo");
   FernNavigation.utils.mutableUpdatePointsTo(root);
 
   return root;

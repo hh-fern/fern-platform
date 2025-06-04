@@ -132,13 +132,13 @@ class EditableDocsLoaderImpl implements EditableDocsLoader {
     markdown: string;
     editThisPageUrl?: string;
   }> {
-    if (this.modifiedMdxFiles[pageId]) {
-      return {
-        filename: pageId,
-        markdown: this.modifiedMdxFiles[pageId],
-        editThisPageUrl: `https://${this.domain}/docs/edit/${pageId}`,
-      };
-    }
+    // if (this.modifiedMdxFiles[pageId] != null) {
+    //   return {
+    //     filename: pageId,
+    //     markdown: this.modifiedMdxFiles[pageId],
+    //     editThisPageUrl: `https://${this.domain}/docs/edit/${pageId}`,
+    //   };
+    // }
     return this.readOnlyDocsLoader.getPage(pageId);
   }
 

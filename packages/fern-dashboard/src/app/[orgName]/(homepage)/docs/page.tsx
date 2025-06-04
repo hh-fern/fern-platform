@@ -7,8 +7,8 @@ import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/ser
 import { constructDocsUrlParam } from "@/utils/constructDocsUrlParam";
 import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
 
-import getMyDocsSites from "../../api/get-my-docs-sites/handler";
-import { getCurrentSessionOrThrow } from "../../services/auth0/getCurrentSession";
+import getMyDocsSites from "../../../api/get-my-docs-sites/handler";
+import { getCurrentSessionOrThrow } from "../../../services/auth0/getCurrentSession";
 
 export default async function Page({
   params,

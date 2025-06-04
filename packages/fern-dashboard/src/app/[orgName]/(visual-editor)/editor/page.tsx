@@ -2,11 +2,10 @@ import { redirect } from "next/navigation";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 
+import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
+import Editor from "@/components/editor/Editor";
 import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
-
-import { getCurrentSession } from "../../services/auth0/getCurrentSession";
-import Editor from "./Editor";
 
 export default async function Page() {
   const session = await getCurrentSession();
@@ -15,13 +14,27 @@ export default async function Page() {
     redirect("/");
   }
 
-  const docs = await createEditableDocsLoader(
+  const editableDocsLoader = await createEditableDocsLoader(
     "https://sarah-bawabe.docs.buildwithfern.com",
     "123",
     session?.accessToken
   );
 
-  console.log("docs", docs);
+  console.log("[1] docs", editableDocsLoader);
+  // const root = await editableDocsLoader.getRoot();
+  // console.log("[2] root", root);
+  // const foundNode = FernNavigation.utils.findNode(root, slugjoin("/"));
+  // if (foundNode.type !== "found") {
+  //   console.log("[3] node not found");
+  //   return null;
+  // }
+  // const rootNodePageId = getPageId(foundNode.node);
+  // if (rootNodePageId == null) {
+  //   console.log("[4] rootNodePageId not found");
+  //   return null;
+  // }
+  // const rootPage = await editableDocsLoader.getPage(rootNodePageId);
+  // console.log("[5] rootPage", rootPage);
   // const docs = await getDocsFromUrl({
   //   url: "https://sarah-bawabe.docs.buildwithfern.com",
   //   token: session?.accessToken,
