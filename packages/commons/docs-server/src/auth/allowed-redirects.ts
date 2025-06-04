@@ -4,7 +4,7 @@
 import { compact } from "es-toolkit/array";
 import { UnreachableCaseError } from "ts-essentials";
 
-import { AuthEdgeConfig, OAuth2, SSOWorkOS } from "@fern-docs/auth";
+import { AuthEdgeConfig, OAuth2, SSOWorkOS } from "@fern-api/docs-auth";
 import { PreviewUrlAuth } from "@fern-docs/edge-config";
 
 const WORKOS_API_URL = "https://api.workos.com";

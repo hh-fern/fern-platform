@@ -1,6 +1,6 @@
 import { Impersonator, User } from "@workos-inc/node";
 
-import { FernUser } from "@fern-docs/auth";
+import { FernUser } from "@fern-api/docs-auth";
 
 export interface WorkOSSession {
   accessToken: string;

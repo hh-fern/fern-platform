@@ -52,7 +52,7 @@ import {
   withoutStaging,
 } from "@fern-docs/utils";
 
-import { findEndpoint } from "../components/util/processRequestSnippetComponents";
+import { findEndpoint } from "../../../../commons/docs-server/src/processRequestSnippetComponents";
 import { AuthState, createGetAuthState } from "./auth/getAuthState";
 import { cacheSeed } from "./cache-seed";
 import { generateFernColorPalette } from "./generateFernColors";

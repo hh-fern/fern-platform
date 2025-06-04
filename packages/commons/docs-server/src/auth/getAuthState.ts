@@ -2,14 +2,14 @@ import "server-only";
 
 import { AsyncOrSync } from "ts-essentials";
 
+import { AuthEdgeConfig, FernUser } from "@fern-api/docs-auth";
+import { removeTrailingSlash } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { AuthEdgeConfig, FernUser } from "@fern-docs/auth";
 import {
   PreviewUrlAuth,
   getAuthEdgeConfig,
   getPreviewUrlAuthConfig,
 } from "@fern-docs/edge-config";
-import { removeTrailingSlash } from "@fern-docs/utils";
 
 import { isLocal } from "../isLocal";
 import { safeVerifyFernJWTConfig } from "./FernJWT";

@@ -42,7 +42,7 @@ export const uncachedGetDocsUrlMetadata = async (
       );
     }
 
-    const body = await response.json();
+    const body = (await response.json()) as any;
     if (typeof body !== "object" || body == null) {
       throw new Error("Invalid docs url metadata (body is not an object)");
     }
