@@ -86,6 +86,7 @@ RUN wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
 
 RUN npm install -g prisma 
 RUN npm install -g fern-api@latest
+RUN npm install -g pnpm
 
 # Copy the built FDR application
 COPY --from=installer /app .
@@ -97,6 +98,13 @@ COPY servers/self-hosted /app/servers/self-hosted
 COPY servers/self-hosted/.env /app/servers/self-hosted/.env
 
 COPY --from=installer /app/servers/fdr/prisma/schema.prisma /app/servers/fdr/prisma/schema.prisma
+
+# Setup Nextapp dependencies
+RUN mkdir -p /app/nextapp/
+COPY servers/self-hosted/docs_bundle.zip /app/servers/self-hosted/docs_bundle.zip
+RUN unzip -q /app/servers/self-hosted/docs_bundle.zip -d /app/nextapp/ && \
+    cd /app/nextapp/standalone/packages/fern-docs/bundle && \
+    pnpm install
 
 # ------------ End FDR setup ------------
 
