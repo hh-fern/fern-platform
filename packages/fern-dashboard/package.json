@@ -9,6 +9,7 @@
   },
   "sideEffects": false,
   "scripts": {
+    "codegen": "prisma generate",
     "compile": "tsc --build",
     "dashboard:build": "next build",
     "dashboard:dev": "next dev",
@@ -31,6 +32,8 @@
     "@aws-sdk/client-s3": "^3.744.0",
     "@aws-sdk/s3-request-presigner": "^3.744.0",
     "@bprogress/next": "^3.2.11",
+    "@fern-api/docs-loader": "workspace:*",
+    "@fern-api/docs-server": "workspace:*",
     "@fern-api/fdr-sdk": "workspace:*",
     "@fern-api/venus-api-sdk": "^0.13.4-7-g5ff8ee8",
     "@fern-ui/loadable": "workspace:*",

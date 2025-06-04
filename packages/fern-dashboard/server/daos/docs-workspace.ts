@@ -1,4 +1,4 @@
-import { DocsWorkspace, PrismaClient } from "../generated/prisma";
+import { DocsWorkspace, PrismaClient } from "@prisma/client";
 
 export class DocsWorkspaceDao {
   private prisma: PrismaClient;
