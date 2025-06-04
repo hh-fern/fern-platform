@@ -1,7 +1,7 @@
 import * as RadixColors from "@radix-ui/colors";
 import Color from "colorjs.io";
 
-import { FERN_COLOR_ACCENT } from "@fern-docs/utils";
+import { FERN_COLOR_ACCENT } from "@fern-api/docs-utils";
 
 import {
   ArrayOf12,

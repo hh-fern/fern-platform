@@ -2,8 +2,8 @@ import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import { isPreviewDomain, withoutStaging } from "@fern-api/docs-utils";
 import { APIResponse, FdrAPI } from "@fern-api/fdr-sdk/client/types";
-import { isPreviewDomain, withoutStaging } from "@fern-docs/utils";
 
 import { isLocal } from "./isLocal";
 import { loadDocsDefinitionFromS3 } from "./loadDocsDefinitionFromS3";

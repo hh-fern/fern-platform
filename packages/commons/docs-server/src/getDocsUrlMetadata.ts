@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
-import { withoutStaging } from "@fern-docs/utils";
+import { withoutStaging } from "@fern-api/docs-utils";
 
 import { cacheSeed } from "./cache-seed";
 import { fernToken_admin, getFdrOrigin } from "./env-variables";
