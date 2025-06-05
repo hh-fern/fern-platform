@@ -123,28 +123,29 @@ echo " docs generated successfully"
 
 echo "Waiting for docs to start at localhost:3000..."
 
-cd /app/nextapp/standalone/packages/fern-docs/bundle
-HOSTNAME="0.0.0.0" \
-PORT=3000 \
-NEXT_PUBLIC_FDR_ORIGIN_PORT=8080 \
-NEXT_PUBLIC_FDR_ORIGIN="http://localhost:8080" \
-NEXT_PUBLIC_DOCS_DOMAIN="example-org.docs.buildwithfern.com" \
-NEXT_PUBLIC_IS_LOCAL=1 \
-NEXT_DISABLE_CACHE=1 \
-NODE_PATH=/app/nextapp/standalone/packages/fern-docs/bundle \
-node server.js & docs_pid=$!
-echo "docs_pid: $docs_pid"
+#cd /app/nextapp/standalone/packages/fern-docs/bundle
+# HOSTNAME="0.0.0.0" \
+# PORT=3000 \
+# NEXT_PUBLIC_FDR_ORIGIN_PORT=8080 \
+# NEXT_PUBLIC_FDR_ORIGIN="http://localhost:8080" \
+# NEXT_PUBLIC_DOCS_DOMAIN="example-org.docs.buildwithfern.com" \
+# NEXT_PUBLIC_IS_LOCAL=1 \
+# NEXT_DISABLE_CACHE=1 \
+# NODE_PATH=/app/nextapp/standalone/packages/fern-docs/bundle \
+# node server.js & docs_pid=$!
+# echo "docs_pid: $docs_pid"
 
-timeout=30
-while ! nc -z localhost 3000; do
-    if [ $timeout -le 0 ]; then
-        echo "Error: Docs failed to start within 30 seconds"
-        exit 1
-    fi
-    sleep 1
-    timeout=$((timeout - 1))
-done
-echo "Docs is up and running at localhost:3000"
+
+#timeout=30
+#while ! nc -z localhost 3000; do
+#    if [ $timeout -le 0 ]; then
+#        echo "Error: Docs failed to start within 30 seconds"
+#        exit 1
+#     fi
+#     sleep 1
+#     timeout=$((timeout - 1))
+#done
+# echo "Docs is up and running at localhost:3000"
 
 # --------------  Finish nextapp --------------
 

@@ -28,10 +28,10 @@ export const loadWithUrl = cache(
       async () => {
         const domainWithoutStaging = withoutStaging(domain);
 
-        if (isLocal()) {
+        if (isLocal()) { // todo add an "isSelfHosted" flag here and use the org name
           const response =
             await provideRegistryService().docs.v2.read.getDocsForUrl({
-              url: FdrAPI.Url("/"),
+              url: FdrAPI.Url("ariel-test.docs.buildwithfern.com"),
             });
           if (response.ok) {
             return response.body;
