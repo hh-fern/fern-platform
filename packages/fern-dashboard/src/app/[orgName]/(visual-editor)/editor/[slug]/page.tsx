@@ -5,40 +5,50 @@ import { FernNavigation } from "@fern-api/fdr-sdk";
 import { getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import Editor from "@/components/editor/Editor";
 
+import Editor from "./Editor";
 import { mdxToHtml } from "./mdxToHtml";
 
-export default async function Page() {
+const ROOT_SLUG_ALIAS = "index";
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ orgName: string; slug: string }>;
+}) {
   const session = await getCurrentSession();
 
   if (session == null) {
     redirect("/");
   }
 
-  const editableDocsLoader = await createEditableDocsLoader(
+  const { orgName, slug: slugAlias } = await params;
+
+  // TODO: dynamically read host value
+  const loader = await createEditableDocsLoader(
     "localhost:3000",
-    "123",
+    orgName,
     session?.accessToken
   );
+  const root = await loader.getRoot();
+  console.log("[1] root", root);
 
-  console.log("[1] docs", editableDocsLoader);
-  const root = await editableDocsLoader.getRoot();
-  console.log("[2] root", root);
-  const foundNode = FernNavigation.utils.findNode(root, slugjoin(root.slug));
-  if (foundNode.type !== "found") {
-    console.log("[3] node not found");
-    return null;
+  const slug = slugAlias === ROOT_SLUG_ALIAS ? root.slug : slugAlias;
+  const pageNode = FernNavigation.utils.findNode(root, slugjoin(slug));
+  console.log("[2] pageNode", pageNode);
+
+  const pageId =
+    pageNode.type === "found" ? getPageId(pageNode.node) : undefined;
+
+  // If the page is not found, redirect to the root (index) page
+  if (!pageId) {
+    redirect(`/${orgName}/editor/${ROOT_SLUG_ALIAS}`);
   }
-  const rootNodePageId = getPageId(foundNode.node);
-  if (rootNodePageId == null) {
-    console.log("[4] rootNodePageId not found");
-    return null;
-  }
-  const rootPage = await editableDocsLoader.getPage(rootNodePageId);
-  console.log("[5] rootPage", rootPage);
 
-  const html = await mdxToHtml(rootPage.markdown);
+  const page = pageId && (await loader.getPage(pageId));
+  const html = page?.markdown && (await mdxToHtml(page?.markdown));
 
-  return <Editor initialHtml={html} />;
+  return html ? (
+    <Editor initialHtml={html} orgName={orgName} slug={slug} />
+  ) : null;
 }
