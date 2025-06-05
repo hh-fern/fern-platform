@@ -16,6 +16,16 @@ import {
 import { initLogger, traced, wrapAISDKModel } from "braintrust";
 import { z } from "zod";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { track } from "@fern-api/docs-server/analytics/posthog";
+import { safeVerifyFernJWTConfig } from "@fern-api/docs-server/auth/FernJWT";
+import {
+  cohereApiKey,
+  openaiApiKey,
+  turbopufferApiKey,
+} from "@fern-api/docs-server/env-variables";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
   createCohereSystemPrompt,
@@ -28,16 +38,6 @@ import {
 import { withoutStaging } from "@fern-docs/utils";
 
 import { getFernToken } from "@/app/fern-token";
-import { track } from "@/server/analytics/posthog";
-import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-import {
-  cohereApiKey,
-  openaiApiKey,
-  turbopufferApiKey,
-} from "@/server/env-variables";
-import { isLocal } from "@/server/isLocal";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 export const maxDuration = 60;
 export const revalidate = 0;

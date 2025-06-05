@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 
 import urlJoin from "url-join";
 
+import { isLocal } from "@fern-api/docs-server/isLocal";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
 import {
@@ -10,8 +11,6 @@ import {
   HEADER_X_FERN_HOST,
   conformTrailingSlash,
 } from "@fern-docs/utils";
-
-import { isLocal } from "@/server/isLocal";
 
 export const runtime = "edge";
 

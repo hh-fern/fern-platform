@@ -5,6 +5,17 @@ import urlJoin from "url-join";
 import { WebflowClient } from "webflow-api";
 import type { OauthScope } from "webflow-api/api/types/OAuthScope";
 
+import { safeVerifyFernJWTConfig } from "@fern-api/docs-server/auth/FernJWT";
+import { preferPreview } from "@fern-api/docs-server/auth/origin";
+import {
+  OryOAuth2Client,
+  getOryAuthorizationUrl,
+} from "@fern-api/docs-server/auth/ory";
+import { getReturnToQueryParam } from "@fern-api/docs-server/auth/return-to";
+import { withSecureCookie } from "@fern-api/docs-server/auth/with-secure-cookie";
+import { fernToken_admin } from "@fern-api/docs-server/env-variables";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { APIKeyInjectionConfig, OryAccessTokenSchema } from "@fern-docs/auth";
 import {
@@ -12,15 +23,6 @@ import {
   getAuthEdgeConfig,
 } from "@fern-docs/edge-config";
 import { removeTrailingSlash } from "@fern-docs/utils";
-
-import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
-import { preferPreview } from "@/server/auth/origin";
-import { OryOAuth2Client, getOryAuthorizationUrl } from "@/server/auth/ory";
-import { getReturnToQueryParam } from "@/server/auth/return-to";
-import { withSecureCookie } from "@/server/auth/with-secure-cookie";
-import { fernToken_admin } from "@/server/env-variables";
-import { isLocal } from "@/server/isLocal";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 export const runtime = "edge";
 

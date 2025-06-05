@@ -1,5 +1,6 @@
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { VisualEditorLayout } from "@/components/layout/VisualEditorLayout";
 
 export default async function AuthedLayout({
   params,
@@ -10,5 +11,9 @@ export default async function AuthedLayout({
 }>) {
   const { orgName } = await params;
 
-  return <ProtectedRoute orgName={orgName}>{children}</ProtectedRoute>;
+  return (
+    <ProtectedRoute orgName={orgName}>
+      <VisualEditorLayout>{children}</VisualEditorLayout>
+    </ProtectedRoute>
+  );
 }

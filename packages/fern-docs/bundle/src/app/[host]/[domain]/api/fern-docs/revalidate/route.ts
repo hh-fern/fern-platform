@@ -8,6 +8,14 @@ import { mapValues } from "es-toolkit/object";
 import { escapeRegExp } from "es-toolkit/string";
 import { UnreachableCaseError } from "ts-essentials";
 
+import {
+  convertResponseToRootNode,
+  createEndpointCacheKey,
+  getMetadataFromResponse,
+} from "@fern-api/docs-loader";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { loadWithUrl } from "@fern-api/docs-server/loadWithUrl";
+import { pruneWithAuthState } from "@fern-api/docs-server/withRbac";
 import { ApiDefinition, DocsV2Read, FernNavigation } from "@fern-api/fdr-sdk";
 import {
   ApiDefinitionV1ToLatest,
@@ -26,17 +34,9 @@ import {
 } from "@fern-docs/utils";
 
 import {
-  convertResponseToRootNode,
-  createEndpointCacheKey,
-  getMetadataFromResponse,
-} from "@/server/docs-loader";
-import { isLocal } from "@/server/isLocal";
-import { loadWithUrl } from "@/server/loadWithUrl";
-import {
   queueAlgoliaReindex,
   queueTurbopufferReindex,
 } from "@/server/queue-reindex";
-import { pruneWithAuthState } from "@/server/withRbac";
 
 export const maxDuration = 300; // 5 minutes timeout
 

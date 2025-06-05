@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { kv } from "@vercel/kv";
 import { escapeRegExp } from "es-toolkit/string";
 
-import { isLocal } from "@/server/isLocal";
+import { isLocal } from "@fern-api/docs-server/isLocal";
 
 export async function GET(
   _req: NextRequest,
