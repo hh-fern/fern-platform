@@ -41,7 +41,7 @@ ENV MINIO_VOLUMES="/data" \
 
 # ----------- Setup FDR  -----------
 FROM base AS builder
-RUN apk add --no-cache libc6-compat unzip && \
+RUN apk add --no-cache libc6-compat && \
     apk update
 
 # Produce a pruned version of the monorepo
