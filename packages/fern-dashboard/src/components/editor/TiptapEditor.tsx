@@ -17,7 +17,7 @@ export declare namespace TiptapEditor {
     className?: string;
     disableFloatingMenu?: boolean;
     disableBubbleMenu?: boolean;
-    initialContent?: EditorProviderProps["content"];
+    content?: EditorProviderProps["content"];
     onUpdate?: EditorProviderProps["onUpdate"];
   }
 }
@@ -27,13 +27,13 @@ export default function TiptapEditor({
   className,
   disableFloatingMenu,
   disableBubbleMenu,
-  initialContent,
+  content,
   onUpdate,
 }: TiptapEditor.Props) {
   return (
     <EditorProvider
       extensions={extensions}
-      content={initialContent}
+      content={content}
       editorProps={{
         attributes: {
           class: "prose prose-md m-5 focus:outline-none",
