@@ -5,15 +5,14 @@ import { cache } from "react";
 
 import { Semaphore } from "es-toolkit/compat";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { cacheSeed } from "@fern-api/docs-server/cache-seed";
+import { postToEngineeringNotifs } from "@fern-api/docs-server/slack";
 import { Frontmatter } from "@fern-api/fdr-sdk/docs";
 import { isDevelopment, isPreviewDomain } from "@fern-docs/utils";
 
 import { serializeMdx as internalSerializeMdx } from "@/mdx/bundler/serialize";
 import { RehypeLinksOptions } from "@/mdx/plugins/rehype-links";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-
-import { cacheSeed } from "./cache-seed";
-import { postToEngineeringNotifs } from "./slack";
 
 export type MdxSerializerOptions = {
   /**

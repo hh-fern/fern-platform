@@ -1,6 +1,15 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+import { FernNextResponse } from "@fern-api/docs-server/FernNextResponse";
+import { getAllowedRedirectUrls } from "@fern-api/docs-server/auth/allowed-redirects";
+import { preferPreview } from "@fern-api/docs-server/auth/origin";
+import { getReturnToQueryParam } from "@fern-api/docs-server/auth/return-to";
+import { withDeleteCookie } from "@fern-api/docs-server/auth/with-secure-cookie";
+import { revokeSessionForToken } from "@fern-api/docs-server/auth/workos-session";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { safeUrl } from "@fern-api/docs-server/safeUrl";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
 import {
@@ -8,16 +17,6 @@ import {
   COOKIE_FERN_TOKEN,
   COOKIE_REFRESH_TOKEN,
 } from "@fern-docs/utils";
-
-import { FernNextResponse } from "@/server/FernNextResponse";
-import { getAllowedRedirectUrls } from "@/server/auth/allowed-redirects";
-import { preferPreview } from "@/server/auth/origin";
-import { getReturnToQueryParam } from "@/server/auth/return-to";
-import { withDeleteCookie } from "@/server/auth/with-secure-cookie";
-import { revokeSessionForToken } from "@/server/auth/workos-session";
-import { isLocal } from "@/server/isLocal";
-import { safeUrl } from "@/server/safeUrl";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 export const runtime = "edge";
 

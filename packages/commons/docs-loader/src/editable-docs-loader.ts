@@ -180,7 +180,7 @@ export const createEditableDocsLoader = async (
   fern_token?: string
 ) => {
   // TODO: derive the domain from the workspace
-  const domain = "sarah-test.docs.buildwithfern.com";
+  const domain = "fern.docs.buildwithfern.com";
   const docsLoader = await createCachedDocsLoader(host, domain, fern_token);
   return new EditableDocsLoaderImpl(docsLoader);
 };

@@ -1,16 +1,14 @@
 import { Client } from "@upstash/qstash";
 import { getEnv } from "@vercel/functions";
 
+import { qstashToken } from "@fern-api/docs-server/env-variables";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { cleanBasePath } from "@fern-api/docs-server/utils/clean-base-path";
 import {
   HEADER_X_FERN_HOST,
   HEADER_X_VERCEL_PROTECTION_BYPASS,
   slugToHref,
 } from "@fern-docs/utils";
-
-import { qstashToken } from "@/server/env-variables";
-
-import { isLocal } from "./isLocal";
-import { cleanBasePath } from "./utils/clean-base-path";
 
 const q = isLocal() ? undefined : new Client({ token: qstashToken() });
 

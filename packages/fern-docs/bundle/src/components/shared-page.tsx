@@ -11,6 +11,7 @@ import React from "react";
 import { compact } from "es-toolkit/array";
 import { HydrationBoundary } from "jotai-ssr";
 
+import { DocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { Slug } from "@fern-api/fdr-sdk/navigation";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
@@ -22,7 +23,6 @@ import {
 } from "@fern-docs/utils";
 
 import FeedbackPopover from "@/components/feedback/FeedbackPopover";
-import { DocsLoader } from "@/server/docs-loader";
 import { withLaunchDarkly } from "@/server/ld-adapter";
 import {
   MdxSerializer,

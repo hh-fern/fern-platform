@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 
+import { DocsLoader, createCachedDocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { Slug } from "@fern-api/fdr-sdk/navigation";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
@@ -9,7 +10,6 @@ import { markdownToString } from "@fern-docs/mdx";
 import { slugToHref } from "@fern-docs/utils";
 
 import { toImageDescriptor } from "@/app/seo";
-import { DocsLoader, createCachedDocsLoader } from "@/server/docs-loader";
 import { createFindNode } from "@/server/find-node";
 
 import { getFrontmatter } from "../../../mdx/src/frontmatter";

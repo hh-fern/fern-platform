@@ -263,7 +263,7 @@ export const getMetadataFromResponse = async (
 
 export const getMetadata = cache(
   async (domain: string): Promise<DocsMetadata> => {
-    // "use cache"; // SARAH TODO: make this work
+    "use cache";
 
     unstable_cacheTag(domain, "getMetadata");
 
@@ -303,7 +303,7 @@ export const getMetadata = cache(
 
 const getFiles = cache(
   async (domain: string): Promise<Record<string, FileData>> => {
-    // "use cache"; // SARAH TODO: make this work
+    "use cache";
 
     unstable_cacheTag(domain, "getFiles");
 
@@ -342,7 +342,7 @@ const getFiles = cache(
 
 // the api reference may be too large to cache, so we don't cache it in the KV store
 const getApi = async (domain: string, id: string) => {
-  // "use cache"; // SARAH TODO: make this work
+  "use cache";
 
   unstable_cacheTag(domain, "getApi", id);
 
@@ -453,7 +453,7 @@ const getEndpointById = async (
   authSchemes: AuthScheme[];
   types: Record<TypeId, TypeDefinition>;
 }> => {
-  // "use cache"; // SARAH TODO: make this work
+  "use cache";
 
   unstable_cacheTag(domain, "getEndpointById", apiDefinitionId, endpointId);
 
@@ -602,7 +602,6 @@ const getRoot = async (
     root = pruneWithAuthState(authState, authConfig, root);
   }
 
-  console.log("[7] mutableUpdatePointsTo");
   FernNavigation.utils.mutableUpdatePointsTo(root);
 
   return root;
@@ -689,7 +688,7 @@ const getPage = cache(async (domain: string, pageId: string) => {
 });
 
 const getMdxBundlerFiles = cache(async (domain: string) => {
-  // "use cache"; // SARAH TODO: make this work
+  "use cache";
 
   unstable_cacheTag(domain, "getMdxBundlerFiles");
 
@@ -714,7 +713,7 @@ const getMdxBundlerFiles = cache(async (domain: string) => {
 });
 
 const getColors = cache(async (domain: string) => {
-  // "use cache"; // SARAH TODO: make this work
+  "use cache";
 
   unstable_cacheTag(domain, "getColors");
 
@@ -801,7 +800,7 @@ const getColors = cache(async (domain: string) => {
 });
 
 const getFonts = cache(async (domain: string) => {
-  // "use cache"; // SARAH TODO: make this work
+  "use cache";
 
   unstable_cacheTag(domain, "getFonts");
 
@@ -826,7 +825,7 @@ const getFonts = cache(async (domain: string) => {
 });
 
 const getLayout = cache(async (domain: string) => {
-  // "use cache"; // SARAH TODO: make this work
+  "use cache";
 
   unstable_cacheTag(domain, "getLayout");
 

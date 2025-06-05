@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { algoliasearch } from "algoliasearch";
 
+import { algoliaAppId } from "@fern-api/docs-server/env-variables";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { selectFirst } from "@fern-api/docs-server/utils/selectFirst";
+import { toArray } from "@fern-api/docs-server/utils/toArray";
 import { fetchFacetValues } from "@fern-docs/search-server/algolia";
-
-import { algoliaAppId } from "@/server/env-variables";
-import { isLocal } from "@/server/isLocal";
-import { selectFirst } from "@/server/utils/selectFirst";
-import { toArray } from "@/server/utils/toArray";
 
 export const maxDuration = 10;
 
