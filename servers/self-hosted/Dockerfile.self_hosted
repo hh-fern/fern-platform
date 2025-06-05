@@ -58,12 +58,10 @@ RUN apk add --no-cache libc6-compat unzip && \
 
 WORKDIR /app
 
-# Copy only the necessary files for dependency installation first
+# Only copy the necessary files for dependency installation first
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml .
-
-# Install dependencies in a separate layer for better caching
 RUN pnpm install
 
 # Copy the rest of the files
@@ -72,7 +70,6 @@ COPY turbo.json turbo.json
 COPY shared shared
 COPY fern fern
 
-# Combine build commands to reduce layers
 RUN pnpm turbo --filter=@fern-api/fdr-sdk compile && \
     pnpm turbo --filter=@fern-platform/fdr codegen && \
     pnpm turbo --filter=@fern-platform/fdr compile
@@ -81,7 +78,6 @@ RUN pnpm turbo --filter=@fern-api/fdr-sdk compile && \
 FROM base AS runner
 WORKDIR /app
 
-# Combine all installations into a single layer
 RUN wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
     chmod +x mc && \
     mv mc /usr/local/bin/ && \
