@@ -6,9 +6,9 @@ import { APIResponse, FdrAPI } from "@fern-api/fdr-sdk/client/types";
 import { isPreviewDomain, withoutStaging } from "@fern-docs/utils";
 
 import { isLocal } from "./isLocal";
+import { isSelfHosted } from "./isSelfHosted";
 import { loadDocsDefinitionFromS3 } from "./loadDocsDefinitionFromS3";
 import { provideRegistryService } from "./registry";
-import { isSelfHosted } from "./isSelfHosted";
 
 export type LoadWithUrlResponse = APIResponse<
   FdrAPI.docs.v2.read.LoadDocsForUrlResponse,
@@ -29,8 +29,9 @@ export const loadWithUrl = cache(
       async () => {
         const domainWithoutStaging = withoutStaging(domain);
         if (isSelfHosted() || isLocal()) {
-          
-          const docsUrl = isSelfHosted() ? process.env.NEXT_PUBLIC_DOCS_DOMAIN ?? "" : "/";
+          const docsUrl = isSelfHosted()
+            ? (process.env.NEXT_PUBLIC_DOCS_DOMAIN ?? "")
+            : "/";
           if (isSelfHosted() && !docsUrl) {
             console.error("NEXT_PUBLIC_DOCS_DOMAIN is not set");
             notFound();
@@ -47,7 +48,7 @@ export const loadWithUrl = cache(
           });
           notFound();
         }
-        
+
         try {
           const response = await loadDocsDefinitionFromS3(
             domainWithoutStaging,
