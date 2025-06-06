@@ -122,3 +122,23 @@ describe("FDR server is running and api endpoints are available", () => {
     expect(curlOutput).toBe("200");
   });
 });
+
+/** describe("Self-hosted docs has a running nextapp instance", () => {
+  it("can load the docs", async () => {
+    const containerId = await getContainerId();
+    expect(containerId).toBeTruthy();
+
+    const { stdout: curlOutput } = await execa("docker", [
+      "exec",
+      containerId,
+      "curl",
+      "-s",
+      "-o",
+      "/dev/null",
+      "-w",
+      "%{http_code}",
+      "http://localhost:3000/hello-world",
+    ]);
+    expect(curlOutput).toBe("200");
+  });
+}); */ 
