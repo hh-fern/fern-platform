@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { safeVerifyFernJWTConfig } from "@fern-api/docs-server/auth/FernJWT";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { COOKIE_FERN_TOKEN } from "@fern-api/docs-utils";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
-import { COOKIE_FERN_TOKEN } from "@fern-docs/utils";
 
 /**
  * This endpoint returns the authentication information pertaining to the current user

@@ -4,8 +4,8 @@ import { RedirectType, redirect } from "next/navigation";
 import React from "react";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { conformTrailingSlash } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
-import { conformTrailingSlash } from "@fern-docs/utils";
 
 import { getFernToken } from "@/app/fern-token";
 import {

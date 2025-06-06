@@ -16,13 +16,13 @@ import { withSecureCookie } from "@fern-api/docs-server/auth/with-secure-cookie"
 import { fernToken_admin } from "@fern-api/docs-server/env-variables";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { removeTrailingSlash } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { APIKeyInjectionConfig, OryAccessTokenSchema } from "@fern-docs/auth";
 import {
   getApiKeyInjectionEdgeConfig,
   getAuthEdgeConfig,
 } from "@fern-docs/edge-config";
-import { removeTrailingSlash } from "@fern-docs/utils";
 
 export const runtime = "edge";
 

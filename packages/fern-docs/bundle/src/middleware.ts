@@ -16,7 +16,6 @@ import {
 } from "@fern-api/docs-server/patterns";
 import { withPathname } from "@fern-api/docs-server/withPathname";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
-import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import {
   COOKIE_FERN_TOKEN,
   HEADER_X_FERN_BASEPATH,
@@ -26,7 +25,8 @@ import {
   isTrailingSlashEnabled,
   removeLeadingSlash,
   removeTrailingSlash,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
+import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 
 function splitPathname(
   pathname: string,

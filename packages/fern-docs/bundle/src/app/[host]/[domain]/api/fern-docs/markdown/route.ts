@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { MARKDOWN_PATTERN } from "@fern-api/docs-server/patterns";
-import { removeLeadingSlash } from "@fern-docs/utils";
+import { removeLeadingSlash } from "@fern-api/docs-utils";
 
 import {
   getMarkdownForPath,

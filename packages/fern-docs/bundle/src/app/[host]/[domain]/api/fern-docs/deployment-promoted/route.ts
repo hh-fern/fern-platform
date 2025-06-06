@@ -13,7 +13,7 @@ import {
   FERN_DOCS_FERNDOCS_APP,
   FERN_DOCS_STAGING_BUILDWITHFERN_COM,
   withoutStaging,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
 
 import { batchQueue } from "@/server/queue";
 

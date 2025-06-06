@@ -8,7 +8,7 @@ import {
   HEADER_X_FERN_HOST,
   HEADER_X_VERCEL_PROTECTION_BYPASS,
   slugToHref,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
 
 const q = isLocal() ? undefined : new Client({ token: qstashToken() });
 

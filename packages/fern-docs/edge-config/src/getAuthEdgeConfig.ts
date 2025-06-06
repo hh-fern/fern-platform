@@ -1,5 +1,5 @@
+import { withoutStaging } from "@fern-api/docs-utils";
 import { type AuthEdgeConfig, AuthEdgeConfigSchema } from "@fern-docs/auth";
-import { withoutStaging } from "@fern-docs/utils";
 
 import { getEdge } from "./getEdge";
 import { isLocal } from "./isLocal";

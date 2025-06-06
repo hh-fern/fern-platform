@@ -16,6 +16,12 @@ import {
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { loadWithUrl } from "@fern-api/docs-server/loadWithUrl";
 import { pruneWithAuthState } from "@fern-api/docs-server/withRbac";
+import {
+  EdgeFlags,
+  HEADER_X_FERN_HOST,
+  slugToHref,
+  withoutStaging,
+} from "@fern-api/docs-utils";
 import { ApiDefinition, DocsV2Read, FernNavigation } from "@fern-api/fdr-sdk";
 import {
   ApiDefinitionV1ToLatest,
@@ -26,12 +32,6 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
-import {
-  EdgeFlags,
-  HEADER_X_FERN_HOST,
-  slugToHref,
-  withoutStaging,
-} from "@fern-docs/utils";
 
 import {
   queueAlgoliaReindex,

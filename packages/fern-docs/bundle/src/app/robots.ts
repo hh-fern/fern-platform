@@ -4,13 +4,13 @@ import { headers } from "next/headers";
 import urlJoin from "url-join";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
-import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
 import {
   HEADER_HOST,
   HEADER_X_FERN_HOST,
   conformTrailingSlash,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
+import { withDefaultProtocol } from "@fern-api/ui-core-utils";
+import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
 
 export const runtime = "edge";
 

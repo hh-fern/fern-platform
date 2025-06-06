@@ -15,9 +15,9 @@ import { isLocal } from "@fern-api/docs-server/isLocal";
 import { postToEngineeringNotifs } from "@fern-api/docs-server/slack";
 import { Gate, withBasicTokenAnonymous } from "@fern-api/docs-server/withRbac";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { slugToHref, withoutStaging } from "@fern-api/docs-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import { turbopufferUpsertTask } from "@fern-docs/search-server/turbopuffer";
-import { slugToHref, withoutStaging } from "@fern-docs/utils";
 
 export const maxDuration = 800; // 13 minutes
 

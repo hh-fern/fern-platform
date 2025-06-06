@@ -11,17 +11,17 @@ import { FernNextResponse } from "@fern-api/docs-server/FernNextResponse";
 import { preferPreview } from "@fern-api/docs-server/auth/origin";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { FileData } from "@fern-api/docs-server/types";
+import {
+  COOKIE_FERN_TOKEN,
+  getRedirectForPath,
+  slugToHref,
+} from "@fern-api/docs-utils";
 import type { DocsV1Read } from "@fern-api/fdr-sdk/client/types";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { NodeCollector } from "@fern-api/fdr-sdk/navigation";
 import { assertNever, withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getEdgeFlags } from "@fern-docs/edge-config";
 import { getFrontmatter } from "@fern-docs/mdx";
-import {
-  COOKIE_FERN_TOKEN,
-  getRedirectForPath,
-  slugToHref,
-} from "@fern-docs/utils";
 
 const FORMATS = ["rss", "atom", "json"] as const;
 type Format = (typeof FORMATS)[number];

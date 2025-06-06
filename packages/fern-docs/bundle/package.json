@@ -60,7 +60,6 @@
     "@fern-docs/mdx": "workspace:*",
     "@fern-docs/search-server": "workspace:*",
     "@fern-docs/search-ui": "workspace:*",
-    "@fern-docs/utils": "workspace:*",
     "@fern-fern/fern-docs-sdk": "0.0.5",
     "@fern-platform/fdr-utils": "workspace:*",
     "@fern-ui/loadable": "workspace:*",

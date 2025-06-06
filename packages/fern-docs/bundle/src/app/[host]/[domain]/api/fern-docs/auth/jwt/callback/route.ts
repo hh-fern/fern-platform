@@ -10,9 +10,9 @@ import { withSecureCookie } from "@fern-api/docs-server/auth/with-secure-cookie"
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { safeUrl } from "@fern-api/docs-server/safeUrl";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { COOKIE_FERN_TOKEN } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
-import { COOKIE_FERN_TOKEN } from "@fern-docs/utils";
 
 import { redirectWithLoginError } from "@/server/redirectWithLoginError";
 

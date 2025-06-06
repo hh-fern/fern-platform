@@ -8,10 +8,10 @@ import {
   getDocsDomainApp,
   getDocsHostApp,
 } from "@fern-api/docs-server/xfernhost/app";
+import { conformTrailingSlash } from "@fern-api/docs-utils";
 import { NodeCollector } from "@fern-api/fdr-sdk/navigation";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getCanonicalUrl } from "@fern-docs/edge-config";
-import { conformTrailingSlash } from "@fern-docs/utils";
 
 import { getFernToken } from "./fern-token";
 

@@ -3,9 +3,9 @@ import "server-only";
 import React, { ReactElement } from "react";
 
 import { DocsLoader } from "@fern-api/docs-loader";
+import { slugToHref } from "@fern-api/docs-utils";
 import type { FernNavigation } from "@fern-api/fdr-sdk";
 import { Badge } from "@fern-docs/components";
-import { slugToHref } from "@fern-docs/utils";
 
 import { FernLink } from "@/components/FernLink";
 import { Separator } from "@/components/Separator";

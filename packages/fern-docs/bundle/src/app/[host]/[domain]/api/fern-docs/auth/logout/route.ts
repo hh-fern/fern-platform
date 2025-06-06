@@ -10,13 +10,13 @@ import { revokeSessionForToken } from "@fern-api/docs-server/auth/workos-session
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { safeUrl } from "@fern-api/docs-server/safeUrl";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
-import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { getAuthEdgeConfig } from "@fern-docs/edge-config";
 import {
   COOKIE_ACCESS_TOKEN,
   COOKIE_FERN_TOKEN,
   COOKIE_REFRESH_TOKEN,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
+import { withDefaultProtocol } from "@fern-api/ui-core-utils";
+import { getAuthEdgeConfig } from "@fern-docs/edge-config";
 
 export const runtime = "edge";
 

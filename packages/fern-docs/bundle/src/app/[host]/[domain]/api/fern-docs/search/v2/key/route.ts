@@ -10,13 +10,13 @@ import { getDocsUrlMetadata } from "@fern-api/docs-server/getDocsUrlMetadata";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { selectFirst } from "@fern-api/docs-server/utils/selectFirst";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { COOKIE_FERN_TOKEN, withoutStaging } from "@fern-api/docs-utils";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
 import {
   DEFAULT_SEARCH_API_KEY_EXPIRATION_SECONDS,
   SEARCH_INDEX,
   getSearchApiKey,
 } from "@fern-docs/search-server/algolia/edge";
-import { COOKIE_FERN_TOKEN, withoutStaging } from "@fern-docs/utils";
 
 export const maxDuration = 10;
 

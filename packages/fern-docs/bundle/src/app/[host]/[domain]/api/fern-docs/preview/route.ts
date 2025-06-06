@@ -12,7 +12,7 @@ import {
   COOKIE_FERN_DOCS_PREVIEW,
   FERN_DOCS_ORIGINS,
   HEADER_X_FORWARDED_HOST,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
 
 import { redirectResponse } from "@/server/serverResponse";
 
