@@ -58,7 +58,7 @@ RUN apk add --no-cache libc6-compat unzip && \
 
 WORKDIR /app
 
-# Copy only the necessary files for dependency installation first
+# Only copy the necessary files for dependency installation first
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml .
@@ -101,11 +101,17 @@ COPY --from=installer /app/servers/fdr/prisma/schema.prisma /app/servers/fdr/pri
 # Setup Nextapp dependencies
 RUN mkdir -p /app/nextapp/ && \
     cd /app/nextapp/ && \
-    unzip -q /app/servers/self-hosted/docs_bundle.zip && \
-    cd standalone/packages/fern-docs/bundle && \
+    tar -xzf /app/servers/self-hosted/docs_bundle.tar.gz && \
+    cd /app/nextapp/packages/fern-docs/bundle && \
     pnpm install && \
-    cd /app/nextapp/standalone && \
+    cd /app/nextapp && \
     pnpm add -w esbuild
+
+# && \
+#    cd .next/standalone/packages/fern-docs/bundle && \
+#    pnpm install && \
+#    cd /app/nextapp/.next/standalone && \
+#    pnpm add -w esbuild
 
 # ------------ End FDR setup ------------
 

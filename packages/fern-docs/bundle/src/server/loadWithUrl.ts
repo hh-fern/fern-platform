@@ -8,6 +8,7 @@ import { isPreviewDomain, withoutStaging } from "@fern-docs/utils";
 import { isLocal } from "./isLocal";
 import { loadDocsDefinitionFromS3 } from "./loadDocsDefinitionFromS3";
 import { provideRegistryService } from "./registry";
+import { isSelfHosted } from "./isSelfHosted";
 
 export type LoadWithUrlResponse = APIResponse<
   FdrAPI.docs.v2.read.LoadDocsForUrlResponse,
@@ -27,11 +28,16 @@ export const loadWithUrl = cache(
     return unstable_cache(
       async () => {
         const domainWithoutStaging = withoutStaging(domain);
-
-        if (isLocal()) { // todo add an "isSelfHosted" flag here and use the org name
+        if (isSelfHosted() || isLocal()) {
+          
+          const docsUrl = isSelfHosted() ? process.env.NEXT_PUBLIC_DOCS_DOMAIN ?? "" : "/";
+          if (isSelfHosted() && !docsUrl) {
+            console.error("NEXT_PUBLIC_DOCS_DOMAIN is not set");
+            notFound();
+          }
           const response =
             await provideRegistryService().docs.v2.read.getDocsForUrl({
-              url: FdrAPI.Url("ariel-test.docs.buildwithfern.com"),
+              url: FdrAPI.Url(docsUrl),
             });
           if (response.ok) {
             return response.body;
@@ -41,7 +47,7 @@ export const loadWithUrl = cache(
           });
           notFound();
         }
-
+        
         try {
           const response = await loadDocsDefinitionFromS3(
             domainWithoutStaging,

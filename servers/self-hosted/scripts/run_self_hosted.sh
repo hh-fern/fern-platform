@@ -123,16 +123,19 @@ echo " docs generated successfully"
 
 echo "Waiting for docs to start at localhost:3000..."
 
-#cd /app/nextapp/standalone/packages/fern-docs/bundle
-# HOSTNAME="0.0.0.0" \
-# PORT=3000 \
-# NEXT_PUBLIC_FDR_ORIGIN_PORT=8080 \
-# NEXT_PUBLIC_FDR_ORIGIN="http://localhost:8080" \
-# NEXT_PUBLIC_DOCS_DOMAIN="example-org.docs.buildwithfern.com" \
-# NEXT_PUBLIC_IS_LOCAL=1 \
-# NEXT_DISABLE_CACHE=1 \
-# NODE_PATH=/app/nextapp/standalone/packages/fern-docs/bundle \
-# node server.js & docs_pid=$!
+
+cd /app/nextapp/packages/fern-docs/bundle
+HOSTNAME="0.0.0.0" \
+PORT=3000 \
+NEXT_PUBLIC_FDR_ORIGIN_PORT=8080 \
+NEXT_PUBLIC_FDR_ORIGIN="http://localhost:8080" \
+NEXT_PUBLIC_DOCS_DOMAIN="ariel-test.docs.buildwithfern.com" \
+NEXT_PUBLIC_IS_LOCAL=1 \
+SELF_HOSTED=1 \
+SELF_HOSTED_DOCS_URL="ariel-test.docs.buildwithfern.com" \
+NEXT_DISABLE_CACHE=1 \
+NODE_PATH=/app/nextapp/.next/standalone/packages/fern-docs/bundle \
+node server.js & docs_pid=$!
 # echo "docs_pid: $docs_pid"
 
 
