@@ -71,6 +71,10 @@ export function createCachedMdxSerializer(
       return;
     }
 
+    if (isPlainText(content)) {
+      return content;
+    }
+
     await monitor.acquire();
 
     // this lets us key on just
@@ -89,7 +93,6 @@ export function createCachedMdxSerializer(
               ...scope,
             },
             replaceHref,
-            domain,
           });
         } catch (error) {
           console.error("Error serializing mdx", error);
@@ -103,7 +106,8 @@ export function createCachedMdxSerializer(
             );
           }
 
-          return content;
+          // Instead of returning raw content, throw the error to be handled by the caller
+          throw error;
         }
       },
       [domain, content, cacheSeed()],
@@ -130,4 +134,12 @@ export function createCachedMdxSerializer(
   };
 
   return cache(serializer);
+}
+
+function isPlainText(content: string): boolean {
+  if (content.length === 0) {
+    return true;
+  }
+
+  return /^[a-zA-Z0-9\s.,'"!?]*$/.test(content);
 }
