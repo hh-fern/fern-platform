@@ -123,7 +123,6 @@ echo " docs generated successfully"
 
 echo "Waiting for docs to start at localhost:3000..."
 
-
 cd /app/nextapp/packages/fern-docs/bundle
 HOSTNAME="0.0.0.0" \
 PORT=3000 \
@@ -136,19 +135,7 @@ SELF_HOSTED_DOCS_URL="ariel-test.docs.buildwithfern.com" \
 NEXT_DISABLE_CACHE=1 \
 NODE_PATH=/app/nextapp/.next/standalone/packages/fern-docs/bundle \
 node server.js & docs_pid=$!
-# echo "docs_pid: $docs_pid"
-
-
-#timeout=30
-#while ! nc -z localhost 3000; do
-#    if [ $timeout -le 0 ]; then
-#        echo "Error: Docs failed to start within 30 seconds"
-#        exit 1
-#     fi
-#     sleep 1
-#     timeout=$((timeout - 1))
-#done
-# echo "Docs is up and running at localhost:3000"
+echo "docs_pid: $docs_pid"
 
 # --------------  Finish nextapp --------------
 

@@ -107,12 +107,6 @@ RUN mkdir -p /app/nextapp/ && \
     cd /app/nextapp && \
     pnpm add -w esbuild
 
-# && \
-#    cd .next/standalone/packages/fern-docs/bundle && \
-#    pnpm install && \
-#    cd /app/nextapp/.next/standalone && \
-#    pnpm add -w esbuild
-
 # ------------ End FDR setup ------------
 
 ENTRYPOINT ["/bin/sh", "/app/servers/self-hosted/scripts/run_self_hosted.sh"]
