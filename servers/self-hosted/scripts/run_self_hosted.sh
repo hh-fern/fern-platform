@@ -11,6 +11,7 @@ fi
 source /app/servers/self-hosted/.env
 ORG_NAME=$(jq -r '.organization' < /app/fern/fern.config.json)
 MINIO_BUCKET_NAME=${ORG_NAME}.${MINIO_BUCKET_NAME_SUFFIX}
+NEXT_PUBLIC_DOCS_DOMAIN=${ORG_NAME}.docs.buildwithfern.com
 
 # --------------------------------------------
 
@@ -128,10 +129,9 @@ HOSTNAME="0.0.0.0" \
 PORT=3000 \
 NEXT_PUBLIC_FDR_ORIGIN_PORT=8080 \
 NEXT_PUBLIC_FDR_ORIGIN="http://localhost:8080" \
-NEXT_PUBLIC_DOCS_DOMAIN="ariel-test.docs.buildwithfern.com" \
+NEXT_PUBLIC_DOCS_DOMAIN=${NEXT_PUBLIC_DOCS_DOMAIN} \
 NEXT_PUBLIC_IS_LOCAL=1 \
 SELF_HOSTED=1 \
-SELF_HOSTED_DOCS_URL="ariel-test.docs.buildwithfern.com" \
 NEXT_DISABLE_CACHE=1 \
 NODE_PATH=/app/nextapp/.next/standalone/packages/fern-docs/bundle \
 node server.js & docs_pid=$!
