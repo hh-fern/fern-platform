@@ -455,7 +455,6 @@ const removeCodeBlocks = (content: string): string => {
   for (const twoSlashLineIndex of twoSlashIndices.reverse()) {
     let topLine = null;
     let bottomLine = null;
-    let codeBlockDepth = 0;
 
     // look backwards for opening tag
     for (let i = twoSlashLineIndex; i >= 0; i--) {
@@ -463,12 +462,12 @@ const removeCodeBlocks = (content: string): string => {
       if (!line) continue;
 
       if (line === "<CodeBlocks>") {
-        if (codeBlockDepth === 0) {
-          topLine = i;
-          break;
-        }
+        topLine = i;
+        break;
       } else if (line === "</CodeBlocks>") {
-        codeBlockDepth++;
+        // code blocks cannot be nested
+        // do not continue searching if we have hit the close of previous block
+        break;
       } else if (line.includes("```")) {
         // skip over code blocks
         while (i >= 0 && !lines[i]?.trim().includes("```")) {
@@ -477,21 +476,18 @@ const removeCodeBlocks = (content: string): string => {
       }
     }
 
-    codeBlockDepth = 0;
-
     // look forwards for closing tag
     for (let i = twoSlashLineIndex; i < lines.length; i++) {
       const line = lines[i]?.trim();
       if (!line) continue;
 
       if (line === "</CodeBlocks>") {
-        if (codeBlockDepth === 0) {
-          bottomLine = i;
-          break;
-        }
-        codeBlockDepth--;
+        bottomLine = i;
+        break;
       } else if (line === "<CodeBlocks>") {
-        codeBlockDepth++;
+        // code blocks cannot be nested
+        // do not continue searching if we have hit the opening of next block
+        break;
       } else if (line.includes("```")) {
         // skip over code blocks
         while (i < lines.length && !lines[i]?.trim().includes("```")) {
