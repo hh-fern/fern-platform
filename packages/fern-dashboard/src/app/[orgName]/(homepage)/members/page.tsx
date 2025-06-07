@@ -1,4 +1,4 @@
-import { MembersPage } from "@/components/members/MembersPage";
+import { MembersPage } from "@fern-docs/components/members/MembersPage";
 
 import { getCurrentSessionOrThrow } from "../../../services/auth0/getCurrentSession";
 

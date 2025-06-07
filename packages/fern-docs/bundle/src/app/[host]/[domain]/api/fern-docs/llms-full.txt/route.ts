@@ -9,10 +9,10 @@ import { slugToHref } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish } from "@fern-api/ui-core-utils";
+import { getMarkdownForPath } from "@fern-docs/components/server/getMarkdownForPath";
+import { getSectionRoot } from "@fern-docs/components/server/getSectionRoot";
 
 import { generateHtml } from "@/app/utils";
-import { getMarkdownForPath } from "@/server/getMarkdownForPath";
-import { getSectionRoot } from "@/server/getSectionRoot";
 
 export const maxDuration = 300; // 5 minutes timeout
 

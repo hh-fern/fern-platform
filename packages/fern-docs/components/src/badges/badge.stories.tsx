@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
 
-import { UIColorOrder } from "../colors";
+import { UIColorOrder } from "@fern-api/docs-utils/src/colors";
+
 import { Badge } from "./badge";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export

@@ -31,12 +31,11 @@ import {
   prune,
 } from "@fern-api/fdr-sdk/api-definition";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
-
 import {
   queueAlgoliaReindex,
   queueTurbopufferReindex,
-} from "@/server/queue-reindex";
+} from "@fern-docs/components/server/queue-reindex";
+import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 
 export const maxDuration = 300; // 5 minutes timeout
 

@@ -1,4 +1,4 @@
-import { MaybeInvalidateDocsSiteQuery } from "@/components/docs-page/MaybeInvalidateDocsSiteQuery";
+import { MaybeInvalidateDocsSiteQuery } from "@fern-docs/components/docs-page/MaybeInvalidateDocsSiteQuery";
 
 export default async function Layout({
   children,

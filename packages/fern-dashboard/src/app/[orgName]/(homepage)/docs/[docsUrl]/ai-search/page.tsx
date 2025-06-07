@@ -1,5 +1,5 @@
-import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
-import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
+import { PosthogFeatureFlag } from "@fern-docs/components/posthog/feature-flags/flags";
+import { FeatureFlaggedServerSide } from "@fern-docs/components/posthog/feature-flags/server-side";
 
 export default async function Page(_props: {
   params: Promise<{ docsUrl: string }>;

@@ -18,9 +18,8 @@ import {
 } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { FernUser, OryAccessTokenSchema } from "@fern-docs/auth";
+import { redirectWithLoginError } from "@fern-docs/components/server/redirectWithLoginError";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
-
-import { redirectWithLoginError } from "@/server/redirectWithLoginError";
 
 export const runtime = "edge";
 

@@ -14,7 +14,8 @@
     ".storybook/**/*.{ts,tsx}",
     "next.config.ts",
     "vitest.config.ts",
-    "../../commons/docs-server/src/processRequestSnippetComponents.ts"
+    "../../commons/docs-server/src/processRequestSnippetComponents.ts",
+    "../components/src/mdx/mdx-serializer.ts"
   ],
   "references": [
     {

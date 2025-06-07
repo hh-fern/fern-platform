@@ -1,6 +1,6 @@
-import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
-import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
-import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
+import { DocsSiteOverviewCard } from "@fern-docs/components/docs-page/DocsSiteOverviewCard";
+import { PosthogFeatureFlag } from "@fern-docs/components/posthog/feature-flags/flags";
+import { FeatureFlaggedServerSide } from "@fern-docs/components/posthog/feature-flags/server-side";
 
 import { parseDocsUrlParam } from "../../../../../utils/parseDocsUrlParam";
 

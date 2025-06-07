@@ -2,11 +2,10 @@ import { Metadata, Viewport } from "next/types";
 import { experimental_taintUniqueValue } from "react";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
-
-import { ConsoleMessage } from "@/components/console-message";
-import { FERN_DOCS_ID } from "@/components/constants";
-import { ScrollToTop } from "@/components/layouts/ScrollToTop";
-import { WebSocketRefresh } from "@/components/websocket-refresh";
+import { ConsoleMessage } from "@fern-docs/components/console-message";
+import { FERN_DOCS_ID } from "@fern-docs/components/constants";
+import { ScrollToTop } from "@fern-docs/components/layouts/ScrollToTop";
+import { WebSocketRefresh } from "@fern-docs/components/websocket-refresh";
 
 import "./globals.css";
 import { Providers } from "./providers";

@@ -6,17 +6,16 @@ import { last } from "es-toolkit/array";
 
 import { DocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
-
-import ApiEndpointPage from "@/components/api-reference/ApiEndpointPage";
-import { EndpointStreamingEnabledToggle } from "@/components/api-reference/endpoints/EndpointStreamingEnabledToggle";
-import { BottomNavigation } from "@/components/bottom-nav";
-import ChangelogEntryPage from "@/components/changelog/ChangelogEntryPage";
+import ApiEndpointPage from "@fern-docs/components/api-reference/ApiEndpointPage";
+import { EndpointStreamingEnabledToggle } from "@fern-docs/components/api-reference/endpoints/EndpointStreamingEnabledToggle";
+import { BottomNavigation } from "@fern-docs/components/bottom-nav";
+import ChangelogEntryPage from "@fern-docs/components/changelog/ChangelogEntryPage";
 import ChangelogPage, {
   ChangelogPageEntry,
   ChangelogPageOverview,
-} from "@/components/changelog/ChangelogPage";
-import { LayoutEvaluator } from "@/components/layouts/LayoutEvaluator";
-import { MdxSerializer } from "@/server/mdx-serializer";
+} from "@fern-docs/components/changelog/ChangelogPage";
+import { LayoutEvaluator } from "@fern-docs/components/layouts/LayoutEvaluator";
+import { MdxSerializer } from "@fern-docs/components/mdx/mdx-serializer";
 
 export async function DocsMainContent({
   loader,

@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 
-import { SemanticColor } from "../colors";
+import { SemanticColor } from "@fern-api/docs-utils/src/colors";
+
 import { SemanticBadge, SemanticBadgeProps } from "./semantic-badge";
 
 interface StatusCodeBadgeProps extends Omit<SemanticBadgeProps, "intent"> {

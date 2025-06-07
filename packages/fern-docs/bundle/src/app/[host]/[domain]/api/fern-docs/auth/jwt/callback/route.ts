@@ -12,9 +12,8 @@ import { safeUrl } from "@fern-api/docs-server/safeUrl";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { COOKIE_FERN_TOKEN } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
+import { redirectWithLoginError } from "@fern-docs/components/server/redirectWithLoginError";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
-
-import { redirectWithLoginError } from "@/server/redirectWithLoginError";
 
 export const runtime = "edge";
 

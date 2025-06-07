@@ -13,8 +13,7 @@ import {
   FERN_DOCS_ORIGINS,
   HEADER_X_FORWARDED_HOST,
 } from "@fern-api/docs-utils";
-
-import { redirectResponse } from "@/server/serverResponse";
+import { redirectResponse } from "@fern-docs/components/server/serverResponse";
 
 export const runtime = "edge";
 

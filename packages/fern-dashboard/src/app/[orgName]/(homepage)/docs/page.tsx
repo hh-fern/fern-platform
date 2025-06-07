@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 
+import { DocsZeroState } from "@fern-docs/components/docs-page/DocsZeroState";
+import { PosthogFeatureFlag } from "@fern-docs/components/posthog/feature-flags/flags";
+import { FeatureFlaggedServerSide } from "@fern-docs/components/posthog/feature-flags/server-side";
+
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import { DocsZeroState } from "@/components/docs-page/DocsZeroState";
-import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
-import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
 import { constructDocsUrlParam } from "@/utils/constructDocsUrlParam";
 import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
 

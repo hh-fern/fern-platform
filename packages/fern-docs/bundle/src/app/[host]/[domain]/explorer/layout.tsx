@@ -1,11 +1,11 @@
 import "server-only";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { PlaygroundCloseButton } from "@fern-docs/components/playground/PlaygroundCloseButton";
+import { PlaygroundKeyboardTrigger } from "@fern-docs/components/playground/PlaygroundKeyboardTrigger";
+import { HorizontalSplitPane } from "@fern-docs/components/playground/VerticalSplitPane";
 
 import { getFernToken } from "@/app/fern-token";
-import { PlaygroundCloseButton } from "@/components/playground/PlaygroundCloseButton";
-import { PlaygroundKeyboardTrigger } from "@/components/playground/PlaygroundKeyboardTrigger";
-import { HorizontalSplitPane } from "@/components/playground/VerticalSplitPane";
 import { ApiExplorerFlags } from "@/state/api-explorer-flags";
 
 export default async function Layout({

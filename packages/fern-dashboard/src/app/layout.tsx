@@ -3,9 +3,10 @@ import { ThemeProvider } from "next-themes";
 
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 
-import { PylonScript } from "@/components/pylon/PylonScript";
-import { HIDE_PYLON_CLASS_NAME } from "@/components/pylon/constants";
-import { Toaster } from "@/components/ui/sonner";
+import { PylonScript } from "@fern-docs/components/pylon/PylonScript";
+import { HIDE_PYLON_CLASS_NAME } from "@fern-docs/components/pylon/constants";
+import { Toaster } from "@fern-docs/components/ui/sonner";
+
 import { PostHogProvider } from "@/providers/PosthogProvider";
 import { ProgressProvider } from "@/providers/ProgressProvider";
 import { ReactQueryProvider } from "@/providers/ReactQueryProvider";

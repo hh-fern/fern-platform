@@ -14,8 +14,7 @@ import {
   FERN_DOCS_STAGING_BUILDWITHFERN_COM,
   withoutStaging,
 } from "@fern-api/docs-utils";
-
-import { batchQueue } from "@/server/queue";
+import { batchQueue } from "@fern-docs/components/server/queue";
 
 export async function POST(request: NextRequest) {
   if (isLocal()) {

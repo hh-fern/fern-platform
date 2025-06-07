@@ -4,11 +4,11 @@ import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { createFileResolver } from "@fern-api/docs-server/file-resolver";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { Logo } from "@fern-docs/components/logo";
+import { withLogo } from "@fern-docs/components/server/withLogo";
 import { getFrontmatter } from "@fern-docs/mdx";
 
 import { getFernToken } from "@/app/fern-token";
-import { Logo } from "@/components/logo";
-import { withLogo } from "@/server/withLogo";
 
 export default async function LogoPage({
   params,

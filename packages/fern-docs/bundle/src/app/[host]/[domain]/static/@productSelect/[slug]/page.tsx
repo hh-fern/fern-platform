@@ -3,10 +3,10 @@ import "server-only";
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { ProductDropdown } from "@fern-docs/components/header/ProductDropdown";
+import { getFallbackProduct } from "@fern-docs/components/util/handle-node-fallbacks";
 
 import { getFernToken } from "@/app/fern-token";
-import { ProductDropdown } from "@/components/header/ProductDropdown";
-import { getFallbackProduct } from "@/components/util/handle-node-fallbacks";
 
 export default async function ProductSelectPage({
   params,

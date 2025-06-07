@@ -253,7 +253,7 @@ export default {
           ],
         },
         {
-          begin: "@/",
+          begin: "../",
           beginCaptures: {
             "1": {
               name: "punctuation.definition.regexp.begin.jinja",

@@ -8,24 +8,25 @@ import { atomWithStorage } from "jotai/utils";
 import useSWR from "swr";
 import { z } from "zod";
 
+// import {
+//   CommandActions,
+//   CommandEmpty,
+//   CommandGroupFilters,
+//   CommandGroupTheme,
+//   CommandSearchHits,
+//   DefaultDesktopBackButton,
+//   DesktopSearchButton,
+//   DesktopSearchDialog,
+//   MobileCommand,
+//   SearchClientRoot,
+// } from "@fern-docs/components";
+// import { ChatbotModelSelect } from "@fern-docs/components/chatbot/model-select";
+// import { DesktopCommandWithAskAI } from "@fern-docs/components/desktop/desktop-ask-ai";
+// import { DialogTrigger } from "@fern-docs/components/ui/dialog";
 import { FacetsResponse, SEARCH_INDEX } from "@fern-docs/search-server/algolia";
 import { useIsMobile } from "@fern-ui/react-commons";
 
-import {
-  CommandActions,
-  CommandEmpty,
-  CommandGroupFilters,
-  CommandGroupTheme,
-  CommandSearchHits,
-  DefaultDesktopBackButton,
-  DesktopSearchButton,
-  DesktopSearchDialog,
-  MobileCommand,
-  SearchClientRoot,
-} from "@/components";
-import { ChatbotModelSelect } from "@/components/chatbot/model-select";
-import { DesktopCommandWithAskAI } from "@/components/desktop/desktop-ask-ai";
-import { DialogTrigger } from "@/components/ui/dialog";
+import { SearchClientRoot } from "../components/search-client";
 
 const USER_TOKEN_KEY = "user-token";
 

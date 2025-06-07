@@ -1,6 +1,6 @@
 "use client";
 
-import { ErrorBoundaryFallback } from "@/components/error-boundary";
+import { ErrorBoundaryFallback } from "@fern-docs/components/error-boundary";
 
 export default function ErrorBoundary({
   error,

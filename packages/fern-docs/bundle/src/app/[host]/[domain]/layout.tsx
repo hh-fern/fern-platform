@@ -11,31 +11,36 @@ import { DocsLoader, createCachedDocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { DocsV1Read, DocsV2Read } from "@fern-api/fdr-sdk/client/types";
 import { isNonNullish } from "@fern-api/ui-core-utils";
+import { JavascriptProvider } from "@fern-docs/components/JavascriptProvider";
+import { CustomerAnalytics } from "@fern-docs/components/analytics/CustomerAnalytics";
+import { FeatureFlagProvider } from "@fern-docs/components/feature-flags/FeatureFlagProvider";
+import { FernUser } from "@fern-docs/components/fern-user";
+import SearchV2 from "@fern-docs/components/search";
+import { generateMetadataFromConfig } from "@fern-docs/components/seo";
+import { SetColors } from "@fern-docs/components/state/colors";
+import { DarkCode } from "@fern-docs/components/state/dark-code";
+import { Domain } from "@fern-docs/components/state/domain";
+import { LaunchDarklyInfo } from "@fern-docs/components/state/feature-flags";
+import { DefaultLanguage } from "@fern-docs/components/state/language";
+import { SetLogoText } from "@fern-docs/components/state/logo-text";
+import {
+  RootNodeProvider,
+  SetBasePath,
+} from "@fern-docs/components/state/navigation";
+import {
+  getAllSidebarRootNodes,
+  getSidebarRootNodeIdToChildToParentsMap,
+} from "@fern-docs/components/state/navigation-server";
+import {
+  SetIsAskAiEnabled,
+  SetIsDefaultSearchFilterOff,
+} from "@fern-docs/components/state/search";
+import { Whitelabeled } from "@fern-docs/components/state/whitelabeled";
+import { withJsConfig } from "@fern-docs/components/with-js-config";
 import {
   getCustomerAnalytics as deprecated_getCustomerAnalytics,
   getLaunchDarklySettings,
 } from "@fern-docs/edge-config";
-
-import { JavascriptProvider } from "@/components/JavascriptProvider";
-import { CustomerAnalytics } from "@/components/analytics/CustomerAnalytics";
-import { FeatureFlagProvider } from "@/components/feature-flags/FeatureFlagProvider";
-import { FernUser } from "@/components/fern-user";
-import SearchV2 from "@/components/search";
-import { generateMetadataFromConfig } from "@/components/seo";
-import { withJsConfig } from "@/components/with-js-config";
-import { SetColors } from "@/state/colors";
-import { DarkCode } from "@/state/dark-code";
-import { Domain } from "@/state/domain";
-import { LaunchDarklyInfo } from "@/state/feature-flags";
-import { DefaultLanguage } from "@/state/language";
-import { SetLogoText } from "@/state/logo-text";
-import { RootNodeProvider, SetBasePath } from "@/state/navigation";
-import {
-  getAllSidebarRootNodes,
-  getSidebarRootNodeIdToChildToParentsMap,
-} from "@/state/navigation-server";
-import { SetIsAskAiEnabled, SetIsDefaultSearchFilterOff } from "@/state/search";
-import { Whitelabeled } from "@/state/whitelabeled";
 
 import { GlobalStyles } from "../../global-styles";
 import { ThemeProvider } from "../../theme";

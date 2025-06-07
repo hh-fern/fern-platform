@@ -3,13 +3,13 @@ import "server-only";
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
-
-import { getFernToken } from "@/app/fern-token";
-import { VersionDropdown } from "@/components/header/VersionDropdown";
+import { VersionDropdown } from "@fern-docs/components/header/VersionDropdown";
 import {
   getFallbackProduct,
   getFallbackVersion,
-} from "@/components/util/handle-node-fallbacks";
+} from "@fern-docs/components/util/handle-node-fallbacks";
+
+import { getFernToken } from "@/app/fern-token";
 
 export default async function VersionSelectPage({
   params,

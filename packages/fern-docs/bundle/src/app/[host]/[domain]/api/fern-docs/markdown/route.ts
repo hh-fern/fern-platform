@@ -5,11 +5,10 @@ import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { MARKDOWN_PATTERN } from "@fern-api/docs-server/patterns";
 import { removeLeadingSlash } from "@fern-api/docs-utils";
-
 import {
   getMarkdownForPath,
   getPageNodeForPath,
-} from "@/server/getMarkdownForPath";
+} from "@fern-docs/components/server/getMarkdownForPath";
 
 /**
  * This endpoint returns the markdown content of any page in the docs by adding `.md` or `.mdx` to the end of any docs page.

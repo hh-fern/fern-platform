@@ -4,10 +4,10 @@ import { Metadata } from "next/types";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { generateMetadataFromPage } from "@fern-docs/components/seo";
+import SharedPage from "@fern-docs/components/shared-page";
 
 import RootPage from "@/app/page";
-import { generateMetadataFromPage } from "@/components/seo";
-import SharedPage from "@/components/shared-page";
 
 export const dynamic = "force-static";
 

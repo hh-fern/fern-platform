@@ -4,11 +4,11 @@ import { Metadata } from "next/types";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { generateMetadataFromPage } from "@fern-docs/components/seo";
+import SharedPage from "@fern-docs/components/shared-page";
 
 import { getFernToken } from "@/app/fern-token";
 import RootPage from "@/app/page";
-import { generateMetadataFromPage } from "@/components/seo";
-import SharedPage from "@/components/shared-page";
 
 export default async function DynamicPage(props: {
   params: Promise<{ host: string; domain: string; slug: string }>;

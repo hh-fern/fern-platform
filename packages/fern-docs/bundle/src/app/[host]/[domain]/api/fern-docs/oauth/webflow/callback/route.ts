@@ -12,9 +12,8 @@ import { safeUrl } from "@fern-api/docs-server/safeUrl";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { withoutStaging } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
+import { redirectWithLoginError } from "@fern-docs/components/server/redirectWithLoginError";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
-
-import { redirectWithLoginError } from "@/server/redirectWithLoginError";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const domain = getDocsDomainEdge(req);

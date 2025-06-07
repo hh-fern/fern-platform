@@ -1,6 +1,6 @@
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { AppLayout } from "@/components/layout/AppLayout";
-import { ServerSidePylonSetup } from "@/components/pylon/ServerSidePylonSetup";
+import { ProtectedRoute } from "@fern-docs/components/auth/ProtectedRoute";
+import { AppLayout } from "@fern-docs/components/layout/AppLayout";
+import { ServerSidePylonSetup } from "@fern-docs/components/pylon/ServerSidePylonSetup";
 
 import { Auth0OrgName } from "../../services/auth0/types";
 

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
-import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
-import { isFeatureFlagEnabledForUser } from "@/components/posthog/feature-flags/server-side";
+import { PosthogFeatureFlag } from "@fern-docs/components/posthog/feature-flags/flags";
+import { isFeatureFlagEnabledForUser } from "@fern-docs/components/posthog/feature-flags/server-side";
 
 import { getCurrentSession } from "../../services/auth0/getCurrentSession";
 import { Auth0OrgName } from "../../services/auth0/types";

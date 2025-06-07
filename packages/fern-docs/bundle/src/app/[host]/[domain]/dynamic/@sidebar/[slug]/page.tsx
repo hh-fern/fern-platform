@@ -3,12 +3,12 @@ import "server-only";
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { createCachedMdxSerializer } from "@fern-docs/components/server/mdx-serializer";
+import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
+import { SidebarTabsRootServer } from "@fern-docs/components/sidebar/SidebarTabsRootServer";
+import { SidebarRootNode } from "@fern-docs/components/sidebar/nodes/SidebarRootNode";
 
 import { getFernToken } from "@/app/fern-token";
-import { SidebarTabsList } from "@/components/sidebar/SidebarTabsList";
-import { SidebarTabsRootServer } from "@/components/sidebar/SidebarTabsRootServer";
-import { SidebarRootNode } from "@/components/sidebar/nodes/SidebarRootNode";
-import { createCachedMdxSerializer } from "@/server/mdx-serializer";
 
 export default async function SidebarPage({
   params,

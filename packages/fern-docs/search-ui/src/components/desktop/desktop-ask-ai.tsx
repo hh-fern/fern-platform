@@ -43,8 +43,6 @@ import {
   useIsMobile,
 } from "@fern-ui/react-commons";
 
-import { FacetFilter } from "@/types";
-
 import { FootnoteSup, FootnotesSection } from "../chatbot/footnote";
 import {
   ChatbotTurnContextProvider,
@@ -62,6 +60,7 @@ import { MarkdownContent } from "../md-content";
 import { useFacetFilters } from "../search-client";
 import { CommandAskAIGroup } from "../shared";
 import { CommandLink } from "../shared/command-link";
+import { FacetFilter } from "../types";
 import { TextArea } from "../ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { DesktopCommandContent, afterInput } from "./desktop-command";

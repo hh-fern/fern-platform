@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
 
+import { SharedLayout } from "@fern-docs/components";
+
 export declare namespace VisualEditorLayout {
   export interface Props {
     children: React.JSX.Element;
@@ -10,10 +12,12 @@ export async function VisualEditorLayout({
   children,
 }: VisualEditorLayout.Props) {
   return (
-    <div className="flex h-full w-full flex-col bg-gray-100">
-      <Header />
-      <Preview>{children}</Preview>
-    </div>
+    <SharedLayout>
+      <div className="flex h-full w-full flex-col bg-gray-100">
+        <Header />
+        <Preview>{children}</Preview>
+      </div>
+    </SharedLayout>
   );
 }
 

@@ -9,9 +9,6 @@ import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, withDefaultProtocol } from "@fern-api/ui-core-utils";
 
 import { generateHtml } from "@/app/utils";
-import { getMarkdownForPath } from "@/server/getMarkdownForPath";
-import { getSectionRoot } from "@/server/getSectionRoot";
-import { getLlmTxtMetadata } from "@/server/llm-txt-md";
 
 /**
  * This endpoint follows the https://llmstxt.org/ specification for a LLM-friendly markdown-esque page listing all the pages in the docs.

@@ -3,10 +3,10 @@ import "server-only";
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { HeaderTabsList } from "@fern-docs/components/header/HeaderTabsList";
+import { getHeaderTabs } from "@fern-docs/components/util/handle-node-fallbacks";
 
-import { getFernToken } from "@/app/fern-token";
-import { HeaderTabsList } from "@/components/header/HeaderTabsList";
-import { getHeaderTabs } from "@/components/util/handle-node-fallbacks";
+// import { getFernToken } from "@/app/fern-token";
 
 export default async function HeaderTabsPage({
   params,

@@ -2,7 +2,7 @@
 
 import { FaceFrownIcon } from "@heroicons/react/24/outline";
 
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { LogoutButton } from "@fern-docs/components/auth/LogoutButton";
 
 export default function ErrorPage() {
   return (

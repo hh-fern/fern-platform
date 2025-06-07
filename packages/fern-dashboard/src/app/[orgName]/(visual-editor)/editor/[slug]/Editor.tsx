@@ -2,7 +2,7 @@
 
 import { EditorEvents } from "@tiptap/react";
 
-import TiptapEditor from "@/components/editor/TiptapEditor";
+import TiptapEditor from "@fern-docs/components/editor/TiptapEditor";
 
 import { htmlToMdx } from "./htmlToMdx";
 import { savePageVersion } from "./savePageVersion";

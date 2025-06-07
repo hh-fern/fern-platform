@@ -1,6 +1,7 @@
+import { DocsSiteLayout } from "@fern-docs/components/docs-page/DocsSiteLayout";
+import { getAllFeatureFlags } from "@fern-docs/components/posthog/feature-flags/server-side";
+
 import { getCurrentSessionOrThrow } from "@/app/services/auth0/getCurrentSession";
-import { DocsSiteLayout } from "@/components/docs-page/DocsSiteLayout";
-import { getAllFeatureFlags } from "@/components/posthog/feature-flags/server-side";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 
 export default async function Layout({
