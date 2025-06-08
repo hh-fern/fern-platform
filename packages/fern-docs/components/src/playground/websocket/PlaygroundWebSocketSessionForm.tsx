@@ -9,10 +9,10 @@ import { cn } from "@fern-docs/components";
 import { FernButton, FernCard, FernScrollArea } from "@fern-docs/components";
 import { WebSocketMessagesVirtualized } from "@fern-docs/components/api-reference/websockets/WebSocketMessagesVirtualized";
 
+import { PlaygroundWebSocketRequestFormState } from "../../../../../commons/docs-utils/types";
 import { HorizontalSplitPane } from "../VerticalSplitPane";
 import { PlaygroundTypeReferenceForm } from "../form/PlaygroundTypeReferenceForm";
 import { useWebsocketMessages } from "../hooks/useWebsocketMessages";
-import { PlaygroundWebSocketRequestFormState } from "../types";
 import { PlaygroundWebSocketHandshakeForm } from "./PlaygroundWebSocketHandshakeForm";
 
 interface PlaygroundWebSocketSessionFormProps {

@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import { Client } from "@upstash/qstash";
 import { getEnv } from "@vercel/functions";
 

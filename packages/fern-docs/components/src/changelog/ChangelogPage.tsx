@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { compact } from "es-toolkit/compat";
 
-import { DocsLoader } from "@fern-api/docs-loader";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import { slugToHref } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { isNonNullish } from "@fern-api/ui-core-utils";
@@ -12,10 +12,9 @@ import { FernLink } from "@fern-docs/components/FernLink";
 import { PageHeader } from "@fern-docs/components/PageHeader";
 import { type TableOfContentsItem, makeToc, toTree } from "@fern-docs/mdx";
 
-import { Markdown } from "@/mdx/components/Markdown";
-import { MdxContent } from "@/mdx/components/MdxContent";
-import { MdxSerializer } from "@/server/mdx-serializer";
-
+import { Markdown } from "../mdx/components/Markdown";
+import { MdxContent } from "../mdx/components/MdxContent";
+import { MdxSerializer } from "../mdx/mdx-serializer";
 import ChangelogPageClient from "./ChangelogPageClient";
 
 export default async function ChangelogPage({

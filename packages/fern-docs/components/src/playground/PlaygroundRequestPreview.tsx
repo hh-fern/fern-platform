@@ -7,6 +7,7 @@ import { useAtom, useAtomValue } from "jotai";
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { FernSyntaxHighlighter } from "@fern-docs/components";
 
+import { PlaygroundEndpointRequestFormState } from "../../../../commons/docs-utils/types";
 import { isFileForgeHackEnabledAtom } from "../state/api-explorer-flags";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
@@ -14,7 +15,6 @@ import {
 } from "../state/playground";
 import { PlaygroundCodeSnippetResolverBuilder } from "./code-snippets/resolver";
 import { useSnippet } from "./code-snippets/useSnippet";
-import { PlaygroundEndpointRequestFormState } from "./types";
 import { usePlaygroundBaseUrl } from "./utils/select-environment";
 
 interface PlaygroundRequestPreviewProps {

@@ -10,16 +10,15 @@ import {
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 import { FernButton, FernDropdown } from "@fern-docs/components";
 
-import { Markdown } from "@/mdx/components/Markdown";
-
-import { renderTypeShorthandRoot } from "../../type-shorthand";
-import { PlaygroundFileUploadForm } from "../form/PlaygroundFileUploadForm";
-import { PlaygroundObjectPropertyForm } from "../form/PlaygroundObjectPropertyForm";
 import {
   PlaygroundEndpointRequestFormState,
   PlaygroundFormDataEntryValue,
   PlaygroundFormStateBody,
-} from "../types";
+} from "../../../../../commons/docs-utils/types";
+import { Markdown } from "../../mdx/components/Markdown";
+import { renderTypeShorthandRoot } from "../../type-shorthand";
+import { PlaygroundFileUploadForm } from "../form/PlaygroundFileUploadForm";
+import { PlaygroundObjectPropertyForm } from "../form/PlaygroundObjectPropertyForm";
 import { formDataFieldIsRequired, getEmptyValueForField } from "../utils";
 import { isValidFile } from "../utils/utils";
 

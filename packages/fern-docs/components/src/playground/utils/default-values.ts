@@ -15,7 +15,7 @@ import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedU
 import {
   PlaygroundFormDataEntryValue,
   PlaygroundFormStateBody,
-} from "../types";
+} from "../../../../../commons/docs-utils/types";
 
 export function getEmptyValueForObjectProperties(
   properties: ObjectProperty[] = [],

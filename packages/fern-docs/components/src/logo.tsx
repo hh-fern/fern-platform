@@ -3,11 +3,10 @@ import React from "react";
 import { DEFAULT_LOGO_HEIGHT } from "@fern-api/docs-utils";
 import { cn } from "@fern-docs/components";
 
-import { LogoText } from "@/state/logo-text";
-import type { LogoConfiguration } from "@/state/types";
-
 import { FernImage } from "./FernImage";
 import { MaybeFernLink } from "./FernLink";
+import { LogoText } from "./state/logo-text";
+import { LogoConfiguration } from "./state/types";
 
 export function Logo({
   logo,

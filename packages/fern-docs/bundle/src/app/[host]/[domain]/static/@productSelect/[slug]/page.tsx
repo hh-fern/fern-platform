@@ -1,12 +1,11 @@
 import "server-only";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { getFernToken } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { ProductDropdown } from "@fern-docs/components/header/ProductDropdown";
 import { getFallbackProduct } from "@fern-docs/components/util/handle-node-fallbacks";
-
-import { getFernToken } from "@/app/fern-token";
 
 export default async function ProductSelectPage({
   params,

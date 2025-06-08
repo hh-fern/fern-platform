@@ -15,9 +15,6 @@
     },
     {
       "path": "../../commons/core-utils"
-    },
-    {
-      "path": "../mdx"
     }
   ]
 }

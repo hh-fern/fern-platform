@@ -1,7 +1,8 @@
 import "server-only";
 
-import { DocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
+
+import { DocsLoader } from "./types";
 
 export function createFindNode(loader: DocsLoader) {
   return async (slug: FernNavigation.Slug) => {

@@ -5,12 +5,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { uniqBy } from "es-toolkit/array";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { getMarkdownForPath } from "@fern-api/docs-server/getMarkdownForPath";
+import { getSectionRoot } from "@fern-api/docs-server/getSectionRoot";
 import { slugToHref } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish } from "@fern-api/ui-core-utils";
-import { getMarkdownForPath } from "@fern-docs/components/server/getMarkdownForPath";
-import { getSectionRoot } from "@fern-docs/components/server/getSectionRoot";
 
 import { generateHtml } from "@/app/utils";
 

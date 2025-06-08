@@ -5,8 +5,7 @@ import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import { Separator } from "@fern-docs/components/Separator";
 
-import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
-
+import { MdxServerComponentProseSuspense } from "../../mdx/components/server-component";
 import { renderTypeShorthand } from "../../type-shorthand";
 import { TypeReferenceDefinitions } from "../type-definitions/TypeReferenceDefinitions";
 

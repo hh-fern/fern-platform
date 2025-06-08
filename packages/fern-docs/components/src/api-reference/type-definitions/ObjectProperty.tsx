@@ -3,10 +3,9 @@ import React from "react";
 import { compact } from "es-toolkit/array";
 
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import { AvailabilityBadge } from "@fern-docs/components/badges";
 
-import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
-
+import { AvailabilityBadge } from "../../badges";
+import { MdxServerComponentProseSuspense } from "../../mdx/components/server-component";
 import {
   PropertyContainer,
   TypeDefinitionAnchor,

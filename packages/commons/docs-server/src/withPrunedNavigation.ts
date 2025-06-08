@@ -1,6 +1,7 @@
-import { DocsLoader } from "@fern-api/docs-loader";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { SKIP } from "@fern-docs/mdx";
+import { SKIP } from "@fern-api/fdr-sdk/traversers";
+
+import { DocsLoader } from "./types";
 
 interface WithPrunedSidebarOpts {
   /**

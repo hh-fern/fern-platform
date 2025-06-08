@@ -5,7 +5,6 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { cn } from "@fern-docs/components";
 
 import { useCurrentTabId } from "../state/navigation";
-import { SearchV2Trigger } from "../state/search";
 
 export function HeaderTabsRoot({
   children,

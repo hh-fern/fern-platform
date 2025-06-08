@@ -3,11 +3,10 @@ import "server-only";
 import { Metadata } from "next/types";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { getFernToken } from "@fern-api/docs-utils";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { getMetadataTitleFromPage } from "@fern-docs/components/seo";
 import SharedPage from "@fern-docs/components/shared-page";
-
-import { getFernToken } from "@/app/fern-token";
 
 export default async function DynamicPage(props: {
   params: Promise<{ host: string; domain: string; slug: string }>;

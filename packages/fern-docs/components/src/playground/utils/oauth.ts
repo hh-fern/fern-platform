@@ -11,8 +11,11 @@ import {
   visitDiscriminatedUnion,
 } from "@fern-api/ui-core-utils";
 
+import {
+  PlaygroundEndpointRequestFormState,
+  ProxyRequest,
+} from "../../../../../commons/docs-utils/types";
 import { executeProxyRest } from "../fetch-utils/executeProxyRest";
-import { PlaygroundEndpointRequestFormState, ProxyRequest } from "../types";
 import { serializeFormStateBody } from "./serialize";
 
 export interface OAuthClientCredentialReferencedEndpointLoginFlowProps {

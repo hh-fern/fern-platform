@@ -18,8 +18,8 @@ import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { FernTooltip, cn } from "@fern-docs/components";
 import { FernLink } from "@fern-docs/components/FernLink";
 
-import { useIsSelectedSidebarNode } from "@/state/navigation";
-import { useScrollSidebarNodeIntoView } from "@/state/sidebar-scroll";
+import { useIsSelectedSidebarNode } from "../state/navigation";
+import { useScrollSidebarNodeIntoView } from "../state/sidebar-scroll";
 
 interface SidebarSlugLinkProps {
   nodeId: FernNavigation.NodeId;

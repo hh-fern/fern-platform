@@ -6,11 +6,10 @@ import { useAtom, useAtomValue } from "jotai/react";
 import { RESET } from "jotai/utils";
 
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
-
 import {
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_ATOM,
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_IS_RESETTABLE_ATOM,
-} from "@/state/playground";
+} from "@fern-docs/components/state/playground";
 
 import { PasswordInputGroup } from "../PasswordInputGroup";
 

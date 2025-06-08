@@ -7,13 +7,5 @@
     "module": "ESNext",
     "types": ["node", "vitest/globals"]
   },
-  "include": ["./src/**/*"],
-  "references": [
-    {
-      "path": "../../fdr-sdk/tsconfig.build.json"
-    },
-    {
-      "path": "../../commons/core-utils"
-    }
-  ]
+  "include": ["./src/**/*"]
 }

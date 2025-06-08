@@ -12,7 +12,7 @@ import { FernUser } from "@fern-docs/auth";
 import type {
   PlaygroundEndpointRequestFormState,
   PlaygroundFormDataEntryValue,
-} from "../types";
+} from "../../../../../commons/docs-utils/types";
 import {
   getEmptyValueForHttpRequestBody,
   getEmptyValueForObjectProperties,

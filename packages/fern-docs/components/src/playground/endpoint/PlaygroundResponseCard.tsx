@@ -2,7 +2,6 @@ import { ReactElement } from "react";
 
 import { round } from "es-toolkit/math";
 import { useAtomValue } from "jotai";
-import { Loadable } from "jotai/vanilla/utils/loadable";
 import { Download } from "lucide-react";
 
 import { cn } from "@fern-docs/components";
@@ -15,12 +14,13 @@ import {
   FernTooltipProvider,
 } from "@fern-docs/components";
 import { ErrorBoundaryFallback } from "@fern-docs/components/error-boundary";
+import { Loadable, visitLoadable } from "@fern-ui/loadable";
 
+import { PlaygroundResponse } from "../../../../../commons/docs-utils/types/playgroundResponse";
+import { ProxyResponse } from "../../../../../commons/docs-utils/types/proxy";
 import { isBinaryOctetStreamAudioPlayerAtom } from "../../state/api-explorer-flags";
 import { PlaygroundResponsePreview } from "../PlaygroundResponsePreview";
 import { PlaygroundSendRequestButton } from "../PlaygroundSendRequestButton";
-import { PlaygroundResponse } from "../types/playgroundResponse";
-import { ProxyResponse } from "../types/proxy";
 
 interface PlaygroundResponseCard {
   response: Loadable<PlaygroundResponse>;

@@ -5,12 +5,11 @@ import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { PageHeader } from "@fern-docs/components/PageHeader";
 import { FooterLayout } from "@fern-docs/components/layouts/FooterLayout";
 import { ReferenceLayout } from "@fern-docs/components/layouts/ReferenceLayout";
-import { renderTypeShorthand } from "@fern-docs/components/type-shorthand";
 
-import { Prose } from "@/mdx/components/prose";
-import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
-import { MdxSerializer } from "@/server/mdx-serializer";
-
+import { Prose } from "../../mdx/components/prose";
+import { MdxServerComponentProseSuspense } from "../../mdx/components/server-component";
+import { MdxSerializer } from "../../mdx/mdx-serializer";
+import { renderTypeShorthand } from "../../type-shorthand";
 import { EndpointSection } from "../endpoints/EndpointSection";
 import { ObjectProperty } from "../type-definitions/ObjectProperty";
 import {

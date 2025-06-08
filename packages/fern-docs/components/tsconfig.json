@@ -7,9 +7,7 @@
   "include": [
     "./src/**/*",
     "./storybook/**/*",
-    "../../commons/docs-utils/src/colors.ts",
-    "src/badges/http-method-badge.stories.tsx",
-    "../../commons/docs-utils/src/http-method-badge.ts"
+    "src/badges/http-method-badge.stories.tsx"
   ],
   "references": [
     {

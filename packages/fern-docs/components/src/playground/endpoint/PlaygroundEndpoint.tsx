@@ -11,6 +11,17 @@ import { buildEndpointUrl } from "@fern-api/fdr-sdk/api-definition";
 import { unknownToString } from "@fern-api/ui-core-utils";
 import { FernTooltipProvider } from "@fern-docs/components";
 import {
+  isProxyDisabledAtom,
+  usesApplicationJsonInFormDataValueAtom,
+} from "@fern-docs/components/state/api-explorer-flags";
+import { fernUserAtom } from "@fern-docs/components/state/fern-user";
+import { jotaiStore } from "@fern-docs/components/state/jotai-provider";
+import {
+  PLAYGROUND_AUTH_STATE_ATOM,
+  PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
+  usePlaygroundEndpointFormState,
+} from "@fern-docs/components/state/playground";
+import {
   Loadable,
   failed,
   loaded,
@@ -19,24 +30,12 @@ import {
 } from "@fern-ui/loadable";
 import { useEventCallback } from "@fern-ui/react-commons";
 
-import {
-  isProxyDisabledAtom,
-  usesApplicationJsonInFormDataValueAtom,
-} from "@/state/api-explorer-flags";
-import { fernUserAtom } from "@/state/fern-user";
-import { jotaiStore } from "@/state/jotai-provider";
-import {
-  PLAYGROUND_AUTH_STATE_ATOM,
-  PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
-  usePlaygroundEndpointFormState,
-} from "@/state/playground";
-
+import type { ProxyRequest } from "../../../../../commons/docs-utils/types";
+import { PlaygroundResponse } from "../../../../../commons/docs-utils/types/playgroundResponse";
 import { track } from "../../analytics";
 import { usePlaygroundSettings } from "../../hooks/usePlaygroundSettings";
 import { executeProxyRest } from "../fetch-utils/executeProxyRest";
 import { executeProxyStream } from "../fetch-utils/executeProxyStream";
-import type { ProxyRequest } from "../types";
-import { PlaygroundResponse } from "../types/playgroundResponse";
 import {
   buildAuthHeaders,
   getInitialEndpointRequestFormStateWithExample,

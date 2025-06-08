@@ -8,8 +8,7 @@ import {
   useIsomorphicLayoutEffect,
 } from "@fern-ui/react-commons";
 
-import { useCurrentAnchor } from "@/hooks/use-anchor";
-
+import { useCurrentAnchor } from "../../hooks/use-anchor";
 import { FernCollapseWithButton } from "./FernCollapseWithButton";
 import { useTypeDefinitionContext } from "./TypeDefinitionContext";
 

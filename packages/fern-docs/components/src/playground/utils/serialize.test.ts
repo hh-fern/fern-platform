@@ -4,7 +4,7 @@ import {
   TypeShape,
 } from "@fern-api/fdr-sdk/api-definition";
 
-import { PlaygroundFormStateBody } from "../types";
+import { PlaygroundFormStateBody } from "../../../../../commons/docs-utils/types";
 import { serializeFormStateBody } from "./serialize";
 
 const STRING_VALUE_SHAPE: TypeShape = {

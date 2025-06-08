@@ -8,8 +8,8 @@ import {
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { Loadable } from "@fern-ui/loadable";
 
-import { PlaygroundEndpointRequestFormState } from "../types";
-import { PlaygroundResponse } from "../types/playgroundResponse";
+import { PlaygroundEndpointRequestFormState } from "../../../../../commons/docs-utils/types";
+import { PlaygroundResponse } from "../../../../../commons/docs-utils/types/playgroundResponse";
 import { usePlaygroundBaseUrl } from "../utils/select-environment";
 import { PlaygroundEndpointContentLayout } from "./PlaygroundEndpointContentLayout";
 import { PlaygroundEndpointForm } from "./PlaygroundEndpointForm";

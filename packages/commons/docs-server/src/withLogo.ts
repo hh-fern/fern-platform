@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { DocsLoader } from "@fern-api/docs-loader";
+import type { DocsLoader } from "@fern-api/docs-server/types";
 import type { FileData } from "@fern-api/docs-server/types";
 import { slugToHref } from "@fern-api/docs-utils";
 import type { FileIdOrUrl, Frontmatter } from "@fern-api/fdr-sdk/docs";

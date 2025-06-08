@@ -7,7 +7,7 @@ import {
 import {
   PlaygroundAuthState,
   PlaygroundEndpointRequestFormState,
-} from "../../types";
+} from "../../../../../../commons/docs-utils/types";
 
 export abstract class PlaygroundCodeSnippetBuilder {
   protected url: string;

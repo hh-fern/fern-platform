@@ -1,8 +1,7 @@
 import "server-only";
 
 import { FaIcon } from "@fern-docs/components";
-
-import { HideAsides } from "@/state/layout";
+import { HideAsides } from "@fern-docs/components/state/layout";
 
 import ReturnHomeButton from "./ReturnHomeButton";
 

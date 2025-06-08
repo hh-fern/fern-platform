@@ -4,12 +4,11 @@ import {
   SidebarRootChild,
   Slug,
 } from "@fern-api/fdr-sdk/navigation";
-
 import {
   createNestedSectionNode,
   createPageNode,
   createSectionNode,
-} from "@/components/playground/utils/create-node";
+} from "@fern-docs/components/playground/utils/create-node";
 
 import { withPrunedNavigation } from "./withPrunedNavigation";
 

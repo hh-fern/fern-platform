@@ -1,10 +1,10 @@
-import { AuthState } from "@fern-api/docs-server";
-import { FernFonts } from "@fern-api/docs-server";
+import { AuthState, FernFonts } from "@fern-api/docs-server";
 import {
   FernColorTheme,
   FernLayoutConfig,
   FileData,
 } from "@fern-api/docs-server";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import { EdgeFlags, HttpMethod } from "@fern-api/docs-utils";
 import { DocsV1Read, FernNavigation } from "@fern-api/fdr-sdk";
 import {
@@ -26,7 +26,7 @@ import {
 } from "@fern-api/fdr-sdk/navigation";
 import { AuthEdgeConfig } from "@fern-docs/auth";
 
-import { DocsLoader, createCachedDocsLoader } from "./readonly-docs-loader";
+import { createCachedDocsLoader } from "./readonly-docs-loader";
 
 export interface EditableDocsLoader extends DocsLoader {
   modifiedMdxFiles: Record<string, string>;

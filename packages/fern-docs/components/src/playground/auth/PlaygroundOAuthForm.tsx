@@ -14,13 +14,12 @@ import {
   FernTooltip,
   FernTooltipProvider,
 } from "@fern-docs/components";
-
-import { Callout } from "@/mdx/components/callout";
 import {
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
   usePlaygroundEndpointFormState,
-} from "@/state/playground";
+} from "@fern-docs/components/state/playground";
 
+import { Callout } from "../../mdx/components/callout";
 import { PasswordInputGroup } from "../PasswordInputGroup";
 import { PlaygroundEndpointForm } from "../endpoint";
 import { oAuthClientCredentialReferencedEndpointLoginFlow } from "../utils/oauth";

@@ -8,10 +8,10 @@ import {
   forwardRef,
 } from "react";
 
+import { SemanticColor } from "@fern-api/docs-utils";
 import { cn } from "@fern-docs/components";
-import { CopyToClipboardButton, SemanticColor } from "@fern-docs/components";
-
-import { useIsDarkCode } from "@/state/dark-code";
+import { CopyToClipboardButton } from "@fern-docs/components";
+import { useIsDarkCode } from "@fern-docs/components/state/dark-code";
 
 export declare namespace TitledExample {
   export interface Props {

@@ -26,7 +26,7 @@ import {
 } from "@fern-api/docs-server/env-variables";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
-import { withoutStaging } from "@fern-api/docs-utils";
+import { getFernToken, withoutStaging } from "@fern-api/docs-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
   createCohereSystemPrompt,
@@ -36,8 +36,6 @@ import {
   queryTurbopuffer,
   toDocuments,
 } from "@fern-docs/search-server/turbopuffer";
-
-import { getFernToken } from "@/app/fern-token";
 
 export const maxDuration = 60;
 export const revalidate = 0;

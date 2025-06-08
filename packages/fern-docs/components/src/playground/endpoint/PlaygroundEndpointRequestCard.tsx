@@ -9,18 +9,17 @@ import {
   FernButtonGroup,
   FernCard,
 } from "@fern-docs/components";
-
-import { isFileForgeHackEnabledAtom } from "@/state/api-explorer-flags";
-import { jotaiStore } from "@/state/jotai-provider";
-import { useProgrammingLanguage } from "@/state/language";
+import { isFileForgeHackEnabledAtom } from "@fern-docs/components/state/api-explorer-flags";
+import { jotaiStore } from "@fern-docs/components/state/jotai-provider";
+import { useProgrammingLanguage } from "@fern-docs/components/state/language";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
-} from "@/state/playground";
+} from "@fern-docs/components/state/playground";
 
+import { PlaygroundEndpointRequestFormState } from "../../../../../commons/docs-utils/types";
 import { PlaygroundRequestPreview } from "../PlaygroundRequestPreview";
 import { PlaygroundCodeSnippetResolverBuilder } from "../code-snippets/resolver";
-import { PlaygroundEndpointRequestFormState } from "../types";
 import { usePlaygroundBaseUrl } from "../utils/select-environment";
 
 interface PlaygroundEndpointRequestCardProps {

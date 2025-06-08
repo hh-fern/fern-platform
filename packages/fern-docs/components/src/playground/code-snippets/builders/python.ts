@@ -1,6 +1,6 @@
 import { isNonNullish, visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 
-import { PlaygroundFormDataEntryValue } from "../../types";
+import { PlaygroundFormDataEntryValue } from "../../../../../../commons/docs-utils/types";
 import { buildPath, buildUrlWithQueryParams, indentAfter } from "./common";
 import { PlaygroundCodeSnippetBuilder } from "./types";
 

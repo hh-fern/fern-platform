@@ -6,13 +6,12 @@ import { SetStateAction } from "jotai";
 import { RESET } from "jotai/utils";
 
 import { EndpointDefinition } from "@fern-api/fdr-sdk/api-definition";
-import { useDeepCompareMemoize } from "@fern-ui/react-commons";
-
 import {
   getProgrammingLanguage,
   useDefaultProgrammingLanguage,
   useProgrammingLanguage,
-} from "@/state/language";
+} from "@fern-docs/components/state/language";
+import { useDeepCompareMemoize } from "@fern-ui/react-commons";
 
 import { CodeExample } from "../examples/code-example";
 import {

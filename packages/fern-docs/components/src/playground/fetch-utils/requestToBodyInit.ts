@@ -1,6 +1,6 @@
 import { UnreachableCaseError } from "ts-essentials";
 
-import { ProxyRequest } from "../types/proxy";
+import { ProxyRequest } from "../../../../../commons/docs-utils/types/proxy";
 
 export async function toBodyInit(
   body: ProxyRequest["body"]

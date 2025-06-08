@@ -1,9 +1,19 @@
 import { z } from "zod";
 
 import { AuthEdgeConfig } from "@fern-api/docs-auth";
-import { FernNavigation } from "@fern-api/fdr-sdk/navigation";
+import { EdgeFlags, HttpMethod } from "@fern-api/docs-utils";
+import { ApiDefinition, DocsV1Read, FernNavigation } from "@fern-api/fdr-sdk";
+import {
+  AuthScheme,
+  ObjectProperty,
+  PruningNodeType,
+  TypeDefinition,
+} from "@fern-api/fdr-sdk/api-definition";
+import { EndpointId, Slug, TypeId } from "@fern-api/fdr-sdk/navigation";
 
+import { AuthState } from "./auth/getAuthState";
 import type { FernColorPalette } from "./generateFernColors";
+import { FernFonts } from "./generateFonts";
 
 export type RgbaColor = { r: number; g: number; b: number; a?: number };
 
@@ -37,7 +47,7 @@ export interface FernLayoutConfig {
   isHeaderDisabled: boolean;
 }
 
-const DocsMetadataSchema = z.object({
+export const DocsMetadataSchema = z.object({
   domain: z.string(),
   basePath: z.string(),
   url: z.string(),
@@ -45,7 +55,7 @@ const DocsMetadataSchema = z.object({
   isPreview: z.boolean(),
 });
 
-type DocsMetadata = z.infer<typeof DocsMetadataSchema>;
+export type DocsMetadata = z.infer<typeof DocsMetadataSchema>;
 
 export interface DocsLoader {
   domain: string;

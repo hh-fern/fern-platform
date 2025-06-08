@@ -7,7 +7,7 @@ import {
   type ScrollToHandle,
 } from "@fern-docs/components/syntax-highlighter";
 
-import { PlaygroundResponse } from "./types/playgroundResponse";
+import { PlaygroundResponse } from "../../../../commons/docs-utils/types/playgroundResponse";
 
 interface PlaygroundResponsePreviewProps {
   response: PlaygroundResponse;

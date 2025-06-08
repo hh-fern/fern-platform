@@ -2,13 +2,12 @@ import "server-only";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { createFileResolver } from "@fern-api/docs-server/file-resolver";
+import { withLogo } from "@fern-api/docs-server/withLogo";
+import { getFernToken } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { Logo } from "@fern-docs/components/logo";
-import { withLogo } from "@fern-docs/components/server/withLogo";
 import { getFrontmatter } from "@fern-docs/mdx";
-
-import { getFernToken } from "@/app/fern-token";
 
 export default async function LogoPage({
   params,

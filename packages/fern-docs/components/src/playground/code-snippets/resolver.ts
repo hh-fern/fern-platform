@@ -8,7 +8,7 @@ import { unknownToString } from "@fern-api/ui-core-utils";
 import {
   PlaygroundAuthState,
   PlaygroundEndpointRequestFormState,
-} from "../types";
+} from "../../../../../commons/docs-utils/types";
 import { buildAuthHeaders, convertToCustomSnippetPayload } from "../utils";
 import { shouldRenderAuth } from "../utils/should-render-auth";
 import { CurlSnippetBuilder } from "./builders/curl";

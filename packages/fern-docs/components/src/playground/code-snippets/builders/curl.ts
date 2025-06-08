@@ -5,7 +5,7 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 
-import { convertPlaygroundFormDataEntryValueToResolvedExampleEndpointRequest } from "../../types";
+import { convertPlaygroundFormDataEntryValueToResolvedExampleEndpointRequest } from "../../../../../../commons/docs-utils/types";
 import { PlaygroundCodeSnippetBuilder } from "./types";
 
 export class CurlSnippetBuilder extends PlaygroundCodeSnippetBuilder {

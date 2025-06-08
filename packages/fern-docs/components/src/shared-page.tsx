@@ -11,7 +11,7 @@ import React from "react";
 import { compact } from "es-toolkit/array";
 import { HydrationBoundary } from "jotai-ssr";
 
-import { DocsLoader } from "@fern-api/docs-loader";
+import { withLaunchDarkly } from "@fern-api/docs-server/ld-adapter";
 import { withPrunedNavigationLoader } from "@fern-api/docs-server/withPrunedNavigation";
 import {
   addLeadingSlash,
@@ -22,10 +22,8 @@ import {
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { Slug } from "@fern-api/fdr-sdk/navigation";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-
-import { withLaunchDarkly } from "@/server/ld-adapter";
-import { isLandingPageAtom } from "@/state/layout";
-import { SetCurrentNavigationNode } from "@/state/navigation";
+import { isLandingPageAtom } from "@fern-docs/components/state/layout";
+import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 
 import { DocsMainContent } from "../app/[host]/[domain]/main";
 import FeedbackPopover from "./feedback/FeedbackPopover";

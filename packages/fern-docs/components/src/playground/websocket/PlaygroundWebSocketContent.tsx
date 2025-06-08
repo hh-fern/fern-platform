@@ -12,7 +12,7 @@ import {
 import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import type { WebSocketContext } from "@fern-api/fdr-sdk/api-definition";
 
-import { PlaygroundWebSocketRequestFormState } from "../types";
+import { PlaygroundWebSocketRequestFormState } from "../../../../../commons/docs-utils/types";
 import { PlaygroundWebSocketSessionForm } from "./PlaygroundWebSocketSessionForm";
 
 interface PlaygroundWebSocketContentProps {

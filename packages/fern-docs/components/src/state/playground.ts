@@ -31,7 +31,7 @@ import {
   type PlaygroundEndpointRequestFormState,
   type PlaygroundRequestFormState,
   type PlaygroundWebSocketRequestFormState,
-} from "../playground/types";
+} from "../../../../commons/docs-utils/types";
 import {
   getInitialEndpointRequestFormStateWithExample,
   getInitialWebSocketRequestFormState,

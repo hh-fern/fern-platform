@@ -1,6 +1,7 @@
 import "server-only";
 
-import { DocsLoader, createPruneKey } from "@fern-api/docs-loader";
+import { createPruneKey } from "@fern-api/docs-server/createPruneKey";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import {
   ApiDefinition,
   createEndpointContext,
@@ -10,8 +11,7 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
-import { MdxSerializer } from "@/server/mdx-serializer";
-
+import { MdxSerializer } from "../mdx/mdx-serializer";
 import { EndpointContent } from "./endpoints/EndpointContent";
 import { WebhookContent } from "./webhooks/WebhookContent";
 import { WebSocketContent } from "./websockets/WebSocket";

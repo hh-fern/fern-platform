@@ -6,10 +6,9 @@ import { Key } from "lucide-react";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import { Button, SemanticBadge } from "@fern-docs/components";
+import { PLAYGROUND_AUTH_STATE_ATOM } from "@fern-docs/components/state/playground";
 
-import { PLAYGROUND_AUTH_STATE_ATOM } from "@/state/playground";
-
-import { PlaygroundAuthState } from "../types";
+import { PlaygroundAuthState } from "../../../../../commons/docs-utils/types";
 import { pascalCaseHeaderKey } from "../utils/header-key-case";
 
 interface PlaygroundCardTriggerManualProps {

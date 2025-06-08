@@ -10,7 +10,7 @@ import {
   SEARCH_INDEX,
 } from "@fern-docs/search-server/algolia";
 
-import { models } from "@/server/models";
+import { models } from "../../../../server/models";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;

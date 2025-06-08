@@ -8,7 +8,7 @@ import type {
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
 import { FernUser } from "@fern-docs/auth";
 
-import { PlaygroundWebSocketRequestFormState } from "../types";
+import { PlaygroundWebSocketRequestFormState } from "../../../../../commons/docs-utils/types";
 import {
   getEmptyValueForObjectProperties,
   getEmptyValueForType,

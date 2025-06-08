@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 
 import { algoliaSearchApikey } from "@fern-api/docs-server/env-variables";
-
-import { withSearchApiKey } from "@/server/with-search-api-key";
+import { withSearchApiKey } from "@fern-api/docs-server/with-search-api-key";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const domain = request.nextUrl.searchParams.get("domain");

@@ -19,9 +19,8 @@ import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
 import { noop } from "ts-essentials";
 
-import { DocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
-import { FileData } from "@fern-api/docs-server/types";
+import { DocsLoader, FileData } from "@fern-api/docs-server/types";
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
 import {
   Hast,

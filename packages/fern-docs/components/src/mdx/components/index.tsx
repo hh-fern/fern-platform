@@ -9,7 +9,6 @@ import {
 } from "@fern-docs/components/error-boundary";
 import type { MDXComponents } from "@fern-docs/mdx";
 
-import { SearchV2Trigger } from "../../state/search";
 import { Accordion, AccordionGroup } from "./accordion";
 import { Availability } from "./availability";
 import { Badge } from "./badge";

@@ -11,12 +11,11 @@ import {
   useApiKeyInjectionConfig,
   useInjectedApiKey,
 } from "@fern-docs/components/services/useApiKeyInjectionConfig";
-import { useBooleanState } from "@fern-ui/react-commons";
-
 import {
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_ATOM,
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
-} from "@/state/playground";
+} from "@fern-docs/components/state/playground";
+import { useBooleanState } from "@fern-ui/react-commons";
 
 import { PlaygroundCardTriggerApiKeyInjected } from "./PlaygroundCardTriggerApiKeyInjected";
 import { PlaygroundCardTriggerManual } from "./PlaygroundCardTriggerManual";

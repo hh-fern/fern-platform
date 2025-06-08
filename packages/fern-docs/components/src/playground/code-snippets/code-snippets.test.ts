@@ -12,7 +12,7 @@ import {
   Slug,
 } from "@fern-api/fdr-sdk/navigation";
 
-import { PlaygroundEndpointRequestFormState } from "../types";
+import { PlaygroundEndpointRequestFormState } from "../../../../../commons/docs-utils/types";
 import { CurlSnippetBuilder } from "./builders/curl";
 import { PythonRequestSnippetBuilder } from "./builders/python";
 import { TypescriptFetchSnippetBuilder } from "./builders/typescript";

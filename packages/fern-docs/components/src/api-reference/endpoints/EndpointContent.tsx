@@ -5,14 +5,13 @@ import React from "react";
 import { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { PageHeader } from "@fern-docs/components/PageHeader";
-import { AvailabilityBadge } from "@fern-docs/components/badges";
 import { FooterLayout } from "@fern-docs/components/layouts/FooterLayout";
 import { ReferenceLayout } from "@fern-docs/components/layouts/ReferenceLayout";
 import { PlaygroundKeyboardTrigger } from "@fern-docs/components/playground/PlaygroundKeyboardTrigger";
 
-import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
-import { MdxSerializer } from "@/server/mdx-serializer";
-
+import { AvailabilityBadge } from "../../badges/availability-badge";
+import { MdxServerComponentProseSuspense } from "../../mdx/components/server-component";
+import { MdxSerializer } from "../../mdx/mdx-serializer";
 import { TypeDefinitionRoot } from "../type-definitions/TypeDefinitionContext";
 import { TypeDefinitionSlotsServer } from "../type-definitions/TypeDefinitionSlotsServer";
 import { EndpointContentCodeSnippets } from "./EndpointContentCodeSnippets";

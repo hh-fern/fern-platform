@@ -1,7 +1,8 @@
 import { compact } from "es-toolkit/array";
 
-import { DocsLoader, createPruneKey } from "@fern-api/docs-loader";
+import { createPruneKey } from "@fern-api/docs-server/createPruneKey";
 import { pascalCaseHeaderKey } from "@fern-api/docs-server/headerKeyCase";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import { ApiDefinition, FernNavigation } from "@fern-api/fdr-sdk";
 import {
   EndpointDefinition,

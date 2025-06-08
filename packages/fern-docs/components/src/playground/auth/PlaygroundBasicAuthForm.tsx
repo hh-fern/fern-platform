@@ -8,13 +8,12 @@ import { User } from "lucide-react";
 
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { FernInput } from "@fern-docs/components";
-
 import {
   PLAYGROUND_AUTH_STATE_BASIC_AUTH_PASSWORD_ATOM,
   PLAYGROUND_AUTH_STATE_BASIC_AUTH_PASSWORD_IS_RESETTABLE_ATOM,
   PLAYGROUND_AUTH_STATE_BASIC_AUTH_USERNAME_ATOM,
   PLAYGROUND_AUTH_STATE_BASIC_AUTH_USERNAME_IS_RESETTABLE_ATOM,
-} from "@/state/playground";
+} from "@fern-docs/components/state/playground";
 
 import { PasswordInputGroup } from "../PasswordInputGroup";
 

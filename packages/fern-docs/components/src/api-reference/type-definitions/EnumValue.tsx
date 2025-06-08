@@ -3,7 +3,7 @@ import React from "react";
 import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { Chip } from "@fern-docs/components/Chip";
 
-import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
+import { MdxServerComponentProseSuspense } from "../../mdx/components/server-component";
 
 export function EnumValue({
   enumValue,

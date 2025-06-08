@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 
-import { useResolvedTheme } from "@/hooks/use-theme";
+import { useResolvedTheme } from "@fern-docs/components/hooks/use-theme";
 
 export function Mermaid({ children }: { children: string }): ReactElement<any> {
   if (typeof window === "undefined" || typeof children !== "string") {
