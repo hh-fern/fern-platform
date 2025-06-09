@@ -12,9 +12,9 @@ import { withSecureCookie } from "@/server/auth/with-secure-cookie";
 import { getWorkOSClientId, workos } from "@/server/auth/workos";
 import { encryptSession } from "@/server/auth/workos-session";
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 import { safeUrl } from "@/server/safeUrl";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const runtime = "edge";
 

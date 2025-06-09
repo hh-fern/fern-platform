@@ -31,13 +31,13 @@ import {
   getMetadataFromResponse,
 } from "@/server/docs-loader";
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 import { loadWithUrl } from "@/server/loadWithUrl";
 import {
   queueAlgoliaReindex,
   queueTurbopufferReindex,
 } from "@/server/queue-reindex";
 import { pruneWithAuthState } from "@/server/withRbac";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 300; // 5 minutes timeout
 

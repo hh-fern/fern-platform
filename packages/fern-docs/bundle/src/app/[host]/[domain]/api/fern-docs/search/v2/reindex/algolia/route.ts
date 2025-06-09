@@ -17,10 +17,10 @@ import {
   fernToken_admin,
 } from "@/server/env-variables";
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 import { postToSlack } from "@/server/slack";
 import { Gate, withBasicTokenAnonymous } from "@/server/withRbac";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 800; // 13 minutes
 

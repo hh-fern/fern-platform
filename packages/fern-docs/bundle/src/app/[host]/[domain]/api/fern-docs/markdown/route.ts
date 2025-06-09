@@ -9,8 +9,8 @@ import {
   getPageNodeForPath,
 } from "@/server/getMarkdownForPath";
 import { isLocal } from "@/server/isLocal";
-import { MARKDOWN_PATTERN } from "@/server/patterns";
 import { isSelfHosted } from "@/server/isSelfHosted";
+import { MARKDOWN_PATTERN } from "@/server/patterns";
 
 /**
  * This endpoint returns the markdown content of any page in the docs by adding `.md` or `.mdx` to the end of any docs page.

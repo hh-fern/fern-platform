@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { cn } from "@fern-docs/components";
 
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 import { Loading } from "./Loading";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export function WebSocketRefresh() {
   const router = useRouter();

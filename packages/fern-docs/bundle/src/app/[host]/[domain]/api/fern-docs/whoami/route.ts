@@ -6,8 +6,8 @@ import { COOKIE_FERN_TOKEN } from "@fern-docs/utils";
 
 import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
 import { isLocal } from "@/server/isLocal";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 import { isSelfHosted } from "@/server/isSelfHosted";
+import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 /**
  * This endpoint returns the authentication information pertaining to the current user

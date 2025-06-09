@@ -6,9 +6,9 @@ import { fetchFacetValues } from "@fern-docs/search-server/algolia";
 
 import { algoliaAppId } from "@/server/env-variables";
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 import { selectFirst } from "@/server/utils/selectFirst";
 import { toArray } from "@/server/utils/toArray";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 10;
 

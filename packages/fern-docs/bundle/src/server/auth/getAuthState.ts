@@ -12,6 +12,7 @@ import {
 import { removeTrailingSlash } from "@fern-docs/utils";
 
 import { isLocal } from "../isLocal";
+import { isSelfHosted } from "../isSelfHosted";
 import { safeVerifyFernJWTConfig } from "./FernJWT";
 import { getAllowedRedirectUrls } from "./allowed-redirects";
 import { preferPreview } from "./origin";
@@ -20,7 +21,6 @@ import { getReturnToQueryParam } from "./return-to";
 import { getWebflowAuthorizationUrl } from "./webflow";
 import { getWorkosSSOAuthorizationUrl } from "./workos";
 import { handleWorkosAuth } from "./workos-handler";
-import { isSelfHosted } from "../isSelfHosted";
 
 export type AuthPartner = "workos" | "ory" | "webflow" | "custom";
 

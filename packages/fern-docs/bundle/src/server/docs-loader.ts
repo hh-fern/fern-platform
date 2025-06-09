@@ -59,12 +59,12 @@ import { generateFernColorPalette } from "./generateFernColors";
 import { FernFonts, generateFonts } from "./generateFonts";
 import { getDocsUrlMetadata } from "./getDocsUrlMetadata";
 import { isLocal } from "./isLocal";
+import { isSelfHosted } from "./isSelfHosted";
 import { loadWithUrl as uncachedLoadWithUrl } from "./loadWithUrl";
 import { postToSlack } from "./slack";
 import { FernColorTheme, FernLayoutConfig, FileData } from "./types";
 import { cleanBasePath } from "./utils/clean-base-path";
 import { pruneWithAuthState } from "./withRbac";
-import { isSelfHosted } from "./isSelfHosted";
 
 const loadWithUrl = uncachedLoadWithUrl;
 

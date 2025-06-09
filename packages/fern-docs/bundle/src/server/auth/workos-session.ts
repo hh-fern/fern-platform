@@ -3,6 +3,7 @@ import { sealData, unsealData } from "iron-session";
 import { createRemoteJWKSet, decodeJwt, jwtVerify } from "jose";
 
 import { isLocal } from "../isLocal";
+import { isSelfHosted } from "../isSelfHosted";
 import type {
   AccessToken,
   NoWorkOSUserInfo,
@@ -10,7 +11,6 @@ import type {
   WorkOSUserInfo,
 } from "./interfaces";
 import { getJwtSecretKey, getWorkOSClientId, workos } from "./workos";
-import { isSelfHosted } from "../isSelfHosted";
 
 // This is adapted from https://github.com/workos/authkit-nextjs/blob/main/src/session.ts
 

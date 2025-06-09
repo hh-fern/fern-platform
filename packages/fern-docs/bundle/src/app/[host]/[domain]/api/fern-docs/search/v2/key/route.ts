@@ -13,9 +13,9 @@ import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
 import { algoliaAppId, algoliaSearchApikey } from "@/server/env-variables";
 import { getDocsUrlMetadata } from "@/server/getDocsUrlMetadata";
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 import { selectFirst } from "@/server/utils/selectFirst";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 10;
 

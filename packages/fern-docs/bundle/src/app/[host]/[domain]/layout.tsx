@@ -23,6 +23,7 @@ import { generateMetadataFromConfig } from "@/components/seo";
 import { withJsConfig } from "@/components/with-js-config";
 import { DocsLoader, createCachedDocsLoader } from "@/server/docs-loader";
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 import { SetColors } from "@/state/colors";
 import { DarkCode } from "@/state/dark-code";
 import { Domain } from "@/state/domain";
@@ -39,7 +40,6 @@ import { Whitelabeled } from "@/state/whitelabeled";
 
 import { GlobalStyles } from "../../global-styles";
 import { ThemeProvider } from "../../theme";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export default async function Layout({
   children,

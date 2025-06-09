@@ -10,10 +10,13 @@ import {
 import { qstashToken } from "@/server/env-variables";
 
 import { isLocal } from "./isLocal";
-import { cleanBasePath } from "./utils/clean-base-path";
 import { isSelfHosted } from "./isSelfHosted";
+import { cleanBasePath } from "./utils/clean-base-path";
 
-const q = isLocal() || isSelfHosted() ? undefined : new Client({ token: qstashToken() });
+const q =
+  isLocal() || isSelfHosted()
+    ? undefined
+    : new Client({ token: qstashToken() });
 
 export async function queue<TBody = unknown>({
   host,

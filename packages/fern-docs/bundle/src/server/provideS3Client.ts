@@ -3,8 +3,8 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { assertNonNullish } from "@fern-api/ui-core-utils";
 
 import { isLocal } from "./isLocal";
-import { once } from "./once";
 import { isSelfHosted } from "./isSelfHosted";
+import { once } from "./once";
 
 export const provideS3Client = once((): S3Client | undefined => {
   if (isLocal() || isSelfHosted()) {

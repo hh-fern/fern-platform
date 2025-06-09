@@ -39,6 +39,7 @@ import {
 
 import { DocsLoader } from "@/server/docs-loader";
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 import { FileData } from "@/server/types";
 
 import { getMDXExport } from "../get-mdx-export";
@@ -57,7 +58,6 @@ import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 // gracefulify fs to avoid EMFILE errors on Vercel
 gracefulify(fs);

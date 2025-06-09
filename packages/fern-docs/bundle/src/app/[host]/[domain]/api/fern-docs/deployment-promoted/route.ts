@@ -15,8 +15,8 @@ import {
 
 import { getMetadata } from "@/server/docs-loader";
 import { isLocal } from "@/server/isLocal";
-import { batchQueue } from "@/server/queue";
 import { isSelfHosted } from "@/server/isSelfHosted";
+import { batchQueue } from "@/server/queue";
 
 export async function POST(request: NextRequest) {
   if (isLocal() || isSelfHosted()) {

@@ -36,9 +36,9 @@ import {
   turbopufferApiKey,
 } from "@/server/env-variables";
 import { isLocal } from "@/server/isLocal";
+import { isSelfHosted } from "@/server/isSelfHosted";
 import { postToSlack } from "@/server/slack";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 60;
 export const revalidate = 0;
