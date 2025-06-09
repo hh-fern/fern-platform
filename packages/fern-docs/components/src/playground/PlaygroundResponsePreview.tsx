@@ -2,12 +2,9 @@
 
 import { FC, useEffect, useMemo, useRef } from "react";
 
-import {
-  FernSyntaxHighlighter,
-  type ScrollToHandle,
-} from "@fern-docs/components/syntax-highlighter";
+import { PlaygroundResponse } from "@fern-api/docs-utils/types/playground";
 
-import { PlaygroundResponse } from "../../../../commons/docs-utils/types/playgroundResponse";
+import { FernSyntaxHighlighter, ScrollToHandle } from "../syntax-highlighter";
 
 interface PlaygroundResponsePreviewProps {
   response: PlaygroundResponse;

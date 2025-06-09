@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { HttpMethodOrder } from "@fern-api/docs-utils/src/http-method-badge";
+import { HttpMethodOrder } from "@fern-api/docs-utils/http-method-badge";
 
 import { HttpMethodBadge } from "./http-method-badge";
 

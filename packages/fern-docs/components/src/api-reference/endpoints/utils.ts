@@ -1,6 +1,6 @@
 import { camelCase, upperFirst } from "es-toolkit/string";
 
-import { HttpMethod } from "@fern-api/docs-utils/src/http-method-badge";
+import { HttpMethod } from "@fern-api/docs-utils/http-method-badge";
 
 export function convertNameToAnchorPart(
   name: string | null | undefined

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { last } from "es-toolkit/array";
 
-import { DocsLoader } from "@fern-api/docs-loader";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import ApiEndpointPage from "@fern-docs/components/api-reference/ApiEndpointPage";
 import { EndpointStreamingEnabledToggle } from "@fern-docs/components/api-reference/endpoints/EndpointStreamingEnabledToggle";

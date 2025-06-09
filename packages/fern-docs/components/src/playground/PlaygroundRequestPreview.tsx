@@ -4,10 +4,10 @@ import { FC, useMemo } from "react";
 
 import { useAtom, useAtomValue } from "jotai";
 
+import { PlaygroundEndpointRequestFormState } from "@fern-api/docs-utils/types/playground";
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { FernSyntaxHighlighter } from "@fern-docs/components";
 
-import { PlaygroundEndpointRequestFormState } from "../../../../commons/docs-utils/types";
 import { isFileForgeHackEnabledAtom } from "../state/api-explorer-flags";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,

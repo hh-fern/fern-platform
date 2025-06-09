@@ -1,6 +1,12 @@
 import { compact, flatten } from "es-toolkit/array";
 
 import {
+  PlaygroundFormStateBody,
+  ProxyRequest,
+  SerializableFile,
+  SerializableFormDataEntryValue,
+} from "@fern-api/docs-utils/types";
+import {
   FormDataField,
   HttpRequestBodyShape,
   Protocol,
@@ -8,12 +14,6 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import { assertNever, isNonNullish } from "@fern-api/ui-core-utils";
 
-import {
-  PlaygroundFormStateBody,
-  ProxyRequest,
-  SerializableFile,
-  SerializableFormDataEntryValue,
-} from "../../../../../commons/docs-utils/types";
 import { blobToDataURL } from "../fetch-utils/blobToDataURL";
 
 export const serializeFormStateBody = async ({

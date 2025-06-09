@@ -1,6 +1,6 @@
 import { FC, ReactElement } from "react";
 
-import { DocsLoader } from "@fern-api/docs-loader";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 

@@ -12,7 +12,7 @@ import {
 
 import { Slot } from "@radix-ui/react-slot";
 
-import { SemanticColor } from "@fern-api/docs-utils/src/colors";
+import { SemanticColor } from "@fern-api/docs-utils/colors";
 
 import { FernTooltip } from "./FernTooltip";
 import { cn } from "./cn";

@@ -5,11 +5,11 @@ import {
   useDeferredValue,
 } from "react";
 
+import { PlaygroundEndpointRequestFormState } from "@fern-api/docs-utils/types";
+import { PlaygroundResponse } from "@fern-api/docs-utils/types/playgroundResponse";
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { Loadable } from "@fern-ui/loadable";
 
-import { PlaygroundEndpointRequestFormState } from "../../../../../commons/docs-utils/types";
-import { PlaygroundResponse } from "../../../../../commons/docs-utils/types/playgroundResponse";
 import { usePlaygroundBaseUrl } from "../utils/select-environment";
 import { PlaygroundEndpointContentLayout } from "./PlaygroundEndpointContentLayout";
 import { PlaygroundEndpointForm } from "./PlaygroundEndpointForm";

@@ -1,8 +1,8 @@
 "use client";
 
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import { renderTypeShorthand } from "@fern-docs/components/type-shorthand";
 
+import { renderTypeShorthand } from "../../type-shorthand";
 import { useEndpointContext } from "./EndpointContext";
 
 export function ResponseSummaryFallback({

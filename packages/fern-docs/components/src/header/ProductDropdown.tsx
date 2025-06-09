@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-import { DocsLoader } from "@fern-api/docs-loader";
 import { createFileResolver } from "@fern-api/docs-server/file-resolver";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { processIcon } from "@fern-docs/components/util/processIcon";
 

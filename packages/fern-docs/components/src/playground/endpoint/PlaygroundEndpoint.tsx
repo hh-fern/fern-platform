@@ -6,6 +6,8 @@ import { mapValues } from "es-toolkit/object";
 import { useAtomValue, useSetAtom } from "jotai";
 import { SendHorizonal } from "lucide-react";
 
+import type { ProxyRequest } from "@fern-api/docs-utils/types";
+import { PlaygroundResponse } from "@fern-api/docs-utils/types/playgroundResponse";
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { buildEndpointUrl } from "@fern-api/fdr-sdk/api-definition";
 import { unknownToString } from "@fern-api/ui-core-utils";
@@ -30,8 +32,6 @@ import {
 } from "@fern-ui/loadable";
 import { useEventCallback } from "@fern-ui/react-commons";
 
-import type { ProxyRequest } from "../../../../../commons/docs-utils/types";
-import { PlaygroundResponse } from "../../../../../commons/docs-utils/types/playgroundResponse";
 import { track } from "../../analytics";
 import { usePlaygroundSettings } from "../../hooks/usePlaygroundSettings";
 import { executeProxyRest } from "../fetch-utils/executeProxyRest";

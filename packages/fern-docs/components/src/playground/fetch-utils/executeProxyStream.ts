@@ -1,6 +1,7 @@
 import urljoin from "url-join";
 
-import { ProxyRequest } from "../../../../../commons/docs-utils/types";
+import { ProxyRequest } from "@fern-api/docs-utils/types";
+
 import { toBodyInit } from "./requestToBodyInit";
 
 const PROXY_URL = "https://proxy.ferndocs.com/";

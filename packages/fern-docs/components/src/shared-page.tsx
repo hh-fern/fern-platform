@@ -12,6 +12,7 @@ import { compact } from "es-toolkit/array";
 import { HydrationBoundary } from "jotai-ssr";
 
 import { withLaunchDarkly } from "@fern-api/docs-server/ld-adapter";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import { withPrunedNavigationLoader } from "@fern-api/docs-server/withPrunedNavigation";
 import {
   addLeadingSlash,

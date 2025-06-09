@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
 
-import { UIColorOrder } from "@fern-api/docs-utils/src/colors";
+import { UIColorOrder } from "@fern-api/docs-utils/colors";
 
 import { Badge } from "./badge";
 

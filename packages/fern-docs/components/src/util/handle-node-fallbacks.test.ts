@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { FernNavigation } from "@fern-api/fdr-sdk";
-import { NodeId } from "@fern-api/fdr-sdk/navigation";
-
 import {
   createFoundNode,
   createNotFoundNode,
@@ -11,7 +8,10 @@ import {
   createRootNode,
   createTabNode,
   createVersionNode,
-} from "../playground/utils/create-node";
+} from "@fern-api/docs-utils/create-node";
+import { FernNavigation } from "@fern-api/fdr-sdk";
+import { NodeId } from "@fern-api/fdr-sdk/navigation";
+
 import {
   getFallbackProduct,
   getFallbackVersion,

@@ -2,7 +2,7 @@
 
 import { forwardRef } from "react";
 
-import { UIColor } from "@fern-api/docs-utils/src/colors";
+import { UIColor } from "@fern-api/docs-utils/colors";
 
 import { Badge, type BadgeProps } from "./badge";
 

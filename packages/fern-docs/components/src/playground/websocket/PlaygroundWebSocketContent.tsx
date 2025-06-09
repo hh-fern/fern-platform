@@ -9,10 +9,10 @@ import {
   useState,
 } from "react";
 
+import { PlaygroundWebSocketRequestFormState } from "@fern-api/docs-utils/types";
 import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import type { WebSocketContext } from "@fern-api/fdr-sdk/api-definition";
 
-import { PlaygroundWebSocketRequestFormState } from "../../../../../commons/docs-utils/types";
 import { PlaygroundWebSocketSessionForm } from "./PlaygroundWebSocketSessionForm";
 
 interface PlaygroundWebSocketContentProps {

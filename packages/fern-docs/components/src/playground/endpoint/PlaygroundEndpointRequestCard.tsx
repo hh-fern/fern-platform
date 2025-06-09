@@ -2,6 +2,7 @@ import { ReactElement } from "react";
 
 import { useAtomValue, useSetAtom } from "jotai";
 
+import { PlaygroundEndpointRequestFormState } from "@fern-api/docs-utils/types";
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import {
   CopyToClipboardButton,
@@ -17,7 +18,6 @@ import {
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
 } from "@fern-docs/components/state/playground";
 
-import { PlaygroundEndpointRequestFormState } from "../../../../../commons/docs-utils/types";
 import { PlaygroundRequestPreview } from "../PlaygroundRequestPreview";
 import { PlaygroundCodeSnippetResolverBuilder } from "../code-snippets/resolver";
 import { usePlaygroundBaseUrl } from "../utils/select-environment";

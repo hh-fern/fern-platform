@@ -1,4 +1,4 @@
-import { DocsLoader } from "@fern-api/docs-loader";
+import { DocsLoader } from "@fern-api/docs-server/types";
 import { extractMethodAndPath } from "@fern-docs/components/api-reference/endpoints/utils";
 import {
   CONTINUE,

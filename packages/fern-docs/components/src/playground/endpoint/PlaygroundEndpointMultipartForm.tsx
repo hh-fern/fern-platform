@@ -3,6 +3,11 @@ import { ReactElement, useCallback } from "react";
 import { PlusCircle } from "lucide-react";
 
 import {
+  PlaygroundEndpointRequestFormState,
+  PlaygroundFormDataEntryValue,
+  PlaygroundFormStateBody,
+} from "@fern-api/docs-utils/types";
+import {
   EndpointDefinition,
   HttpRequestBodyShape,
   TypeDefinition,
@@ -10,11 +15,6 @@ import {
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 import { FernButton, FernDropdown } from "@fern-docs/components";
 
-import {
-  PlaygroundEndpointRequestFormState,
-  PlaygroundFormDataEntryValue,
-  PlaygroundFormStateBody,
-} from "../../../../../commons/docs-utils/types";
 import { Markdown } from "../../mdx/components/Markdown";
 import { renderTypeShorthandRoot } from "../../type-shorthand";
 import { PlaygroundFileUploadForm } from "../form/PlaygroundFileUploadForm";

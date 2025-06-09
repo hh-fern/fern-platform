@@ -3,12 +3,9 @@ import { FC, Fragment, PropsWithChildren, ReactNode, forwardRef } from "react";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
+import { SemanticColor } from "@fern-api/docs-utils";
 import { cn } from "@fern-docs/components";
-import {
-  FernButton,
-  SemanticColor,
-  statusCodeToIntent,
-} from "@fern-docs/components";
+import { FernButton, statusCodeToIntent } from "@fern-docs/components";
 
 import { CodeExample } from "../examples/code-example";
 import {

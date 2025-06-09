@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { SemanticColorOrder } from "@fern-api/docs-utils/src/colors";
+import { SemanticColorOrder } from "@fern-api/docs-utils/colors";
 
 import { SemanticBadge } from "./semantic-badge";
 

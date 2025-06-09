@@ -1,14 +1,14 @@
 import { compact } from "es-toolkit/array";
 import { pick } from "es-toolkit/object";
 
+import { FernUser } from "@fern-api/docs-auth";
+import { PlaygroundWebSocketRequestFormState } from "@fern-api/docs-utils/types";
 import type {
   ObjectProperty,
   WebSocketContext,
 } from "@fern-api/fdr-sdk/api-definition";
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
-import { FernUser } from "@fern-docs/auth";
 
-import { PlaygroundWebSocketRequestFormState } from "../../../../../commons/docs-utils/types";
 import {
   getEmptyValueForObjectProperties,
   getEmptyValueForType,

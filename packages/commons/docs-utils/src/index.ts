@@ -11,3 +11,4 @@ export * from "./isPreviewUrl";
 export * from "./fern-token";
 export * from "./colors";
 export * from "./http-method-badge";
+export * from "./seo";

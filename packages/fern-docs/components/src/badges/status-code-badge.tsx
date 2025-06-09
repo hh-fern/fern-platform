@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 
-import { SemanticColor } from "@fern-api/docs-utils/src/colors";
+import { SemanticColor } from "@fern-api/docs-utils/colors";
 
 import { SemanticBadge, SemanticBadgeProps } from "./semantic-badge";
 

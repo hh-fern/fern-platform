@@ -5,12 +5,12 @@ import React, { FC, createRef, useCallback, useEffect, useMemo } from "react";
 import { isEqual } from "es-toolkit/predicate";
 
 import { ErrorBoundary } from "@fern-docs/components/error-boundary";
-import {
-  FernSyntaxHighlighter,
-  type ScrollToHandle,
-} from "@fern-docs/components/syntax-highlighter";
 import { useResizeObserver } from "@fern-ui/react-commons";
 
+import {
+  FernSyntaxHighlighter,
+  ScrollToHandle,
+} from "../../syntax-highlighter";
 import { JsonPropertyPath } from "./JsonPropertyPath";
 import { TitledExample } from "./TitledExample";
 import { useHighlightJsonLines } from "./useHighlightJsonLines";

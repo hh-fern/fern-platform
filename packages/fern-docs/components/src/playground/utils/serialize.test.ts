@@ -1,10 +1,10 @@
+import { PlaygroundFormStateBody } from "@fern-api/docs-utils/types";
 import {
   HttpRequestBodyShape,
   PropertyKey,
   TypeShape,
 } from "@fern-api/fdr-sdk/api-definition";
 
-import { PlaygroundFormStateBody } from "../../../../../commons/docs-utils/types";
 import { serializeFormStateBody } from "./serialize";
 
 const STRING_VALUE_SHAPE: TypeShape = {
@@ -35,6 +35,7 @@ describe("serializeFormStateBody", () => {
           valueShape: STRING_VALUE_SHAPE,
           exploded: true,
           contentType: "application/json",
+          propertyAccess: undefined,
         },
       ],
       description: undefined,
@@ -81,6 +82,7 @@ describe("serializeFormStateBody", () => {
           contentType: "application/json",
           description: undefined,
           availability: undefined,
+          propertyAccess: undefined,
         },
       ],
       description: undefined,

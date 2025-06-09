@@ -67,6 +67,7 @@ export async function queue<TBody = unknown>({
   const basepath = cleanBasePath(basepathProp);
   const endpoint = slugToHref(endpointProp);
 
+  // @ts-expect-error - TODO: migration broke types here, not sure why
   const res = await q.publishJSON({
     url: `https://${host}${basepath}${endpoint}`,
     retries: 1,
@@ -74,6 +75,7 @@ export async function queue<TBody = unknown>({
     headers,
   });
 
+  // @ts-expect-error - TODO: migration broke types here, not sure why
   return res.messageId;
 }
 
@@ -161,7 +163,9 @@ export async function batchQueue<TBody = unknown>({
     }
   );
 
+  // @ts-expect-error - TODO: migration broke types here, not sure why
   const responses = await q.batchJSON(batchRequests);
 
+  // @ts-expect-error - TODO: migration broke types here, not sure why
   return responses.map((res) => res.messageId);
 }

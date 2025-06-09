@@ -4,17 +4,5 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": [
-    "./src/**/*",
-    "./storybook/**/*",
-    "src/badges/http-method-badge.stories.tsx"
-  ],
-  "references": [
-    {
-      "path": "../../commons/react-commons"
-    },
-    {
-      "path": "../../commons/core-utils"
-    }
-  ]
+  "include": ["./src/**/*", "./storybook/**/*"]
 }

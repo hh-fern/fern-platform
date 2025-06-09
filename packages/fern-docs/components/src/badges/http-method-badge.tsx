@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import {
   HttpMethod,
   METHOD_COLOR_SCHEMES,
-} from "@fern-api/docs-utils/src/http-method-badge";
+} from "@fern-api/docs-utils/http-method-badge";
 
 import { Badge, BadgeProps } from "./badge";
 

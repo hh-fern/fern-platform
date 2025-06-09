@@ -3,15 +3,15 @@
 import { Dispatch, FC, SetStateAction, useCallback, useMemo } from "react";
 
 import {
+  PlaygroundEndpointRequestFormState,
+  PlaygroundFormStateBody,
+} from "@fern-api/docs-utils/types";
+import {
   type EndpointContext,
   PropertyKey,
 } from "@fern-api/fdr-sdk/api-definition";
 import { EMPTY_ARRAY, visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 
-import {
-  PlaygroundEndpointRequestFormState,
-  PlaygroundFormStateBody,
-} from "../../../../../commons/docs-utils/types";
 import { PlaygroundFileUploadForm } from "../form/PlaygroundFileUploadForm";
 import { PlaygroundObjectForm } from "../form/PlaygroundObjectForm";
 import { PlaygroundObjectPropertiesForm } from "../form/PlaygroundObjectPropertyForm";

@@ -1,6 +1,10 @@
 import { UnreachableCaseError } from "ts-essentials";
 
 import {
+  PlaygroundFormDataEntryValue,
+  PlaygroundFormStateBody,
+} from "@fern-api/docs-utils/types";
+import {
   FormDataField,
   HttpRequestBodyShape,
   ObjectProperty,
@@ -11,11 +15,6 @@ import {
   unwrapReference,
 } from "@fern-api/fdr-sdk/api-definition";
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
-
-import {
-  PlaygroundFormDataEntryValue,
-  PlaygroundFormStateBody,
-} from "../../../../../commons/docs-utils/types";
 
 export function getEmptyValueForObjectProperties(
   properties: ObjectProperty[] = [],

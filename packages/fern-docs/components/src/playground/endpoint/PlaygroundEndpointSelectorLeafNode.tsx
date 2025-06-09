@@ -8,8 +8,8 @@ import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { cn } from "@fern-docs/components";
 import { FernTooltip } from "@fern-docs/components";
 import { FernLinkButton } from "@fern-docs/components/FernLinkButton";
-import { HttpMethodBadge } from "@fern-docs/components/badges";
 
+import { HttpMethodBadge } from "../../badges/http-method-badge";
 import { conformExplorerRoute } from "../utils/explorer-route";
 
 interface PlaygroundEndpointSelectorLeafNodeProps {

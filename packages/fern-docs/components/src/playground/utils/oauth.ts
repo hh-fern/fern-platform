@@ -1,6 +1,10 @@
 import { mapValues } from "es-toolkit/object";
 import { JSONPath } from "jsonpath-plus";
 
+import {
+  PlaygroundEndpointRequestFormState,
+  ProxyRequest,
+} from "@fern-api/docs-utils/types";
 import type { APIV1Read } from "@fern-api/fdr-sdk";
 import {
   type EndpointDefinition,
@@ -11,10 +15,6 @@ import {
   visitDiscriminatedUnion,
 } from "@fern-api/ui-core-utils";
 
-import {
-  PlaygroundEndpointRequestFormState,
-  ProxyRequest,
-} from "../../../../../commons/docs-utils/types";
 import { executeProxyRest } from "../fetch-utils/executeProxyRest";
 import { serializeFormStateBody } from "./serialize";
 

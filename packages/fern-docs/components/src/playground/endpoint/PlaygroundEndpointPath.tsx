@@ -3,6 +3,7 @@ import { FC, Fragment, ReactNode } from "react";
 import { omitBy } from "es-toolkit/object";
 import { isUndefined } from "es-toolkit/predicate";
 
+import { PlaygroundRequestFormState } from "@fern-api/docs-utils/types";
 import type {
   Environment,
   EnvironmentId,
@@ -24,7 +25,6 @@ import { MaybeEnvironmentDropdown } from "@fern-docs/components/MaybeEnvironment
 import { useAllEnvironmentIds } from "@fern-docs/components/state/environment";
 import { useBooleanState } from "@fern-ui/react-commons";
 
-import { PlaygroundRequestFormState } from "../../../../../commons/docs-utils/types";
 import { HttpMethodBadge } from "../../badges/http-method-badge";
 import { closeButton } from "../PlaygroundCloseButton";
 import { PlaygroundSendRequestButton } from "../PlaygroundSendRequestButton";

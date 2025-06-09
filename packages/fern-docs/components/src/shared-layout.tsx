@@ -2,8 +2,8 @@ import "server-only";
 
 import React from "react";
 
-import { DocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { DocsLoader } from "@fern-api/docs-server/types";
 
 import { Announcement } from "./header/Announcement";
 import { HeaderContent } from "./header/HeaderContent";

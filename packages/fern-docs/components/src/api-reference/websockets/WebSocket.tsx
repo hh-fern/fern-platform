@@ -133,7 +133,7 @@ export async function WebSocketContent({
       }
       reference={
         <TypeDefinitionRoot types={types} slug={node.slug}>
-          <TypeDefinitionSlotsServer types={types} serialize={serialize}>
+          <TypeDefinitionSlotsServer types={types}>
             <CardedSection
               number={1}
               title={
@@ -169,7 +169,6 @@ export async function WebSocketContent({
                       <WithSeparator>
                         {headers.map((parameter) => (
                           <ObjectProperty
-                            serialize={serialize}
                             key={parameter.key}
                             property={parameter}
                             types={types}
@@ -186,7 +185,6 @@ export async function WebSocketContent({
                         <WithSeparator>
                           {channel.pathParameters.map((parameter) => (
                             <ObjectProperty
-                              serialize={serialize}
                               key={parameter.key}
                               property={parameter}
                               types={types}
@@ -204,7 +202,6 @@ export async function WebSocketContent({
                           {channel.queryParameters.map((parameter) => {
                             return (
                               <ObjectProperty
-                                serialize={serialize}
                                 key={parameter.key}
                                 property={parameter}
                                 types={types}
@@ -231,7 +228,6 @@ export async function WebSocketContent({
                   }
                 >
                   <TypeReferenceDefinitions
-                    serialize={serialize}
                     shape={publishMessageShape}
                     types={types}
                   />
@@ -251,7 +247,6 @@ export async function WebSocketContent({
                   }
                 >
                   <TypeReferenceDefinitions
-                    serialize={serialize}
                     shape={subscribeMessageShape}
                     types={types}
                   />
@@ -264,10 +259,7 @@ export async function WebSocketContent({
       footer={<FooterLayout bottomNavigation={bottomNavigation} />}
     >
       <PlaygroundKeyboardTrigger />
-      <MdxServerComponentProseSuspense
-        serialize={serialize}
-        mdx={channel.description}
-      />
+      <MdxServerComponentProseSuspense mdx={channel.description} />
     </ReferenceLayout>
   );
 }

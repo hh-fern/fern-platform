@@ -15,9 +15,12 @@ import { HideBuiltWithFern } from "@fern-docs/components/built-with-fern";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 
 import { BottomNavigationClient } from "../bottom-nav-client";
+import { useCurrentAnchor } from "../hooks/use-anchor";
 import { AsideAwareDiv } from "../layouts/AsideAwareDiv";
 import { FooterLayout } from "../layouts/FooterLayout";
 import { TableOfContentsLayout } from "../layouts/TableOfContentsLayout";
+import { SetLayout } from "../state/layout";
+import { SCROLL_BODY_ATOM } from "../state/viewport";
 import { ChangelogContentLayout } from "./ChangelogContentLayout";
 
 function flattenChangelogEntries(
