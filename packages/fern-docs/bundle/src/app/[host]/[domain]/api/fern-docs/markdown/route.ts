@@ -10,6 +10,7 @@ import {
 } from "@/server/getMarkdownForPath";
 import { isLocal } from "@/server/isLocal";
 import { MARKDOWN_PATTERN } from "@/server/patterns";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 /**
  * This endpoint returns the markdown content of any page in the docs by adding `.md` or `.mdx` to the end of any docs page.
@@ -19,7 +20,7 @@ export async function GET(
   req: NextRequest,
   props: { params: Promise<{ host: string; domain: string }> }
 ): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return new NextResponse(".md preview is not available in local preview", {
       status: 400,
     });

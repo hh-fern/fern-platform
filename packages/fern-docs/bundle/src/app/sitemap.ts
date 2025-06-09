@@ -12,9 +12,10 @@ import { isLocal } from "@/server/isLocal";
 import { getDocsDomainApp, getDocsHostApp } from "@/server/xfernhost/app";
 
 import { getFernToken } from "./fern-token";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return [];
   }
 

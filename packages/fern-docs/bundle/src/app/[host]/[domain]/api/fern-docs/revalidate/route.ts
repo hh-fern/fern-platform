@@ -37,6 +37,7 @@ import {
   queueTurbopufferReindex,
 } from "@/server/queue-reindex";
 import { pruneWithAuthState } from "@/server/withRbac";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 300; // 5 minutes timeout
 
@@ -44,7 +45,7 @@ export async function GET(
   req: NextRequest,
   props: { params: Promise<{ host: string; domain: string }> }
 ): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     throw new Error("revalidation is only available in production");
   }
 

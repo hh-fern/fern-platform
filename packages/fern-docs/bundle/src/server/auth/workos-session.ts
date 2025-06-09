@@ -10,6 +10,7 @@ import type {
   WorkOSUserInfo,
 } from "./interfaces";
 import { getJwtSecretKey, getWorkOSClientId, workos } from "./workos";
+import { isSelfHosted } from "../isSelfHosted";
 
 // This is adapted from https://github.com/workos/authkit-nextjs/blob/main/src/session.ts
 
@@ -20,7 +21,7 @@ async function encryptSession(session: WorkOSSession): Promise<string> {
 async function refreshSession(
   session: WorkOSSession
 ): Promise<WorkOSSession | undefined> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return undefined;
   }
 

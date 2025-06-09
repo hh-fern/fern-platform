@@ -20,6 +20,7 @@ import { track } from "@/server/analytics/posthog";
 import { algoliaAppId } from "@/server/env-variables";
 import { isLocal } from "@/server/isLocal";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 const DEPLOYMENT_ID = getEnv().VERCEL_DEPLOYMENT_ID ?? "development";
 const PREFIX = `docs:${DEPLOYMENT_ID}`;
@@ -32,7 +33,7 @@ const BodySchema = z.object({
 });
 
 export async function POST(req: NextRequest): Promise<Response> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
       "ai suggestions are not accessible in local preview mode",
       { status: 400 }

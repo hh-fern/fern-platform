@@ -21,13 +21,14 @@ import { withSecureCookie } from "@/server/auth/with-secure-cookie";
 import { fernToken_admin } from "@/server/env-variables";
 import { isLocal } from "@/server/isLocal";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const runtime = "edge";
 
 export async function GET(
   req: NextRequest
 ): Promise<NextResponse<APIKeyInjectionConfig>> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json({
       enabled: false,
       returnToQueryParam: "",

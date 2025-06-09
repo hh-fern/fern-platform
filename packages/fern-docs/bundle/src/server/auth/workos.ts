@@ -2,12 +2,15 @@ import { AuthorizationURLOptions, WorkOS } from "@workos-inc/node";
 import { once } from "es-toolkit/function";
 
 import { isLocal } from "../isLocal";
+import { isSelfHosted } from "../isSelfHosted";
 
 export const workos = once(() => new WorkOS(getWorkOSApiKey()));
 
 export function getWorkOSApiKey(): string {
   if (isLocal()) {
     throw new Error("workOS is not accessible in local preview mode");
+  } else if (isSelfHosted()) {
+    throw new Error("workOS is not accessible in self-hosted mode");
   }
 
   const apiKey = process.env.WORKOS_API_KEY;
@@ -22,6 +25,8 @@ export function getWorkOSApiKey(): string {
 export function getWorkOSClientId(): string {
   if (isLocal()) {
     throw new Error("workOS is not accessible in local preview mode");
+  } else if (isSelfHosted()) {
+    throw new Error("workOS is not accessible in self-hosted mode");
   }
 
   const clientId = process.env.WORKOS_CLIENT_ID;
@@ -36,6 +41,8 @@ export function getWorkOSClientId(): string {
 export function getJwtSecretKey(): string {
   if (isLocal()) {
     throw new Error("workOS is not accessible in local preview mode");
+  } else if (isSelfHosted()) {
+    throw new Error("workOS is not accessible in self-hosted mode");
   }
 
   const secret = process.env.JWT_SECRET_KEY;

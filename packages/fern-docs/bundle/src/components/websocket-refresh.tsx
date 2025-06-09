@@ -8,6 +8,7 @@ import { cn } from "@fern-docs/components";
 import { isLocal } from "@/server/isLocal";
 
 import { Loading } from "./Loading";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export function WebSocketRefresh() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export function WebSocketRefresh() {
     let connectionTimeout: NodeJS.Timeout | null = null;
 
     const setupWebSocket = async (): Promise<void> => {
-      if (!isLocal()) {
+      if (!isLocal() || isSelfHosted()) {
         return;
       }
 
@@ -137,7 +138,7 @@ export function WebSocketRefresh() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!isLocal()) {
+  if (!isLocal() || isSelfHosted()) {
     return null;
   }
 

@@ -8,13 +8,14 @@ import { algoliaAppId } from "@/server/env-variables";
 import { isLocal } from "@/server/isLocal";
 import { selectFirst } from "@/server/utils/selectFirst";
 import { toArray } from "@/server/utils/toArray";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 10;
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
-      "search facet is not accessible in local preview mode",
+      `search facet is not accessible in ${isLocal() ? "local" : "self-hosted"} preview mode`,
       { status: 400 }
     );
   }

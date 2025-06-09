@@ -4,6 +4,7 @@ import { FdrClient } from "@fern-api/fdr-sdk/client";
 
 import { fernToken_admin } from "./env-variables";
 import { isLocal } from "./isLocal";
+import { isSelfHosted } from "./isSelfHosted";
 
 function getEnvironment() {
   // environment variable is used by local development
@@ -13,8 +14,9 @@ function getEnvironment() {
 }
 
 export const provideRegistryService = once(() => {
+  const isLocalOrSelfHosted = isLocal() || isSelfHosted();
   return new FdrClient({
     environment: getEnvironment(),
-    token: isLocal() ? undefined : fernToken_admin(),
+    token: isLocalOrSelfHosted ? undefined : fernToken_admin(),
   });
 });

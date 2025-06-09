@@ -19,11 +19,12 @@ import { isLocal } from "@/server/isLocal";
 import { postToSlack } from "@/server/slack";
 import { Gate, withBasicTokenAnonymous } from "@/server/withRbac";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 800; // 13 minutes
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
       "turbopuffer is not accessible in local preview mode",
       { status: 400 }

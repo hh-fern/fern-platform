@@ -39,6 +39,7 @@ import { Whitelabeled } from "@/state/whitelabeled";
 
 import { GlobalStyles } from "../../global-styles";
 import { ThemeProvider } from "../../theme";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export default async function Layout({
   children,
@@ -48,7 +49,7 @@ export default async function Layout({
   params: Promise<{ host: string; domain: string }>;
 }) {
   const { host, domain } = await params;
-  const isLocalEnvironment = isLocal();
+  const isLocalOrSelfHostedEnvironment = isLocal() || isSelfHosted();
   const loader = await createCachedDocsLoader(host, domain);
   const [
     { basePath },
@@ -123,7 +124,7 @@ export default async function Layout({
           {children}
         </FeatureFlagProvider>
         <React.Suspense fallback={null}>
-          {!edgeFlags.isSearchDisabled && !isLocalEnvironment && (
+          {!edgeFlags.isSearchDisabled && !isLocalOrSelfHostedEnvironment && (
             <SearchV2 domain={domain} />
           )}
         </React.Suspense>

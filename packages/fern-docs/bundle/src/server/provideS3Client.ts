@@ -4,9 +4,10 @@ import { assertNonNullish } from "@fern-api/ui-core-utils";
 
 import { isLocal } from "./isLocal";
 import { once } from "./once";
+import { isSelfHosted } from "./isSelfHosted";
 
 export const provideS3Client = once((): S3Client | undefined => {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return undefined;
   }
 

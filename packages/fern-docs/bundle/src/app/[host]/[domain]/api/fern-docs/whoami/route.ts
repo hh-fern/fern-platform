@@ -7,12 +7,13 @@ import { COOKIE_FERN_TOKEN } from "@fern-docs/utils";
 import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
 import { isLocal } from "@/server/isLocal";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 /**
  * This endpoint returns the authentication information pertaining to the current user
  */
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return new NextResponse(
       "authentication is not accessible in local preview mode",
       {

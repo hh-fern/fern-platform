@@ -57,6 +57,7 @@ import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 // gracefulify fs to avoid EMFILE errors on Vercel
 gracefulify(fs);
@@ -516,7 +517,7 @@ function hashKey(key: string): string {
 }
 
 function kvSet(key: string, value: unknown) {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return;
   }
 
@@ -537,7 +538,7 @@ function kvSet(key: string, value: unknown) {
 }
 
 async function kvGet(key: string): Promise<Record<string, string> | null> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return null;
   }
 

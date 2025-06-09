@@ -16,9 +16,10 @@ import {
 import { getMetadata } from "@/server/docs-loader";
 import { isLocal } from "@/server/isLocal";
 import { batchQueue } from "@/server/queue";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export async function POST(request: NextRequest) {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     throw new Error("production deployment is only available in production");
   }
 

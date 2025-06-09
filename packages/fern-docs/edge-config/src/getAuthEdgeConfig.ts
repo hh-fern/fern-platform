@@ -3,11 +3,12 @@ import { withoutStaging } from "@fern-docs/utils";
 
 import { getEdge } from "./getEdge";
 import { isLocal } from "./isLocal";
+import { isSelfHosted } from "./isSelfHosted";
 
 export async function getAuthEdgeConfig(
   currentDomain: string
 ): Promise<AuthEdgeConfig | undefined> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return undefined;
   }
 
@@ -17,7 +18,7 @@ export async function getAuthEdgeConfig(
 export async function getApiKeyInjectionEdgeConfig(
   currentDomain: string
 ): Promise<AuthEdgeConfig | undefined> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return undefined;
   }
 

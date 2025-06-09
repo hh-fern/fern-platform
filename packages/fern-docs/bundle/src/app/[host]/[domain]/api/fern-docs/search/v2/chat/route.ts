@@ -38,6 +38,7 @@ import {
 import { isLocal } from "@/server/isLocal";
 import { postToSlack } from "@/server/slack";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 60;
 export const revalidate = 0;
@@ -55,9 +56,9 @@ const modelMap: Record<string, { modelId: string; region: string }> = {
 };
 
 export async function POST(req: NextRequest) {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
-      "ai chat is not accessible in local preview mode",
+      `ai chat is not accessible in ${isLocal() ? "local" : "self-hosted"} preview mode`,
       { status: 400 }
     );
   }

@@ -18,11 +18,12 @@ import { revokeSessionForToken } from "@/server/auth/workos-session";
 import { isLocal } from "@/server/isLocal";
 import { safeUrl } from "@/server/safeUrl";
 import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const runtime = "edge";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return new NextResponse(
       "auth logout is not accessible in local preview mode",
       {

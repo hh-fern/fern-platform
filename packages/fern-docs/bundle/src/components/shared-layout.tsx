@@ -104,7 +104,7 @@ export default async function SharedLayout({
                 loader={loader}
                 size="sm"
                 className="ml-2"
-                disabled={isLocalEnvironment}
+                disabled={isLocalEnvironment} // TODO figure out if we should disable this for self-hosted
               />
             </React.Suspense>
           }

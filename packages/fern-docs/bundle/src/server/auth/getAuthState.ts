@@ -20,6 +20,7 @@ import { getReturnToQueryParam } from "./return-to";
 import { getWebflowAuthorizationUrl } from "./webflow";
 import { getWorkosSSOAuthorizationUrl } from "./workos";
 import { handleWorkosAuth } from "./workos-handler";
+import { isSelfHosted } from "../isSelfHosted";
 
 export type AuthPartner = "workos" | "ory" | "webflow" | "custom";
 
@@ -192,7 +193,7 @@ export async function createGetAuthState(
     getAuthState: (pathname?: string) => AsyncOrSync<AuthState>;
   }
 > {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return {
       domain: domain,
       allowedDestinations: [],
