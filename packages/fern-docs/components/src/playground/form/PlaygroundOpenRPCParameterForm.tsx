@@ -12,7 +12,10 @@ import { cn } from "@fern-docs/components";
 import { withErrorBoundary } from "@fern-docs/components/error-boundary";
 import { useBooleanState } from "@fern-ui/react-commons";
 
-import { castToArray, isExpandable } from "../utils";
+import {../../../../../commons/docs-utils/playground
+  castToArray,
+  isExpandable,
+} from "../../../../../commons/docs-utils/utils";
 import { PlaygroundTypeReferenceForm } from "./PlaygroundTypeReferenceForm";
 
 interface PlaygroundOpenRPCParameterFormProps {

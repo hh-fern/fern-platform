@@ -1,6 +1,6 @@
 "use client";
 
-import { useConsoleMessage } from "./hooks/useConsoleMessage";
+import { useConsoleMessage } from "../../../commons/hooks/src/useConsoleMessage";
 
 export function ConsoleMessage() {
   useConsoleMessage();

@@ -12,8 +12,8 @@ import {
 import { HorizontalOverflowMask } from "@fern-docs/components/HorizontalOverflowMask";
 import { getLanguageDisplayName } from "@fern-docs/components/api-reference/examples/code-example";
 
-import { useIsDarkCode } from "../../../state/dark-code";
-import { useProgrammingLanguage } from "../../../state/language";
+import { useIsDarkCode } from "../../../../../../commons/state/src/dark-code";
+import { useProgrammingLanguage } from "../../../../../../commons/state/src/language";
 import { unwrapChildren } from "../../common/unwrap-children";
 import { CodeBlock, toSyntaxHighlighterProps } from "./CodeBlock";
 import { Template, applyTemplates, useTemplate } from "./Template";

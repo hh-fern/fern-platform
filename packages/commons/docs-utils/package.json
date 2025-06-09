@@ -20,6 +20,11 @@
       "import": "./dist/types/index.js",
       "require": "./dist/types/index.js"
     },
+    "./playground": {
+      "types": "./dist/playground/index.d.ts",
+      "import": "./dist/playground/index.js",
+      "require": "./dist/playground/index.js"
+    },
     "./*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js",
@@ -43,9 +48,14 @@
     "test": "vitest --run --passWithNoTests --globals"
   },
   "dependencies": {
+    "@fern-api/docs-auth": "workspace:*",
     "@fern-api/fdr-sdk": "workspace:*",
     "@fern-api/ui-core-utils": "workspace:*",
+    "es-toolkit": "^1.39.3",
+    "jose": "^5.9.6",
+    "jotai": "^2.12.1",
     "path-to-regexp": "6.3.0",
+    "ts-essentials": "^10.0.4",
     "url-join": "5.0.0",
     "zod": "^3.24.1"
   },

@@ -15,8 +15,11 @@ import {
   FernSegmentedControl,
 } from "@fern-docs/components";
 
+import {
+  getEmptyValueForType,../../../../../commons/docs-utils/playground
+  matchesTypeReference,
+} from "../../../../../commons/docs-utils/utils";
 import { renderTypeShorthand } from "../../type-shorthand";
-import { getEmptyValueForType, matchesTypeReference } from "../utils";
 import { PlaygroundTypeReferenceForm } from "./PlaygroundTypeReferenceForm";
 
 const Markdown = dynamic(() =>

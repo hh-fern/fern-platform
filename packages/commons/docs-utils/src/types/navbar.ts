@@ -1,4 +1,4 @@
-import { FileData } from "@fern-api/docs-server/types";
+import { FileData } from "./file-data";
 
 export interface DefaultNavbarLink {
   type: "filled" | "outlined" | "minimal" | "primary" | "secondary";
@@ -26,18 +26,4 @@ export interface LogoConfiguration {
   href: string | undefined;
   light: FileData | undefined;
   dark: FileData | undefined;
-}
-
-export interface JsConfig {
-  remote:
-    | {
-        url: string;
-        strategy:
-          | "beforeInteractive"
-          | "afterInteractive"
-          | "lazyOnload"
-          | undefined;
-      }[]
-    | undefined;
-  inline: string[] | undefined;
 }

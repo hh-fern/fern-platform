@@ -6,8 +6,8 @@ import * as RadixTabs from "@radix-ui/react-tabs";
 import { ApiDefinition } from "@fern-api/fdr-sdk";
 import { cn } from "@fern-docs/components";
 
-import { useCurrentAnchor } from "../../../hooks/use-anchor";
-import { useProgrammingLanguage } from "../../../state/language";
+import { useCurrentAnchor } from "../../../../../../commons/hooks/src/use-anchor";
+import { useProgrammingLanguage } from "../../../../../../commons/state/src/language";
 import { unwrapChildren } from "../../common/unwrap-children";
 
 export interface TabProps {

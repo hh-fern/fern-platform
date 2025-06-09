@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 
-import { useCurrentPathname } from "../hooks/use-current-pathname";
-import { useDomain } from "../state/domain";
+import { useDomain } from "../../state/src/domain";
+import { useCurrentPathname } from "./use-current-pathname";
 
 function useServerSideLocationHref() {
   const domain = useDomain();

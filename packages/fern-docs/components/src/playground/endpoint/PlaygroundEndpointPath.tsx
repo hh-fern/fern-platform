@@ -22,9 +22,9 @@ import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedU
 import { cn } from "@fern-docs/components";
 import { CopyToClipboardButton } from "@fern-docs/components";
 import { MaybeEnvironmentDropdown } from "@fern-docs/components/MaybeEnvironmentDropdown";
-import { useAllEnvironmentIds } from "@fern-docs/components/state/environment";
 import { useBooleanState } from "@fern-ui/react-commons";
 
+import { useAllEnvironmentIds } from "../../../../../commons/state/src/environment";
 import { HttpMethodBadge } from "../../badges/http-method-badge";
 import { closeButton } from "../PlaygroundCloseButton";
 import { PlaygroundSendRequestButton } from "../PlaygroundSendRequestButton";

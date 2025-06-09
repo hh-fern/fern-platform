@@ -5,8 +5,8 @@ import React, { ComponentPropsWithoutRef } from "react";
 import { cn } from "@fern-docs/components";
 import { useIsMobile } from "@fern-ui/react-commons";
 
+import { SetLayout } from "../../../../commons/state/src/layout";
 import { Prose } from "../mdx/components/prose";
-import { SetLayout } from "../state/layout";
 import { AsideAwareDiv } from "./AsideAwareDiv";
 
 interface ReferenceLayoutProps {

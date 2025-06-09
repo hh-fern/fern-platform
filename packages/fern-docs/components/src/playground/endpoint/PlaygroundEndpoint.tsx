@@ -13,17 +13,6 @@ import { buildEndpointUrl } from "@fern-api/fdr-sdk/api-definition";
 import { unknownToString } from "@fern-api/ui-core-utils";
 import { FernTooltipProvider } from "@fern-docs/components";
 import {
-  isProxyDisabledAtom,
-  usesApplicationJsonInFormDataValueAtom,
-} from "@fern-docs/components/state/api-explorer-flags";
-import { fernUserAtom } from "@fern-docs/components/state/fern-user";
-import { jotaiStore } from "@fern-docs/components/state/jotai-provider";
-import {
-  PLAYGROUND_AUTH_STATE_ATOM,
-  PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
-  usePlaygroundEndpointFormState,
-} from "@fern-docs/components/state/playground";
-import {
   Loadable,
   failed,
   loaded,
@@ -32,16 +21,27 @@ import {
 } from "@fern-ui/loadable";
 import { useEventCallback } from "@fern-ui/react-commons";
 
-import { track } from "../../analytics";
-import { usePlaygroundSettings } from "../../hooks/usePlaygroundSettings";
-import { executeProxyRest } from "../fetch-utils/executeProxyRest";
-import { executeProxyStream } from "../fetch-utils/executeProxyStream";
 import {
   buildAuthHeaders,
   getInitialEndpointRequestFormStateWithExample,
   serializeFormStateBody,
-} from "../utils";
-import { usePlaygroundBaseUrl } from "../utils/select-environment";
+} from "../../../../../commons/docs-utils/utils";
+import { usePlaygroundBaseUrl } from "../../../../../commons/docs-utils/utils/select-environment";
+import { usePlaygroundSettings } from "../../../../../commons/hooks/src/usePlaygroundSettings";
+import {
+  isProxyDisabledAtom,
+  usesApplicationJsonInFormDataValueAtom,
+} from "../../../../../commons/state/src/api-explorer-flags";
+import { fernUserAtom } from "../../../../../commons/state/src/fern-user";
+import { jotaiStore } from "../../../../../commons/state/src/jotai-provider";
+import {
+  PLAYGROUND_AUTH_STATE_ATOM,
+  PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
+  usePlaygroundEndpointFormState,
+} from "../../../../../commons/state/src/playground";
+import { track } from "../../analytics";
+import {../../../../../commons/docs-utils/playgrounds/executeProxyRest";
+import { executeProxyStream } from "../../../../../commons/docs-utils/src/playground/select-environmentt
 import { PlaygroundEndpointContent } from "./PlaygroundEndpointContent";
 import { PlaygroundEndpointPath } from "./PlaygroundEndpointPath";
 

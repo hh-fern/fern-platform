@@ -6,7 +6,6 @@ import { isTrailingSlashEnabled } from "@fern-api/docs-utils";
 import { FernButton } from "@fern-docs/components";
 
 import { LoginButtonClient } from "./login-button-client";
-import { getApiRouteSupplier } from "./util/getApiRouteSupplier";
 
 export async function LoginButton({
   loader,

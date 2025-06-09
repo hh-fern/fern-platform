@@ -18,7 +18,7 @@ import {
 import { ErrorBoundaryFallback } from "@fern-docs/components/error-boundary";
 import { Loadable, visitLoadable } from "@fern-ui/loadable";
 
-import { isBinaryOctetStreamAudioPlayerAtom } from "../../state/api-explorer-flags";
+import { isBinaryOctetStreamAudioPlayerAtom } from "../../../../../commons/state/src/api-explorer-flags";
 import { PlaygroundResponsePreview } from "../PlaygroundResponsePreview";
 import { PlaygroundSendRequestButton } from "../PlaygroundSendRequestButton";
 

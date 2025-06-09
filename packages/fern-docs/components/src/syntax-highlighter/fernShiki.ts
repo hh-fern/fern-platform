@@ -12,7 +12,8 @@ import {
   getSingletonHighlighter,
 } from "shiki";
 
-import { isLocal } from "../util/isLocal";
+import { isLocal } from "@fern-api/docs-utils/component/isLocal";
+
 import { additionalLanguages } from "./syntaxes";
 import { templateTransformer } from "./transformers/template";
 

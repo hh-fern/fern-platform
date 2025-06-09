@@ -4,7 +4,7 @@ import React from "react";
 import { CopyToClipboardButton, cn } from "@fern-docs/components";
 import { useIsMobile } from "@fern-ui/react-commons";
 
-import { useResolvedTheme } from "../../../hooks/use-theme";
+import { useResolvedTheme } from "../../../../../../commons/hooks/src/use-theme";
 import "./index.scss";
 
 const JsonView = dynamic(() => import("@microlink/react-json-view"), {

@@ -9,7 +9,7 @@ import { useExampleSelection } from "@fern-docs/components/api-reference/endpoin
 import { CodeSnippetExample } from "@fern-docs/components/api-reference/examples/CodeSnippetExample";
 import { usePlaygroundBaseUrl } from "@fern-docs/components/playground/utils/select-environment";
 
-import { useCurrentVersionSlug } from "../../../state/navigation";
+import { useCurrentVersionSlug } from "../../../../../../commons/state/src/navigation";
 
 export function EndpointRequestSnippet({
   example,

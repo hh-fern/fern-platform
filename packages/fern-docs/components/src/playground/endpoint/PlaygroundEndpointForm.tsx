@@ -12,11 +12,11 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import { EMPTY_ARRAY, visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 
+import { pascalCaseHeaderKey } from "../../../../../commons/docs-utils/utils/header-key-case";
 import { PlaygroundFileUploadForm } from "../form/PlaygroundFileUploadForm";
 import { PlaygroundObjectForm } from "../form/PlaygroundObjectForm";
 import { PlaygroundObjectPropertiesForm } from "../form/PlaygroundObjectPropertyForm";
-import { PlaygroundOpenRPCParamsForm } from "../form/PlaygroundOpenRPCParamsForm";
-import { pascalCaseHeaderKey } from "../utils/header-key-case";
+import { PlaygroundOpenRPCParamsForm ../../../../../commons/docs-utils/playground/header-key-case
 import { PlaygroundEndpointAliasForm } from "./PlaygroundEndpointAliasForm";
 import { PlaygroundEndpointFormSection } from "./PlaygroundEndpointFormSection";
 import { PlaygroundEndpointMultipartForm } from "./PlaygroundEndpointMultipartForm";

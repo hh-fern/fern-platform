@@ -12,12 +12,12 @@ import {
 } from "@fern-docs/components";
 import { useIsDesktop } from "@fern-ui/react-commons";
 
-import { FernLinkDropdown } from "../FernLinkDropdown";
-import { FernSelectionItem } from "../FernSelectionItem";
 import {
   useCurrentVersionId,
   useCurrentVersionSlug,
-} from "../state/navigation";
+} from "../../../../commons/state/src/navigation";
+import { FernLinkDropdown } from "../FernLinkDropdown";
+import { FernSelectionItem } from "../FernSelectionItem";
 
 export interface VersionDropdownItem {
   versionId: string;

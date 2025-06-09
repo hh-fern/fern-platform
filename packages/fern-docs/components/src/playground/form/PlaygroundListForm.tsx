@@ -11,7 +11,10 @@ import {
 import { cn } from "@fern-docs/components";
 import { FernButton } from "@fern-docs/components";
 
-import { getEmptyValueForType, shouldRenderInline } from "../utils";
+import {../../../../../commons/docs-utils/playground
+  getEmptyValueForType,
+  shouldRenderInline,
+} from "../../../../../commons/docs-utils/utils";
 import { PlaygroundTypeReferenceForm } from "./PlaygroundTypeReferenceForm";
 
 interface PlaygroundListFormProps {

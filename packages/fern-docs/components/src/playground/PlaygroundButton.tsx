@@ -9,8 +9,8 @@ import { FernTooltip, FernTooltipProvider } from "@fern-docs/components";
 import { cn } from "@fern-docs/components";
 import { ButtonLink } from "@fern-docs/components/FernLinkButton";
 
-import { usePlaygroundSettings } from "../hooks/usePlaygroundSettings";
-import { conformExplorerRoute } from "./utils/explorer-route";
+import { conformExplorerRoute } from "../../../../commons/docs-utils/src/playground/explorer-route";
+import { usePlaygroundSettings } from "../../../../commons/hooks/src/usePlaygroundSettings";
 
 export const PlaygroundButton: FC<{
   state: FernNavigation.NavigationNodeApiLeaf;

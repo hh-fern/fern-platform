@@ -7,9 +7,9 @@ import { PlaygroundAuthState } from "@fern-api/docs-utils/types";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import { Button, SemanticBadge } from "@fern-docs/components";
-import { PLAYGROUND_AUTH_STATE_ATOM } from "@fern-docs/components/state/playground";
 
-import { pascalCaseHeaderKey } from "../utils/header-key-case";
+import { pascalCaseHeaderKey } from "../../../../../commons/docs-utils/utils/header-key-case";
+import { PLAYGROUND_AUTH_STATE_ATOM }../../../../../commons/docs-utils/playground/header-key-case
 
 interface PlaygroundCardTriggerManualProps {
   auth: APIV1Read.ApiAuth;

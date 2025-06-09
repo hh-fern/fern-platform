@@ -3,7 +3,7 @@ import "server-only";
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { getFernToken } from "@fern-api/docs-utils";
 
-import { SetFernUser } from "./state/fern-user";
+import { SetFernUser } from "../../../commons/state/src/fern-user";
 
 export async function FernUser({
   host,

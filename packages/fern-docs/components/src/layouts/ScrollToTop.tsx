@@ -2,11 +2,10 @@
 
 import React from "react";
 
+import { scrollToRoute } from "@fern-api/docs-utils/component/anchor";
+import { isExplorerRoute } from "@fern-api/docs-utils/playground/explorer-route";
+import { useCurrentPathname } from "@fern-ui/hooks/use-current-pathname";
 import { usePrevious } from "@fern-ui/react-commons";
-
-import { useCurrentPathname } from "../hooks/use-current-pathname";
-import { isExplorerRoute } from "../playground/utils/explorer-route";
-import { scrollToRoute } from "../util/anchor";
 
 export function ScrollToTop() {
   const pathname = useCurrentPathname();

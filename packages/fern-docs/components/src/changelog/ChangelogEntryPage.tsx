@@ -10,10 +10,10 @@ import { FernLink } from "@fern-docs/components/FernLink";
 import { Separator } from "@fern-docs/components/Separator";
 import { HideBuiltWithFern } from "@fern-docs/components/built-with-fern";
 
+import { HideAsides, SetLayout } from "../../../../commons/state/src/layout";
 import { AsideAwareDiv } from "../layouts/AsideAwareDiv";
 import { FooterLayout } from "../layouts/FooterLayout";
 import { MdxSerializer } from "../mdx/mdx-serializer";
-import { HideAsides, SetLayout } from "../state/layout";
 import { ChangelogContentLayout } from "./ChangelogContentLayout";
 
 export default function ChangelogEntryPage({

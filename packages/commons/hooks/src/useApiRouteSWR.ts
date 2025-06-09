@@ -4,7 +4,8 @@ import useSWR, { Fetcher, SWRConfiguration, SWRResponse } from "swr";
 import useSWRImmutable from "swr/immutable";
 import { z } from "zod";
 
-import { withSkewProtection } from "../util/withSkewProtection";
+import { withSkewProtection } from "@fern-api/docs-utils/component/withSkewProtection";
+
 import { FernDocsApiRoute, useApiRoute } from "./useApiRoute";
 
 interface Options<T> extends SWRConfiguration<T, Error, Fetcher<T>> {

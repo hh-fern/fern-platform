@@ -9,8 +9,11 @@ import { Drawer } from "vaul";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 
-import { useUrlParams } from "../hooks/use-url-params";
-import { useHeaderHeight, useViewportSize } from "../hooks/useViewportSize";
+import { useUrlParams } from "../../../../commons/hooks/src/use-url-params";
+import {
+  useHeaderHeight,
+  useViewportSize,
+} from "../../../../commons/hooks/src/useViewportSize";
 
 export function PlaygroundDrawer({ children }: { children: React.ReactNode }) {
   const [snap, setSnap] = React.useState<number | string | null>(null);

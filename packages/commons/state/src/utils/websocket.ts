@@ -2,18 +2,17 @@ import { compact } from "es-toolkit/array";
 import { pick } from "es-toolkit/object";
 
 import { FernUser } from "@fern-api/docs-auth";
+import {
+  getEmptyValueForObjectProperties,
+  getEmptyValueForType,
+} from "@fern-api/docs-utils/playground";
+import { pascalCaseHeaderKeys } from "@fern-api/docs-utils/playground/header-key-case";
 import { PlaygroundWebSocketRequestFormState } from "@fern-api/docs-utils/types";
 import type {
   ObjectProperty,
   WebSocketContext,
 } from "@fern-api/fdr-sdk/api-definition";
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
-
-import {
-  getEmptyValueForObjectProperties,
-  getEmptyValueForType,
-} from "./default-values";
-import { pascalCaseHeaderKeys } from "./header-key-case";
 
 export function getInitialWebSocketRequestFormState(
   context: WebSocketContext,

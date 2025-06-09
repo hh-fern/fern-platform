@@ -7,10 +7,10 @@ import { HydrationBoundary } from "jotai-ssr";
 
 import { cn } from "@fern-docs/components";
 
+import { isSidebarFixedAtom } from "../../../../../commons/state/src/layout";
 import { Separator } from "../../Separator";
 import { FERN_FOOTER_ID } from "../../constants";
 import { HeaderTabsRoot } from "../../header/HeaderTabsRoot";
-import { isSidebarFixedAtom } from "../../state/layout";
 import { FernHeader } from "./fern-header";
 import { MainCtx } from "./mobile-menu";
 import { SidebarNav } from "./side-nav";

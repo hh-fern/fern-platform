@@ -8,8 +8,8 @@ import { type UrlObject, format, parse, resolve } from "url";
 
 import { conformTrailingSlash } from "@fern-api/docs-utils";
 
-import { useCurrentPathname } from "./hooks/use-current-pathname";
-import { useDomain } from "./state/domain";
+import { useCurrentPathname } from "../../../commons/hooks/src/use-current-pathname";
+import { useDomain } from "../../../commons/state/src/domain";
 
 export const FernLink = React.forwardRef<
   HTMLAnchorElement,

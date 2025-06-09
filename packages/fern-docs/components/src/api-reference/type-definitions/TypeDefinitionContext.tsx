@@ -8,8 +8,8 @@ import { TypeDefinition } from "@fern-api/fdr-sdk/api-definition";
 import { ErrorBoundary } from "@fern-docs/components/error-boundary";
 import { useLazyRef } from "@fern-ui/react-commons";
 
-import { useCurrentAnchor } from "../../hooks/use-anchor";
-import { useCurrentPathname } from "../../hooks/use-current-pathname";
+import { useCurrentAnchor } from "../../../../../commons/hooks/src/use-anchor";
+import { useCurrentPathname } from "../../../../../commons/hooks/src/use-current-pathname";
 import { JsonPropertyPath } from "../examples/JsonPropertyPath";
 import { JsonPropertyPathPart } from "../examples/JsonPropertyPath";
 

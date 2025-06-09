@@ -17,31 +17,31 @@ import { FeatureFlagProvider } from "@fern-docs/components/feature-flags/Feature
 import { FernUser } from "@fern-docs/components/fern-user";
 import SearchV2 from "@fern-docs/components/search";
 import { generateMetadataFromConfig } from "@fern-docs/components/seo";
-import { SetColors } from "@fern-docs/components/state/colors";
-import { DarkCode } from "@fern-docs/components/state/dark-code";
-import { Domain } from "@fern-docs/components/state/domain";
-import { LaunchDarklyInfo } from "@fern-docs/components/state/feature-flags";
-import { DefaultLanguage } from "@fern-docs/components/state/language";
-import { SetLogoText } from "@fern-docs/components/state/logo-text";
-import {
-  RootNodeProvider,
-  SetBasePath,
-} from "@fern-docs/components/state/navigation";
-import {
-  getAllSidebarRootNodes,
-  getSidebarRootNodeIdToChildToParentsMap,
-} from "@fern-docs/components/state/navigation-server";
-import {
-  SetIsAskAiEnabled,
-  SetIsDefaultSearchFilterOff,
-} from "@fern-docs/components/state/search";
-import { Whitelabeled } from "@fern-docs/components/state/whitelabeled";
 import { withJsConfig } from "@fern-docs/components/with-js-config";
 import {
   getCustomerAnalytics as deprecated_getCustomerAnalytics,
   getLaunchDarklySettings,
 } from "@fern-docs/edge-config";
 
+import { SetColors } from "../../../../../../commons/state/src/colors";
+import { DarkCode } from "../../../../../../commons/state/src/dark-code";
+import { Domain } from "../../../../../../commons/state/src/domain";
+import { LaunchDarklyInfo } from "../../../../../../commons/state/src/feature-flags";
+import { DefaultLanguage } from "../../../../../../commons/state/src/language";
+import { SetLogoText } from "../../../../../../commons/state/src/logo-text";
+import {
+  RootNodeProvider,
+  SetBasePath,
+} from "../../../../../../commons/state/src/navigation";
+import {
+  getAllSidebarRootNodes,
+  getSidebarRootNodeIdToChildToParentsMap,
+} from "../../../../../../commons/state/src/navigation-server";
+import {
+  SetIsAskAiEnabled,
+  SetIsDefaultSearchFilterOff,
+} from "../../../../../../commons/state/src/search";
+import { Whitelabeled } from "../../../../../../commons/state/src/whitelabeled";
 import { GlobalStyles } from "../../global-styles";
 import { ThemeProvider } from "../../theme";
 

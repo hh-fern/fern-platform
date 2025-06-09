@@ -16,8 +16,8 @@ import { useCallbackOne } from "use-memo-one";
 import { cn } from "@fern-docs/components";
 import type { TableOfContentsItem as TableOfContentsItemType } from "@fern-docs/mdx";
 
+import { useCurrentAnchor } from "../../../../commons/hooks/src/use-anchor";
 import { WithFeatureFlags } from "../feature-flags/WithFeatureFlags";
-import { useCurrentAnchor } from "../hooks/use-anchor";
 import { TableOfContentsItem } from "./TableOfContentsItem";
 import { useTableOfContentsObserver } from "./useTableOfContentsObserver";
 

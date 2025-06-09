@@ -3,7 +3,7 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 
-import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isLocal } from "@fern-api/docs-utils/component/isLocal";
 
 export const searchDialogOpenAtom = atom(false);
 export const searchInitializedAtom = atom(false);

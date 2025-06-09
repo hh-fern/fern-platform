@@ -9,8 +9,8 @@ import { cn } from "@fern-docs/components";
 import { FernTooltip } from "@fern-docs/components";
 import { FernLinkButton } from "@fern-docs/components/FernLinkButton";
 
-import { HttpMethodBadge } from "../../badges/http-method-badge";
-import { conformExplorerRoute } from "../utils/explorer-route";
+import { conformExplorerRoute } from "../../../../../commons/docs-utils/utils/explorer-route";
+import { HttpMethodBadge } from "../..../../../../../commons/docs-utils/playground/explorer-route
 
 interface PlaygroundEndpointSelectorLeafNodeProps {
   node: FernNavigation.EndpointNode | FernNavigation.WebSocketNode;

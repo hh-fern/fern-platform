@@ -6,4 +6,4 @@ export * from "./oauth";
 export * from "./serialize";
 export * from "./snippets";
 export * from "./utils";
-export * from "./websocket";
+export * from "../../../state/src/utils/websocket";

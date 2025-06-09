@@ -1,5 +1,5 @@
-import { useBasePath } from "../state/navigation";
-import { getApiRouteSupplier } from "../util/getApiRouteSupplier";
+import { getApiRouteSupplier } from "@fern-api/docs-utils/component/getApiRouteSupplier";
+import { useBasePath } from "@fern-ui/state/navigation";
 
 export type FernDocsApiRoute = `/api/fern-docs/${string}`;
 

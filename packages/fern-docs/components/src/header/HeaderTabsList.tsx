@@ -4,11 +4,11 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { Lock } from "lucide-react";
 
 import { slugToHref } from "@fern-api/docs-utils";
+import { processIcon } from "@fern-api/docs-utils/component/processIcon";
 import { TabChild, hasRedirect } from "@fern-api/fdr-sdk/navigation";
 import { cn } from "@fern-docs/components";
 
 import { FernLinkTab } from "../FernLinkTab";
-import { processIcon } from "../util/processIcon";
 
 export function HeaderTabsList({
   tabs,

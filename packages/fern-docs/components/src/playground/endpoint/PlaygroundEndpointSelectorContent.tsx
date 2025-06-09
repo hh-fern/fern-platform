@@ -16,9 +16,9 @@ import {
 } from "@fern-docs/components";
 import { BuiltWithFern } from "@fern-docs/components/built-with-fern";
 
-import { useCurrentPathname } from "../../hooks/use-current-pathname";
-import { conformExplorerRoute } from "../utils/explorer-route";
-import { ApiGroup } from "../utils/flatten-apis";
+import { conformExplorerRoute } from "../../../../../commons/docs-utils/utils/explorer-route";
+import { ApiGroup } from "../../../../../../../../../commons/docs-utils/playground/explorer-route
+import { useCurrentPathnam../../../../../commons/docs-utils/playground/flatten-apisnt-pathname";
 import { PlaygroundEndpointSelectorLeafNode } from "./PlaygroundEndpointSelectorLeafNode";
 
 export interface PlaygroundEndpointSelectorContentProps {

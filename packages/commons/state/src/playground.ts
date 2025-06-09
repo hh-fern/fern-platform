@@ -12,6 +12,10 @@ import {
 import { useCallbackOne } from "use-memo-one";
 
 import {
+  getInitialEndpointRequestFormStateWithExample,
+  getInitialWebSocketRequestFormState,
+} from "@fern-api/docs-utils/playground";
+import {
   PLAYGROUND_AUTH_STATE_BASIC_AUTH_INITIAL,
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_INITIAL,
   PLAYGROUND_AUTH_STATE_HEADER_INITIAL,
@@ -32,11 +36,6 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
-import {
-  getInitialEndpointRequestFormStateWithExample,
-  getInitialWebSocketRequestFormState,
-} from "../playground/utils";
-import { pascalCaseHeaderKeys } from "../playground/utils/header-key-case";
 import { useDomain } from "./domain";
 import { fernUserAtom } from "./fern-user";
 import { atomWithStorageValidation } from "./utils/atomWithStorageValidation";

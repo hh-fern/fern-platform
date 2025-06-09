@@ -4,7 +4,7 @@ import { Atom } from "jotai";
 
 import { FernUser } from "@fern-api/docs-auth";
 
-import { useFernUser } from "../../../state/fern-user";
+import { useFernUser } from "../../../../../../commons/state/src/fern-user";
 
 export interface IfProps {
   /**

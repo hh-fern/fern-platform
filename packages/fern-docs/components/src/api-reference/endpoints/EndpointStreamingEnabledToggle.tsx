@@ -8,8 +8,8 @@ import { slugToHref } from "@fern-api/docs-utils";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 
-import { useCurrentSlug } from "../../hooks/use-current-pathname";
-import { FERN_STREAM_ATOM } from "../../state/stream";
+import { useCurrentSlug } from "../../../../../commons/hooks/src/use-current-pathname";
+import { FERN_STREAM_ATOM } from "../../../../../commons/state/src/stream";
 import { StreamingEnabledToggle } from "./StreamingEnabledToggle";
 
 export function EndpointStreamingEnabledToggle({

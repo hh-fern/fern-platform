@@ -1,7 +1,7 @@
 "use client";
 
+import { useDispatchSidebarAction } from "../../../commons/state/src/navigation";
 import { FernLink } from "./FernLink";
-import { useDispatchSidebarAction } from "./state/navigation";
 
 export function FernLinkTab({
   children,

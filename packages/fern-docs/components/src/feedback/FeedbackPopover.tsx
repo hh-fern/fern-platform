@@ -10,8 +10,8 @@ import * as Selection from "selection-popover";
 import { cn } from "@fern-docs/components";
 import { FernButton, FernButtonGroup } from "@fern-docs/components";
 
+import { useSelection } from "../../../../commons/hooks/src/useSelection";
 import { track } from "../analytics";
-import { useSelection } from "../hooks/useSelection";
 import { FeedbackForm } from "./FeedbackForm";
 
 const MotionFernButton = m.create(FernButton);

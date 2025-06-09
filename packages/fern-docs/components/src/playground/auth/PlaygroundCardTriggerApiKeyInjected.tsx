@@ -9,12 +9,12 @@ import { APIKeyInjectionConfigEnabled } from "@fern-api/docs-auth";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { FernButton, FernCard } from "@fern-docs/components";
 
-import { useApiRoute } from "../../hooks/useApiRoute";
-import { Callout } from "../../mdx/components/callout";
+import { useApiRoute } from "../../../../../commons/hooks/src/useApiRoute";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_ATOM,
-} from "../../state/playground";
+} from "../../../../../commons/state/src/playground";
+import { Callout } from "../../mdx/components/callout";
 import { PlaygroundAuthorizationForm } from "./PlaygroundAuthorizationForm";
 
 interface PlaygroundCardTriggerApiKeyInjectedProps {

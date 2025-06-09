@@ -9,8 +9,11 @@ import { type APIV1Read, FdrAPI } from "@fern-api/fdr-sdk/client/types";
 import { SnippetTemplateResolver } from "@fern-api/template-resolver";
 import { unknownToString } from "@fern-api/ui-core-utils";
 
-import { buildAuthHeaders, convertToCustomSnippetPayload } from "../utils";
-import { shouldRenderAuth } from "../utils/should-render-auth";
+import {
+  buildAuthHeaders,
+  convertToCustomSnippetPayload,
+} from "../../../../../commons/docs-utils/src/playground";
+import { shouldRenderAuth } from "../../../../../commons/docs-utils/src/playground/should-render-auth";
 import { CurlSnippetBuilder } from "./builders/curl";
 import { PythonRequestSnippetBuilder } from "./builders/python";
 import { TypescriptFetchSnippetBuilder } from "./builders/typescript";

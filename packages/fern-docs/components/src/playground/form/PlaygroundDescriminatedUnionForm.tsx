@@ -17,7 +17,10 @@ import {
   FernSegmentedControl,
 } from "@fern-docs/components";
 
-import { castToRecord, getEmptyValueForObjectProperties } from "../utils";
+import {../../../../../commons/docs-utils/playground
+  castToRecord,
+  getEmptyValueForObjectProperties,
+} from "../../../../../commons/docs-utils/utils";
 import { PlaygroundObjectPropertiesForm } from "./PlaygroundObjectPropertyForm";
 
 const Markdown = dynamic(() =>

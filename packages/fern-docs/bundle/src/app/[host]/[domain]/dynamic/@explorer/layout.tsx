@@ -3,7 +3,8 @@ import { getFernToken } from "@fern-api/docs-utils";
 import { InterceptedPlaygroundCloseButton } from "@fern-docs/components/playground/PlaygroundCloseButton";
 import { PlaygroundDrawer } from "@fern-docs/components/playground/PlaygroundDrawer";
 import { HorizontalSplitPane } from "@fern-docs/components/playground/VerticalSplitPane";
-import { ApiExplorerFlags } from "@fern-docs/components/state/api-explorer-flags";
+
+import { ApiExplorerFlags } from "../../../../../../../../commons/state/src/api-explorer-flags";
 
 export default async function ExplorerLayout({
   children,

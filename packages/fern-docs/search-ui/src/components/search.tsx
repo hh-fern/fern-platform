@@ -8,22 +8,6 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { z } from "zod";
 
 import { Feedback } from "@fern-docs/components/feedback/Feedback";
-import { useCurrentPathname } from "@fern-docs/components/hooks/use-current-pathname";
-import {
-  useSetTheme,
-  useThemeSwitchEnabled,
-} from "@fern-docs/components/hooks/use-theme";
-import { useApiRoute } from "@fern-docs/components/hooks/useApiRoute";
-import { useApiRouteSWRImmutable } from "@fern-docs/components/hooks/useApiRouteSWR";
-import { useCurrentVersionId } from "@fern-docs/components/state/navigation";
-import {
-  askAiAtom,
-  searchDialogOpenAtom,
-  searchInitializedAtom,
-  useIsAskAiEnabled,
-  useIsDefaultSearchFilterOff,
-} from "@fern-docs/components/state/search";
-import { atomWithStorageString } from "@fern-docs/components/state/utils/atomWithStorageString";
 import {
   CommandActions,
   CommandEmpty,
@@ -32,12 +16,29 @@ import {
   CommandSearchHits,
   DefaultDesktopBackButton,
   DesktopCommand,
-  DesktopCommandWithAskAI,
+  DesktopCommandWithAskAI,../../../../commons/state/src/utils/atomWithStorageString
   DesktopSearchDialog,
   SEARCH_INDEX,
   SearchClientRoot,
 } from "@fern-docs/search-ui";
 import { useEventCallback, useLazyRef } from "@fern-ui/react-commons";
+
+import { useCurrentPathname } from "../../../../commons/hooks/src/use-current-pathname";
+import {
+  useSetTheme,
+  useThemeSwitchEnabled,
+} from "../../../../commons/hooks/src/use-theme";
+import { useApiRoute } from "../../../../commons/hooks/src/useApiRoute";
+import { useApiRouteSWRImmutable } from "../../../../commons/hooks/src/useApiRouteSWR";
+import { useCurrentVersionId } from "../../../../commons/state/src/navigation";
+import {
+  askAiAtom,
+  searchDialogOpenAtom,
+  searchInitializedAtom,
+  useIsAskAiEnabled,
+  useIsDefaultSearchFilterOff,
+} from "../../../../commons/state/src/search";
+import { atomWithStorageString } from "../../../../commons/state/utils/atomWithStorageString";
 
 const ALGOLIA_USER_TOKEN_KEY = "algolia-user-token";
 

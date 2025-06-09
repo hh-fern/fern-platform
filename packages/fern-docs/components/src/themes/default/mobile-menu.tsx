@@ -22,8 +22,8 @@ import {
 } from "@fern-docs/components/constants";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 
-import { useCurrentPathname } from "../../hooks/use-current-pathname";
-import { useIsDismissableSidebarOpen } from "../../state/mobile";
+import { useCurrentPathname } from "../../../../../commons/hooks/src/use-current-pathname";
+import { useIsDismissableSidebarOpen } from "../../../../../commons/state/src/mobile";
 
 export const MainCtx = React.createContext<
   React.RefObject<HTMLDivElement | null>

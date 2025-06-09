@@ -27,7 +27,6 @@ export * from "./FernTextarea";
 export * from "./FernToast";
 export * from "./FernTooltip";
 export * from "./kbd";
-export * from "./util/shared-component-types";
 export * from "./syntax-highlighter";
 export * from "./shared-layout";
 export * from "./shared-page";

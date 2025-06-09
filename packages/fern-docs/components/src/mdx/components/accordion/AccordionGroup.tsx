@@ -2,7 +2,7 @@ import React from "react";
 
 import * as AccordionComponent from "@fern-docs/components";
 
-import { useCurrentAnchor } from "../../../hooks/use-anchor";
+import { useCurrentAnchor } from "../../../../../../commons/hooks/src/use-anchor";
 import { unwrapChildren } from "../../common/unwrap-children";
 
 export interface AccordionGroupProps {

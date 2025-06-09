@@ -8,8 +8,8 @@ import { X } from "lucide-react";
 import { FernButton } from "@fern-docs/components";
 import { tunnel } from "@fern-ui/react-commons";
 
+import { useUrlParams } from "../../../../commons/hooks/src/use-url-params";
 import { FernLinkButton } from "../FernLinkButton";
-import { useUrlParams } from "../hooks/use-url-params";
 
 export const closeButton = tunnel();
 

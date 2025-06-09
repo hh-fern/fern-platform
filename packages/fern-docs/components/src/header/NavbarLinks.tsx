@@ -9,7 +9,10 @@ import { cn } from "@fern-docs/components";
 import { FernLinkButton } from "@fern-docs/components/FernLinkButton";
 import { FaIconServer } from "@fern-docs/components/fa-icon-server";
 
-import type { NavbarLink, NavbarLink as NavbarLinkType } from "../state/types";
+import type {
+  NavbarLink,
+  NavbarLink as NavbarLinkType,
+} from "../../../../commons/docs-utils/src/types/navbar";
 import { GitHubWidget } from "./GitHubWidget";
 import { WithReturnTo } from "./WithReturnTo";
 

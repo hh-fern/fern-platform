@@ -15,9 +15,12 @@ import prettyBytes from "pretty-bytes";
 import { cn } from "@fern-docs/components";
 import { FernButton, FernButtonGroup, FernCard } from "@fern-docs/components";
 
+import {
+  isValidFile,
+  uniqueFiles,../../../../../commons/docs-utils/playground/utils
+} from "../../../../../commons/docs-utils/utils/utils";
 import { WithLabelInternal } from "../WithLabel";
 import { useAudioRecorder } from "../hooks/useAudioRecorder";
-import { isValidFile, uniqueFiles } from "../utils/utils";
 import { PlaygroundAudioControls } from "./PlaygroundAudioControls";
 import { WaveformAnimation } from "./PlaygroundWaveformAnimation";
 

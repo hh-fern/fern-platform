@@ -6,7 +6,7 @@ import { useAtomValue } from "jotai";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
-import { FERN_STREAM_ATOM } from "../../state/stream";
+import { FERN_STREAM_ATOM } from "../../../../../commons/state/src/stream";
 import { SidebarApiLeafNode } from "./SidebarApiLeafNode";
 
 interface SidebarEndpointPairNodeProps {

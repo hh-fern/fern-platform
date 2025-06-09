@@ -17,8 +17,12 @@ import { FernButton, FernDropdown } from "@fern-docs/components";
 import { withErrorBoundary } from "@fern-docs/components/error-boundary";
 import { useBooleanState } from "@fern-ui/react-commons";
 
+import {
+  castToRecord,../../../../../commons/docs-utils/playground
+  getEmptyValueForType,
+  isExpandable,
+} from "../../../../../commons/docs-utils/utils";
 import { renderTypeShorthandRoot } from "../../type-shorthand";
-import { castToRecord, getEmptyValueForType, isExpandable } from "../utils";
 import { PlaygroundAdditionalProperties } from "./PlaygroundAdditionalProperties";
 import { PlaygroundTypeReferenceForm } from "./PlaygroundTypeReferenceForm";
 

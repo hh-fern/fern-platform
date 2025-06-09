@@ -7,7 +7,10 @@ import {
 } from "@fern-docs/components/constants";
 import { useIsDesktop } from "@fern-ui/react-commons";
 
-import { HideAsides, useIsSidebarFixed } from "../../state/layout";
+import {
+  HideAsides,
+  useIsSidebarFixed,
+} from "../../../../../commons/state/src/layout";
 import { MobileMenu } from "./mobile-menu";
 
 export function SidebarNav({

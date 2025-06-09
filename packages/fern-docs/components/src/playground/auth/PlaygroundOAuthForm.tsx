@@ -14,16 +14,16 @@ import {
   FernTooltip,
   FernTooltipProvider,
 } from "@fern-docs/components";
+
+import { oAuthClientCredentialReferencedEndpointLoginFlow } from "../../../../../commons/docs-utils/utils/oauth";
+import { usePlaygroundBaseUrl } from "../../../../../commons/docs-utils/utils/select-environment";
 import {
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
   usePlaygroundEndpointFormState,
-} from "@fern-docs/components/state/playground";
-
+} from "../../../../../commons/state/src/playground";
 import { Callout } from "../../mdx/components/callout";
-import { PasswordInputGroup } from "../PasswordInputGroup";
-import { PlaygroundEndpointForm } from "../endpoint";
-import { oAuthClientCredentialReferencedEndpointLoginFlow } from "../utils/oauth";
-import { usePlaygroundBaseUrl } from "../utils/select-environment";
+import { PasswordInputGroup } from "../PasswordInputGroup";../../../../../commons/docs-utils/playground/oauth
+import { PlaygroundEndpointForm } from../../../../../commons/docs-utils/playground/select-environment
 import { useClosePlaygroundAuthorizationFormCard } from "./PlaygroundAuthorizationFormCardRoot";
 
 export function FoundOAuthReferencedEndpointForm({

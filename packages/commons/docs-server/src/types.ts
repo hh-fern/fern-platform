@@ -2,6 +2,9 @@ import { z } from "zod";
 
 import { AuthEdgeConfig } from "@fern-api/docs-auth";
 import { EdgeFlags, HttpMethod } from "@fern-api/docs-utils";
+import { FernColorTheme } from "@fern-api/docs-utils/types/colors";
+import { FernLayoutConfig } from "@fern-api/docs-utils/types/fern-layout-config";
+import { FileData } from "@fern-api/docs-utils/types/file-data";
 import { ApiDefinition, DocsV1Read, FernNavigation } from "@fern-api/fdr-sdk";
 import {
   AuthScheme,
@@ -12,40 +15,7 @@ import {
 import { EndpointId, Slug, TypeId } from "@fern-api/fdr-sdk/navigation";
 
 import { AuthState } from "./auth/getAuthState";
-import type { FernColorPalette } from "./generateFernColors";
 import { FernFonts } from "./generateFonts";
-
-export type RgbaColor = { r: number; g: number; b: number; a?: number };
-
-export interface FileData {
-  src: string;
-  height?: number;
-  width?: number;
-  blurDataURL?: string;
-  blurWidth?: number;
-  blurHeight?: number;
-  alt?: string;
-}
-
-export interface FernColorTheme extends FernColorPalette {
-  logo?: FileData;
-  backgroundImage?: FileData;
-  /**
-   * If true, render a linear gradient in the background using the accent color
-   */
-  backgroundGradient: boolean;
-}
-
-export interface FernLayoutConfig {
-  logoHeight: number;
-  sidebarWidth: number;
-  headerHeight: number;
-  pageWidth: number | undefined;
-  contentWidth: number;
-  tabsPlacement: "SIDEBAR" | "HEADER";
-  searchbarPlacement: "SIDEBAR" | "HEADER" | "HEADER_TABS";
-  isHeaderDisabled: boolean;
-}
 
 export const DocsMetadataSchema = z.object({
   domain: z.string(),

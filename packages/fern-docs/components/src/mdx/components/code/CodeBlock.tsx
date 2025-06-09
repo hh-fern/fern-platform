@@ -8,7 +8,7 @@ import {
   cn,
 } from "@fern-docs/components";
 
-import { useIsDarkCode } from "../../../state/dark-code";
+import { useIsDarkCode } from "../../../../../../commons/state/src/dark-code";
 import { applyTemplates, useTemplate } from "./Template";
 
 export function CodeBlock(props: {

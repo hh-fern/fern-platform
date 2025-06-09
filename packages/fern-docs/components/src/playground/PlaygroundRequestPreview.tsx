@@ -8,14 +8,14 @@ import { PlaygroundEndpointRequestFormState } from "@fern-api/docs-utils/types/p
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { FernSyntaxHighlighter } from "@fern-docs/components";
 
-import { isFileForgeHackEnabledAtom } from "../state/api-explorer-flags";
+import { usePlaygroundBaseUrl } from "../../../../commons/docs-utils/src/playground/select-environment";
+import { isFileForgeHackEnabledAtom } from "../../../../commons/state/src/api-explorer-flags";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
-} from "../state/playground";
+} from "../../../../commons/state/src/playground";
 import { PlaygroundCodeSnippetResolverBuilder } from "./code-snippets/resolver";
 import { useSnippet } from "./code-snippets/useSnippet";
-import { usePlaygroundBaseUrl } from "./utils/select-environment";
 
 interface PlaygroundRequestPreviewProps {
   context: EndpointContext;

@@ -8,8 +8,8 @@ import { noop } from "ts-essentials";
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { cn } from "@fern-docs/components";
 
-import { WithLabel } from "../WithLabel";
-import { castToRecord } from "../utils";
+import { castToRecord } from "../../../../../commons/docs-utils/utils";
+import { WithLabel } from "../../../../../../commons/docs-utils/playground
 import { PlaygroundMapForm } from "./PlaygroundMapForm";
 
 const ADDITIONAL_PROPERTIES_KEY_SHAPE = {

@@ -4,10 +4,10 @@ import { ReactNode } from "react";
 
 import { History } from "lucide-react";
 
+import { Changelog } from "@fern-api/docs-utils/component/dateUtils";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
 import { WithFeatureFlags } from "../../feature-flags/WithFeatureFlags";
-import { Changelog } from "../../util/dateUtils";
 import { SidebarSlugLink } from "../SidebarLink";
 
 export interface SidebarChangelogNodeProps {

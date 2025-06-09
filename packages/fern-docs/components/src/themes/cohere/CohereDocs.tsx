@@ -13,8 +13,8 @@ import {
 } from "@fern-docs/components/constants";
 import { HeaderTabsRoot } from "@fern-docs/components/header/HeaderTabsRoot";
 
-import { useCurrentPathname } from "../../hooks/use-current-pathname";
-import { SCROLL_BODY_ATOM } from "../../state/viewport";
+import { useCurrentPathname } from "../../../../../commons/hooks/src/use-current-pathname";
+import { SCROLL_BODY_ATOM } from "../../../../../commons/state/src/viewport";
 import { FernHeader } from "../default/fern-header";
 import { MainCtx } from "../default/mobile-menu";
 import { SidebarNav } from "../default/side-nav";

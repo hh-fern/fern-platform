@@ -11,18 +11,20 @@ import {
   buildRequestUrl,
 } from "@fern-api/fdr-sdk/api-definition";
 import { FernTooltipProvider } from "@fern-docs/components";
+import { usePlaygroundSettings } from "@fern-ui/hooks/usePlaygroundSettings";
 import { usePrevious } from "@fern-ui/react-commons";
-
-import { usePlaygroundSettings } from "../../hooks/usePlaygroundSettings";
-import { jotaiStore } from "../../state/jotai-provider";
+// import { buildAuthHeaders } from "@fern-api/docs-utils/utils";
+// import { usePlaygroundBaseUrl } from "@fern-api/docs-utils/utils/select-environment";
+// import { usePlaygroundSettings } from "@fern-ui/hooks/usePlaygroundSettings";
+// import { jotaiStore } from "@fern-ui/state/jotai-provider";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   usePlaygroundWebsocketFormState,
-} from "../../state/playground";
-import { PlaygroundEndpointPath } from "../endpoint/PlaygroundEndpointPath";
+} from "@fern-ui/state/playground";
+
 import { useWebsocketMessages } from "../hooks/useWebsocketMessages";
-import { buildAuthHeaders } from "../utils";
-import { usePlaygroundBaseUrl } from "../utils/select-environment";
+// import { PlaygroundEndpointPath } from "@fern-api/docs-utils/playground";
+// import { useWebsocketMessages } from "@fern-api/docs-utils/playground/select-environment";
 import { PlaygroundWebSocketContent } from "./PlaygroundWebSocketContent";
 
 // TODO: decide if this should be an env variable, and if we should move REST proxy to the same (or separate) cloudflare worker

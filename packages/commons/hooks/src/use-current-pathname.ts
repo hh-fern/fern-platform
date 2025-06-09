@@ -2,7 +2,7 @@ import { usePathname } from "next/navigation";
 
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 
-import { conformExplorerRoute } from "../playground/utils/explorer-route";
+import { conformExplorerRoute } from "../../docs-utils/src/playground/explorer-route";
 
 export function useCurrentPathname() {
   const pathname = usePathname();

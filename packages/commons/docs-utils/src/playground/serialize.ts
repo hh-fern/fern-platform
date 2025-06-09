@@ -14,7 +14,7 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import { assertNever, isNonNullish } from "@fern-api/ui-core-utils";
 
-import { blobToDataURL } from "../fetch-utils/blobToDataURL";
+import { blobToDataURL } from "../../../../fern-docs/components/src/playground/fetch-utils/blobToDataURL";
 
 export const serializeFormStateBody = async ({
   shape,

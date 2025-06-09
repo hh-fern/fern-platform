@@ -1,11 +1,11 @@
 import { decodeJwt } from "jose";
 import { noop } from "ts-essentials";
 
-import { PlaygroundAuthState } from "@fern-api/docs-utils/types";
 import { obfuscateSecret } from "@fern-api/fdr-sdk";
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 
+import { PlaygroundAuthState } from "../types";
 import { pascalCaseHeaderKey } from "./header-key-case";
 import {
   OAuthClientCredentialReferencedEndpointLoginFlowProps,
@@ -75,7 +75,7 @@ export function buildAuthHeaders(
                   try {
                     const payload = decodeJwt(token);
                     if (payload.exp && new Date().getTime() > payload.exp) {
-                      oAuthClientCredentialReferencedEndpointLoginFlow({
+                      void oAuthClientCredentialReferencedEndpointLoginFlow({
                         formState,
                         endpoint,
                         referencedEndpoint,

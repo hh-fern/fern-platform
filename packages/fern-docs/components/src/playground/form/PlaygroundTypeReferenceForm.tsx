@@ -20,7 +20,7 @@ import {
 } from "@fern-docs/components";
 import { withErrorBoundary } from "@fern-docs/components/error-boundary";
 
-import { hasVoiceIdPlaygroundFormAtom } from "../../state/api-explorer-flags";
+import { hasVoiceIdPlaygroundFormAtom } from "../../../../../commons/state/src/api-explorer-flags";
 import { WithLabel } from "../WithLabel";
 import { PlaygroundDiscriminatedUnionForm } from "./PlaygroundDescriminatedUnionForm";
 import { PlaygroundElevenLabsVoiceIdForm } from "./PlaygroundElevenLabsVoiceIdForm";

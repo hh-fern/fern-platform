@@ -4,8 +4,8 @@ import React from "react";
 
 import { FernScrollArea, cn } from "@fern-docs/components";
 
+import { useDismountMeasureSidebarScrollPosition } from "../../../../commons/state/src/sidebar-scroll";
 import { FERN_SIDEBAR_SCROLL_AREA_ID } from "../constants";
-import { useDismountMeasureSidebarScrollPosition } from "../state/sidebar-scroll";
 import { MobileSidebarHeaderLinks } from "./MobileSidebarHeaderLinks";
 import { SidebarFixedItemsSection } from "./SidebarFixedItemsSection";
 import { ThemeSwitch } from "./theme-switch";

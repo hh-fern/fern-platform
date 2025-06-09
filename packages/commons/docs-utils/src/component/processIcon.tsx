@@ -3,8 +3,8 @@ import { ReactNode } from "react";
 import { NavigationNode } from "@fern-api/fdr-sdk/navigation";
 import { hasMetadata } from "@fern-api/fdr-sdk/navigation";
 
-import { FaIconServer } from "../fa-icon-server";
-import { NoZoom } from "../mdx/components/html/image";
+import { FaIconServer } from "../../../fern-docs/components/src/fa-icon-server";
+import { NoZoom } from "../../../fern-docs/components/src/mdx/components/html/image";
 
 export const processIcon = (
   node: NavigationNode,

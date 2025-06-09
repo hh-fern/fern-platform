@@ -11,7 +11,8 @@ import {
 import { SemanticColor } from "@fern-api/docs-utils";
 import { cn } from "@fern-docs/components";
 import { CopyToClipboardButton } from "@fern-docs/components";
-import { useIsDarkCode } from "@fern-docs/components/state/dark-code";
+
+import { useIsDarkCode } from "../../../../../commons/state/src/dark-code";
 
 export declare namespace TitledExample {
   export interface Props {

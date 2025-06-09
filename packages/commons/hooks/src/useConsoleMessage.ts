@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useIsWhitelabeled } from "../state/whitelabeled";
+import { useIsWhitelabeled } from "../../state/src/whitelabeled";
 
 export const useConsoleMessage = (): void => {
   const hasBeenCalled = React.useRef(false);

@@ -14,13 +14,13 @@ import { Separator } from "@fern-docs/components/Separator";
 import { HideBuiltWithFern } from "@fern-docs/components/built-with-fern";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 
+import { useCurrentAnchor } from "../../../../commons/hooks/src/use-anchor";
+import { SetLayout } from "../../../../commons/state/src/layout";
+import { SCROLL_BODY_ATOM } from "../../../../commons/state/src/viewport";
 import { BottomNavigationClient } from "../bottom-nav-client";
-import { useCurrentAnchor } from "../hooks/use-anchor";
 import { AsideAwareDiv } from "../layouts/AsideAwareDiv";
 import { FooterLayout } from "../layouts/FooterLayout";
 import { TableOfContentsLayout } from "../layouts/TableOfContentsLayout";
-import { SetLayout } from "../state/layout";
-import { SCROLL_BODY_ATOM } from "../state/viewport";
 import { ChangelogContentLayout } from "./ChangelogContentLayout";
 
 function flattenChangelogEntries(

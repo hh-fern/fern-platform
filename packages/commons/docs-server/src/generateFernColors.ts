@@ -1,11 +1,14 @@
 import * as RadixColors from "@radix-ui/colors";
 import Color from "colorjs.io";
 
-import { FERN_COLOR_ACCENT } from "@fern-api/docs-utils";
+import { FERN_COLOR_ACCENT } from "@fern-api/docs-utils/constants";
+import {
+  ColorPalette,
+  FernColorPalette,
+} from "@fern-api/docs-utils/types/colors";
+import { ArrayOf12 } from "@fern-api/docs-utils/types/colors";
 
 import {
-  ArrayOf12,
-  ColorPalette,
   darkGrayColors,
   generateRadixColors,
   lightGrayColors,
@@ -121,18 +124,6 @@ function generateColorPalette(opts: {
     grayScaleWideGamut,
     grayScaleAlphaWideGamut,
   };
-}
-
-export interface FernColorPalette extends Omit<ColorPalette, "background"> {
-  border?: string;
-  accent: string;
-  sidebarBackground?: string;
-  sidebarBackgroundTheme?: "light" | "dark";
-  headerBackground?: string;
-  headerBackgroundTheme?: "light" | "dark";
-  cardBackground?: string;
-  background?: string;
-  themeColor: string;
 }
 
 export function generateFernColorPalette({

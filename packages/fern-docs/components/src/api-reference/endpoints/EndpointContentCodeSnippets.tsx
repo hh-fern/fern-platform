@@ -15,8 +15,8 @@ import {
 } from "@fern-docs/components";
 import { WebSocketMessages } from "@fern-docs/components/api-reference/websockets/WebSocketMessages";
 
+import { usePlaygroundBaseUrl } from "../../../../../commons/docs-utils/src/playground/select-environment";
 import { PlaygroundButtonTray } from "../../playground/PlaygroundButtonTray";
-import { usePlaygroundBaseUrl } from "../../playground/utils/select-environment";
 import { AudioExample } from "../examples/AudioExample";
 import {
   CodeSnippetExample,

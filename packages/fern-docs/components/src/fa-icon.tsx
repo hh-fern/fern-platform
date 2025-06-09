@@ -5,7 +5,7 @@ import React from "react";
 import { isEqual } from "es-toolkit/predicate";
 import useSWRImmutable from "swr/immutable";
 
-import { getIconUrl, parseSvg } from "./util/fa";
+import { getIconUrl, parseSvg } from "@fern-api/docs-utils/components/fa";
 
 export type FaIconGradient = {
   id: string;

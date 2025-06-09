@@ -9,15 +9,15 @@ import { FernButton, FernDropdown } from "@fern-docs/components";
 import { capturePosthogEventInternal } from "@fern-docs/components/analytics/posthog";
 
 import {
+  askAiAtom,
+  searchDialogOpenAtom,
+  useIsAskAiEnabled,
+} from "../../../commons/state/src/search";
+import {
   CopyPageOption,
   OpenAISearchOption,
   ViewAsMarkdownOption,
 } from "./PageActionsDropdownOptions";
-import {
-  askAiAtom,
-  searchDialogOpenAtom,
-  useIsAskAiEnabled,
-} from "./state/search";
 
 export function PageActionsDropdown({ markdown }: { markdown: string }) {
   const [showCopied, setShowCopied] = useState<boolean>(false);

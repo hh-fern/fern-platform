@@ -5,7 +5,8 @@ import { getFernToken } from "@fern-api/docs-utils";
 import { PlaygroundCloseButton } from "@fern-docs/components/playground/PlaygroundCloseButton";
 import { PlaygroundKeyboardTrigger } from "@fern-docs/components/playground/PlaygroundKeyboardTrigger";
 import { HorizontalSplitPane } from "@fern-docs/components/playground/VerticalSplitPane";
-import { ApiExplorerFlags } from "@fern-docs/components/state/api-explorer-flags";
+
+import { ApiExplorerFlags } from "../../../../../../../commons/state/src/api-explorer-flags";
 
 export default async function Layout({
   params,

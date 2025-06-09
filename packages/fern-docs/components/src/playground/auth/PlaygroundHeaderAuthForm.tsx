@@ -9,11 +9,11 @@ import { useMemoOne } from "use-memo-one";
 
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { unknownToString } from "@fern-api/ui-core-utils";
-import { fernUserAtom } from "@fern-docs/components/state/fern-user";
-import { PLAYGROUND_AUTH_STATE_HEADER_ATOM } from "@fern-docs/components/state/playground";
 
-import { PasswordInputGroup } from "../PasswordInputGroup";
-import { pascalCaseHeaderKey } from "../utils/header-key-case";
+import { pascalCaseHeaderKey } from "../../../../../commons/docs-utils/utils/header-key-case";
+import { fernUserAtom } from "../../../../../commons/state/src/fern-user";
+import { PLAYGROUND_AUTH_STATE_HEADER_ATOM } from "../../../../../commons/state/src/playground";
+import { PasswordInputGroup } from "../../../../../commons/docs-utils/src/playground/header-key-casee
 
 function headerAtom(headerName: string) {
   return atom(

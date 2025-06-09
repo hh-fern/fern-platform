@@ -15,12 +15,15 @@ import {
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 import { FernButton, FernDropdown } from "@fern-docs/components";
 
-import { Markdown } from "../../mdx/components/Markdown";
+import {
+  formDataFieldIsRequired,
+  getEmptyValueForField,
+} from "../../../../../commons/docs-utils/utils";
+import { isValidFile } from "../../../../../commons/docs-utils/u../../../../../commons/docs-utils/playground
+import { Markdown } from "../../../../../../commons/docs-utils/playground/utils
 import { renderTypeShorthandRoot } from "../../type-shorthand";
 import { PlaygroundFileUploadForm } from "../form/PlaygroundFileUploadForm";
 import { PlaygroundObjectPropertyForm } from "../form/PlaygroundObjectPropertyForm";
-import { formDataFieldIsRequired, getEmptyValueForField } from "../utils";
-import { isValidFile } from "../utils/utils";
 
 interface PlaygroundEndpointMultipartFormProps {
   endpoint: EndpointDefinition;
