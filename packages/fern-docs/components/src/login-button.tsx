@@ -3,6 +3,7 @@ import "server-only";
 import { getReturnToQueryParam } from "@fern-api/docs-server/auth/return-to";
 import { DocsLoader } from "@fern-api/docs-server/types";
 import { isTrailingSlashEnabled } from "@fern-api/docs-utils";
+import { getApiRouteSupplier } from "@fern-api/docs-utils/component/getApiRouteSupplier";
 import { FernButton } from "@fern-docs/components";
 
 import { LoginButtonClient } from "./login-button-client";

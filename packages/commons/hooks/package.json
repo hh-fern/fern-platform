@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@fern-api/docs-utils": "workspace:*",
+    "@fern-api/fdr-sdk": "workspace:*",
     "@fern-api/ui-core-utils": "workspace:*",
     "@fern-platform/fdr-utils": "workspace:*",
     "@fern-ui/react-commons": "workspace:*",

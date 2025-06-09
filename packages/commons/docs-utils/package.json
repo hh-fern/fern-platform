@@ -31,6 +31,10 @@
       "require": "./dist/*.js"
     }
   },
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "source": "src/index.ts",
+  "types": "src/index.ts",
   "files": [
     "dist"
   ],

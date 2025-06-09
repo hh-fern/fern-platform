@@ -2,17 +2,21 @@ import { compact } from "es-toolkit/array";
 import { mapValues, omitBy, pick } from "es-toolkit/object";
 
 import { FernUser } from "@fern-api/docs-auth";
-import type {
-  PlaygroundEndpointRequestFormState,
-  PlaygroundFormDataEntryValue,
-} from "@fern-api/docs-utils/types";
-import type {
+import {
   EndpointContext,
-  ObjectProperty,
-} from "@fern-api/fdr-sdk/api-definition";
-import { ExampleEndpointCall } from "@fern-api/fdr-sdk/api-definition";
+  ExampleEndpointCall,
+} from "@fern-api/fdr-sdk/dist/api-definition";
+// import type {
+//   EndpointContext,
+//   ObjectProperty,
+// } from "@fern-api/fdr-sdk/api-definition";
+// import { ExampleEndpointCall } from "@fern-api/fdr-sdk/api-definition";
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
 
+import {
+  PlaygroundEndpointRequestFormState,
+  PlaygroundFormDataEntryValue,
+} from "../types";
 import {
   getEmptyValueForHttpRequestBody,
   getEmptyValueForObjectProperties,
