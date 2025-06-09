@@ -49,6 +49,7 @@ import {
   DEFAULT_SIDEBAR_WIDTH,
   EdgeFlags,
   FERN_DOCS_ORIGINS,
+  isPreviewDomain,
   withoutStaging,
 } from "@fern-docs/utils";
 
@@ -288,11 +289,14 @@ export const getMetadata = cache(
       console.log("[getMetadata] cache miss:", metadata);
       return metadata;
     } catch (error) {
-      postToSlack(
-        "#docs-notifs",
-        `:rotating_light: Failed to get metadata for ${domain} with the following error: ${String(error)}`,
-        "get-metadata"
-      );
+      if (!isPreviewDomain(domain)) {
+        postToSlack(
+          "#docs-notifs",
+          `:rotating_light: Failed to get metadata for ${domain} with the following error: ${String(error)}`,
+          "get-metadata"
+        );
+      }
+
       throw error;
     }
   }
