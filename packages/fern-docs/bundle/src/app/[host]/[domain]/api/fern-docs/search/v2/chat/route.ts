@@ -80,8 +80,7 @@ export async function POST(req: NextRequest) {
   const isCohere = url.includes("cohere");
   const chatSource = source ?? "chat"; // distinguish between chat and mcp server request
 
-  // const model: string = config.aiChatConfig?.model || "claude-3.5";
-  const model = "claude-4";
+  const model: string = config.aiChatConfig?.model || "claude-3.5";
   let languageModel;
   if (model === "command-a" || model === "command-r-plus") {
     // TODO: remove command-r-plus once fern generate change is resolved
