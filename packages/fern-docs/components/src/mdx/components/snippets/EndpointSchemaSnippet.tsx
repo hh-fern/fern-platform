@@ -11,7 +11,7 @@ import {
 import { WithSeparator } from "@fern-docs/components/api-reference/type-definitions/TypeDefinitionDetails";
 import { TypeDefinitionSlotsServer } from "@fern-docs/components/api-reference/type-definitions/TypeDefinitionSlotsServer";
 
-import { useCurrentSlug } from "../../../../../../commons/hooks/src/use-current-pathname";
+import { useCurrentSlug } from "../../../layouts/hooks/use-current-pathname";
 
 type EndpointSchemaSnippetProps = {
   /**

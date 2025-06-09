@@ -3,9 +3,9 @@
 import { createContext, useContext, useEffect, useRef } from "react";
 
 import { BuiltWithFern as BuiltWithFernComponent } from "@fern-docs/components";
+import { useDomain } from "@fern-ui/state/domain";
+import { useIsWhitelabeled } from "@fern-ui/state/whitelabeled";
 
-import { useDomain } from "../../../commons/state/src/domain";
-import { useIsWhitelabeled } from "../../../commons/state/src/whitelabeled";
 import { trackInternal } from "./analytics";
 import { BUILTWITHFERN_ID } from "./constants";
 

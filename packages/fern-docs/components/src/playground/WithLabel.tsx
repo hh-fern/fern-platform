@@ -2,10 +2,7 @@ import { FC, PropsWithChildren, ReactNode } from "react";
 
 import { HelpCircle, X } from "lucide-react";
 
-import {
-  renderTypeShorthandRoot,
-  shouldRenderInline,
-} from "@fern-api/docs-utils/playground";
+import { cn } from "@fern-api/docs-utils/cn";
 import {
   ObjectProperty,
   TypeDefinition,
@@ -13,10 +10,12 @@ import {
   WithDescription,
   unwrapReference,
 } from "@fern-api/fdr-sdk/api-definition";
-import { AvailabilityBadge, cn } from "@fern-docs/components";
+import { AvailabilityBadge } from "@fern-docs/components";
 import { FernButton, FernTooltip } from "@fern-docs/components";
 
 import { Markdown } from "../mdx/components/Markdown";
+import { renderTypeShorthandRoot } from "../type-shorthand";
+import { shouldRenderInline } from "../utils/playground";
 
 interface WithLabelProps {
   htmlFor?: string;

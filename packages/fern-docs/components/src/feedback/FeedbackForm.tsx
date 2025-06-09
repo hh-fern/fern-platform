@@ -7,7 +7,7 @@ import { atomWithStorage } from "jotai/utils";
 import { LazyMotion, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import {
   FernButton,
   FernCheckbox,

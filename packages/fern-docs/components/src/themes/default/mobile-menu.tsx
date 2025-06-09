@@ -14,16 +14,16 @@ import {
   useTransform,
 } from "motion/react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import {
   FERN_HEADER_ID,
   FERN_SIDEBAR_ID,
   FERN_SIDEBAR_OVERLAY_ID,
 } from "@fern-docs/components/constants";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
+import { useIsDismissableSidebarOpen } from "@fern-ui/state/mobile";
 
-import { useCurrentPathname } from "../../../../../commons/hooks/src/use-current-pathname";
-import { useIsDismissableSidebarOpen } from "../../../../../commons/state/src/mobile";
+import { useCurrentPathname } from "../../layouts/hooks/use-current-pathname";
 
 export const MainCtx = React.createContext<
   React.RefObject<HTMLDivElement | null>

@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-import { FeatureFlagsConfig } from "../../../../commons/state/src/feature-flags";
+import { FeatureFlagsConfig } from "@fern-ui/state/feature-flags";
 
 const LDFeatureFlagProvider = dynamic(
   () =>

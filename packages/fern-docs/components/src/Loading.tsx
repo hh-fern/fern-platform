@@ -1,4 +1,4 @@
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 interface LoadingProps {
   className?: string;

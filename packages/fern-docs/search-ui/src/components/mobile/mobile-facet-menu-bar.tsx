@@ -8,8 +8,8 @@ import {
 import * as Menubar from "@radix-ui/react-menubar";
 import { Check, ChevronDown, Minus } from "lucide-react";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { EMPTY_ARRAY } from "@fern-api/ui-core-utils";
-import { cn } from "@fern-docs/components";
 import {
   AvailabilityBadge,
   AvailabilityDisplayNames,

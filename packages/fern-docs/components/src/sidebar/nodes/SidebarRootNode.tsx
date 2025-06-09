@@ -4,7 +4,7 @@ import { DocsLoader } from "@fern-api/docs-server/types";
 import { withPrunedNavigation } from "@fern-api/docs-server/withPrunedNavigation";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
-import { SetEmptySidebar } from "../../../../../commons/state/src/layout";
+import { SetEmptySidebar } from "../../utils/layout";
 import { SidebarRootChild } from "./SidebarRootChild";
 
 export async function SidebarRootNode({

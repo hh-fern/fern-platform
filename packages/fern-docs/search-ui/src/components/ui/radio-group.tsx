@@ -3,7 +3,7 @@ import React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 const RadioGroup = React.forwardRef<
   React.ComponentRef<typeof RadioGroupPrimitive.Root>,

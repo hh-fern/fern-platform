@@ -12,7 +12,7 @@ import {
 import { File, FilePlus, Mic, X } from "lucide-react";
 import prettyBytes from "pretty-bytes";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernButton, FernButtonGroup, FernCard } from "@fern-docs/components";
 
 import {

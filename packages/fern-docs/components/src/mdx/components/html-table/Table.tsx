@@ -6,7 +6,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Expand } from "lucide-react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernButton, FernScrollArea } from "@fern-docs/components";
 
 export function Table({ className, ...rest }: ComponentProps<"table">) {

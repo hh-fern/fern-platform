@@ -4,9 +4,9 @@ import { round } from "es-toolkit/math";
 import { useAtomValue } from "jotai";
 import { Download } from "lucide-react";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { PlaygroundResponse } from "@fern-api/docs-utils/types/playgroundResponse";
 import { ProxyResponse } from "@fern-api/docs-utils/types/proxy";
-import { cn } from "@fern-docs/components";
 import {
   CopyToClipboardButton,
   FernAudioPlayer,
@@ -18,7 +18,7 @@ import {
 import { ErrorBoundaryFallback } from "@fern-docs/components/error-boundary";
 import { Loadable, visitLoadable } from "@fern-ui/loadable";
 
-import { isBinaryOctetStreamAudioPlayerAtom } from "../../../../../commons/state/src/api-explorer-flags";
+import { isBinaryOctetStreamAudioPlayerAtom } from "../../utils/api-explorer-flags";
 import { PlaygroundResponsePreview } from "../PlaygroundResponsePreview";
 import { PlaygroundSendRequestButton } from "../PlaygroundSendRequestButton";
 

@@ -5,8 +5,8 @@ import { uniq } from "es-toolkit/array";
 import { ChevronRight } from "lucide-react";
 import { MarkRequired, UnreachableCaseError } from "ts-essentials";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { formatUtc } from "@fern-api/ui-core-utils";
-import { cn } from "@fern-docs/components";
 import {
   AvailabilityBadge,
   HttpMethodBadge,

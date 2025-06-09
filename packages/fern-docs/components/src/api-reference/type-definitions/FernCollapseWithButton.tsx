@@ -2,7 +2,7 @@ import { FC, PropsWithChildren, ReactNode } from "react";
 
 import { X } from "lucide-react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import {
   FernButton,
   FernButtonProps,

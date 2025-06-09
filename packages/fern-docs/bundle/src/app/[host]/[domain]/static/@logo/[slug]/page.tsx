@@ -3,9 +3,9 @@ import "server-only";
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { createFileResolver } from "@fern-api/docs-server/file-resolver";
 import { withLogo } from "@fern-api/docs-server/withLogo";
-import { getFernToken } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { getFernToken } from "@fern-docs/components/fern-token";
 import { Logo } from "@fern-docs/components/logo";
 import { getFrontmatter } from "@fern-docs/mdx";
 

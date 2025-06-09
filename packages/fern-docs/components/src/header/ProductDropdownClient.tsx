@@ -7,11 +7,11 @@ import { FernNavigation } from "@fern-api/fdr-sdk";
 import { FernDropdown, cn } from "@fern-docs/components";
 import { useIsDesktop } from "@fern-ui/react-commons";
 
+import { FernSelectionItem } from "../FernSelectionItem";
 import {
   useCurrentProductId,
   useCurrentProductSlug,
-} from "../../../../commons/state/src/navigation";
-import { FernSelectionItem } from "../FernSelectionItem";
+} from "../utils/navigation";
 
 export interface ProductDropdownItem {
   productId: string;

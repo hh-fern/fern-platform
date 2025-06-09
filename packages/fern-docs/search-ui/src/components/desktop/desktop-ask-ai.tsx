@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 import { useIsomorphicLayoutEffect } from "swr/_internal";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { Badge } from "@fern-docs/components/badges";
 import { Button } from "@fern-docs/components/button";
 import {

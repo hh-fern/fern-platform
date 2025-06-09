@@ -3,6 +3,7 @@ import { FC, Fragment, ReactNode } from "react";
 import { omitBy } from "es-toolkit/object";
 import { isUndefined } from "es-toolkit/predicate";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { PlaygroundRequestFormState } from "@fern-api/docs-utils/types";
 import type {
   Environment,
@@ -19,12 +20,11 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import unknownToString from "@fern-api/ui-core-utils/unknownToString";
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
-import { cn } from "@fern-docs/components";
 import { CopyToClipboardButton } from "@fern-docs/components";
 import { MaybeEnvironmentDropdown } from "@fern-docs/components/MaybeEnvironmentDropdown";
 import { useBooleanState } from "@fern-ui/react-commons";
+import { useAllEnvironmentIds } from "@fern-ui/state/environment";
 
-import { useAllEnvironmentIds } from "../../../../../commons/state/src/environment";
 import { HttpMethodBadge } from "../../badges/http-method-badge";
 import { closeButton } from "../PlaygroundCloseButton";
 import { PlaygroundSendRequestButton } from "../PlaygroundSendRequestButton";

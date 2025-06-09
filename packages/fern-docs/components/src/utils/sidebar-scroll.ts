@@ -2,8 +2,8 @@
 
 import React from "react";
 
-import { FERN_SIDEBAR_SCROLL_AREA_ID } from "@fern-docs/components/constants";
-import { scrollToCenter } from "@fern-docs/components/util/scrollToCenter";
+import { scrollToCenter } from "@fern-api/docs-utils/component/scrollToCenter";
+import { FERN_SIDEBAR_SCROLL_AREA_ID } from "@fern-api/docs-utils/element-ids";
 import {
   isomorphicRequestIdleCallback,
   useIsomorphicLayoutEffect,

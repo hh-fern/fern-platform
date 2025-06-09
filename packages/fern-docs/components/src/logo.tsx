@@ -1,10 +1,10 @@
 import React from "react";
 
 import { DEFAULT_LOGO_HEIGHT } from "@fern-api/docs-utils";
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
+import { LogoText } from "@fern-ui/state/logo-text";
 
 import { LogoConfiguration } from "../../../commons/docs-utils/src/types/navbar";
-import { LogoText } from "../../../commons/state/src/logo-text";
 import { FernImage } from "./FernImage";
 import { MaybeFernLink } from "./FernLink";
 

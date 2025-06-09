@@ -5,8 +5,8 @@ import React from "react";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { conformTrailingSlash } from "@fern-api/docs-utils";
-import { getFernToken } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
+import { getFernToken } from "@fern-docs/components/fern-token";
 import {
   ExplorerContent,
   NoEndpointSelected,

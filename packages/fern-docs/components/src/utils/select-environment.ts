@@ -6,9 +6,8 @@ import {
   EnvironmentId,
   WebSocketChannel,
 } from "@fern-api/fdr-sdk/api-definition";
-
-import { SELECTED_ENVIRONMENT_ATOM } from "../../../state/src/environment";
-import { usePlaygroundEnvironment } from "../../../state/src/playground";
+import { SELECTED_ENVIRONMENT_ATOM } from "@fern-ui/state/environment";
+import { usePlaygroundEnvironment } from "@fern-ui/state/playground";
 
 function selectEnvironment(
   endpoint: WebSocketChannel | EndpointDefinition,

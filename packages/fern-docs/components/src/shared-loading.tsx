@@ -1,9 +1,7 @@
 "use client";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
-import { useLayout } from "../../../commons/state/src/layout";
-import { useRestoreSidebarScrollPosition } from "../../../commons/state/src/sidebar-scroll";
 import {
   CustomLayout,
   GuideLayout,
@@ -11,6 +9,8 @@ import {
   PageLayout,
   ReferenceLayout,
 } from "./layouts";
+import { useLayout } from "./utils/layout";
+import { useRestoreSidebarScrollPosition } from "./utils/sidebar-scroll";
 
 export default function LoadingDocs() {
   const layout = useLayout();

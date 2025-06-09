@@ -7,9 +7,9 @@ import { useAtom } from "jotai";
 import { slugToHref } from "@fern-api/docs-utils";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
+import { FERN_STREAM_ATOM } from "@fern-ui/state/stream";
 
-import { useCurrentSlug } from "../../../../../commons/hooks/src/use-current-pathname";
-import { FERN_STREAM_ATOM } from "../../../../../commons/state/src/stream";
+import { useCurrentSlug } from "../../layouts/hooks/use-current-pathname";
 import { StreamingEnabledToggle } from "./StreamingEnabledToggle";
 
 export function EndpointStreamingEnabledToggle({

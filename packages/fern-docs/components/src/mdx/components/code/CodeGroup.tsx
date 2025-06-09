@@ -3,17 +3,17 @@ import React from "react";
 
 import * as Tabs from "@radix-ui/react-tabs";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import {
   CopyToClipboardButton,
   FernSyntaxHighlighter,
-  cn,
 } from "@fern-docs/components";
 import { HorizontalOverflowMask } from "@fern-docs/components/HorizontalOverflowMask";
 import { getLanguageDisplayName } from "@fern-docs/components/api-reference/examples/code-example";
+import { useIsDarkCode } from "@fern-ui/state/dark-code";
 
-import { useIsDarkCode } from "../../../../../../commons/state/src/dark-code";
-import { useProgrammingLanguage } from "../../../../../../commons/state/src/language";
+import { useProgrammingLanguage } from "../../../utils/language";
 import { unwrapChildren } from "../../common/unwrap-children";
 import { CodeBlock, toSyntaxHighlighterProps } from "./CodeBlock";
 import { Template, applyTemplates, useTemplate } from "./Template";

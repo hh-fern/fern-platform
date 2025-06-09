@@ -510,9 +510,21 @@ importers:
       '@fern-api/ui-core-utils':
         specifier: workspace:*
         version: link:../core-utils
+      '@types/react':
+        specifier: 19.0.10
+        version: 19.0.10
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       es-toolkit:
         specifier: ^1.39.3
         version: 1.39.3
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
       jose:
         specifier: ^5.9.6
         version: 5.9.6
@@ -522,6 +534,9 @@ importers:
       path-to-regexp:
         specifier: 6.3.0
         version: 6.3.0
+      tailwind-merge:
+        specifier: ^3.0.1
+        version: 3.0.1
       ts-essentials:
         specifier: ^10.0.4
         version: 10.0.4(typescript@5.7.3)
@@ -541,9 +556,6 @@ importers:
       depcheck:
         specifier: ^1.4.7
         version: 1.4.7
-      next:
-        specifier: 15.3.0-canary.1
-        version: 15.3.0-canary.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0)
       stylelint:
         specifier: ^16.1.0
         version: 16.14.1(typescript@5.7.3)
@@ -624,9 +636,6 @@ importers:
       '@fern-api/ui-core-utils':
         specifier: workspace:*
         version: link:../core-utils
-      '@fern-platform/fdr-utils':
-        specifier: workspace:*
-        version: link:../fdr-utils
       '@fern-ui/react-commons':
         specifier: workspace:*
         version: link:../react-commons
@@ -642,6 +651,9 @@ importers:
       es-toolkit:
         specifier: ^1.39.3
         version: 1.39.3
+      jotai-effect:
+        specifier: ^1.1.6
+        version: 1.1.6(jotai@2.12.1(@types/react@19.0.10)(react@19.0.0))
       next:
         specifier: 15.3.0-canary.1
         version: 15.3.0-canary.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0)
@@ -910,15 +922,15 @@ importers:
       '@fern-ui/react-commons':
         specifier: workspace:*
         version: link:../react-commons
-      '@types/react':
-        specifier: 19.0.10
-        version: 19.0.10
       es-toolkit:
         specifier: ^1.39.3
         version: 1.39.3
       jotai:
         specifier: ^2.12.1
         version: 2.12.1(@types/react@19.0.10)(react@19.0.0)
+      launchdarkly-react-client-sdk:
+        specifier: ^3.6.0
+        version: 3.6.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -941,6 +953,9 @@ importers:
       '@types/node':
         specifier: ^18.11.9
         version: 18.19.87
+      '@types/react':
+        specifier: 19.0.10
+        version: 19.0.10
       depcheck:
         specifier: ^1.4.7
         version: 1.4.7
@@ -1310,12 +1325,18 @@ importers:
       '@fern-platform/fdr-utils':
         specifier: workspace:*
         version: link:../../commons/fdr-utils
+      '@fern-ui/hooks':
+        specifier: workspace:*
+        version: link:../../commons/hooks
       '@fern-ui/loadable':
         specifier: workspace:*
         version: link:../../commons/loadable
       '@fern-ui/react-commons':
         specifier: workspace:*
         version: link:../../commons/react-commons
+      '@fern-ui/state':
+        specifier: workspace:*
+        version: link:../../commons/state
       '@launchdarkly/node-server-sdk':
         specifier: ^9.7.2
         version: 9.7.2

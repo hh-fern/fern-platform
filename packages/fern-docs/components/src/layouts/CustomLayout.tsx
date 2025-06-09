@@ -1,4 +1,4 @@
-import { HideAsides, SetLayout } from "../../../../commons/state/src/layout";
+import { HideAsides, SetLayout } from "../utils/layout";
 
 interface CustomLayoutProps {
   children?: React.ReactNode;

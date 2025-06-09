@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { cn } from "@fern-docs/components";
 
 import { WithFeatureFlags } from "../../feature-flags/WithFeatureFlags";
 import { SidebarSlugLink } from "../SidebarLink";

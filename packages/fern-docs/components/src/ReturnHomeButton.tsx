@@ -2,7 +2,7 @@
 
 import { FernLinkButton } from "@fern-docs/components/FernLinkButton";
 
-import { useBasePath } from "../../../commons/state/src/navigation";
+import { useBasePath } from "./utils/navigation";
 
 export default function ReturnHomeButton() {
   const basePath = useBasePath();

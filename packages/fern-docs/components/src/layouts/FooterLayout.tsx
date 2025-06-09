@@ -1,4 +1,4 @@
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 import { EditThisPageButton } from "../EditThisPage";
 import { BuiltWithFern } from "../built-with-fern";

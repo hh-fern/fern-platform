@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernAnchor } from "@fern-docs/components/FernAnchor";
 import { isomorphicRequestIdleCallback } from "@fern-ui/react-commons";
 

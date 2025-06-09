@@ -2,9 +2,9 @@
 
 import { MouseEventHandler } from "react";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
-import { cn } from "@fern-docs/components";
 import {
   AvailabilityBadge,
   StatusCodeBadge,

@@ -1,6 +1,6 @@
 import { UnreachableCaseError } from "ts-essentials";
 
-import { ProxyRequest } from "@fern-api/docs-utils/types/proxy";
+import { ProxyRequest } from "../types";
 
 export async function toBodyInit(
   body: ProxyRequest["body"]

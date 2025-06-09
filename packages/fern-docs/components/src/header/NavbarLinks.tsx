@@ -5,7 +5,7 @@ import React from "react";
 import { ArrowRight } from "lucide-react";
 
 import { DocsLoader } from "@fern-api/docs-server/types";
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernLinkButton } from "@fern-docs/components/FernLinkButton";
 import { FaIconServer } from "@fern-docs/components/fa-icon-server";
 

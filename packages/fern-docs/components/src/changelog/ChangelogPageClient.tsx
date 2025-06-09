@@ -12,15 +12,15 @@ import { Badge } from "@fern-docs/components";
 import { FernLink } from "@fern-docs/components/FernLink";
 import { Separator } from "@fern-docs/components/Separator";
 import { HideBuiltWithFern } from "@fern-docs/components/built-with-fern";
+import { useCurrentAnchor } from "@fern-ui/hooks/use-anchor";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
+import { SCROLL_BODY_ATOM } from "@fern-ui/state/viewport";
 
-import { useCurrentAnchor } from "../../../../commons/hooks/src/use-anchor";
-import { SetLayout } from "../../../../commons/state/src/layout";
-import { SCROLL_BODY_ATOM } from "../../../../commons/state/src/viewport";
 import { BottomNavigationClient } from "../bottom-nav-client";
 import { AsideAwareDiv } from "../layouts/AsideAwareDiv";
 import { FooterLayout } from "../layouts/FooterLayout";
 import { TableOfContentsLayout } from "../layouts/TableOfContentsLayout";
+import { SetLayout } from "../utils/layout";
 import { ChangelogContentLayout } from "./ChangelogContentLayout";
 
 function flattenChangelogEntries(

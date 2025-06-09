@@ -22,7 +22,6 @@ export * from "./slack";
 export * from "./types";
 export * from "./withRbac";
 export * from "./file-resolver";
-export * from "./processRequestSnippetComponents";
 export * from "./utils/clean-base-path";
 export * from "./utils/selectFirst";
 export * from "./utils/toArray";

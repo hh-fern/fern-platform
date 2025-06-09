@@ -1,5 +1,6 @@
 import { compact, flatten } from "es-toolkit/array";
 
+import { blobToDataURL } from "@fern-api/docs-utils/fetch/blobToDataURL";
 import {
   PlaygroundFormStateBody,
   ProxyRequest,
@@ -13,8 +14,6 @@ import {
   wrapOpenRPCRequest,
 } from "@fern-api/fdr-sdk/api-definition";
 import { assertNever, isNonNullish } from "@fern-api/ui-core-utils";
-
-import { blobToDataURL } from "../../../../fern-docs/components/src/playground/fetch-utils/blobToDataURL";
 
 export const serializeFormStateBody = async ({
   shape,

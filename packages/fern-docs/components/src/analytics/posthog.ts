@@ -4,8 +4,8 @@ import type { PostHog } from "posthog-js";
 
 import type { DocsV1Read } from "@fern-api/fdr-sdk";
 
-import { useCurrentPathname } from "../../../../commons/hooks/src/use-current-pathname";
 import { useApiRoute } from "../../../../commons/hooks/src/useApiRoute";
+import { useCurrentPathname } from "../layouts/hooks/use-current-pathname";
 
 export function safeCall(action: () => void): void {
   try {

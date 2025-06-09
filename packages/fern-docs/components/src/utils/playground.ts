@@ -12,10 +12,6 @@ import {
 import { useCallbackOne } from "use-memo-one";
 
 import {
-  getInitialEndpointRequestFormStateWithExample,
-  getInitialWebSocketRequestFormState,
-} from "@fern-api/docs-utils/playground";
-import {
   PLAYGROUND_AUTH_STATE_BASIC_AUTH_INITIAL,
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_INITIAL,
   PLAYGROUND_AUTH_STATE_HEADER_INITIAL,
@@ -35,10 +31,14 @@ import {
   WebSocketContext,
 } from "@fern-api/fdr-sdk/api-definition";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { useDomain } from "@fern-ui/state/domain";
+import { fernUserAtom } from "@fern-ui/state/fern-user";
+import { atomWithStorageValidation } from "@fern-ui/state/utils/atomWithStorageValidation";
 
-import { useDomain } from "./domain";
-import { fernUserAtom } from "./fern-user";
-import { atomWithStorageValidation } from "./utils/atomWithStorageValidation";
+import {
+  getInitialEndpointRequestFormStateWithExample,
+  getInitialWebSocketRequestFormState,
+} from "./playground";
 
 export const PLAYGROUND_AUTH_STATE_ATOM =
   atomWithStorageValidation<PlaygroundAuthState>(

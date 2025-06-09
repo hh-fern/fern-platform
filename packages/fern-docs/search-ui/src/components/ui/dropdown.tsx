@@ -3,8 +3,8 @@ import React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { Kbd } from "@fern-docs/components";
-import { cn } from "@fern-docs/components";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

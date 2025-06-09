@@ -4,10 +4,10 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { Lock } from "lucide-react";
 
 import { slugToHref } from "@fern-api/docs-utils";
+import { cn } from "@fern-api/docs-utils/cn";
 import { TabChild, hasRedirect } from "@fern-api/fdr-sdk/navigation";
-import { cn } from "@fern-docs/components";
 import { FernLinkTab } from "@fern-docs/components/FernLinkTab";
-import { processIcon } from "@fern-docs/components/util/processIcon";
+import { processIcon } from "@fern-docs/components/processIcon";
 
 export function SidebarTabsList({
   tabs,

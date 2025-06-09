@@ -3,7 +3,7 @@
 import React from "react";
 import { useState } from "react";
 
-import { useCurrentPathname } from "../../../../commons/hooks/src/use-current-pathname";
+import { useCurrentPathname } from "../layouts/hooks/use-current-pathname";
 
 export function WithReturnTo({
   queryParam,

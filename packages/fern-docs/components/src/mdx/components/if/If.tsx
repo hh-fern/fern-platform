@@ -3,8 +3,7 @@ import { PropsWithChildren, ReactNode } from "react";
 import { Atom } from "jotai";
 
 import { FernUser } from "@fern-api/docs-auth";
-
-import { useFernUser } from "../../../../../../commons/state/src/fern-user";
+import { useFernUser } from "@fern-ui/state/fern-user";
 
 export interface IfProps {
   /**

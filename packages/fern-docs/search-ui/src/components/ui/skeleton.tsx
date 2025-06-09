@@ -1,6 +1,6 @@
 import React from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 function Skeleton({
   className,

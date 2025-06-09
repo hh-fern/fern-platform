@@ -11,8 +11,8 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
-import { cn } from "@fern-docs/components";
 import { FaIcon } from "@fern-docs/components";
 
 type Intent =

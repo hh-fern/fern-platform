@@ -9,7 +9,7 @@ import {
 } from "launchdarkly-react-client-sdk";
 import useSWR from "swr";
 
-import { useFernUser } from "../../../../commons/state/src/fern-user";
+import { useFernUser } from "@fern-ui/state/fern-user";
 
 interface Props extends PropsWithChildren {
   clientSideId: string;

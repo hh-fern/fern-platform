@@ -1,7 +1,7 @@
 import "server-only";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { cn } from "@fern-docs/components";
 
 import { WithFeatureFlags } from "../../feature-flags/WithFeatureFlags";
 import { SidebarApiPackageChild } from "./SidebarApiPackageChild";

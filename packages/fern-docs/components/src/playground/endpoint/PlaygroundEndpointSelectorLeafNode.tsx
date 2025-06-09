@@ -5,7 +5,7 @@ import { ReactElement, forwardRef } from "react";
 import { escapeRegExp } from "es-toolkit/string";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernTooltip } from "@fern-docs/components";
 import { FernLinkButton } from "@fern-docs/components/FernLinkButton";
 

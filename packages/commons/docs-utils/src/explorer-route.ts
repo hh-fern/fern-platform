@@ -1,8 +1,6 @@
-import {
-  addLeadingSlash,
-  conformTrailingSlash,
-  removeTrailingSlash,
-} from "@fern-api/docs-utils";
+import { removeTrailingSlash } from ".";
+import { addLeadingSlash } from ".";
+import { conformTrailingSlash } from "./trailing-slash";
 
 /**
  * Conforms the slug to the explorer route.

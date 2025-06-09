@@ -3,9 +3,9 @@
 import { ProgressProvider } from "@bprogress/next/app";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
-import { Toaster } from "@fern-docs/components";
+import { JotaiProvider } from "@fern-docs/components/contexts/jotai-provider";
+import { Toaster } from "@fern-docs/components/toaster";
 
-import { JotaiProvider } from "../../../../commons/state/src/jotai-provider";
 import StyledJsxRegistry from "./registry";
 
 export function Providers({ children }: { children: React.ReactNode }) {

@@ -1,9 +1,9 @@
 import "server-only";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
-import { getFernToken } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { getFernToken } from "@fern-docs/components/fern-token";
 import { PlaygroundEndpointSelectorContent } from "@fern-docs/components/playground/endpoint/PlaygroundEndpointSelectorContent";
 import { flattenApiSection } from "@fern-docs/components/playground/utils/flatten-apis";
 

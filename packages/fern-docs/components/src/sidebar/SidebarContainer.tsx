@@ -2,10 +2,11 @@
 
 import React from "react";
 
-import { FernScrollArea, cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
+import { FERN_SIDEBAR_SCROLL_AREA_ID } from "@fern-api/docs-utils/element-ids";
+import { FernScrollArea } from "@fern-docs/components";
 
-import { useDismountMeasureSidebarScrollPosition } from "../../../../commons/state/src/sidebar-scroll";
-import { FERN_SIDEBAR_SCROLL_AREA_ID } from "../constants";
+import { useDismountMeasureSidebarScrollPosition } from "../utils/sidebar-scroll";
 import { MobileSidebarHeaderLinks } from "./MobileSidebarHeaderLinks";
 import { SidebarFixedItemsSection } from "./SidebarFixedItemsSection";
 import { ThemeSwitch } from "./theme-switch";

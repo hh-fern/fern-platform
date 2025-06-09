@@ -12,8 +12,8 @@ import { unknownToString } from "@fern-api/ui-core-utils";
 import {
   buildAuthHeaders,
   convertToCustomSnippetPayload,
-} from "../../../../../commons/docs-utils/src/playground";
-import { shouldRenderAuth } from "../../../../../commons/docs-utils/src/playground/should-render-auth";
+} from "../../utils/playground";
+import { shouldRenderAuth } from "../../utils/playground/should-render-auth";
 import { CurlSnippetBuilder } from "./builders/curl";
 import { PythonRequestSnippetBuilder } from "./builders/python";
 import { TypescriptFetchSnippetBuilder } from "./builders/typescript";

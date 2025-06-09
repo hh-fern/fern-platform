@@ -7,9 +7,9 @@ import { ExternalLinkIcon } from "lucide-react";
 import { type UrlObject, format, parse, resolve } from "url";
 
 import { conformTrailingSlash } from "@fern-api/docs-utils";
+import { useDomain } from "@fern-ui/state/domain";
 
-import { useCurrentPathname } from "../../../commons/hooks/src/use-current-pathname";
-import { useDomain } from "../../../commons/state/src/domain";
+import { useCurrentPathname } from "./layouts/hooks/use-current-pathname";
 
 export const FernLink = React.forwardRef<
   HTMLAnchorElement,

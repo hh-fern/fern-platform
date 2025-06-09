@@ -7,7 +7,7 @@ import { preload } from "react-dom";
 import { getEnv } from "@vercel/functions";
 import { compact } from "es-toolkit/array";
 
-import { DocsLoader, createCachedDocsLoader } from "@fern-api/docs-loader";
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { DocsV1Read, DocsV2Read } from "@fern-api/fdr-sdk/client/types";
 import { isNonNullish } from "@fern-api/ui-core-utils";
@@ -22,26 +22,23 @@ import {
   getCustomerAnalytics as deprecated_getCustomerAnalytics,
   getLaunchDarklySettings,
 } from "@fern-docs/edge-config";
-
-import { SetColors } from "../../../../../../commons/state/src/colors";
-import { DarkCode } from "../../../../../../commons/state/src/dark-code";
-import { Domain } from "../../../../../../commons/state/src/domain";
-import { LaunchDarklyInfo } from "../../../../../../commons/state/src/feature-flags";
-import { DefaultLanguage } from "../../../../../../commons/state/src/language";
-import { SetLogoText } from "../../../../../../commons/state/src/logo-text";
-import {
-  RootNodeProvider,
-  SetBasePath,
-} from "../../../../../../commons/state/src/navigation";
+import { SetColors } from "@fern-ui/state/colors";
+import { DarkCode } from "@fern-ui/state/dark-code";
+import { Domain } from "@fern-ui/state/domain";
+import { LaunchDarklyInfo } from "@fern-ui/state/feature-flags";
+import { DefaultLanguage } from "@fern-ui/state/language";
+import { SetLogoText } from "@fern-ui/state/logo-text";
+import { RootNodeProvider, SetBasePath } from "@fern-ui/state/navigation";
 import {
   getAllSidebarRootNodes,
   getSidebarRootNodeIdToChildToParentsMap,
-} from "../../../../../../commons/state/src/navigation-server";
+} from "@fern-ui/state/navigation-server";
 import {
   SetIsAskAiEnabled,
   SetIsDefaultSearchFilterOff,
-} from "../../../../../../commons/state/src/search";
-import { Whitelabeled } from "../../../../../../commons/state/src/whitelabeled";
+} from "@fern-ui/state/search";
+import { Whitelabeled } from "@fern-ui/state/whitelabeled";
+
 import { GlobalStyles } from "../../global-styles";
 import { ThemeProvider } from "../../theme";
 

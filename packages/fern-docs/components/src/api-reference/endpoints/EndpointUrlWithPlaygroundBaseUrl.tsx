@@ -5,7 +5,7 @@ import {
   WebSocketChannel,
 } from "@fern-api/fdr-sdk/api-definition";
 
-import { usePlaygroundBaseUrl } from "../../../../../commons/docs-utils/src/playground/select-environment";
+import { usePlaygroundBaseUrl } from "../../utils/select-environment";
 import { EndpointUrlWithOverflow } from "./EndpointUrlWithOverflow";
 
 export function EndpointUrlWithPlaygroundBaseUrl({

@@ -7,7 +7,7 @@ import { LazyMotion, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 import * as Selection from "selection-popover";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernButton, FernButtonGroup } from "@fern-docs/components";
 
 import { useSelection } from "../../../../commons/hooks/src/useSelection";

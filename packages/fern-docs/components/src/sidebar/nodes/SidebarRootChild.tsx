@@ -3,7 +3,7 @@ import "server-only";
 import { UnreachableCaseError } from "ts-essentials";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { processIcon } from "@fern-docs/components/util/processIcon";
+import { processIcon } from "@fern-docs/components/processIcon";
 
 import { SidebarGroupNode } from "./SidebarGroupNode";
 import { SidebarRootApiPackageNode } from "./SidebarRootApiPackageNode";

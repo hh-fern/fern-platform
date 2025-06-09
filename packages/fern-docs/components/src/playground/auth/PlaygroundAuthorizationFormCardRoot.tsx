@@ -16,7 +16,7 @@ import { useBooleanState } from "@fern-ui/react-commons";
 import {
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_ATOM,
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
-} from "../../../../../commons/state/src/playground";
+} from "../../utils/playground";
 import { PlaygroundCardTriggerApiKeyInjected } from "./PlaygroundCardTriggerApiKeyInjected";
 import { PlaygroundCardTriggerManual } from "./PlaygroundCardTriggerManual";
 

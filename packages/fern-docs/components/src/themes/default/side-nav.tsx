@@ -1,16 +1,13 @@
 "use client";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import {
   FERN_SIDEBAR_ID,
   FERN_SIDEBAR_SPACER_ID,
-} from "@fern-docs/components/constants";
+} from "@fern-api/docs-utils/element-ids";
 import { useIsDesktop } from "@fern-ui/react-commons";
 
-import {
-  HideAsides,
-  useIsSidebarFixed,
-} from "../../../../../commons/state/src/layout";
+import { HideAsides, useIsSidebarFixed } from "../../utils/layout";
 import { MobileMenu } from "./mobile-menu";
 
 export function SidebarNav({

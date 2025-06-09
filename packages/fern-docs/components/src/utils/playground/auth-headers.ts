@@ -1,16 +1,16 @@
 import { decodeJwt } from "jose";
 import { noop } from "ts-essentials";
 
+import { PlaygroundAuthState } from "@fern-api/docs-utils/types/auth";
 import { obfuscateSecret } from "@fern-api/fdr-sdk";
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 
-import { PlaygroundAuthState } from "../types";
-import { pascalCaseHeaderKey } from "./header-key-case";
 import {
   OAuthClientCredentialReferencedEndpointLoginFlowProps,
   oAuthClientCredentialReferencedEndpointLoginFlow,
 } from "./oauth";
+import { pascalCaseHeaderKey } from "./playground/header-key-case";
 
 export function buildAuthHeaders(
   auth: ApiDefinition.AuthScheme | undefined,

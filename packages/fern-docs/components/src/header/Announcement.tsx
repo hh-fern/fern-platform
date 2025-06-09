@@ -9,9 +9,10 @@ import * as m from "motion/react-m";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { FernButton, cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
+import { FERN_ANNOUNCEMENT_ID } from "@fern-api/docs-utils/element-ids";
 
-import { FERN_ANNOUNCEMENT_ID } from "../constants";
+import { FernButton } from "../FernButton";
 import { ErrorBoundary } from "../error-boundary";
 
 type AnnouncementStore = {

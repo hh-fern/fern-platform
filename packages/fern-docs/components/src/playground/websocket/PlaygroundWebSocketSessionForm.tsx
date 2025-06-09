@@ -2,11 +2,11 @@
 
 import { Dispatch, FC, SetStateAction, useCallback } from "react";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { PlaygroundWebSocketRequestFormState } from "@fern-api/docs-utils/types";
 import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import type { WebSocketContext } from "@fern-api/fdr-sdk/api-definition";
 import titleCase from "@fern-api/ui-core-utils/titleCase";
-import { cn } from "@fern-docs/components";
 import { FernButton, FernCard, FernScrollArea } from "@fern-docs/components";
 import { WebSocketMessagesVirtualized } from "@fern-docs/components/api-reference/websockets/WebSocketMessagesVirtualized";
 

@@ -8,13 +8,13 @@ import urlJoin from "url-join";
 import { APIKeyInjectionConfigEnabled } from "@fern-api/docs-auth";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { FernButton, FernCard } from "@fern-docs/components";
+import { useApiRoute } from "@fern-ui/hooks/useApiRoute";
 
-import { useApiRoute } from "../../../../../commons/hooks/src/useApiRoute";
+import { Callout } from "../../mdx/components/callout";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_ATOM,
-} from "../../../../../commons/state/src/playground";
-import { Callout } from "../../mdx/components/callout";
+} from "../../utils/playground";
 import { PlaygroundAuthorizationForm } from "./PlaygroundAuthorizationForm";
 
 interface PlaygroundCardTriggerApiKeyInjectedProps {

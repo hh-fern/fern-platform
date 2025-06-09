@@ -10,7 +10,7 @@ import { PlaygroundResponse } from "@fern-api/docs-utils/types/playgroundRespons
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { Loadable } from "@fern-ui/loadable";
 
-import { usePlaygroundBaseUrl } from "../../../../../commons/docs-utils/src/playground/select-environment";
+import { usePlaygroundBaseUrl } from "../../utils/select-environment";
 import { PlaygroundEndpointContentLayout } from "./PlaygroundEndpointContentLayout";
 import { PlaygroundEndpointForm } from "./PlaygroundEndpointForm";
 import { PlaygroundEndpointFormButtons } from "./PlaygroundEndpointFormButtons";

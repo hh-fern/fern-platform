@@ -10,7 +10,7 @@ import {
 } from "react";
 import Zoom from "react-medium-image-zoom";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernImage } from "@fern-docs/components/FernImage";
 import { useFrontmatter } from "@fern-docs/components/contexts/frontmatter";
 import { toPixelValue } from "@fern-docs/components/util/to-pixel-value";

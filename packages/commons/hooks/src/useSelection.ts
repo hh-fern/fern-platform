@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 import { useEffect, useState } from "react";
 
 export const useSelection: () => {

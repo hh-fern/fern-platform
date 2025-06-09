@@ -8,9 +8,9 @@ import { Button, cn } from "@fern-docs/components";
 import { toast } from "@fern-docs/components";
 import { useKeyboardPress } from "@fern-ui/react-commons";
 
-import { useCurrentPathname } from "../../../../commons/hooks/src/use-current-pathname";
 import { track } from "../analytics";
 import { registerPosthogProperties } from "../analytics/posthog";
+import { useCurrentPathname } from "../layouts/hooks/use-current-pathname";
 import { FeedbackForm } from "./FeedbackForm";
 import { FeedbackFormDialog } from "./FeedbackFormDialog";
 

@@ -4,7 +4,7 @@ import * as Select from "@radix-ui/react-select";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { SemanticColor } from "@fern-api/docs-utils";
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernButton, statusCodeToIntent } from "@fern-docs/components";
 
 import { CodeExample } from "../examples/code-example";

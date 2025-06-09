@@ -7,8 +7,8 @@ import {
   FernSyntaxHighlighter,
   cn,
 } from "@fern-docs/components";
+import { useIsDarkCode } from "@fern-ui/state/dark-code";
 
-import { useIsDarkCode } from "../../../../../../commons/state/src/dark-code";
 import { applyTemplates, useTemplate } from "./Template";
 
 export function CodeBlock(props: {

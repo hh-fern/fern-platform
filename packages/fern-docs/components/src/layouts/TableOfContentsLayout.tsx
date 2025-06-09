@@ -1,11 +1,11 @@
 import { HydrationBoundary } from "jotai-ssr";
 
+import { FERN_TOC_ID } from "@fern-api/docs-utils/element-ids";
 import { FernScrollArea } from "@fern-docs/components";
 import type { TableOfContentsItem } from "@fern-docs/mdx";
 
-import { emptyTableOfContentsAtom } from "../../../../commons/state/src/layout";
-import { FERN_TOC_ID } from "../constants";
 import { TableOfContents } from "../table-of-contents/TableOfContents";
+import { emptyTableOfContentsAtom } from "../utils/layout";
 
 interface TableOfContentsLayoutProps {
   tableOfContents: TableOfContentsItem[] | undefined;

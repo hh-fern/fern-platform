@@ -6,7 +6,7 @@ import { ReactElement, useCallback, useMemo } from "react";
 import { noop } from "ts-essentials";
 
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 import { castToRecord } from "../../../../../commons/docs-utils/utils";
 import { WithLabel } from "../../../../../../commons/docs-utils/playground

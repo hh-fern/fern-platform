@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { useShouldHideAsides } from "../../../../commons/state/src/layout";
+import { useShouldHideAsides } from "../utils/layout";
 
 export const AsideAwareDiv = React.forwardRef<
   HTMLDivElement,

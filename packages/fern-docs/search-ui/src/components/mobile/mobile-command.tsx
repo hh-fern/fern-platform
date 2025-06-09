@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef, forwardRef, useRef, useState } from "react";
 import { useSearchBox } from "react-instantsearch";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { Button } from "@fern-docs/components/button";
 
 import { FERN_SEARCH_MOBILE_COMMAND_ID } from "../../constants";

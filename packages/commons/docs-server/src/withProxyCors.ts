@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 export function withProxyCors(origin: string): HeadersInit {
   return {
     "Access-Control-Allow-Origin": origin,

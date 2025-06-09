@@ -24,11 +24,11 @@ import { FernNavigation } from "@fern-api/fdr-sdk";
 import { Slug } from "@fern-api/fdr-sdk/navigation";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 
-import { isLandingPageAtom } from "../../../commons/state/src/layout";
-import { SetCurrentNavigationNode } from "../../../commons/state/src/navigation";
-import { DocsMainContent } from "../app/[host]/[domain]/main";
+// import { DocsMainContent } from "../app/[host]/[domain]/main"; SARAH TODO: add this back in
 import FeedbackPopover from "./feedback/FeedbackPopover";
 import { MdxSerializer, createCachedMdxSerializer } from "./mdx/mdx-serializer";
+import { isLandingPageAtom } from "./utils/layout";
+import { SetCurrentNavigationNode } from "./utils/navigation";
 
 export default async function SharedPage({
   loader,
@@ -225,6 +225,7 @@ export default async function SharedPage({
           versionIsDefault={found.isCurrentVersionDefault}
           productIsDefault={found.isCurrentProductDefault}
         />
+        {/* SARAH TODO: add this back in
         <DocsMainContent
           loader={loader}
           serialize={serialize}
@@ -232,7 +233,7 @@ export default async function SharedPage({
           parents={found.parents}
           neighbors={await neighborsPromise}
           breadcrumb={found.breadcrumb}
-        />
+        /> */}
       </FeedbackPopoverProvider>
     </HydrationBoundary>
   );

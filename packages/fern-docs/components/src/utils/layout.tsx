@@ -31,33 +31,12 @@ export function useLayout() {
 export const emptySidebarAtom = atom<boolean>(false);
 export const emptyTableOfContentsAtom = atom<boolean>(false);
 
-export function SetEmptySidebar({ value }: { value: boolean }) {
-  const setEmptySidebar = useSetAtom(emptySidebarAtom);
-  useEffect(() => {
-    setEmptySidebar(value);
-  }, [value, setEmptySidebar]);
-  return null;
-}
-
-export function SetEmptyTableOfContents({ value }: { value: boolean }) {
-  const setEmptyTableOfContents = useSetAtom(emptyTableOfContentsAtom);
-  useEffect(() => {
-    setEmptyTableOfContents(value);
-  }, [value, setEmptyTableOfContents]);
-  return null;
-}
-
 export function useShouldHideAsides() {
   const isSidebarFixed = useAtomValue(isSidebarFixedAtom);
   const layout = useLayout();
   const emptySidebar = useAtomValue(emptySidebarAtom);
   const isLandingPage = useAtomValue(isLandingPageAtom);
   const tocIsEmpty = useAtomValue(emptyTableOfContentsAtom);
-
-  console.log("isSidebarFixed", isSidebarFixed);
-  console.log("layout", layout);
-  console.log("emptySidebar", emptySidebar);
-  console.log("isLandingPage", isLandingPage);
 
   // only guides and overviews currently have table of contents
   const emptyTableOfContents =

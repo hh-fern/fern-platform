@@ -1,6 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@fern-platform/configs/tsconfig/library.json",
-  "compilerOptions": { "outDir": "./dist", "rootDir": "./src" },
-  "include": ["./src/**/*"]
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "lib": ["dom", "es2021"]
+  },
+  "include": [
+    "./src/**/*",
+    "../../fern-docs/components/src/utils/select-environment.ts",
+    "../../fern-docs/components/src/utils/playground/oauth.ts",
+    "../../fern-docs/components/src/utils/playground/auth-headers.test.ts",
+    "../../fern-docs/components/src/utils/playground/auth-headers.ts",
+    "../../fern-docs/components/src/utils/playground"
+  ]
 }

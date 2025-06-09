@@ -4,9 +4,9 @@ import { ReactNode } from "react";
 
 import { UnreachableCaseError } from "ts-essentials";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { cn } from "@fern-docs/components";
-import { processIcon } from "@fern-docs/components/util/processIcon";
+import { processIcon } from "@fern-docs/components/processIcon";
 
 import { SidebarApiPackageChild } from "./SidebarApiPackageChild";
 import { SidebarApiPackageNode } from "./SidebarApiPackageNode";

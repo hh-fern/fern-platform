@@ -5,8 +5,6 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { Wifi, WifiOff } from "lucide-react";
 import urlJoin from "url-join";
 
-import { buildAuthHeaders } from "@fern-api/docs-utils/playground/auth-headers";
-import { usePlaygroundBaseUrl } from "@fern-api/docs-utils/playground/select-environment";
 import type { WebSocketContext } from "@fern-api/fdr-sdk/api-definition";
 import {
   WebSocketMessage,
@@ -21,6 +19,8 @@ import {
   usePlaygroundWebsocketFormState,
 } from "@fern-ui/state/playground";
 
+import { buildAuthHeaders } from "../../utils/playground/auth-headers";
+import { usePlaygroundBaseUrl } from "../../utils/select-environment";
 import { PlaygroundEndpointPath } from "../endpoint/PlaygroundEndpointPath";
 import { useWebsocketMessages } from "../hooks/useWebsocketMessages";
 import { PlaygroundWebSocketContent } from "./PlaygroundWebSocketContent";

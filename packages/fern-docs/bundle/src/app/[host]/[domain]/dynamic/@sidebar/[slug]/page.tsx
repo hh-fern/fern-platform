@@ -2,9 +2,9 @@ import "server-only";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { createCachedMdxSerializer } from "@fern-api/docs-server/mdx-serializer";
-import { getFernToken } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { getFernToken } from "@fern-docs/components/fern-token";
 import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
 import { SidebarTabsRootServer } from "@fern-docs/components/sidebar/SidebarTabsRootServer";
 import { SidebarRootNode } from "@fern-docs/components/sidebar/nodes/SidebarRootNode";

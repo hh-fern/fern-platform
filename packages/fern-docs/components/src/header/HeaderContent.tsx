@@ -6,8 +6,8 @@ import React from "react";
 import { FernButtonGroup, cn } from "@fern-docs/components";
 import { useIsDesktop } from "@fern-ui/react-commons";
 
-import { SearchV2Trigger } from "../../../../commons/state/src/search";
 import { ThemeSwitch } from "../sidebar/theme-switch";
+import { SearchV2Trigger } from "../utils/search";
 import { MobileMenuButton } from "./MobileButtons";
 
 export function HeaderContent({

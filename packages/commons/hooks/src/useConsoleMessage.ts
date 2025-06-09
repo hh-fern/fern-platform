@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useIsWhitelabeled } from "../../state/src/whitelabeled";
+import { useIsWhitelabeled } from "@fern-ui/state/whitelabeled";
 
 export const useConsoleMessage = (): void => {
   const hasBeenCalled = React.useRef(false);

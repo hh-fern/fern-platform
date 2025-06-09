@@ -8,7 +8,7 @@ import {
   TypeId,
   TypeReference,
 } from "@fern-api/fdr-sdk/api-definition";
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { withErrorBoundary } from "@fern-docs/components/error-boundary";
 import { useBooleanState } from "@fern-ui/react-commons";
 

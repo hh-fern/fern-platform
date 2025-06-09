@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 export declare namespace PlaygroundFormDataEntryValue {
   interface SingleFile {
     type: "file";

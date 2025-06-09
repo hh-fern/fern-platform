@@ -7,7 +7,7 @@ import { Search, Slash, X } from "lucide-react";
 import { removeTrailingSlash } from "@fern-api/docs-utils";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { isNonNullish } from "@fern-api/ui-core-utils";
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import {
   FernButton,
   FernInput,

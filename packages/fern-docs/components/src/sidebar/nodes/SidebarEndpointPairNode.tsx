@@ -5,8 +5,8 @@ import { ReactNode } from "react";
 import { useAtomValue } from "jotai";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { FERN_STREAM_ATOM } from "@fern-ui/state/stream";
 
-import { FERN_STREAM_ATOM } from "../../../../../commons/state/src/stream";
 import { SidebarApiLeafNode } from "./SidebarApiLeafNode";
 
 interface SidebarEndpointPairNodeProps {

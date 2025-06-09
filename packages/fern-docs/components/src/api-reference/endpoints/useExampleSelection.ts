@@ -12,7 +12,7 @@ import {
   getProgrammingLanguage,
   useDefaultProgrammingLanguage,
   useProgrammingLanguage,
-} from "../../../../../commons/state/src/language";
+} from "../../utils/language";
 import { CodeExample } from "../examples/code-example";
 import {
   getAvailableLanguages,

@@ -1,10 +1,10 @@
 "use client";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import type { FernNavigation } from "@fern-api/fdr-sdk";
-import { cn } from "@fern-docs/components";
 
-import { useIsSelectedSidebarNode } from "../../../../../commons/state/src/navigation";
 import { HttpMethodBadge } from "../../badges/http-method-badge";
+import { useIsSelectedSidebarNode } from "../../utils/navigation";
 
 export function ApiLeafBadge({
   node,

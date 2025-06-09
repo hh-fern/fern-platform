@@ -12,9 +12,9 @@ import {
   cn,
 } from "@fern-docs/components";
 import { useBooleanState } from "@fern-ui/react-commons";
+import { SELECTED_ENVIRONMENT_ATOM } from "@fern-ui/state/environment";
 
-import { SELECTED_ENVIRONMENT_ATOM } from "../../../commons/state/src/environment";
-import { PLAYGROUND_ENVIRONMENT_ATOM } from "../../../commons/state/src/playground";
+import { PLAYGROUND_ENVIRONMENT_ATOM } from "./utils/playground";
 
 interface MaybeEnvironmentDropdownProps {
   baseUrl?: string;

@@ -1,6 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@fern-platform/configs/tsconfig/library.json",
-  "compilerOptions": { "outDir": "./dist", "rootDir": "./src" },
-  "include": ["src/**/*"]
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "lib": ["dom"]
+  },
+  "include": [
+    "src/**/*",
+    "../../fern-docs/components/src/layouts/hooks/use-anchor.ts",
+    "../../fern-docs/components/src/layouts/hooks/use-current-pathname.test.ts",
+    "../../fern-docs/components/src/layouts/hooks/use-current-pathname.ts",
+    "../../fern-docs/components/src/layouts/hooks/use-theme.ts",
+    "../../fern-docs/components/src/layouts/hooks/use-url-params.test.ts",
+    "../../fern-docs/components/src/layouts/hooks/use-url-params.ts",
+    "../../fern-docs/components/src/hooks/useLocationHref.ts"
+  ]
 }

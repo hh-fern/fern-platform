@@ -8,10 +8,17 @@ import { SendHorizonal } from "lucide-react";
 
 import type { ProxyRequest } from "@fern-api/docs-utils/types";
 import { PlaygroundResponse } from "@fern-api/docs-utils/types/playgroundResponse";
+import {
+  buildAuthHeaders,
+  getInitialEndpointRequestFormStateWithExample,
+  serializeFormStateBody,
+} from "@fern-api/docs-utils/utils";
+import { usePlaygroundBaseUrl } from "@fern-api/docs-utils/utils/select-environment";
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { buildEndpointUrl } from "@fern-api/fdr-sdk/api-definition";
 import { unknownToString } from "@fern-api/ui-core-utils";
 import { FernTooltipProvider } from "@fern-docs/components";
+import { usePlaygroundSettings } from "@fern-ui/hooks/usePlaygroundSettings";
 import {
   Loadable,
   failed,
@@ -20,28 +27,19 @@ import {
   notStartedLoading,
 } from "@fern-ui/loadable";
 import { useEventCallback } from "@fern-ui/react-commons";
-
-import {
-  buildAuthHeaders,
-  getInitialEndpointRequestFormStateWithExample,
-  serializeFormStateBody,
-} from "../../../../../commons/docs-utils/utils";
-import { usePlaygroundBaseUrl } from "../../../../../commons/docs-utils/utils/select-environment";
-import { usePlaygroundSettings } from "../../../../../commons/hooks/src/usePlaygroundSettings";
-import {
-  isProxyDisabledAtom,
-  usesApplicationJsonInFormDataValueAtom,
-} from "../../../../../commons/state/src/api-explorer-flags";
-import { fernUserAtom } from "../../../../../commons/state/src/fern-user";
-import { jotaiStore } from "../../../../../commons/state/src/jotai-provider";
+import { fernUserAtom } from "@fern-ui/state/fern-user";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
   usePlaygroundEndpointFormState,
-} from "../../../../../commons/state/src/playground";
+} from "@fern-ui/state/playground";
+
 import { track } from "../../analytics";
-import {../../../../../commons/docs-utils/playgrounds/executeProxyRest";
-import { executeProxyStream } from "../../../../../commons/docs-utils/src/playground/select-environmentt
+import { jotaiStore } from "../../contexts/jotai-provider";
+import {
+  isProxyDisabledAtom,
+  usesApplicationJsonInFormDataValueAtom,
+} from "../../utils/api-explorer-flags";
 import { PlaygroundEndpointContent } from "./PlaygroundEndpointContent";
 import { PlaygroundEndpointPath } from "./PlaygroundEndpointPath";
 

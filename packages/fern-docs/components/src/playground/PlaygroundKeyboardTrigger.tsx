@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 
-import { useUrlParams } from "../../../../commons/hooks/src/use-url-params";
+import { useUrlParams } from "../layouts/hooks/use-url-params";
 
 export function PlaygroundKeyboardTrigger() {
   const router = useRouter();

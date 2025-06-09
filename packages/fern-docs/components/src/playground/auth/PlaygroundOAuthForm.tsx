@@ -5,6 +5,8 @@ import { ReactElement, useState } from "react";
 import { useAtom } from "jotai";
 import { HelpCircle, Key, User } from "lucide-react";
 
+import { oAuthClientCredentialReferencedEndpointLoginFlow } from "@fern-api/docs-utils/oauth";
+import { usePlaygroundBaseUrl } from "@fern-api/docs-utils/select-environment";
 import { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import {
@@ -15,15 +17,13 @@ import {
   FernTooltipProvider,
 } from "@fern-docs/components";
 
-import { oAuthClientCredentialReferencedEndpointLoginFlow } from "../../../../../commons/docs-utils/utils/oauth";
-import { usePlaygroundBaseUrl } from "../../../../../commons/docs-utils/utils/select-environment";
+import { Callout } from "../../mdx/components/callout";
 import {
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
   usePlaygroundEndpointFormState,
-} from "../../../../../commons/state/src/playground";
-import { Callout } from "../../mdx/components/callout";
-import { PasswordInputGroup } from "../PasswordInputGroup";../../../../../commons/docs-utils/playground/oauth
-import { PlaygroundEndpointForm } from../../../../../commons/docs-utils/playground/select-environment
+} from "../../utils/playground";
+import { PasswordInputGroup } from "../PasswordInputGroup";
+import { PlaygroundEndpointForm } from "../endpoint";
 import { useClosePlaygroundAuthorizationFormCard } from "./PlaygroundAuthorizationFormCardRoot";
 
 export function FoundOAuthReferencedEndpointForm({

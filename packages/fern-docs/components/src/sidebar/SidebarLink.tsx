@@ -15,11 +15,11 @@ import { ChevronDown, Lock } from "lucide-react";
 
 import { slugToHref } from "@fern-api/docs-utils";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { FernTooltip, cn } from "@fern-docs/components";
+import { FernTooltip } from "@fern-docs/components";
 import { FernLink } from "@fern-docs/components/FernLink";
+import { useScrollSidebarNodeIntoView } from "@fern-ui/state/sidebar-scroll";
 
-import { useIsSelectedSidebarNode } from "../../../../commons/state/src/navigation";
-import { useScrollSidebarNodeIntoView } from "../../../../commons/state/src/sidebar-scroll";
+import { useIsSelectedSidebarNode } from "../utils/navigation";
 
 interface SidebarSlugLinkProps {
   nodeId: FernNavigation.NodeId;

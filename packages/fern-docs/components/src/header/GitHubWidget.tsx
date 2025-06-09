@@ -6,7 +6,7 @@ import { preload } from "react-dom";
 import { GitFork, Github, Star } from "lucide-react";
 import useSWRImmutable from "swr/immutable";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernLinkButton } from "@fern-docs/components/FernLinkButton";
 
 /* eslint-disable @typescript-eslint/no-deprecated */

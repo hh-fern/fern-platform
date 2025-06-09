@@ -8,12 +8,11 @@ import { StoreApi, UseBoundStore, create } from "zustand";
 
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { useIsomorphicLayoutEffect, useLazyRef } from "@fern-ui/react-commons";
-
 import {
   ExpandedNodesState,
   createInitialExpandedNodes,
   invertParentChildMap,
-} from "./navigation-server";
+} from "@fern-ui/state/navigation-server";
 
 type SidebarAction =
   | { type: "toggle"; nodeId: FernNavigation.NodeId }

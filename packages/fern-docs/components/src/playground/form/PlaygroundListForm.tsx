@@ -8,7 +8,7 @@ import {
   TypeDefinition,
   TypeShapeOrReference,
 } from "@fern-api/fdr-sdk/api-definition";
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernButton } from "@fern-docs/components";
 
 import {../../../../../commons/docs-utils/playground

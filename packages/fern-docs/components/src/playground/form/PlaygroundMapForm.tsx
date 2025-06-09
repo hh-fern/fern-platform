@@ -11,7 +11,7 @@ import {
 import { isPlainObject, unknownToString } from "@fern-api/ui-core-utils";
 import { FernButton } from "@fern-docs/components";
 
-import { getEmptyValueForType } from "../../../../../commons/docs-utils/src/playground";
+import { getEmptyValueForType } from "../../utils/playground";
 import { PlaygroundTypeReferenceForm } from "./PlaygroundTypeReferenceForm";
 
 interface PlaygroundMapFormProps {

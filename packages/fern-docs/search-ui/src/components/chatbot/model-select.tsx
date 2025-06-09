@@ -8,7 +8,7 @@ import {
   useContext,
 } from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 import { Anthropic } from "../icons/anthropic";
 import { Cohere } from "../icons/cohere";

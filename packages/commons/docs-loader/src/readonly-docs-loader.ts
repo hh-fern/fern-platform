@@ -21,7 +21,6 @@ import {
   cacheSeed,
   cleanBasePath,
   createGetAuthState,
-  findEndpoint,
   generateFernColorPalette,
   generateFonts,
   getDocsUrlMetadata,
@@ -43,6 +42,7 @@ import {
   HttpMethod,
   withoutStaging,
 } from "@fern-api/docs-utils";
+import { findEndpoint } from "@fern-api/docs-utils/processRequestSnippetComponents";
 import {
   ApiDefinition,
   DocsV1Read,

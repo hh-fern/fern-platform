@@ -2,8 +2,8 @@ import "server-only";
 
 import { FaIcon } from "@fern-docs/components";
 
-import { HideAsides } from "../../../commons/state/src/layout";
 import ReturnHomeButton from "./ReturnHomeButton";
+import { HideAsides } from "./utils/layout";
 
 export default async function NotFoundContent() {
   return (

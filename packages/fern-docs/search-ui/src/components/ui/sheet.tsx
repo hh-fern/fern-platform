@@ -5,7 +5,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { type VariantProps, cva } from "class-variance-authority";
 import { X } from "lucide-react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 const Sheet = SheetPrimitive.Root;
 

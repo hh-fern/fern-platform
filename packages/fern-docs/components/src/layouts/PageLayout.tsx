@@ -1,7 +1,7 @@
 import React from "react";
 
-import { HideAsides, SetLayout } from "../../../../commons/state/src/layout";
 import { Prose } from "../mdx/components/prose";
+import { HideAsides, SetLayout } from "../utils/layout";
 
 interface PageLayoutProps {
   header?: React.ReactNode;

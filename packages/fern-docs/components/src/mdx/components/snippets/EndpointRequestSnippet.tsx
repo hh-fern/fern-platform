@@ -7,9 +7,9 @@ import { CodeExampleClientDropdown } from "@fern-docs/components/api-reference/e
 import { EndpointUrlWithOverflow } from "@fern-docs/components/api-reference/endpoints/EndpointUrlWithOverflow";
 import { useExampleSelection } from "@fern-docs/components/api-reference/endpoints/useExampleSelection";
 import { CodeSnippetExample } from "@fern-docs/components/api-reference/examples/CodeSnippetExample";
-import { usePlaygroundBaseUrl } from "@fern-docs/components/playground/utils/select-environment";
 
-import { useCurrentVersionSlug } from "../../../../../../commons/state/src/navigation";
+import { useCurrentVersionSlug } from "../../../utils/navigation";
+import { usePlaygroundBaseUrl } from "../../../utils/select-environment";
 
 export function EndpointRequestSnippet({
   example,

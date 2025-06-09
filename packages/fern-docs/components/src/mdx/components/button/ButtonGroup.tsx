@@ -1,6 +1,6 @@
 import { ComponentProps, ReactElement } from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernButtonGroup } from "@fern-docs/components";
 
 export function ButtonGroup(

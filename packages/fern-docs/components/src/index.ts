@@ -1,7 +1,6 @@
 export * from "./accordion";
 export * from "./badges";
 export * from "./BuiltWithFern";
-export * from "./cn";
 export * from "./CopyToClipboardButton";
 export * from "./Empty";
 export * from "./fa-icon";

@@ -3,11 +3,11 @@ import React from "react";
 
 import * as RadixTabs from "@radix-ui/react-tabs";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { ApiDefinition } from "@fern-api/fdr-sdk";
-import { cn } from "@fern-docs/components";
+import { useCurrentAnchor } from "@fern-ui/hooks/use-anchor";
 
-import { useCurrentAnchor } from "../../../../../../commons/hooks/src/use-anchor";
-import { useProgrammingLanguage } from "../../../../../../commons/state/src/language";
+import { useProgrammingLanguage } from "../../../utils/language";
 import { unwrapChildren } from "../../common/unwrap-children";
 
 export interface TabProps {

@@ -2,7 +2,7 @@
 
 import { ReactElement, memo, useEffect, useRef } from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernLink } from "@fern-docs/components/FernLink";
 
 export interface TableOfContentsItemProps {

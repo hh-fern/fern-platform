@@ -7,8 +7,8 @@ import type { Element as HastElement } from "hast";
 import { useAtom, useAtomValue } from "jotai";
 import { CONTINUE, EXIT, visit } from "unist-util-visit";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { isNonNullish } from "@fern-api/ui-core-utils";
-import { cn } from "@fern-docs/components";
 import { Badge } from "@fern-docs/components/badges";
 
 import { AlgoliaRecordHit } from "../../types";

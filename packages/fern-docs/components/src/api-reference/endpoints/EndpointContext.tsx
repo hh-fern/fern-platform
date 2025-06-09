@@ -9,7 +9,7 @@ import {
   ErrorResponse,
 } from "@fern-api/fdr-sdk/api-definition";
 
-import { useCurrentAnchor } from "../../../../../commons/hooks/src/use-anchor";
+import { useCurrentAnchor } from "../../layouts/hooks/use-anchor";
 import { useExampleSelection } from "./useExampleSelection";
 import { convertNameToAnchorPart } from "./utils";
 

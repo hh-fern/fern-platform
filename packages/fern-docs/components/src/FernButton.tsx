@@ -12,10 +12,10 @@ import {
 
 import { Slot } from "@radix-ui/react-slot";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import { SemanticColor } from "@fern-api/docs-utils/colors";
 
 import { FernTooltip } from "./FernTooltip";
-import { cn } from "./cn";
 import { FaIcon } from "./fa-icon";
 
 export interface FernButtonSharedProps {

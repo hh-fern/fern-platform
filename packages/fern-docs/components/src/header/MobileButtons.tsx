@@ -3,8 +3,7 @@
 import { Menu, X } from "lucide-react";
 
 import { Button, cn } from "@fern-docs/components";
-
-import { useIsDismissableSidebarOpen } from "../../../../commons/state/src/mobile";
+import { useIsDismissableSidebarOpen } from "@fern-ui/state/mobile";
 
 export function MobileMenuButton({ className }: { className?: string }) {
   const [open, setOpen] = useIsDismissableSidebarOpen();

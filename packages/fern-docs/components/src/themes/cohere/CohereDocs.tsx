@@ -5,16 +5,16 @@ import React, { useEffect, useRef } from "react";
 
 import { useSetAtom } from "jotai";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { FernScrollArea } from "@fern-docs/components";
 import {
   FERN_COHERE_CONTENT_ID,
   FERN_FOOTER_ID,
 } from "@fern-docs/components/constants";
 import { HeaderTabsRoot } from "@fern-docs/components/header/HeaderTabsRoot";
+import { SCROLL_BODY_ATOM } from "@fern-ui/state/viewport";
 
-import { useCurrentPathname } from "../../../../../commons/hooks/src/use-current-pathname";
-import { SCROLL_BODY_ATOM } from "../../../../../commons/state/src/viewport";
+import { useCurrentPathname } from "../../layouts/hooks/use-current-pathname";
 import { FernHeader } from "../default/fern-header";
 import { MainCtx } from "../default/mobile-menu";
 import { SidebarNav } from "../default/side-nav";

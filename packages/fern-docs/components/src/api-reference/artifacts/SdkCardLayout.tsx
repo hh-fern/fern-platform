@@ -2,7 +2,7 @@
 
 import { ReactElement, useMemo } from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 export declare namespace SdkCardLayout {
   export interface Props {

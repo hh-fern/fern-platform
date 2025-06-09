@@ -1,7 +1,7 @@
 import React from "react";
 
-import { SetLayout } from "../../../../commons/state/src/layout";
 import { Prose } from "../mdx/components/prose";
+import { SetLayout } from "../utils/layout";
 import { AsideAwareDiv } from "./AsideAwareDiv";
 
 interface OverviewLayoutProps {

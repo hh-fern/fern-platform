@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 
+import { cn } from "@fern-api/docs-utils/cn";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { cn } from "@fern-docs/components";
 
 import { SidebarPageNode } from "./SidebarPageNode";
 

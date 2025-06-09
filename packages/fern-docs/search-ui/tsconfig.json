@@ -26,13 +26,13 @@
     },
     {
       "path": "../../commons/core-utils"
-    },
-    {
-      "path": "../components"
-    },
-    {
-      "path": "../../commons/react-commons"
     }
+    // {
+    //   "path": "../components"
+    // },
+    // {
+    //   "path": "../../commons/react-commons"
+    // }
   ],
   "include": [
     "next-env.d.ts",

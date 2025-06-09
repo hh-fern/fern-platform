@@ -1,8 +1,5 @@
 import { UIColor } from "./colors";
 
-// import { UIColor } from "../../../fern-docs/components/src/colors";
-// import { Badge, BadgeProps } from "../../../fern-docs/components/src/badges/badge";
-
 export type HttpMethod =
   | "GET"
   | "DELETE"

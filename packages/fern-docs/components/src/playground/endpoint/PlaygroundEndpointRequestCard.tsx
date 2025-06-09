@@ -10,17 +10,17 @@ import {
   FernButtonGroup,
   FernCard,
 } from "@fern-docs/components";
-
-import { usePlaygroundBaseUrl } from "../../../../../commons/docs-utils/utils/select-environment";
-import { isFileForgeHackEnabledAtom } from "../../../../../commons/state/src/api-explorer-flags";
-import { jotaiStore } from "../../../../../commons/state/src/jotai-provider";
-import { useProgrammingLanguage } from "../../../../../commons/state/src/language";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
-} from "../../../../../commons/state/src/playground";
+} from "@fern-ui/state/playground";
+
+import { jotaiStore } from "../../contexts/jotai-provider";
+import { isFileForgeHackEnabledAtom } from "../../utils/api-explorer-flags";
+import { useProgrammingLanguage } from "../../utils/language";
+import { usePlaygroundBaseUrl } from "../../utils/select-environment";
 import { PlaygroundRequestPreview } from "../PlaygroundRequestPreview";
-import { PlaygroundCodeSnippetResolver../../../../../commons/docs-utils/playground/select-environment
+import { PlaygroundCodeSnippetResolverBuilder } from "../code-snippets/resolver";
 
 interface PlaygroundEndpointRequestCardProps {
   context: EndpointContext;

@@ -2,7 +2,7 @@ import { FC } from "react";
 
 import * as Popover from "@radix-ui/react-popover";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 export interface FeedbackFormDialogProps extends Popover.PopoverProps {
   trigger: React.ReactNode;

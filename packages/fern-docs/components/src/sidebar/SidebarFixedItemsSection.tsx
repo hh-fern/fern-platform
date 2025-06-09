@@ -2,10 +2,10 @@
 
 import { Fragment } from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import { useIsMobile } from "@fern-ui/react-commons";
 
-import { SearchV2Trigger } from "../../../../commons/state/src/search";
+import { SearchV2Trigger } from "../utils/search";
 
 export function SidebarFixedItemsSection({
   logo,

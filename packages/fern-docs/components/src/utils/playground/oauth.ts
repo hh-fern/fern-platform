@@ -1,6 +1,7 @@
 import { mapValues } from "es-toolkit/object";
 import { JSONPath } from "jsonpath-plus";
 
+import { executeProxyRest } from "@fern-api/docs-utils/fetch/executeProxyRest";
 import {
   PlaygroundEndpointRequestFormState,
   ProxyRequest,
@@ -15,8 +16,7 @@ import {
   visitDiscriminatedUnion,
 } from "@fern-api/ui-core-utils";
 
-import { executeProxyRest } from "../../../../fern-docs/components/src/playground/fetch-utils/executeProxyRest";
-import { serializeFormStateBody } from "./serialize";
+import { serializeFormStateBody } from ".";
 
 export interface OAuthClientCredentialReferencedEndpointLoginFlowProps {
   formState: PlaygroundEndpointRequestFormState;

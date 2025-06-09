@@ -13,11 +13,11 @@ import React from "react";
 import fastdom from "fastdom";
 import { useCallbackOne } from "use-memo-one";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 import type { TableOfContentsItem as TableOfContentsItemType } from "@fern-docs/mdx";
 
-import { useCurrentAnchor } from "../../../../commons/hooks/src/use-anchor";
 import { WithFeatureFlags } from "../feature-flags/WithFeatureFlags";
+import { useCurrentAnchor } from "../layouts/hooks/use-anchor";
 import { TableOfContentsItem } from "./TableOfContentsItem";
 import { useTableOfContentsObserver } from "./useTableOfContentsObserver";
 

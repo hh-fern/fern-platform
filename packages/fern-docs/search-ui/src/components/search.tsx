@@ -8,37 +8,37 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { z } from "zod";
 
 import { Feedback } from "@fern-docs/components/feedback/Feedback";
-import {
-  CommandActions,
-  CommandEmpty,
-  CommandGroupFilters,
-  CommandGroupTheme,
-  CommandSearchHits,
-  DefaultDesktopBackButton,
-  DesktopCommand,
-  DesktopCommandWithAskAI,../../../../commons/state/src/utils/atomWithStorageString
-  DesktopSearchDialog,
-  SEARCH_INDEX,
-  SearchClientRoot,
-} from "@fern-docs/search-ui";
+// import {
+//   CommandActions,
+//   CommandEmpty,
+//   CommandGroupFilters,
+//   CommandGroupTheme,
+//   CommandSearchHits,
+//   DefaultDesktopBackButton,
+//   DesktopCommand,
+//   DesktopCommandWithAskAI,@fern-ui/state/utils/atomWithStorageString
+//   DesktopSearchDialog,
+//   SEARCH_INDEX,
+//   SearchClientRoot,
+// } from "@fern-docs/search-ui";
 import { useEventCallback, useLazyRef } from "@fern-ui/react-commons";
 
-import { useCurrentPathname } from "../../../../commons/hooks/src/use-current-pathname";
-import {
-  useSetTheme,
-  useThemeSwitchEnabled,
-} from "../../../../commons/hooks/src/use-theme";
-import { useApiRoute } from "../../../../commons/hooks/src/useApiRoute";
-import { useApiRouteSWRImmutable } from "../../../../commons/hooks/src/useApiRouteSWR";
-import { useCurrentVersionId } from "../../../../commons/state/src/navigation";
-import {
-  askAiAtom,
-  searchDialogOpenAtom,
-  searchInitializedAtom,
-  useIsAskAiEnabled,
-  useIsDefaultSearchFilterOff,
-} from "../../../../commons/state/src/search";
-import { atomWithStorageString } from "../../../../commons/state/utils/atomWithStorageString";
+// import { useCurrentPathname } from "../../../../commons/hooks/src/use-current-pathname";
+// import {
+//   useSetTheme,
+//   useThemeSwitchEnabled,
+// } from "../../../../commons/hooks/src/use-theme";
+// import { useApiRoute } from "../../../../commons/hooks/src/useApiRoute";
+// import { useApiRouteSWRImmutable } from "../../../../commons/hooks/src/useApiRouteSWR";
+// import { useCurrentVersionId } from "../../../components/src/utils/navigation";
+// import {
+//   askAiAtom,
+//   searchDialogOpenAtom,
+//   searchInitializedAtom,
+//   useIsAskAiEnabled,
+//   useIsDefaultSearchFilterOff,
+// } from "../../../components/src/utils/search";
+// import { atomWithStorageString } from "../../../../commons/state/utils/atomWithStorageString";
 
 const ALGOLIA_USER_TOKEN_KEY = "algolia-user-token";
 

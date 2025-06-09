@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef, ReactElement, ReactNode } from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn } from "@fern-api/docs-utils/cn";
 
 interface ChangelogContentLayoutProps extends ComponentPropsWithoutRef<"div"> {
   as: "div" | "section" | "article";
