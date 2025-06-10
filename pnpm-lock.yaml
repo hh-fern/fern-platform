@@ -779,6 +779,9 @@ importers:
       '@sparticuz/chromium':
         specifier: ^133.0.0
         version: 133.0.0
+      '@tailwindcss/typography':
+        specifier: ^0.5.16
+        version: 0.5.16(tailwindcss@4.0.9)
       '@tanstack/react-query':
         specifier: ^5.71.1
         version: 5.71.1(react@19.0.0)
@@ -1079,9 +1082,6 @@ importers:
       '@segment/snippet':
         specifier: ^5.2.1
         version: 5.2.1
-      '@slack/web-api':
-        specifier: ^6.9.0
-        version: 6.12.0
       '@upstash/qstash':
         specifier: ^2.7.16
         version: 2.7.16
