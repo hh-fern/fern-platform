@@ -11,6 +11,7 @@ import { z } from "zod";
 import { track } from "@fern-api/docs-server/analytics/posthog";
 import { algoliaAppId } from "@fern-api/docs-server/env-variables";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { COOKIE_FERN_TOKEN } from "@fern-api/docs-utils";
 import { getEdgeFlags } from "@fern-docs/edge-config";
@@ -19,8 +20,6 @@ import {
   type AlgoliaRecord,
   SEARCH_INDEX,
 } from "@fern-docs/search-server/algolia";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 const DEPLOYMENT_ID = getEnv().VERCEL_DEPLOYMENT_ID ?? "development";
 const PREFIX = `docs:${DEPLOYMENT_ID}`;

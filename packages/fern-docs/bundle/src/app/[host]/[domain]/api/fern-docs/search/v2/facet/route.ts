@@ -4,11 +4,10 @@ import { algoliasearch } from "algoliasearch";
 
 import { algoliaAppId } from "@fern-api/docs-server/env-variables";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { selectFirst } from "@fern-api/docs-server/utils/selectFirst";
 import { toArray } from "@fern-api/docs-server/utils/toArray";
 import { fetchFacetValues } from "@fern-docs/search-server/algolia";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 10;
 

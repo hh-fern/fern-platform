@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import urlJoin from "url-join";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import {
   HEADER_HOST,
   HEADER_X_FERN_HOST,
@@ -11,8 +12,6 @@ import {
 } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const runtime = "edge";
 

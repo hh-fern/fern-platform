@@ -27,6 +27,7 @@ import {
   turbopufferApiKey,
 } from "@fern-api/docs-server/env-variables";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { withoutStaging } from "@fern-api/docs-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
@@ -40,7 +41,6 @@ import {
 } from "@fern-docs/search-server/turbopuffer";
 
 import { getFernToken } from "@/app/fern-token";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 60;
 export const revalidate = 0;

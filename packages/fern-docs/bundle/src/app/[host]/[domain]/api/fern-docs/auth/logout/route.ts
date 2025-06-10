@@ -8,6 +8,7 @@ import { getReturnToQueryParam } from "@fern-api/docs-server/auth/return-to";
 import { withDeleteCookie } from "@fern-api/docs-server/auth/with-secure-cookie";
 import { revokeSessionForToken } from "@fern-api/docs-server/auth/workos-session";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { safeUrl } from "@fern-api/docs-server/safeUrl";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import {
@@ -17,8 +18,6 @@ import {
 } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const runtime = "edge";
 

@@ -14,6 +14,7 @@ import {
   getMetadataFromResponse,
 } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { loadWithUrl } from "@fern-api/docs-server/loadWithUrl";
 import { pruneWithAuthState } from "@fern-api/docs-server/withRbac";
 import {
@@ -33,7 +34,6 @@ import {
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 
-import { isSelfHosted } from "@/server/isSelfHosted";
 import {
   queueAlgoliaReindex,
   queueTurbopufferReindex,

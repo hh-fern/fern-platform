@@ -4,6 +4,7 @@ import urljoin from "url-join";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import {
   getDocsDomainApp,
   getDocsHostApp,
@@ -12,8 +13,6 @@ import { conformTrailingSlash } from "@fern-api/docs-utils";
 import { NodeCollector } from "@fern-api/fdr-sdk/navigation";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getCanonicalUrl } from "@fern-docs/edge-config";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 import { getFernToken } from "./fern-token";
 

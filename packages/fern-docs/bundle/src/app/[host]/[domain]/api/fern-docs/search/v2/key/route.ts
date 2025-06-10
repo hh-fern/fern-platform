@@ -8,6 +8,7 @@ import {
 } from "@fern-api/docs-server/env-variables";
 import { getDocsUrlMetadata } from "@fern-api/docs-server/getDocsUrlMetadata";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { selectFirst } from "@fern-api/docs-server/utils/selectFirst";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { COOKIE_FERN_TOKEN, withoutStaging } from "@fern-api/docs-utils";
@@ -17,8 +18,6 @@ import {
   SEARCH_INDEX,
   getSearchApiKey,
 } from "@fern-docs/search-server/algolia/edge";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 10;
 

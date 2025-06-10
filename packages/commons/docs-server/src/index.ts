@@ -17,6 +17,7 @@ export * from "./generateFonts";
 export * from "./generateRadixColors";
 export * from "./getDocsUrlMetadata";
 export * from "./isLocal";
+export * from "./isSelfHosted";
 export * from "./loadWithUrl";
 export * from "./slack";
 export * from "./types";

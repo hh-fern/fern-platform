@@ -7,11 +7,11 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { DesktopSearchButton } from "@fern-docs/search-ui";
 import { useIsMobile } from "@fern-ui/react-commons";
 
 import { FERN_SEARCH_BUTTON_ID } from "@/components/constants";
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const searchDialogOpenAtom = atom(false);
 export const searchInitializedAtom = atom(false);

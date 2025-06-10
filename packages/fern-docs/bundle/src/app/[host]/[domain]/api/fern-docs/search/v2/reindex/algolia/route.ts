@@ -9,6 +9,7 @@ import {
   fernToken_admin,
 } from "@fern-api/docs-server/env-variables";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { Gate, withBasicTokenAnonymous } from "@fern-api/docs-server/withRbac";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { slugToHref, withoutStaging } from "@fern-api/docs-utils";
@@ -18,8 +19,6 @@ import {
   algoliaIndexSettingsTask,
   algoliaIndexerTask,
 } from "@fern-docs/search-server/algolia";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export const maxDuration = 800; // 13 minutes
 

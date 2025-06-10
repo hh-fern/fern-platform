@@ -10,6 +10,7 @@ import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { FernNextResponse } from "@fern-api/docs-server/FernNextResponse";
 import { preferPreview } from "@fern-api/docs-server/auth/origin";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { FileData } from "@fern-api/docs-server/types";
 import {
   COOKIE_FERN_TOKEN,
@@ -22,8 +23,6 @@ import { NodeCollector } from "@fern-api/fdr-sdk/navigation";
 import { assertNever, withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getEdgeFlags } from "@fern-docs/edge-config";
 import { getFrontmatter } from "@fern-docs/mdx";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 const FORMATS = ["rss", "atom", "json"] as const;
 type Format = (typeof FORMATS)[number];

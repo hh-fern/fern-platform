@@ -9,6 +9,7 @@ import { OryOAuth2Client } from "@fern-api/docs-server/auth/ory";
 import { getReturnToQueryParam } from "@fern-api/docs-server/auth/return-to";
 import { withSecureCookie } from "@fern-api/docs-server/auth/with-secure-cookie";
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { safeUrl } from "@fern-api/docs-server/safeUrl";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import {
@@ -20,7 +21,6 @@ import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { FernUser, OryAccessTokenSchema } from "@fern-docs/auth";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
 
-import { isSelfHosted } from "@/server/isSelfHosted";
 import { redirectWithLoginError } from "@/server/redirectWithLoginError";
 
 export const runtime = "edge";

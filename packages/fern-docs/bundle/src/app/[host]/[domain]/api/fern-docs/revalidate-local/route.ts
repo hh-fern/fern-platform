@@ -2,9 +2,8 @@ import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
 
 export async function GET(req: NextRequest) {
   if (!isLocal() || !isSelfHosted()) {

@@ -5,8 +5,7 @@ import { kv } from "@vercel/kv";
 import { escapeRegExp } from "es-toolkit/string";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 
 export async function GET(
   _req: NextRequest,

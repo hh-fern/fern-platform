@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
-
-import { isSelfHosted } from "@/server/isSelfHosted";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 
 export async function GET() {
   if (!isLocal() || !isSelfHosted()) {
