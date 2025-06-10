@@ -106,9 +106,9 @@ export class S3ServiceImpl implements S3Service {
     this.publicDocsCDNUrl = config.cdnPublicDocsUrl;
     this.publicDocsS3 = new S3Client({
       ...(config.publicDocsS3.urlOverride != null
-        ? { 
+        ? {
             endpoint: config.publicDocsS3.urlOverride,
-            forcePathStyle: shouldForcePathStyle
+            forcePathStyle: shouldForcePathStyle,
           }
         : {}),
       region: config.publicDocsS3.bucketRegion,
@@ -119,9 +119,9 @@ export class S3ServiceImpl implements S3Service {
     });
     this.privateDocsS3 = new S3Client({
       ...(config.privateDocsS3.urlOverride != null
-        ? { 
+        ? {
             endpoint: config.privateDocsS3.urlOverride,
-            forcePathStyle: shouldForcePathStyle
+            forcePathStyle: shouldForcePathStyle,
           }
         : {}),
       region: config.privateDocsS3.bucketRegion,
@@ -132,9 +132,9 @@ export class S3ServiceImpl implements S3Service {
     });
     this.dbDocsDefinitionS3 = new S3Client({
       ...(config.dbDocsDefinitionS3.urlOverride != null
-        ? { 
+        ? {
             endpoint: config.dbDocsDefinitionS3.urlOverride,
-            forcePathStyle: shouldForcePathStyle
+            forcePathStyle: shouldForcePathStyle,
           }
         : {}),
       region: config.dbDocsDefinitionS3.bucketRegion,
@@ -145,9 +145,9 @@ export class S3ServiceImpl implements S3Service {
     });
     this.privateApiDefinitionSourceS3 = new S3Client({
       ...(config.privateApiDefinitionSourceS3.urlOverride != null
-        ? { 
+        ? {
             endpoint: config.privateApiDefinitionSourceS3.urlOverride,
-            forcePathStyle: shouldForcePathStyle
+            forcePathStyle: shouldForcePathStyle,
           }
         : {}),
       region: config.privateApiDefinitionSourceS3.bucketRegion,
@@ -207,8 +207,8 @@ export class S3ServiceImpl implements S3Service {
       });
 
       const signedUrl = await getSignedUrl(this.privateDocsS3, command, {
-          expiresIn: 604800,
-        });
+        expiresIn: 604800,
+      });
       this.presignedDownloadUrlCache.set(key, signedUrl);
       return FdrAPI.Url(signedUrl);
     }
