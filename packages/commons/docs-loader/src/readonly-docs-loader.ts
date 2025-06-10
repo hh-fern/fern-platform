@@ -9,6 +9,7 @@ import { mapValues } from "es-toolkit/object";
 import { AsyncOrSync, UnreachableCaseError } from "ts-essentials";
 import { z } from "zod";
 
+import { AuthEdgeConfig } from "@fern-api/docs-auth";
 import {
   AuthState,
   FernColorTheme,
@@ -63,7 +64,6 @@ import {
 } from "@fern-api/fdr-sdk/navigation";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, isPlainObject } from "@fern-api/ui-core-utils";
-import { AuthEdgeConfig } from "@fern-docs/auth";
 import { HttpMethod } from "@fern-docs/components";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 

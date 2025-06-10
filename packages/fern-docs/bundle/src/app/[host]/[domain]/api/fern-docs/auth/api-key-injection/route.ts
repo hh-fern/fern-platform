@@ -5,6 +5,10 @@ import urlJoin from "url-join";
 import { WebflowClient } from "webflow-api";
 import type { OauthScope } from "webflow-api/api/types/OAuthScope";
 
+import {
+  APIKeyInjectionConfig,
+  OryAccessTokenSchema,
+} from "@fern-api/docs-auth";
 import { safeVerifyFernJWTConfig } from "@fern-api/docs-server/auth/FernJWT";
 import { preferPreview } from "@fern-api/docs-server/auth/origin";
 import {
@@ -19,7 +23,6 @@ import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { removeTrailingSlash } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { APIKeyInjectionConfig, OryAccessTokenSchema } from "@fern-docs/auth";
 import {
   getApiKeyInjectionEdgeConfig,
   getAuthEdgeConfig,

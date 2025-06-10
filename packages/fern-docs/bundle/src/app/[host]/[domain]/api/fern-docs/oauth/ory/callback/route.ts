@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+import { FernUser, OryAccessTokenSchema } from "@fern-api/docs-auth";
 import { FernNextResponse } from "@fern-api/docs-server/FernNextResponse";
 import { signFernJWT } from "@fern-api/docs-server/auth/FernJWT";
 import { getAllowedRedirectUrls } from "@fern-api/docs-server/auth/allowed-redirects";
@@ -18,7 +19,6 @@ import {
   COOKIE_REFRESH_TOKEN,
 } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { FernUser, OryAccessTokenSchema } from "@fern-docs/auth";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
 
 import { redirectWithLoginError } from "@/server/redirectWithLoginError";

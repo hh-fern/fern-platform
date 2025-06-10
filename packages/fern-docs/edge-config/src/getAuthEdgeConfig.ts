@@ -1,10 +1,10 @@
-import { withoutStaging } from "@fern-api/docs-utils";
 import {
   ApiKeyDemo,
   ApiKeySchema,
   type AuthEdgeConfig,
   AuthEdgeConfigSchema,
-} from "@fern-docs/auth";
+} from "@fern-api/docs-auth";
+import { withoutStaging } from "@fern-api/docs-utils";
 
 import { getEdge } from "./getEdge";
 import { isLocal } from "./isLocal";

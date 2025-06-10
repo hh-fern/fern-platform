@@ -1,3 +1,4 @@
+import { AuthEdgeConfig } from "@fern-api/docs-auth";
 import { AuthState } from "@fern-api/docs-server";
 import { FernFonts } from "@fern-api/docs-server";
 import {
@@ -24,7 +25,6 @@ import {
   RootNode,
   Slug,
 } from "@fern-api/fdr-sdk/navigation";
-import { AuthEdgeConfig } from "@fern-docs/auth";
 import { HttpMethod } from "@fern-docs/components";
 
 import { DocsLoader, createCachedDocsLoader } from "./readonly-docs-loader";
