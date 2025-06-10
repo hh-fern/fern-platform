@@ -431,9 +431,6 @@ importers:
       colorjs.io:
         specifier: ^0.5.2
         version: 0.5.2
-      crypto:
-        specifier: ^1.0.1
-        version: 1.0.1
       es-toolkit:
         specifier: ^1.33.0
         version: 1.33.0
@@ -452,15 +449,15 @@ importers:
       react:
         specifier: 19.0.0
         version: 19.0.0
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
       ts-essentials:
         specifier: ^10.0.4
         version: 10.0.4(typescript@5.7.3)
       url-join:
         specifier: ^5.0.0
         version: 5.0.0
-      zod:
-        specifier: ^3.24.1
-        version: 3.24.4
     devDependencies:
       '@fern-api/fdr-sdk':
         specifier: workspace:*
@@ -752,9 +749,6 @@ importers:
       '@fern-api/docs-loader':
         specifier: workspace:*
         version: link:../commons/docs-loader
-      '@fern-api/docs-server':
-        specifier: workspace:*
-        version: link:../commons/docs-server
       '@fern-api/fdr-sdk':
         specifier: workspace:*
         version: link:../fdr-sdk
@@ -867,12 +861,6 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4.0.9
         version: 4.0.9
-      '@tailwindcss/typography':
-        specifier: ^0.5.16
-        version: 0.5.16(tailwindcss@4.0.9)
-      '@types/jest':
-        specifier: ^29.5.14
-        version: 29.5.14
       '@types/jsonwebtoken':
         specifier: ^9.0.9
         version: 9.0.9
@@ -894,9 +882,6 @@ importers:
       tailwindcss:
         specifier: ^4.0.9
         version: 4.0.9
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@18.19.76)(typescript@5.7.3)
       typescript:
         specifier: 5.7.3
         version: 5.7.3
@@ -1043,9 +1028,6 @@ importers:
       '@opentelemetry/sdk-logs':
         specifier: ^0.57.0
         version: 0.57.0(@opentelemetry/api@1.9.0)
-      '@radix-ui/colors':
-        specifier: ^3.0.0
-        version: 3.0.0
       '@radix-ui/primitive':
         specifier: ^1.1.1
         version: 1.1.1
@@ -1100,9 +1082,6 @@ importers:
       '@slack/web-api':
         specifier: ^6.9.0
         version: 6.12.0
-      '@types/qs':
-        specifier: 6.9.14
-        version: 6.9.14
       '@upstash/qstash':
         specifier: ^2.7.16
         version: 2.7.16
@@ -1115,24 +1094,15 @@ importers:
       '@vercel/otel':
         specifier: ^1.10.1
         version: 1.10.1(@opentelemetry/api-logs@0.57.0)(@opentelemetry/api@1.9.0)(@opentelemetry/instrumentation@0.57.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@1.30.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-logs@0.57.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-metrics@1.30.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.0(@opentelemetry/api@1.9.0))
-      '@workos-inc/node':
-        specifier: ^7.31.0
-        version: 7.31.0(express@4.21.2)(next@15.3.0-canary.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))
       ai:
         specifier: ^4.3.13
         version: 4.3.14(react@19.0.0)(zod@3.24.1)
       algoliasearch:
         specifier: ^5.20.3
         version: 5.20.3
-      bezier-easing:
-        specifier: ^2.1.0
-        version: 2.1.0
       braintrust:
         specifier: ^0.0.184
         version: 0.0.184(@aws-sdk/credential-provider-web-identity@3.744.0)(react@19.0.0)(sswr@2.1.0(svelte@5.19.2))(svelte@5.19.2)(vue@3.5.13(typescript@5.7.3))(zod@3.24.1)
-      colorjs.io:
-        specifier: ^0.5.2
-        version: 0.5.2
       cssnano:
         specifier: ^6.0.3
         version: 6.1.2(postcss@8.5.2)
@@ -1169,9 +1139,6 @@ importers:
       hast-util-to-estree:
         specifier: ^3.1.1
         version: 3.1.1
-      iron-session:
-        specifier: ^8.0.4
-        version: 8.0.4
       jose:
         specifier: ^5.9.6
         version: 5.9.6
@@ -1214,15 +1181,9 @@ importers:
       posthog-js:
         specifier: ^1.216.1
         version: 1.216.1
-      posthog-node:
-        specifier: ^4.5.0
-        version: 4.5.0
       pretty-bytes:
         specifier: ^6.1.1
         version: 6.1.1
-      qs:
-        specifier: 6.14.0
-        version: 6.14.0
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -10540,10 +10501,6 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
-
-  crypto@1.0.1:
-    resolution: {integrity: sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==}
-    deprecated: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
 
   css-declaration-sorter@7.2.0:
     resolution: {integrity: sha512-h70rUM+3PNFuaBDTLe8wF/cdWu+dOZmb7pJt8Z2sedYbAcQVQV/tEchueg3GWxwqS0cxtbxmaHEdkNACqcvsow==}
@@ -30808,8 +30765,6 @@ snapshots:
       randomfill: 1.0.4
 
   crypto-js@4.2.0: {}
-
-  crypto@1.0.1: {}
 
   css-declaration-sorter@7.2.0(postcss@8.5.2):
     dependencies:

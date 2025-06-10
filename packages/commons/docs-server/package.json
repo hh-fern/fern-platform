@@ -54,16 +54,15 @@
     "@workos-inc/node": "^7.31.0",
     "bezier-easing": "^2.1.0",
     "colorjs.io": "^0.5.2",
-    "crypto": "^1.0.1",
     "es-toolkit": "^1.33.0",
     "iron-session": "^8.0.4",
     "jose": "^5.9.6",
     "next": "15.3.0-canary.1",
     "posthog-node": "^4.5.0",
     "react": "19.0.0",
+    "server-only": "^0.0.1",
     "ts-essentials": "^10.0.4",
-    "url-join": "^5.0.0",
-    "zod": "^3.24.1"
+    "url-join": "^5.0.0"
   },
   "devDependencies": {
     "@fern-api/fdr-sdk": "workspace:*",
