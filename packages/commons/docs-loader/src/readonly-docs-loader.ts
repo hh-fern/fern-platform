@@ -1,5 +1,3 @@
-import "server-only";
-
 import { unstable_cache, unstable_cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
