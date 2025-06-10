@@ -100,10 +100,16 @@ export class S3ServiceImpl implements S3Service {
     private readonly config: FdrConfig,
     private readonly app: FdrApplication
   ) {
+    // MinIO does not support path style requests, so we need to force the forcePathStyle to true if we are in local / self-hosted mode
+    const shouldForcePathStyle = config.localModeOverride ? true : false;
+
     this.publicDocsCDNUrl = config.cdnPublicDocsUrl;
     this.publicDocsS3 = new S3Client({
       ...(config.publicDocsS3.urlOverride != null
-        ? { endpoint: config.publicDocsS3.urlOverride }
+        ? { 
+            endpoint: config.publicDocsS3.urlOverride,
+            forcePathStyle: shouldForcePathStyle
+          }
         : {}),
       region: config.publicDocsS3.bucketRegion,
       credentials: {
@@ -113,7 +119,10 @@ export class S3ServiceImpl implements S3Service {
     });
     this.privateDocsS3 = new S3Client({
       ...(config.privateDocsS3.urlOverride != null
-        ? { endpoint: config.privateDocsS3.urlOverride }
+        ? { 
+            endpoint: config.privateDocsS3.urlOverride,
+            forcePathStyle: shouldForcePathStyle
+          }
         : {}),
       region: config.privateDocsS3.bucketRegion,
       credentials: {
@@ -123,7 +132,10 @@ export class S3ServiceImpl implements S3Service {
     });
     this.dbDocsDefinitionS3 = new S3Client({
       ...(config.dbDocsDefinitionS3.urlOverride != null
-        ? { endpoint: config.dbDocsDefinitionS3.urlOverride }
+        ? { 
+            endpoint: config.dbDocsDefinitionS3.urlOverride,
+            forcePathStyle: shouldForcePathStyle
+          }
         : {}),
       region: config.dbDocsDefinitionS3.bucketRegion,
       credentials: {
@@ -133,7 +145,10 @@ export class S3ServiceImpl implements S3Service {
     });
     this.privateApiDefinitionSourceS3 = new S3Client({
       ...(config.privateApiDefinitionSourceS3.urlOverride != null
-        ? { endpoint: config.privateApiDefinitionSourceS3.urlOverride }
+        ? { 
+            endpoint: config.privateApiDefinitionSourceS3.urlOverride,
+            forcePathStyle: shouldForcePathStyle
+          }
         : {}),
       region: config.privateApiDefinitionSourceS3.bucketRegion,
       credentials: {
@@ -190,9 +205,10 @@ export class S3ServiceImpl implements S3Service {
         Bucket: this.config.privateDocsS3.bucketName,
         Key: key,
       });
+
       const signedUrl = await getSignedUrl(this.privateDocsS3, command, {
-        expiresIn: 604800,
-      });
+          expiresIn: 604800,
+        });
       this.presignedDownloadUrlCache.set(key, signedUrl);
       return FdrAPI.Url(signedUrl);
     }
@@ -266,6 +282,11 @@ export class S3ServiceImpl implements S3Service {
     filepath: DocsV1Write.FilePath;
     isPrivate: boolean;
   }): Promise<{ url: string; key: string }> {
+    const urlOverride = isPrivate ? this.config.privateDocsS3.urlOverride : this.config.publicDocsS3.urlOverride;
+    if (!urlOverride) {
+      throw new Error("urlOverride is not set");
+    }
+
     const key = this.constructS3DocsKey({ domain, time, filepath });
     const bucketName = isPrivate
       ? this.config.privateDocsS3.bucketName
@@ -278,12 +299,13 @@ export class S3ServiceImpl implements S3Service {
       input.ContentType = "image/svg+xml";
     }
     const command = new PutObjectCommand(input);
+    const url = await getSignedUrl(
+      isPrivate ? this.privateDocsS3 : this.publicDocsS3,
+      command,
+      { expiresIn: 3600 }
+    )
     return {
-      url: await getSignedUrl(
-        isPrivate ? this.privateDocsS3 : this.publicDocsS3,
-        command,
-        { expiresIn: 3600 }
-      ),
+      url: url,
       key,
     };
   }
