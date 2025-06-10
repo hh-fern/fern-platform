@@ -358,6 +358,9 @@ importers:
       react:
         specifier: 19.0.0
         version: 19.0.0
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
       ts-essentials:
         specifier: ^10.0.4
         version: 10.0.4(typescript@5.7.3)
@@ -402,8 +405,8 @@ importers:
         specifier: workspace:*
         version: link:../docs-utils
       '@fern-api/ui-core-utils':
-        specifier: 0.137.1-bf050228b
-        version: 0.137.1-bf050228b
+        specifier: workspace:*
+        version: link:../core-utils
       '@fern-docs/edge-config':
         specifier: workspace:*
         version: link:../../fern-docs/edge-config
@@ -867,6 +870,9 @@ importers:
       '@tailwindcss/typography':
         specifier: ^0.5.16
         version: 0.5.16(tailwindcss@4.0.9)
+      '@types/jest':
+        specifier: ^29.5.14
+        version: 29.5.14
       '@types/jsonwebtoken':
         specifier: ^9.0.9
         version: 9.0.9
@@ -34407,7 +34413,7 @@ snapshots:
 
   jest-message-util@29.7.0:
     dependencies:
-      '@babel/code-frame': 7.26.2
+      '@babel/code-frame': 7.27.1
       '@jest/types': 29.6.3
       '@types/stack-utils': 2.0.3
       chalk: 4.1.2

@@ -4,11 +4,11 @@ export function withPathname(
   request: NextRequest,
   pathname: string,
   search?: any
-    // | string
-    // | URLSearchParams
-    // | Record<string, string | readonly string[]>
-    // | Iterable<[string, string]>
-    // | readonly [string, string][]
+  // | string
+  // | URLSearchParams
+  // | string[][]
+  // | Record<string, string>
+  // | undefined
 ): string {
   const url = new URL(request.url);
   url.pathname = pathname;

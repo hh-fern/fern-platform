@@ -45,7 +45,7 @@
     "@aws-sdk/s3-request-presigner": "^3.744.0",
     "@fern-api/docs-auth": "workspace:*",
     "@fern-api/docs-utils": "workspace:*",
-    "@fern-api/ui-core-utils": "0.137.1-bf050228b",
+    "@fern-api/ui-core-utils": "workspace:*",
     "@fern-docs/edge-config": "workspace:*",
     "@radix-ui/colors": "^3.0.0",
     "@slack/web-api": "^6.9.0",

@@ -40,7 +40,7 @@ export async function VersionDropdown({
 }) {
   const root = await loader.getRoot();
   // HACK: force the version dropdown to appear in the cohere theme
-  const isCohere = (await loader.domain).includes("cohere");
+  const isCohere = loader.domain.includes("cohere");
 
   // If the root is not versioned or a productgroup, don't render the version dropdown
   if (root.child.type !== "versioned" && root.child.type !== "productgroup") {
