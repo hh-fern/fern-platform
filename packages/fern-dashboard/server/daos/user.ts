@@ -1,4 +1,4 @@
-import { PrismaClient, User } from "../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 export class UserDao {
   private prisma: PrismaClient;
@@ -7,9 +7,9 @@ export class UserDao {
     this.prisma = prisma;
   }
 
-  async createUser(user: User) {
-    await this.prisma.user.create({
-      data: user,
-    });
-  }
+  // async createUser(user: User) {
+  //   await this.prisma.user.create({
+  //     data: user,
+  //   });
+  // }
 }

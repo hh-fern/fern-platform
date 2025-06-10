@@ -1,6 +1,7 @@
+import { PrismaClient } from "@prisma/client";
+
 import { DocsWorkspaceDao } from "./daos/docs-workspace";
 import { UserDao } from "./daos/user";
-import { PrismaClient } from "./generated/prisma";
 
 export class DashboardDao {
   private workspaceDao: DocsWorkspaceDao;

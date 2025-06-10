@@ -22,7 +22,7 @@ export function DocsSiteNavBar({
     <div className="flex">
       <DocsSiteNavBarItem title="Overview" href="" />
       {/* TEMP: shortcut to editor */}
-      <DocsSiteNavBarItem title="Editor" href={`../../../editor/${orgName}`} />
+      <DocsSiteNavBarItem title="Editor" href={`../../../${orgName}/editor`} />
       <FeatureFlaggedClientSide
         flag={PosthogFeatureFlag.ENABLE_DOCS_ANALYTICS_TAB}
         featureFlags={featureFlags}

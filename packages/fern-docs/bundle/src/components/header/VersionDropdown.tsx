@@ -1,8 +1,8 @@
 import "server-only";
 
+import { DocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 
-import { DocsLoader } from "@/server/docs-loader";
 import { withVersionSwitcherInfo } from "@/server/withVersionSwitcherInfo";
 
 import { FaIconServer } from "../fa-icon-server";

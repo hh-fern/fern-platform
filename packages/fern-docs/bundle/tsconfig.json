@@ -13,7 +13,8 @@
     ".next/types/**/*.ts",
     ".storybook/**/*.{ts,tsx}",
     "next.config.ts",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "../../commons/docs-server/src/processRequestSnippetComponents.ts"
   ],
   "references": [
     {
@@ -39,9 +40,6 @@
     },
     {
       "path": "../search-server"
-    },
-    {
-      "path": "../utils"
     }
   ]
 }

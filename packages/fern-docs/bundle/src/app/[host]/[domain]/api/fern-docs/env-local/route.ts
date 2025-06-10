@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { isLocal } from "@/server/isLocal";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+
 import { isSelfHosted } from "@/server/isSelfHosted";
 
 export async function GET() {
