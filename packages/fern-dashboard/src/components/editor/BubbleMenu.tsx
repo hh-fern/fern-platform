@@ -16,7 +16,7 @@ type BubbleMenuAction =
   | "toggleBulletList"
   | "toggleOrderedList";
 
-export function BubbleMenu() {
+export default function BubbleMenu() {
   const { editor } = useCurrentEditor();
 
   function menuItemClickHandler(action: BubbleMenuAction) {

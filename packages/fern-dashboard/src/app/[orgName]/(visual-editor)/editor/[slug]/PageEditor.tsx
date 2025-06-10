@@ -7,7 +7,7 @@ import TiptapEditor from "@/components/editor/TiptapEditor";
 import { htmlToMdx } from "./htmlToMdx";
 import { savePageVersion } from "./savePageVersion";
 
-export declare namespace Editor {
+export declare namespace PageEditor {
   export interface Props {
     className?: string;
     initialHtml: string;
@@ -17,16 +17,16 @@ export declare namespace Editor {
 }
 
 // SEE: https://tiptap.dev/docs/editor/getting-started/install/react
-export default function Editor({
+export default function PageEditor({
   className,
   initialHtml,
   orgName,
   slug,
-}: Editor.Props) {
-  async function onTiptapEditorUpdate(props: EditorEvents["update"]) {
+}: PageEditor.Props) {
+  function onTiptapEditorUpdate(props: EditorEvents["update"]) {
     const html = props.editor.getHTML();
     const mdx = htmlToMdx(html);
-    await savePageVersion({ orgName, slug, mdx });
+    void savePageVersion({ orgName, slug, mdx });
   }
 
   return (

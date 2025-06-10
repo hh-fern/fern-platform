@@ -5,8 +5,8 @@ import Underline from "@tiptap/extension-underline";
 import { EditorProvider, EditorProviderProps } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-import { BubbleMenu } from "./BubbleMenu";
-import { FloatingMenu } from "./FloatingMenu";
+import BubbleMenu from "./BubbleMenu";
+import FloatingMenu from "./FloatingMenu";
 import Fallback from "./extension-fallback";
 
 // Configure Tiptap extensions

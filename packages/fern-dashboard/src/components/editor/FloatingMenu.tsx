@@ -14,7 +14,7 @@ type FloatingMenuAction =
   | "toggleQuote"
   | "setLink";
 
-export function FloatingMenu() {
+export default function FloatingMenu() {
   const { editor } = useCurrentEditor();
 
   function menuItemClickHandler(action: FloatingMenuAction) {
