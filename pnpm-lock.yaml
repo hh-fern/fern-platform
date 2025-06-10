@@ -788,6 +788,9 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.71.1
         version: 5.71.1(@tanstack/react-query@5.71.1(react@19.0.0))(react@19.0.0)
+      '@tiptap/core':
+        specifier: 3.0.0-beta.7
+        version: 3.0.0-beta.7(@tiptap/pm@3.0.0-beta.7)
       '@tiptap/extension-link':
         specifier: 3.0.0-beta.7
         version: 3.0.0-beta.7(@tiptap/core@3.0.0-beta.7(@tiptap/pm@3.0.0-beta.7))(@tiptap/pm@3.0.0-beta.7)

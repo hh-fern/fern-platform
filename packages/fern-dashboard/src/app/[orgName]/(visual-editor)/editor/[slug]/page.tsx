@@ -49,6 +49,11 @@ export default async function Page({
   const html = page?.markdown && (await mdxToHtml(page?.markdown));
 
   return html ? (
-    <Editor initialHtml={html} orgName={orgName} slug={slug} />
+    <Editor
+      className="w-full max-w-4xl"
+      initialHtml={html}
+      orgName={orgName}
+      slug={slug}
+    />
   ) : null;
 }
