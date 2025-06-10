@@ -100,7 +100,8 @@ export class S3ServiceImpl implements S3Service {
     private readonly config: FdrConfig,
     private readonly app: FdrApplication
   ) {
-    // MinIO does not support path style requests, so we need to force the forcePathStyle to true if we are in local / self-hosted mode
+    // When FDR is running in local mode, use path-style URLs instead of virtual-hosted style because MinIO
+    // runs at http://localhost:9000, and virtual-hosted URLs look like https://my-bucket.localhost:9000/my-key
     const shouldForcePathStyle = config.localModeOverride ? true : false;
 
     this.publicDocsCDNUrl = config.cdnPublicDocsUrl;
