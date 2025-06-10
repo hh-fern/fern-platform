@@ -282,11 +282,6 @@ export class S3ServiceImpl implements S3Service {
     filepath: DocsV1Write.FilePath;
     isPrivate: boolean;
   }): Promise<{ url: string; key: string }> {
-    const urlOverride = isPrivate ? this.config.privateDocsS3.urlOverride : this.config.publicDocsS3.urlOverride;
-    if (!urlOverride) {
-      throw new Error("urlOverride is not set");
-    }
-
     const key = this.constructS3DocsKey({ domain, time, filepath });
     const bucketName = isPrivate
       ? this.config.privateDocsS3.bucketName
@@ -299,13 +294,12 @@ export class S3ServiceImpl implements S3Service {
       input.ContentType = "image/svg+xml";
     }
     const command = new PutObjectCommand(input);
-    const url = await getSignedUrl(
-      isPrivate ? this.privateDocsS3 : this.publicDocsS3,
-      command,
-      { expiresIn: 3600 }
-    )
     return {
-      url: url,
+      url: await getSignedUrl(
+        isPrivate ? this.privateDocsS3 : this.publicDocsS3,
+        command,
+        { expiresIn: 3600 }
+      ),
       key,
     };
   }
