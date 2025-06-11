@@ -6,23 +6,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { Feed, Item } from "feed";
 import urlJoin from "url-join";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { FernNextResponse } from "@fern-api/docs-server/FernNextResponse";
+import { preferPreview } from "@fern-api/docs-server/auth/origin";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { FileData } from "@fern-api/docs-server/types";
+import {
+  COOKIE_FERN_TOKEN,
+  getRedirectForPath,
+  slugToHref,
+} from "@fern-api/docs-utils";
 import type { DocsV1Read } from "@fern-api/fdr-sdk/client/types";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { NodeCollector } from "@fern-api/fdr-sdk/navigation";
 import { assertNever, withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getEdgeFlags } from "@fern-docs/edge-config";
 import { getFrontmatter } from "@fern-docs/mdx";
-import {
-  COOKIE_FERN_TOKEN,
-  getRedirectForPath,
-  slugToHref,
-} from "@fern-docs/utils";
-
-import { FernNextResponse } from "@/server/FernNextResponse";
-import { preferPreview } from "@/server/auth/origin";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-import { isLocal } from "@/server/isLocal";
-import { FileData } from "@/server/types";
 
 const FORMATS = ["rss", "atom", "json"] as const;
 type Format = (typeof FORMATS)[number];
@@ -31,7 +31,7 @@ export async function GET(
   req: NextRequest,
   props: { params: Promise<{ host: string; domain: string }> }
 ): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return new NextResponse(
       "changelog is not accessible in local preview mode",
       {
@@ -179,7 +179,7 @@ async function createFeed(
               await toFeedItem(entry, domain, (id) => loader.getPage(id), files)
             );
           } catch (e) {
-            console.error(e);
+            console.error(`[changelog:to-feed] ${JSON.stringify(e)}`);
             // TODO: sentry
           }
         });
@@ -240,7 +240,7 @@ async function toFeedItem(
       item.image = { url: image };
     }
   } catch (e) {
-    console.error(e);
+    console.error(`[changlelog:to-feed-item] ${JSON.stringify(e)}`);
     // TODO: sentry
   }
   return item;

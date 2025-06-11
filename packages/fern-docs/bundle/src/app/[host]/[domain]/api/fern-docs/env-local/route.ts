@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { isLocal } from "@/server/isLocal";
+import { isLocal } from "@fern-api/docs-server/isLocal";
 
 export async function GET() {
   if (!isLocal()) {
@@ -21,7 +21,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       {
-        error: "[revalidate-local] failed to revalidate",
+        error: "[env-local] failed to revalidate",
         message: error instanceof Error ? error.message : "unknown error",
       },
       { status: 500 }

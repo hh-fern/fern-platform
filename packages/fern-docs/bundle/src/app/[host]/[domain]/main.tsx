@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { last } from "es-toolkit/array";
 
+import { DocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 
 import ApiEndpointPage from "@/components/api-reference/ApiEndpointPage";
@@ -15,7 +16,6 @@ import ChangelogPage, {
   ChangelogPageOverview,
 } from "@/components/changelog/ChangelogPage";
 import { LayoutEvaluator } from "@/components/layouts/LayoutEvaluator";
-import { DocsLoader } from "@/server/docs-loader";
 import { MdxSerializer } from "@/server/mdx-serializer";
 
 export async function DocsMainContent({
@@ -49,12 +49,19 @@ export async function DocsMainContent({
   );
 
   if (node.type === "changelog") {
+    // only render full page mode for changelog tabs
+    const changelogType = parents[parents.length - 1]?.type ?? "sidebarGroup";
+    const isSidebarFixed =
+      (await loader.getConfig()).layout?.disableHeader ||
+      (await loader.getConfig()).layout?.tabsPlacement === "SIDEBAR";
+
     return (
       <ChangelogPage
         loader={loader}
         serialize={serialize}
         nodeId={node.id}
         breadcrumb={breadcrumb}
+        isFullPage={changelogType === "tabbed" && !isSidebarFixed}
       />
     );
   }

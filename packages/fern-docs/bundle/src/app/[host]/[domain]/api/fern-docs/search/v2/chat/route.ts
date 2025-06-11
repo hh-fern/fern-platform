@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { createCohere } from "@ai-sdk/cohere";
 import { createOpenAI } from "@ai-sdk/openai";
 import {
@@ -15,6 +16,20 @@ import {
 import { initLogger, traced, wrapAISDKModel } from "braintrust";
 import { z } from "zod";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { postToSlack } from "@fern-api/docs-server";
+import { track } from "@fern-api/docs-server/analytics/posthog";
+import { safeVerifyFernJWTConfig } from "@fern-api/docs-server/auth/FernJWT";
+import {
+  anthropicApiKey,
+  cohereApiKey,
+  openaiApiKey,
+  turbopufferApiKey,
+} from "@fern-api/docs-server/env-variables";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { withoutStaging } from "@fern-api/docs-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
   createCohereSystemPrompt,
@@ -24,20 +39,8 @@ import {
   queryTurbopuffer,
   toDocuments,
 } from "@fern-docs/search-server/turbopuffer";
-import { withoutStaging } from "@fern-docs/utils";
 
 import { getFernToken } from "@/app/fern-token";
-import { track } from "@/server/analytics/posthog";
-import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-import {
-  cohereApiKey,
-  openaiApiKey,
-  turbopufferApiKey,
-} from "@/server/env-variables";
-import { isLocal } from "@/server/isLocal";
-import { postToSlack } from "@/server/slack";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 export const maxDuration = 60;
 export const revalidate = 0;
@@ -55,7 +58,7 @@ const modelMap: Record<string, { modelId: string; region: string }> = {
 };
 
 export async function POST(req: NextRequest) {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
       "ai chat is not accessible in local preview mode",
       { status: 400 }
@@ -84,6 +87,10 @@ export async function POST(req: NextRequest) {
     // TODO: remove command-r-plus once fern generate change is resolved
     const cohere = createCohere({ apiKey: cohereApiKey() });
     languageModel = wrapAISDKModel(cohere("command-a-03-2025"));
+  } else if (model === "claude-4") {
+    // claude-4 goes through anthropic directly
+    const anthropic = createAnthropic({ apiKey: anthropicApiKey() });
+    languageModel = wrapAISDKModel(anthropic("claude-4-sonnet-20250514"));
   } else {
     let modelId = modelMap["claude-3.5"]?.modelId || ""; // defaults for improper docs.yml entries
     let region = modelMap["claude-3.5"]?.region || "";

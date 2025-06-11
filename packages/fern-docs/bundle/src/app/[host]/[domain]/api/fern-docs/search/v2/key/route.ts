@@ -1,25 +1,28 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+import { safeVerifyFernJWTConfig } from "@fern-api/docs-server/auth/FernJWT";
+import {
+  algoliaAppId,
+  algoliaSearchApikey,
+} from "@fern-api/docs-server/env-variables";
+import { getDocsUrlMetadata } from "@fern-api/docs-server/getDocsUrlMetadata";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { selectFirst } from "@fern-api/docs-server/utils/selectFirst";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { COOKIE_FERN_TOKEN, withoutStaging } from "@fern-api/docs-utils";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
 import {
   DEFAULT_SEARCH_API_KEY_EXPIRATION_SECONDS,
   SEARCH_INDEX,
   getSearchApiKey,
 } from "@fern-docs/search-server/algolia/edge";
-import { COOKIE_FERN_TOKEN, withoutStaging } from "@fern-docs/utils";
-
-import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
-import { algoliaAppId, algoliaSearchApikey } from "@/server/env-variables";
-import { getDocsUrlMetadata } from "@/server/getDocsUrlMetadata";
-import { isLocal } from "@/server/isLocal";
-import { selectFirst } from "@/server/utils/selectFirst";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 export const maxDuration = 10;
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
       "search key is not accessible in local preview mode",
       { status: 400 }

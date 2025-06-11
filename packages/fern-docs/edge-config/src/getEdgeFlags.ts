@@ -1,14 +1,15 @@
-import type { EdgeFlags } from "@fern-docs/utils";
+import type { EdgeFlags } from "@fern-api/docs-utils";
 import {
   DEFAULT_EDGE_FLAGS,
   isCustomDomain,
   isDevelopment,
   isFern,
   withoutStaging,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
 
 import { getAllEdge } from "./getEdge";
 import { isLocal } from "./isLocal";
+import { isSelfHosted } from "./isSelfHosted";
 
 export const runtime = "edge";
 
@@ -55,7 +56,7 @@ type EdgeFlag = (typeof EDGE_FLAGS)[number];
 type EdgeConfigResponse = Record<EdgeFlag, string[] | Record<string, unknown>>;
 
 export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return DEFAULT_EDGE_FLAGS;
   }
 
@@ -240,7 +241,7 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isChangelogRedirects,
     };
   } catch (e) {
-    console.error(e);
+    console.error(`[get-edge-flags] ${JSON.stringify(e)}`);
     return {
       isApiPlaygroundEnabled: isDevelopment(domain),
       isApiScrollingDisabled: false,

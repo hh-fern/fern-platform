@@ -2,11 +2,10 @@ import * as ld from "@launchdarkly/node-server-sdk";
 import { isEqual } from "es-toolkit/predicate";
 import { camelCase } from "es-toolkit/string";
 
+import { DocsLoader } from "@fern-api/docs-loader";
+import { AuthState } from "@fern-api/docs-server/auth/getAuthState";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { getLaunchDarklySettings } from "@fern-docs/edge-config";
-
-import { AuthState } from "./auth/getAuthState";
-import { DocsLoader } from "./docs-loader";
 
 async function withLaunchDarklyContext(
   endpoint: string | undefined,
@@ -44,7 +43,7 @@ async function withLaunchDarklyContext(
 
     return context;
   } catch (error) {
-    console.error(error);
+    console.error(`[ld-adapter:with-ld-context] ${JSON.stringify(error)}`);
     return { kind: "user", key: "anonymous", anonymous: true };
   }
 }
@@ -178,7 +177,7 @@ async function fetchInitialFlags(
       hash: ldClient.secureModeHash(context),
     };
   } catch (error) {
-    console.error(error);
+    console.error(`[ld-adapter:fetch-initial-flags] ${JSON.stringify(error)}`);
     return {
       flags: undefined,
       json: undefined,

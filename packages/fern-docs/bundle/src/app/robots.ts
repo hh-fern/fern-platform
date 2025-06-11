@@ -3,20 +3,20 @@ import { headers } from "next/headers";
 
 import urlJoin from "url-join";
 
-import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import {
   HEADER_HOST,
   HEADER_X_FERN_HOST,
   conformTrailingSlash,
-} from "@fern-docs/utils";
-
-import { isLocal } from "@/server/isLocal";
+} from "@fern-api/docs-utils";
+import { withDefaultProtocol } from "@fern-api/ui-core-utils";
+import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
 
 export const runtime = "edge";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return {
       rules: {
         userAgent: "*",

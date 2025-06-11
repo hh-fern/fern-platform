@@ -5,10 +5,10 @@ import React, { Fragment, ReactElement, useEffect, useMemo } from "react";
 import { chunk } from "es-toolkit/array";
 import { useAtomValue } from "jotai";
 
+import { slugToHref } from "@fern-api/docs-utils";
 import type { FernNavigation } from "@fern-api/fdr-sdk";
 import { EMPTY_ARRAY } from "@fern-api/ui-core-utils";
 import { Badge } from "@fern-docs/components";
-import { slugToHref } from "@fern-docs/utils";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 
 import { FernLink } from "@/components/FernLink";
@@ -39,11 +39,13 @@ export default function ChangelogPageClient({
   anchorIds,
   overview,
   entries,
+  isFullPage,
 }: {
   node: FernNavigation.ChangelogNode;
   anchorIds: Record<string, FernNavigation.PageId>;
   overview: React.ReactNode;
   entries: Record<string, React.ReactNode>;
+  isFullPage: boolean;
 }): ReactElement<any> {
   const flattenedEntries = useMemo(() => flattenChangelogEntries(node), [node]);
   const chunkedEntries = useMemo(
@@ -146,7 +148,7 @@ export default function ChangelogPageClient({
         hideTableOfContents={true}
       />
       {/* TODO(cd): treat as a guide for now, update for large-screen changelog */}
-      <AsideAwareDiv className="fern-layout-changelog">
+      <AsideAwareDiv className="fern-layout-changelog" isFullPage={isFullPage}>
         <article className="max-w-full">
           <SetLayout value="guide" />
           <HideBuiltWithFern>

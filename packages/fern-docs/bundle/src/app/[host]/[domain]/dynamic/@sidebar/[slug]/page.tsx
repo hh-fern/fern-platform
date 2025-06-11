@@ -1,5 +1,6 @@
 import "server-only";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 
@@ -7,8 +8,7 @@ import { getFernToken } from "@/app/fern-token";
 import { SidebarTabsList } from "@/components/sidebar/SidebarTabsList";
 import { SidebarTabsRootServer } from "@/components/sidebar/SidebarTabsRootServer";
 import { SidebarRootNode } from "@/components/sidebar/nodes/SidebarRootNode";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-import { createCachedMdxSerializer } from "@/server/mdx-serializer";
+import { HiddenSidebar } from "@/state/layout";
 
 export default async function SidebarPage({
   params,
@@ -21,6 +21,9 @@ export default async function SidebarPage({
     domain,
     await getFernToken()
   );
+  const isSidebarFixed =
+    (await loader.getConfig()).layout?.disableHeader ||
+    (await loader.getConfig()).layout?.tabsPlacement === "SIDEBAR";
 
   const rootPromise = loader.getRoot();
 
@@ -47,27 +50,7 @@ export default async function SidebarPage({
     found.sidebar.children.length <= 1 &&
     found.node.type === "page"
   ) {
-    const serialize = createCachedMdxSerializer(loader, {
-      scope: {
-        product: found?.currentProduct?.productId,
-        version: found?.currentVersion?.versionId,
-        tab: found?.currentTab?.title,
-        path: found.node.slug,
-      },
-    });
-    // For page nodes, we need to get the page to check if it's a landing page
-    const page = await loader.getPage(found.node.pageId);
-    const mdx = await serialize(page.markdown, {
-      filename: page.filename,
-      slug: found.node.slug,
-      toc: true, // this is probably already cached with toc: true
-    });
-    if (
-      mdx?.frontmatter?.layout === "page" ||
-      mdx?.frontmatter?.layout === "custom"
-    ) {
-      isSingleOverviewPage = true;
-    }
+    // check if there is only one page in the sidebar
 
     if (found.sidebar.children.length <= 1) {
       let current: FernNavigation.NavigationNode | undefined =
@@ -91,7 +74,9 @@ export default async function SidebarPage({
           <SidebarTabsList tabs={found.tabs} />
         </SidebarTabsRootServer>
       )}
-      {!isSingleOverviewPage && (
+      {isSingleOverviewPage && !isSidebarFixed ? (
+        <HiddenSidebar />
+      ) : (
         <SidebarRootNode
           root={found.sidebar}
           visibleNodeIds={visibleNodeIds}
