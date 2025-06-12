@@ -13,9 +13,7 @@ export function useUserGithubRepos() {
   return convertQueryResultToLoadable(
     useQuery({
       queryKey: queryKey,
-      queryFn: () => {
-        DashboardApiClient.getUserGithubRepos();
-      },
+      queryFn: () => DashboardApiClient.getUserGithubRepos(),
     })
   );
 }
