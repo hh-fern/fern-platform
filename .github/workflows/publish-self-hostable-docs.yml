@@ -27,6 +27,10 @@ jobs:
       - name: Compile
         run: pnpm compile
 
+      - name: Delete .env.local files
+        run: |
+          find /app -name ".env.local" -type f -delete
+      
       - name: Build self-hosted bundle
         run: pnpm docs:self-hosted-bundle:build
 
