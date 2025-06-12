@@ -33,9 +33,6 @@ export async function setup() {
   await removeContainer(SELF_HOSTED_CONTAINER_NAME);
   await removeImage(SELF_HOSTED_IMAGE_TAG_NAME);
 
-  const monorepoRoot = path.join(__dirname, "../../../");
-  await execa("pnpm", ["compile"], { stdio: "inherit", cwd: monorepoRoot });
-  await execa("pnpm", ["docs:self-hosted-bundle:build"], { stdio: "inherit", cwd: monorepoRoot });
   await execa(
     "pnpm",
     ["docker:build", SELF_HOSTED_IMAGE_NAME, SELF_HOSTED_TAG],
