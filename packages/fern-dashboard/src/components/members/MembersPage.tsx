@@ -4,6 +4,7 @@ import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { useOrgInvitations } from "@/state/useOrgInvitations";
 import { useOrgMembers } from "@/state/useOrgMembers";
 import { useCurrentOrganization } from "@/state/useOrganizations";
+import { useUserGithubRepos } from "@/state/useUserGithubRepos";
 
 import { PageHeader } from "../layout/PageHeader";
 import { InviteUserDialog } from "./InviteUserDialog";
@@ -20,6 +21,9 @@ export function MembersPage({ session }: MembersPage.Props) {
 
   const invitations = useOrgInvitations();
   const members = useOrgMembers();
+
+  // andyz - for testing purposes
+  useUserGithubRepos();
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">

@@ -276,3 +276,19 @@ export async function addUserToOrg(userId: Auth0UserID, orgName: Auth0OrgName) {
   );
   await invalidateCachesAfterAddingOrRemovingOrgMember({ orgName });
 }
+
+async function getUsersById(userId: Auth0UserID) {
+  const auth0 = getAuth0ManagementClient();
+  const user = (await auth0.users.get({ id: userId })).data;
+  return user;
+}
+
+export async function getUserGithubToken(userId: Auth0UserID) {
+  const user = await getUsersById(userId);
+
+  const githubIdentity = user.identities.find(
+    (identity) => identity.provider === "github"
+  );
+
+  return githubIdentity?.access_token;
+}

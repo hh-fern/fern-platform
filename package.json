@@ -59,6 +59,7 @@
     "webpack": "5.94.0"
   },
   "dependencies": {
+    "@octokit/core": "^7.0.2",
     "fern-api": "0.57.0"
   },
   "devDependencies": {
