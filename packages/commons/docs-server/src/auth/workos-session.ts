@@ -10,7 +10,7 @@ import type {
   WorkOSSession,
   WorkOSUserInfo,
 } from "./interfaces";
-import { getJwtSecretKey, getWorkOSClientId, workos } from "./workos";
+import { getJwtSecretKey, getWorkOSClientId, getWorkOs } from "./workos";
 
 // This is adapted from https://github.com/workos/authkit-nextjs/blob/main/src/session.ts
 
@@ -29,8 +29,9 @@ async function refreshSession(
     const { org_id: organizationId } = decodeJwt<AccessToken>(
       session.accessToken
     );
+
     const { accessToken, refreshToken, user, impersonator } =
-      await workos().userManagement.authenticateWithRefreshToken({
+      await getWorkOs().userManagement.authenticateWithRefreshToken({
         clientId: getWorkOSClientId(),
         refreshToken: session.refreshToken,
         organizationId,
@@ -54,12 +55,12 @@ async function revokeSessionForToken(
   }
 
   const { sid: sessionId } = decodeJwt<AccessToken>(session.accessToken);
-  return workos().userManagement.revokeSession({ sessionId });
+  return getWorkOs().userManagement.revokeSession({ sessionId });
 }
 
 const withJWKS = once(() =>
   createRemoteJWKSet(
-    new URL(workos().userManagement.getJwksUrl(getWorkOSClientId()))
+    new URL(getWorkOs().userManagement.getJwksUrl(getWorkOSClientId()))
   )
 );
 

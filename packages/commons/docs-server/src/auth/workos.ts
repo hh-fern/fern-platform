@@ -1,22 +1,29 @@
-import { AuthorizationURLOptions, WorkOS } from "@workos-inc/node";
-import { once } from "es-toolkit/function";
+import { AuthorizationURLOptions } from "@workos-inc/node";
 
 import { isLocal } from "../isLocal";
 import { isSelfHosted } from "../isSelfHosted";
 
-export const workos = once(() => new WorkOS(getWorkOSApiKey()));
+let workOsInstance: any;
 
-export function getWorkOSApiKey(): string {
+export function getWorkOs(): any {
   if (isLocal() || isSelfHosted()) {
     throw new Error("workOS is not accessible in local preview mode");
   }
 
-  const apiKey = process.env.WORKOS_API_KEY;
+  if (!workOsInstance) {
+    const mod = require("@workos-inc/node");
+    const { WorkOS } = mod;
+    workOsInstance = new WorkOS(getWorkOSApiKey());
+  }
 
+  return workOsInstance;
+}
+
+export function getWorkOSApiKey(): string {
+  const apiKey = process.env.WORKOS_API_KEY;
   if (apiKey != null) {
     return apiKey;
   }
-
   throw new Error("WORKOS_API_KEY is not set");
 }
 
@@ -51,12 +58,13 @@ export function getJwtSecretKey(): string {
 export function getWorkosSSOAuthorizationUrl(
   options: Omit<AuthorizationURLOptions, "clientId">
 ): string {
-  const authorizationUrl = workos().sso.getAuthorizationUrl({
+  const workOs = getWorkOs();
+  const authorizationUrl = workOs.sso.getAuthorizationUrl({
     ...options,
     provider: options.provider ?? "authkit",
     clientId: getWorkOSClientId(),
-    // The endpoint that WorkOS will redirect to after a user authenticates
     redirectUri: options.redirectUri,
   });
   return authorizationUrl;
 }
+
