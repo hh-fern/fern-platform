@@ -5,7 +5,7 @@ import { FernNextResponse } from "@fern-api/docs-server/FernNextResponse";
 import { preferPreview } from "@fern-api/docs-server/auth/origin";
 import { getReturnToQueryParam } from "@fern-api/docs-server/auth/return-to";
 import { withSecureCookie } from "@fern-api/docs-server/auth/with-secure-cookie";
-import { getWorkOSClientId, workos } from "@fern-api/docs-server/auth/workos";
+import { getWorkOs, getWorkOSClientId } from "@fern-api/docs-server/auth/workos";
 import { encryptSession } from "@fern-api/docs-server/auth/workos-session";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
@@ -98,6 +98,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 
   try {
+    const workos = getWorkOs();
     const { accessToken, refreshToken, user, impersonator } =
       await workos().userManagement.authenticateWithCode({
         code,
