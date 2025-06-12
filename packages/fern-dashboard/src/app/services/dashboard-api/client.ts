@@ -1,3 +1,4 @@
+import { createGithubBranch } from "@/app/api/create-github-branch/route";
 import { getDocsUrlOwner } from "@/app/api/get-docs-url-owner/route";
 import { getMyDocsSites } from "@/app/api/get-my-docs-sites/route";
 import { getMyOrganizations } from "@/app/api/get-my-organizations/route";
@@ -17,6 +18,11 @@ export const DashboardApiClient = {
     typedFetch<getOrgInvitations.Response>("/api/get-org-invitations", request),
   getUserGithubRepos: () =>
     typedFetch<getUserGithubRepos.Response>("/api/get-user-github-repos"),
+  createGithubBranch: (request: createGithubBranch.Request) =>
+    typedFetch<createGithubBranch.Response>(
+      "/api/create-github-branch",
+      request
+    ),
   getOrgMembers: (
     request: getOrgMembers.Request
   ): Promise<getOrgMembers.Response> =>

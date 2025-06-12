@@ -290,5 +290,7 @@ export async function getUserGithubToken(userId: Auth0UserID) {
     (identity) => identity.provider === "github"
   );
 
+  console.log(githubIdentity);
+
   return githubIdentity?.access_token;
 }

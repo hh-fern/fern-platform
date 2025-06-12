@@ -4,8 +4,11 @@ import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { useOrgInvitations } from "@/state/useOrgInvitations";
 import { useOrgMembers } from "@/state/useOrgMembers";
 import { useCurrentOrganization } from "@/state/useOrganizations";
+import { useUserGithubRepos } from "@/state/useUserGithubRepos";
 
 import { PageHeader } from "../layout/PageHeader";
+import GithubBranchTest from "./GithubBranchTest";
+import { GithubTestComponent } from "./GithubTestComponent";
 import { InviteUserDialog } from "./InviteUserDialog";
 import { MembersTable } from "./MembersTable";
 
@@ -20,6 +23,8 @@ export function MembersPage({ session }: MembersPage.Props) {
 
   const invitations = useOrgInvitations();
   const members = useOrgMembers();
+
+  const repos = useUserGithubRepos();
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
@@ -37,6 +42,8 @@ export function MembersPage({ session }: MembersPage.Props) {
         invitations={invitations}
         userId={session.user.sub}
       />
+      <GithubTestComponent repos={repos} />
+      <GithubBranchTest />
     </div>
   );
 }

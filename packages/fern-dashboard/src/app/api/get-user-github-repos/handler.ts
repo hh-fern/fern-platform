@@ -13,6 +13,8 @@ export default async function getUserGithubRepos(userId: Auth0UserID) {
   const repos = response.data.map((repo) => ({
     name: repo.name,
     url: repo.html_url,
+    owner: repo.owner.login,
+    full_name: repo.full_name,
   }));
 
   return repos as GithubRepo[];
