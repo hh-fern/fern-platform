@@ -6,7 +6,10 @@ import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { COOKIE_FERN_TOKEN } from "@fern-api/docs-utils";
-import { getAuthEdgeConfig } from "@fern-docs/edge-config";
+import {
+  getApiKeyInjectionEdgeConfig,
+  getAuthEdgeConfig,
+} from "@fern-docs/edge-config";
 
 /**
  * This endpoint returns the authentication information pertaining to the current user
@@ -35,7 +38,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
 
     const domain = getDocsDomainEdge(req);
-    const config = await getAuthEdgeConfig(domain);
+    const authConfig = await getAuthEdgeConfig(domain);
+    const apiKeyConfig = await getApiKeyInjectionEdgeConfig(domain);
+    const config = authConfig || apiKeyConfig;
 
     if (!config) {
       return NextResponse.json(
@@ -47,7 +52,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
 
     const userInfo = await safeVerifyFernJWTConfig(fernToken, config);
-    console.log(userInfo);
 
     if (!userInfo) {
       return NextResponse.json(
@@ -60,11 +64,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({
       fern_token: fernToken,
-      user_info: {
-        name: userInfo.name,
-        email: userInfo.email,
-        roles: userInfo.roles,
-      },
+      userInfo,
     });
   } catch (error) {
     console.error("Error in whoami endpoint:", error);

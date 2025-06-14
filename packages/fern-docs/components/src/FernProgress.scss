@@ -1,0 +1,80 @@
+@layer components {
+  .fern-progress {
+    position: relative;
+    width: 100px;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .fern-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin: 0px 4px;
+  }
+
+  .fern-progress {
+    height: 8px;
+  }
+
+  .fern-progress-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-sm);
+    line-height: 1;
+    color: #6b7280;
+  }
+
+  .fern-progress-used {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .fern-progress-separator {
+    color: #6b7280;
+  }
+
+  .fern-progress-total {
+    color: #6b7280;
+  }
+
+  .fern-progress .fern-progress-bar {
+    height: 100%;
+    background-color: var(--accent);
+    border-radius: 9999px;
+    transition: width 0.3s ease-in-out;
+  }
+
+  .fern-progress.indeterminate .fern-progress-bar {
+    position: absolute;
+    width: 50%;
+    animation: fern-progress-indeterminate 1.5s infinite ease-in-out;
+  }
+
+  .fern-progress-value {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: #374151;
+  }
+
+  @keyframes fern-progress-indeterminate {
+    0% {
+      left: -50%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+}

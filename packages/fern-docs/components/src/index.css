@@ -5,6 +5,7 @@
 @import "./FernDropdown.scss";
 @import "./FernSelectionItem.scss";
 @import "./FernInput.scss";
+@import "./FernProgress.scss";
 @import "./FernRadioGroup.scss";
 @import "./FernScrollArea.scss";
 @import "./FernSegmentedControl.scss";

@@ -17,6 +17,7 @@ export * from "./FernDropdown";
 export * from "./FernInput";
 export * from "./FernLogo";
 export * from "./FernNumericInput";
+export * from "./FernProgress";
 export * from "./FernRadioGroup";
 export * from "./FernScrollArea";
 export * from "./FernSdk";

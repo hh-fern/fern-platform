@@ -11,6 +11,7 @@ import { FernLinkButton } from "@/components/FernLinkButton";
 import { FaIconServer } from "@/components/fa-icon-server";
 import type { NavbarLink, NavbarLink as NavbarLinkType } from "@/state/types";
 
+import { FernApiUsage } from "./FernApiUsage";
 import { GitHubWidget } from "./GitHubWidget";
 import { WithReturnTo } from "./WithReturnTo";
 
@@ -47,6 +48,7 @@ export async function NavbarLinks({ loader }: { loader: DocsLoader }) {
       {navbarLinks.map((navbarLink, idx) => (
         <HeaderNavbarLink key={navbarLink.id ?? idx} navbarLink={navbarLink} />
       ))}
+      <FernApiUsage />
     </>
   );
 }
