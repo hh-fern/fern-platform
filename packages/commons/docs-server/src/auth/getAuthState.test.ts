@@ -296,6 +296,9 @@ describe("getAuthState", () => {
       lastName: null,
       createdAt: "test",
       updatedAt: "test",
+      lastSignInAt: "test",
+      externalId: "test",
+      metadata: {},
     };
 
     const authStateBadToken = await getAuthStateInternal({

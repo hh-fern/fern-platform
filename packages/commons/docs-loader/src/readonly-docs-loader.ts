@@ -4,7 +4,7 @@ import { after } from "next/server";
 import { cache } from "react";
 
 import { kv } from "@vercel/kv";
-import { Semaphore } from "es-toolkit/compat";
+import Semaphore from "es-toolkit/compat";
 import { mapValues } from "es-toolkit/object";
 import { AsyncOrSync, UnreachableCaseError } from "ts-essentials";
 
@@ -71,6 +71,17 @@ import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, isPlainObject } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 
+interface Semaphore {
+  acquire(): Promise<void>;
+  release(): void;
+}
+
+type SemaphoreConstructor = new (count: number) => Semaphore;
+
+const SemaphoreClass = Semaphore as unknown as SemaphoreConstructor;
+const setMonitor = new SemaphoreClass(10);
+const getMonitor = new SemaphoreClass(10);
+
 const loadWithUrl = uncachedLoadWithUrl;
 
 function assertDocsDomain(domain: string) {
@@ -80,7 +91,6 @@ function assertDocsDomain(domain: string) {
   }
 }
 
-const setMonitor = new Semaphore(10);
 function kvSet(domain: string, key: string, value: unknown) {
   if (isLocal() || isSelfHosted()) {
     return;
@@ -98,7 +108,6 @@ function kvSet(domain: string, key: string, value: unknown) {
   });
 }
 
-const getMonitor = new Semaphore(10);
 async function kvGet<T>(domain: string, key: string): Promise<T | null> {
   if (isLocal() || isSelfHosted()) {
     return null;

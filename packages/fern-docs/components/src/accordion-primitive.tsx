@@ -132,7 +132,7 @@ const AccordionImplSingle = React.forwardRef<
 
   const [value, setValue] = useControllableState({
     prop: valueProp,
-    defaultProp: defaultValue,
+    defaultProp: defaultValue ?? "",
     onChange: onValueChange,
   });
 
@@ -191,7 +191,7 @@ const AccordionImplMultiple = React.forwardRef<
 
   const [value = [], setValue] = useControllableState({
     prop: valueProp,
-    defaultProp: defaultValue,
+    defaultProp: defaultValue ?? [],
     onChange: onValueChange,
   });
 

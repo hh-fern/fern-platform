@@ -37,7 +37,7 @@ async function createPersonalProjectInVenus({
   venus: FernVenusApiClient;
 }) {
   let createOrgResponse: APIResponse<
-    FernVenusApi.CreateOrganizationResponse,
+    void,
     FernVenusApi.organization.create.Error
   >;
   let attempt = 0;
@@ -47,7 +47,6 @@ async function createPersonalProjectInVenus({
       organizationId: FernVenusApi.OrganizationId(
         getPersonalProjectOrgId({ userId, userName, attempt: attempt++ })
       ),
-      displayName: `${userName ?? userId}'s Project`,
       enableGithubConnection: true,
     });
   } while (
@@ -63,7 +62,9 @@ async function createPersonalProjectInVenus({
     throw new Error("Failed to create organization");
   }
 
-  return Auth0OrgName(createOrgResponse.body.organizationId);
+  return Auth0OrgName(
+    getPersonalProjectOrgId({ userId, userName, attempt: attempt - 1 })
+  );
 }
 
 function getPersonalProjectOrgId({
