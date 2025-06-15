@@ -153,9 +153,15 @@ export function PlaygroundResponseCard({
             (isBinaryOctetStreamAudioPlayer &&
               response.contentType === "binary/octet-stream")
           ) {
+            // For both streaming and non-streaming responses, create a blob URL
+            const audioBlob = new Blob([response.response.body], {
+              type: response.contentType,
+            });
+            const audioSrc = URL.createObjectURL(audioBlob);
+
             return (
               <FernAudioPlayer
-                src={response.response.body}
+                src={audioSrc}
                 className="flex h-full items-center justify-center p-4"
               />
             );
