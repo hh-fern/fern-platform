@@ -56,7 +56,7 @@ RUN turbo prune @fern-platform/fdr @fern-docs/bundle @fern-docs/edge-config --do
 FROM base AS installer
 RUN apk add --no-cache libc6-compat unzip bash && \
     apk update && \
-    npm install -g pnpm@v9.4.0
+    npm install -g pnpm@latest
 
 WORKDIR /app
 
