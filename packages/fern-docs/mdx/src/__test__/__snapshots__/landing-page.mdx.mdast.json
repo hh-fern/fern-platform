@@ -8,7 +8,7 @@
       "children": [
         {
           "type": "mdxFlowExpression",
-          "value": "`\n\n  /*Custom Styles*/\n  .rm-Header {\n    position: sticky;\n    top: 0;\n    --Header-background: none;\n  }\n\n  #enterprise .container {\n    margin-bottom: 0;\n  }\n  .rm-Flyout {\n    background: #fbfbfb;\n  }\n\n`",
+          "value": "`\n\n/*Custom Styles*/\n.rm-Header {\n  position: sticky;\n  top: 0;\n  --Header-background: none;\n}\n\n#enterprise .container {\n  margin-bottom: 0;\n}\n.rm-Flyout {\n  background: #fbfbfb;\n}\n\n`",
           "position": {
             "start": {
               "line": 3,
@@ -40,8 +40,8 @@
                         "start": 13,
                         "end": 218,
                         "value": {
-                          "raw": "\n\n  /*Custom Styles*/\n  .rm-Header {\n    position: sticky;\n    top: 0;\n    --Header-background: none;\n  }\n\n  #enterprise .container {\n    margin-bottom: 0;\n  }\n  .rm-Flyout {\n    background: #fbfbfb;\n  }\n\n",
-                          "cooked": "\n\n  /*Custom Styles*/\n  .rm-Header {\n    position: sticky;\n    top: 0;\n    --Header-background: none;\n  }\n\n  #enterprise .container {\n    margin-bottom: 0;\n  }\n  .rm-Flyout {\n    background: #fbfbfb;\n  }\n\n"
+                          "raw": "\n\n/*Custom Styles*/\n.rm-Header {\n  position: sticky;\n  top: 0;\n  --Header-background: none;\n}\n\n#enterprise .container {\n  margin-bottom: 0;\n}\n.rm-Flyout {\n  background: #fbfbfb;\n}\n\n",
+                          "cooked": "\n\n/*Custom Styles*/\n.rm-Header {\n  position: sticky;\n  top: 0;\n  --Header-background: none;\n}\n\n#enterprise .container {\n  margin-bottom: 0;\n}\n.rm-Flyout {\n  background: #fbfbfb;\n}\n\n"
                         },
                         "tail": true,
                         "loc": {
@@ -320,7 +320,6 @@
                                   269
                                 ]
                               },
-                              "kind": "init",
                               "value": {
                                 "type": "Identifier",
                                 "start": 265,
@@ -343,6 +342,7 @@
                                   269
                                 ]
                               },
+                              "kind": "init",
                               "range": [
                                 265,
                                 269
@@ -389,7 +389,6 @@
                                   276
                                 ]
                               },
-                              "kind": "init",
                               "value": {
                                 "type": "Identifier",
                                 "start": 271,
@@ -412,6 +411,7 @@
                                   276
                                 ]
                               },
+                              "kind": "init",
                               "range": [
                                 271,
                                 276
@@ -458,7 +458,6 @@
                                   284
                                 ]
                               },
-                              "kind": "init",
                               "value": {
                                 "type": "Identifier",
                                 "start": 278,
@@ -481,6 +480,7 @@
                                   284
                                 ]
                               },
+                              "kind": "init",
                               "range": [
                                 278,
                                 284
@@ -527,7 +527,6 @@
                                   297
                                 ]
                               },
-                              "kind": "init",
                               "value": {
                                 "type": "Identifier",
                                 "start": 286,
@@ -550,6 +549,7 @@
                                   297
                                 ]
                               },
+                              "kind": "init",
                               "range": [
                                 286,
                                 297
@@ -3788,7 +3788,6 @@
                                   1499
                                 ]
                               },
-                              "kind": "init",
                               "value": {
                                 "type": "Identifier",
                                 "start": 1495,
@@ -3811,6 +3810,7 @@
                                   1499
                                 ]
                               },
+                              "kind": "init",
                               "range": [
                                 1495,
                                 1499
@@ -3857,7 +3857,6 @@
                                   1506
                                 ]
                               },
-                              "kind": "init",
                               "value": {
                                 "type": "Identifier",
                                 "start": 1501,
@@ -3880,6 +3879,7 @@
                                   1506
                                 ]
                               },
+                              "kind": "init",
                               "range": [
                                 1501,
                                 1506
@@ -8081,7 +8081,7 @@
           "children": [
             {
               "type": "mdxFlowExpression",
-              "value": "cards.map((card) => (\n      <LandingPageCard\n        key={card.href}\n        href={card.href}\n        imgSrc={card.imgSrc}\n        title={card.title}\n        description={card.description}\n      />\n    ))",
+              "value": "cards.map((card) => (\n    <LandingPageCard\n      key={card.href}\n      href={card.href}\n      imgSrc={card.imgSrc}\n      title={card.title}\n      description={card.description}\n    />\n  ))",
               "position": {
                 "start": {
                   "line": 128,
@@ -9253,7 +9253,7 @@
                       "children": [
                         {
                           "type": "mdxFlowExpression",
-                          "value": "endpoints.map((endpoint) => (\n            <EndpointLink key={endpoint.href} {...endpoint} />\n          ))",
+                          "value": "endpoints.map((endpoint) => (\n          <EndpointLink key={endpoint.href} {...endpoint} />\n        ))",
                           "position": {
                             "start": {
                               "line": 146,
@@ -9764,7 +9764,7 @@
                       "name": "style",
                       "value": {
                         "type": "mdxJsxAttributeValueExpression",
-                        "value": "{\n          backgroundImage: \"url('https://fern-image-hosting.s3.amazonaws.com/cohere/55d9cde-InfoCards.png')\",\n        }",
+                        "value": "{\n        backgroundImage: \"url('https://fern-image-hosting.s3.amazonaws.com/cohere/55d9cde-InfoCards.png')\",\n      }",
                         "data": {
                           "estree": {
                             "type": "Program",
@@ -10471,7 +10471,7 @@
               "name": "style",
               "value": {
                 "type": "mdxJsxAttributeValueExpression",
-                "value": "{\n      backgroundImage: \"url('https://fern-image-hosting.s3.amazonaws.com/cohere/ddd53ed-Mask_group.png')\",\n    }",
+                "value": "{\n    backgroundImage: \"url('https://fern-image-hosting.s3.amazonaws.com/cohere/ddd53ed-Mask_group.png')\",\n  }",
                 "data": {
                   "estree": {
                     "type": "Program",
