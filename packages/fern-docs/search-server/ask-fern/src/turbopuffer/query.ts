@@ -46,12 +46,11 @@ export async function queryTurbopuffer(
     documentIdsToIgnore = [],
   }: SemanticSearchOptions
 ): Promise<TurbopufferRecord[]> {
-  const tmp_namespace = namespace + "_" + "this_will_break";
   const tpuf = new Turbopuffer({
     apiKey,
     baseUrl: "https://gcp-us-east4.turbopuffer.com",
   });
-  let ns = tpuf.namespace(tmp_namespace);
+  let ns = tpuf.namespace(namespace);
 
   // sanity check to make sure namespace exists and is not empty
   // otherwise use backup namespace (turbopuffer throws 404 for empty namespaces)
