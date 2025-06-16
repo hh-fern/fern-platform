@@ -41,7 +41,6 @@ export const runReindexTurbopuffer = async (
       });
       return embeddings.embeddings;
     },
-    deleteExisting: true,
   });
 };
 

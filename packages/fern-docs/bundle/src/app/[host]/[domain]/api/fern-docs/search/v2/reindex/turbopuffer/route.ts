@@ -39,6 +39,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const domain = getDocsDomainEdge(req);
   const deleteExisting =
     req.nextUrl.searchParams.get("deleteExisting") === "true";
+  const deleteBackup = req.nextUrl.searchParams.get("deleteBackup") === "true";
   const namespace = `${withoutStaging(domain)}_${embeddingModel.modelId}`;
 
   try {
@@ -91,6 +92,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         );
       },
       deleteExisting,
+      deleteBackup,
     });
     const end = Date.now();
 
