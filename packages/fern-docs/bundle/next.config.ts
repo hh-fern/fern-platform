@@ -3,6 +3,7 @@ import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
 import NextBundleAnalyzer from "@next/bundle-analyzer";
 import process from "node:process";
+import webpack from "webpack";
 
 const cdnUri =
   process.env.NEXT_PUBLIC_CDN_URI != null
@@ -11,7 +12,10 @@ const cdnUri =
 const isTrailingSlashEnabled = process.env.NEXT_PUBLIC_TRAILING_SLASH === "1";
 const isAssetPrefixDisabled =
   process.env.NEXT_PUBLIC_ASSET_PREFIX_DISABLED === "1";
-const isLocal = process.env.NEXT_PUBLIC_IS_LOCAL === "1";
+const isSelfHosted = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "1";
+const isStandalone =
+  process.env.NEXT_PUBLIC_IS_LOCAL === "1" ||
+  process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "1";
 
 // TODO: move this to a shared location (this is copied in FernImage.tsx)
 const NEXT_IMAGE_HOSTS = [
@@ -38,13 +42,16 @@ const nextConfig: NextConfig = {
     "@fern-api/fdr-sdk",
     "@fern-api/template-resolver",
     "@fern-api/ui-core-utils",
-    "@fern-docs/auth",
+    "@fern-api/docs-loader",
+    "@fern-api/docs-server",
+    "@fern-api/docs-auth",
     "@fern-docs/components",
     "@fern-docs/edge-config",
     "@fern-docs/mdx",
-    "@fern-docs/search-server",
+    "@fern-docs/search-keyword",
+    "@fern-docs/search-ask-fern",
     "@fern-docs/search-ui",
-    "@fern-docs/utils",
+    "@fern-api/docs-utils",
     "@fern-platform/fdr-utils",
     "@fern-ui/loadable",
     "@fern-ui/react-commons",
@@ -57,7 +64,8 @@ const nextConfig: NextConfig = {
       "@fern-api/fdr-sdk",
       "@fern-docs/mdx",
       "@fern-docs/components",
-      "@fern-docs/search-server",
+      "@fern-docs/search-keyword",
+      "@fern-docs/search-ask-fern",
       "es-toolkit",
       "ts-essentials",
       "lucide-react",
@@ -201,19 +209,7 @@ const nextConfig: NextConfig = {
         source: "/:prefix*/api/fern-docs/search/v2/:path*",
         headers: searchV2Headers,
       },
-      ...(isLocal ? [disableCaching] : []),
-
-      /**
-       * Access-Control-Allow-Origin header is required for sentry tunnel
-       * to work across origins (i.e. subpath routing)
-       */
-      // {
-      //     source: sentryTunnelRoute,
-      //     headers: [
-      //         { key: "Access-Control-Allow-Origin", value: "*" },
-      //         { key: "Access-Control-Allow-Headers", value: "sentry-trace, baggage" },
-      //     ],
-      // },
+      ...(isStandalone ? [disableCaching] : []),
     ];
   },
   images: {
@@ -238,6 +234,16 @@ const nextConfig: NextConfig = {
       ...config.resolve.fallback,
       crypto: false,
     };
+    if (isSelfHosted) {
+      // To solve workos security vulnerability
+      config.plugins.push(
+        new webpack.NormalModuleReplacementPlugin(
+          /@workos-inc\/node/,
+          require.resolve("./src/server/workos-stub.ts")
+        )
+      );
+    }
+
     config.module.rules.push({
       test: /\.(glsl|vs|fs|vert|frag)$/,
       exclude: /node_modules/,
@@ -253,7 +259,7 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
-  output: isLocal ? "standalone" : undefined,
+  output: isStandalone ? "standalone" : undefined,
 };
 
 function withVercelEnv(config: NextConfig): NextConfig {

@@ -5,15 +5,12 @@ import { cache } from "react";
 
 import { Semaphore } from "es-toolkit/compat";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { cacheSeed } from "@fern-api/docs-server/cache-seed";
 import { Frontmatter } from "@fern-api/fdr-sdk/docs";
-import { isDevelopment, isPreviewDomain } from "@fern-docs/utils";
 
 import { serializeMdx as internalSerializeMdx } from "@/mdx/bundler/serialize";
 import { RehypeLinksOptions } from "@/mdx/plugins/rehype-links";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-
-import { cacheSeed } from "./cache-seed";
-import { postToSlack } from "./slack";
 
 export type MdxSerializerOptions = {
   /**
@@ -83,29 +80,23 @@ export function createCachedMdxSerializer(
         const authState = await loader.getAuthState();
 
         try {
-          return await internalSerializeMdx(content, {
-            filename,
-            loader,
-            toc,
-            scope: {
-              authed: authState.authed,
-              user: authState.authed ? authState.user : undefined,
-              ...scope,
+          return await internalSerializeMdx(
+            content,
+            {
+              filename,
+              loader,
+              toc,
+              scope: {
+                authed: authState.authed,
+                user: authState.authed ? authState.user : undefined,
+                ...scope,
+              },
+              replaceHref,
             },
-            replaceHref,
-          });
+            domain
+          );
         } catch (error) {
           console.error("Error serializing mdx", error);
-
-          if (!isDevelopment(domain) && !isPreviewDomain(domain)) {
-            const path = options.slug || scope?.path;
-            postToSlack(
-              "#docs-notifs",
-              `:rotating_light: Error serializing mdx for ${domain}${path ? "/" + path : ""} with ${String(error)}`,
-              "mdx-serializer",
-              { message: content, mrkdwn: true }
-            );
-          }
 
           // Instead of returning raw content, throw the error to be handled by the caller
           throw error;

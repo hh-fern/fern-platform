@@ -19,6 +19,12 @@ import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
 import { noop } from "ts-essentials";
 
+import { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { postToSlack } from "@fern-api/docs-server/slack";
+import { isDevelopment, isPreviewDomain } from "@fern-api/docs-utils";
+import { FileData } from "@fern-api/docs-utils/types/file-data";
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
 import {
   Hast,
@@ -36,10 +42,6 @@ import {
   remarkInjectEsm,
   remarkSanitizeAcorn,
 } from "@fern-docs/mdx/plugins";
-
-import { DocsLoader } from "@/server/docs-loader";
-import { isLocal } from "@/server/isLocal";
-import { FileData } from "@/server/types";
 
 import { getMDXExport } from "../get-mdx-export";
 import { rehypeAccordionNestedHeaders } from "../plugins/rehype-accordion-nested-headers";
@@ -84,7 +86,8 @@ async function serializeMdxImpl(
     filename?: string;
     toc?: boolean;
     replaceHref?: RehypeLinksOptions["replaceHref"];
-  } = {}
+  } = {},
+  domain: string
 ): Promise<SerializeMdxResponse> {
   content = sanitizeBreaks(content);
   content = sanitizeMdxExpression(content)[0];
@@ -260,7 +263,15 @@ async function serializeMdxImpl(
 
   if (bundled.errors.length > 0) {
     bundled.errors.forEach((error) => {
-      console.error(error);
+      if (!isPreviewDomain(domain) && !isDevelopment(domain)) {
+        postToSlack(
+          "#docs-notifs",
+          `:rotating_light: Error serializing mdx for ${domain}${path ? "/" + path : ""} with ${String(error)}`,
+          "mdx-serializer",
+          { message: content, mrkdwn: true }
+        );
+      }
+      console.error(`[serializer:bundle-mdx] ${JSON.stringify(error)}`);
     });
     console.debug("content", content, "code", bundled.code);
   }
@@ -277,7 +288,8 @@ async function serializeMdxImpl(
 
 export function serializeMdx(
   content: string | undefined,
-  options?: Parameters<typeof serializeMdxImpl>[1]
+  options?: Parameters<typeof serializeMdxImpl>[1],
+  domain?: string
 ): Promise<SerializeMdxResponse | undefined> {
   const abortController = new AbortController();
   const { signal } = abortController;
@@ -303,7 +315,7 @@ export function serializeMdx(
       }
     }, serializeTimeout);
 
-    serializeMdxImpl(content, { ...options }).then(
+    serializeMdxImpl(content, { ...options }, domain ?? "").then(
       (result) => {
         clearTimeout(timeoutId);
         resolve(result);
@@ -311,7 +323,7 @@ export function serializeMdx(
       (error: unknown) => {
         clearTimeout(timeoutId);
         reject(error instanceof Error ? error : new Error(String(error)));
-        console.error(error);
+        console.error(`[serialize:serialize-mdx] ${JSON.stringify(error)}`);
       }
     );
   });
@@ -516,7 +528,7 @@ function hashKey(key: string): string {
 }
 
 function kvSet(key: string, value: unknown) {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return;
   }
 
@@ -537,7 +549,7 @@ function kvSet(key: string, value: unknown) {
 }
 
 async function kvGet(key: string): Promise<Record<string, string> | null> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return null;
   }
 

@@ -50,7 +50,7 @@ RUN apk add --no-cache libc6-compat && \
 WORKDIR /app
 RUN npm install -g turbo@2.0.1
 COPY . .
-RUN turbo prune @fern-platform/fdr @fern-docs/bundle --docker
+RUN turbo prune @fern-platform/fdr @fern-docs/bundle @fern-docs/edge-config --docker
 
 # Add lockfile and package.json's
 FROM base AS installer
@@ -88,6 +88,8 @@ RUN wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
     apk add --no-cache jq && \
     npm install -g prisma fern-api@latest pnpm
 
+RUN fern upgrade
+
 # Copy the built FDR application
 COPY --from=installer /app .
 
@@ -103,7 +105,9 @@ COPY --from=installer /app/servers/fdr/prisma/schema.prisma /app/servers/fdr/pri
 # Setup Nextapp dependencies
 COPY --from=installer /app/docs_bundle.tar.gz /app/self-hosted.tar.gz
 RUN mkdir -p /app/nextapp && \
-    tar -xzf /app/self-hosted.tar.gz -C /app/nextapp
+    tar -xzf /app/self-hosted.tar.gz -C /app/nextapp && \
+    cd /app/nextapp && \
+    pnpm add esbuild
 
 # ------------ End FDR setup ------------
 

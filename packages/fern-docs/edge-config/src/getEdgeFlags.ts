@@ -1,14 +1,16 @@
-import type { EdgeFlags } from "@fern-docs/utils";
+import type { EdgeFlags } from "@fern-api/docs-utils";
 import {
   DEFAULT_EDGE_FLAGS,
+  DEFAULT_SELF_HOSTED_EDGE_FLAGS,
   isCustomDomain,
   isDevelopment,
   isFern,
   withoutStaging,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
 
 import { getAllEdge } from "./getEdge";
 import { isLocal } from "./isLocal";
+import { isSelfHosted } from "./isSelfHosted";
 
 export const runtime = "edge";
 
@@ -48,6 +50,7 @@ const EDGE_FLAGS = [
   "search-disabled" as const,
   "default-search-filter-off" as const,
   "changelog-redirects" as const,
+  "posthog-disabled" as const,
 ];
 
 type EdgeFlag = (typeof EDGE_FLAGS)[number];
@@ -57,6 +60,8 @@ type EdgeConfigResponse = Record<EdgeFlag, string[] | Record<string, unknown>>;
 export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
   if (isLocal()) {
     return DEFAULT_EDGE_FLAGS;
+  } else if (isSelfHosted()) {
+    return DEFAULT_SELF_HOSTED_EDGE_FLAGS;
   }
 
   try {
@@ -201,6 +206,10 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       domain,
       config["changelog-redirects"]
     );
+    const isPosthogDisabled = checkDomainMatchesCustomers(
+      domain,
+      config["posthog-disabled"]
+    );
 
     return {
       isApiPlaygroundEnabled: isDevelopment(domain) || isApiPlaygroundEnabled,
@@ -238,9 +247,10 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isSearchDisabled,
       isDefaultSearchFilterOff,
       isChangelogRedirects,
+      isPosthogDisabled,
     };
   } catch (e) {
-    console.error(e);
+    console.error(`[get-edge-flags] ${JSON.stringify(e)}`);
     return {
       isApiPlaygroundEnabled: isDevelopment(domain),
       isApiScrollingDisabled: false,
@@ -275,6 +285,7 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isSearchDisabled: false,
       isDefaultSearchFilterOff: false,
       isChangelogRedirects: false,
+      isPosthogDisabled: false,
     };
   }
 }

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
+<<<<<<< HEAD
 import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createCohere } from "@ai-sdk/cohere";
+=======
+>>>>>>> app
 import { createOpenAI } from "@ai-sdk/openai";
 import {
   EmbeddingModel,
@@ -13,11 +16,15 @@ import {
   streamText,
   tool,
 } from "ai";
-import { initLogger, traced, wrapAISDKModel } from "braintrust";
+import { initLogger, traced } from "braintrust";
 import { z } from "zod";
 
-import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { postToSlack } from "@fern-api/docs-server";
+import { track } from "@fern-api/docs-server/analytics/posthog";
+import { safeVerifyFernJWTConfig } from "@fern-api/docs-server/auth/FernJWT";
 import {
+<<<<<<< HEAD
   createCohereSystemPrompt,
   createDefaultSystemPrompt,
 } from "@fern-docs/search-server";
@@ -34,34 +41,58 @@ import { createCachedDocsLoader } from "@/server/docs-loader";
 import {
   anthropicApiKey,
   cohereApiKey,
+=======
+>>>>>>> app
   openaiApiKey,
   turbopufferApiKey,
-} from "@/server/env-variables";
-import { isLocal } from "@/server/isLocal";
-import { postToSlack } from "@/server/slack";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+} from "@fern-api/docs-server/env-variables";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { withoutStaging } from "@fern-api/docs-utils";
+import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
+import {
+  buildCustomConfig,
+  convertTpufRecordsToDocuments,
+  createChatSystemPrompt,
+  getLanguageModel,
+  queryTurbopuffer,
+} from "@fern-docs/search-ask-fern";
+
+import { getFernToken } from "@/app/fern-token";
 
 export const maxDuration = 60;
 export const revalidate = 0;
 
-const modelMap: Record<string, { modelId: string; region: string }> = {
-  "claude-3.5": {
-    modelId: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-    region: "us-west-2",
-  },
-  "claude-3.7": {
-    modelId: "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    region: "us-east-1",
-  },
-  // command-a is not supported by bedrock
-};
-
 export async function POST(req: NextRequest) {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
-      "ai chat is not accessible in local preview mode",
+      "Ask Fern is not available in local preview mode or self-hosted mode",
       { status: 400 }
     );
+  }
+  const host = req.nextUrl.host;
+  const domain = getDocsDomainEdge(req);
+  const loader = await createCachedDocsLoader(host, domain);
+  const metadata = await loader.getMetadata();
+  if (metadata == null) {
+    return NextResponse.json("Not found", { status: 404 });
+  }
+  if (metadata.isPreview) {
+    return NextResponse.json("Chat is not enabled for preview environments", {
+      status: 404,
+    });
+  }
+
+  const [authEdgeConfig, edgeFlags] = await Promise.all([
+    getAuthEdgeConfig(domain),
+    getEdgeFlags(domain),
+  ]);
+
+  if (!edgeFlags.isAskAiEnabled) {
+    return NextResponse.json("Ask AI is not enabled for this domain", {
+      status: 404,
+    });
   }
 
   initLogger({
@@ -69,71 +100,21 @@ export async function POST(req: NextRequest) {
     apiKey: process.env.BRAINTRUST_API_KEY,
   });
 
-  const host = req.nextUrl.host;
-  const domain = getDocsDomainEdge(req);
-  const loader = await createCachedDocsLoader(host, domain);
-  const metadata = await loader.getMetadata();
+  const { messages, url, source, conversationId } = await req.json();
   const config = await loader.getConfig();
 
-  const { messages, url, source, conversationId } = await req.json();
-
-  const isCohere = url.includes("cohere");
+  const customConfig = buildCustomConfig(url);
   const chatSource = source ?? "chat"; // distinguish between chat and mcp server request
 
-  const model: string = config.aiChatConfig?.model || "claude-3.5";
-  let languageModel;
-  if (model === "command-a" || model === "command-r-plus") {
-    // TODO: remove command-r-plus once fern generate change is resolved
-    const cohere = createCohere({ apiKey: cohereApiKey() });
-    languageModel = wrapAISDKModel(cohere("command-a-03-2025"));
-  } else if (model === "claude-4") {
-    // claude-4 goes through anthropic directly
-    const anthropic = createAnthropic({ apiKey: anthropicApiKey() });
-    languageModel = wrapAISDKModel(anthropic("claude-4-sonnet-20250514"));
-  } else {
-    let modelId = modelMap["claude-3.5"]?.modelId || ""; // defaults for improper docs.yml entries
-    let region = modelMap["claude-3.5"]?.region || "";
-    if (modelMap[model] != null) {
-      // fallback
-      ({ modelId, region } = modelMap[model]);
-    }
-    const bedrock = createAmazonBedrock({
-      region: region,
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    });
-
-    languageModel = wrapAISDKModel(bedrock(modelId));
-  }
-
+  const languageModel = getLanguageModel(config.aiChatConfig?.model);
   const openai = createOpenAI({ apiKey: openaiApiKey() });
   const embeddingModel = openai.embedding("text-embedding-3-large");
-  const namespace = `${withoutStaging(domain)}_${embeddingModel.modelId}`;
-
-  const promptTemplate = config.aiChatConfig?.systemPrompt;
-  if (metadata == null) {
-    return NextResponse.json("Not found", { status: 404 });
-  }
-
-  if (metadata.isPreview) {
-    return NextResponse.json("Chat is not enabled for preview environments", {
-      status: 404,
-    });
-  }
 
   const start = Date.now();
-  const [authEdgeConfig, edgeFlags] = await Promise.all([
-    getAuthEdgeConfig(domain),
-    getEdgeFlags(domain),
-  ]);
 
-  if (!edgeFlags.isAskAiEnabled) {
-    throw new Error(`Ask AI is not enabled for ${domain}`);
-  }
-
-  const fern_token = await getFernToken();
-  const user = await safeVerifyFernJWTConfig(fern_token, authEdgeConfig);
-
+  const namespace = `${withoutStaging(domain)}_${embeddingModel.modelId}`;
+  const fernToken = await getFernToken();
+  const user = await safeVerifyFernJWTConfig(fernToken, authEdgeConfig);
   const lastUserMessage: string | undefined = messages.findLast(
     (message: any) => message.role === "user"
   )?.content;
@@ -145,20 +126,17 @@ export async function POST(req: NextRequest) {
     roles: user?.roles ?? [],
     topK: 3,
   });
-  const documents = toDocuments(searchResults).join("\n\n");
-  const system = isCohere
-    ? createCohereSystemPrompt({
-        domain,
-        date: new Date().toDateString(),
-        documents,
-        promptTemplate,
-      })
-    : createDefaultSystemPrompt({
-        domain,
-        date: new Date().toDateString(),
-        documents,
-        promptTemplate,
-      });
+  const documents = convertTpufRecordsToDocuments(searchResults).join("\n\n");
+
+  const promptTemplate = config.aiChatConfig?.systemPrompt;
+  const systemPrompt = createChatSystemPrompt({
+    customConfig,
+    domain,
+    date: new Date().toDateString(),
+    documents,
+    promptTemplate,
+  });
+
   return traced(async (span) => {
     span.log({
       metadata: {
@@ -169,10 +147,9 @@ export async function POST(req: NextRequest) {
     });
 
     const documentIdsToIgnore: string[] = [];
-
     const result = streamText({
       model: languageModel,
-      system,
+      system: systemPrompt,
       messages,
       maxSteps: 5,
       maxRetries: 3,

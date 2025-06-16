@@ -1,10 +1,12 @@
 "use client";
 
-import { FERN_COLOR_ACCENT } from "@fern-docs/utils";
-
-import { FernFonts } from "@/server/generateFonts";
-import { ArrayOf12 } from "@/server/generateRadixColors";
-import { FernColorTheme, FernLayoutConfig } from "@/server/types";
+import { FernFonts } from "@fern-api/docs-server/generateFonts";
+import {
+  ArrayOf12,
+  FERN_COLOR_ACCENT,
+  FernColorTheme,
+} from "@fern-api/docs-utils";
+import { FernLayoutConfig } from "@fern-api/docs-utils/types/layout-config";
 
 const FONT_MONO =
   "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";

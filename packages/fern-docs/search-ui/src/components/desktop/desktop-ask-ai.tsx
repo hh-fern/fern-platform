@@ -413,6 +413,7 @@ const DesktopAskAIChat = ({
                     size="iconXs"
                     variant="outline"
                     onClick={() => {
+                      chat.stop();
                       chat.setMessages([]);
                       setInitialConversation([]);
                       resetConversationId();
@@ -538,7 +539,11 @@ const AskAIComposer = forwardRef<
     forwardedRef
   ) => {
     const value = typeof props.value === "string" ? props.value : "";
-    const canSubmit = value.trim().split(/\s+/).length >= 1;
+    const canSubmit =
+      value
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word.length > 0).length >= 1;
     const inputRef = useRef<HTMLTextAreaElement>(null);
     return (
       <div
@@ -762,7 +767,8 @@ const AskAICommandItems = memo<{
                             {message.assistant.content}
                           </MarkdownContent>
                         )}
-                        {isLoading &&
+                        {isLastMessage &&
+                          isLoading &&
                           (!message.toolInvocations ||
                             message.toolInvocations.some(
                               (invocation) => invocation.state !== "result"
