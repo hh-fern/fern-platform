@@ -34,6 +34,11 @@ interface TurbopufferIndexerTaskOptions {
    * Whether to delete the existing records before upserting.
    */
   deleteExisting?: boolean;
+
+  /**
+   * Whether to delete the existing backup records before upserting.
+   */
+  deleteBackup?: boolean;
 }
 
 export async function turbopufferUpsertTask({
@@ -43,14 +48,17 @@ export async function turbopufferUpsertTask({
   authed,
   vectorizer,
   splitText = (text) => Promise.resolve([text]),
-  deleteExisting = false,
+  deleteExisting = true,
+  deleteBackup = false,
 }: TurbopufferIndexerTaskOptions): Promise<number> {
+  const backupNamespace = namespace + "_backup";
+
   const tpuf = new Turbopuffer({
     apiKey,
     baseUrl: "https://gcp-us-east4.turbopuffer.com",
   });
   const ns = tpuf.namespace(namespace);
-
+  const backupNs = tpuf.namespace(backupNamespace);
   const { org_id, root, pages, apis, domain } = await loadDocsWithUrl(payload);
 
   const unvectorizedRecords = await createTurbopufferRecords({
@@ -72,7 +80,17 @@ export async function turbopufferUpsertTask({
     await ns.deleteAll();
   }
 
+  if (deleteBackup) {
+    await backupNs.deleteAll();
+  }
+
   await ns.upsert({
+    vectors: records,
+    distance_metric: "cosine_distance",
+    schema: FernTurbopufferAttributeSchema,
+  });
+
+  await backupNs.upsert({
     vectors: records,
     distance_metric: "cosine_distance",
     schema: FernTurbopufferAttributeSchema,

@@ -52,6 +52,9 @@ export async function queryTurbopuffer(
     baseUrl: "https://gcp-us-east4.turbopuffer.com",
   });
   let ns = tpuf.namespace(tmp_namespace);
+
+  // sanity check to make sure namespace exists and is not empty
+  // otherwise use backup namespace (turbopuffer throws 404 for empty namespaces)
   try {
     const numVectors = await ns.approxNumVectors();
     if (numVectors === 0) {

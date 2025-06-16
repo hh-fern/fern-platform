@@ -24,9 +24,11 @@ const model = openai.embedding("text-embedding-3-large");
 export const runReindexTurbopuffer = async (
   domain: string
 ): Promise<number> => {
+  const namespace = `${domain}_${model.modelId}`;
+
   return turbopufferUpsertTask({
     apiKey: turbopufferApiKey(),
-    namespace: `${domain}_${model.modelId}`,
+    namespace: namespace,
     payload: {
       environment: fdrEnvironment(),
       fernToken: fernToken_admin(),
@@ -39,6 +41,7 @@ export const runReindexTurbopuffer = async (
       });
       return embeddings.embeddings;
     },
+    deleteExisting: true,
   });
 };
 

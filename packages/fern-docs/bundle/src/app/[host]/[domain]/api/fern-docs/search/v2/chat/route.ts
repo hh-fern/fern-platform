@@ -223,7 +223,7 @@ async function runQueryTurbopuffer(
   return query == null || query.trimStart().length === 0
     ? []
     : await queryTurbopuffer(query, {
-        namespace: opts.namespace + "_this_will_break",
+        namespace: opts.namespace,
         apiKey: turbopufferApiKey(),
         topK: opts.topK ?? 5,
         vectorizer: async (text) => {
