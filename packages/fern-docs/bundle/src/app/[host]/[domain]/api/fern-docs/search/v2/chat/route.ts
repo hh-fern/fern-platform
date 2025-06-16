@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
         });
       },
     });
-    const response = result.toUIMessageStream({
+    const response = result.toDataStreamResponse({
       getErrorMessage: (error) => {
         if (error == null) {
           return "";
