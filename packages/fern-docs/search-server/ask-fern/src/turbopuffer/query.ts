@@ -46,12 +46,23 @@ export async function queryTurbopuffer(
     documentIdsToIgnore = [],
   }: SemanticSearchOptions
 ): Promise<TurbopufferRecord[]> {
+  const tmp_namespace = namespace + "_" + "this_will_break";
   const tpuf = new Turbopuffer({
     apiKey,
     baseUrl: "https://gcp-us-east4.turbopuffer.com",
   });
-  const ns = tpuf.namespace(namespace);
-
+  let ns = tpuf.namespace(tmp_namespace);
+  try {
+    const numVectors = await ns.approxNumVectors();
+    if (numVectors === 0) {
+      throw new Error(
+        "No vectors found, using backup namespace: " + namespace + "_backup"
+      );
+    }
+  } catch (e) {
+    ns = tpuf.namespace(namespace + "_backup");
+    console.error(e);
+  }
   const vector = await vectorizer(query);
 
   const authFilter: FilterCondition = authed

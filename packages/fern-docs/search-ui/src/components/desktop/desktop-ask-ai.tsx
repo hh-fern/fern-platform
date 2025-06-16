@@ -486,7 +486,7 @@ const DesktopAskAIChat = ({
             }),
             [darkCodeEnabled]
           )}
-          isLoading={chat.status !== "ready"}
+          isLoading={chat.status !== "streaming"}
           userScrolled={userScrolled}
           domain={domain}
           renderActions={renderActions}
@@ -510,7 +510,10 @@ const DesktopAskAIChat = ({
         value={chat.input}
         onValueChange={chat.setInput}
         isLoading={chat.status !== "ready"}
-        stop={chat.stop}
+        stop={() => {
+          chat.stop();
+          chat.status = "ready";
+        }}
         onSend={askAI}
         onKeyDown={useEventCallback((e) => {
           if (e.key === "ArrowUp" || e.key === "ArrowDown") {
