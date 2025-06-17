@@ -1,4 +1,3 @@
-import compression from "compression";
 import cors from "cors";
 import express from "express";
 import { Agent, setGlobalDispatcher } from "undici";
@@ -35,7 +34,6 @@ const expressApp = express();
 expressApp.disable("x-powered-by");
 
 expressApp.use(cors());
-expressApp.use(compression());
 
 setGlobalDispatcher(new Agent({ connect: { timeout: 5_000 } }));
 

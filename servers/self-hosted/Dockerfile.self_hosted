@@ -1,10 +1,8 @@
-FROM node:20.18-alpine3.20 AS base
-
+FROM node:20.18.2-bookworm AS base
 
 # -----------  Start Postgres setup  -----------
 
-RUN apk update && apk add --no-cache postgresql curl
-
+RUN apt-get update && apt-get install -y postgresql curl netcat-openbsd
 
 # Set up Postgres data directory and configuration
 RUN mkdir -p /var/lib/postgresql/data && \
@@ -14,7 +12,7 @@ RUN mkdir -p /var/lib/postgresql/data && \
 
 # Switch to postgres user & initialize the database
 USER postgres
-RUN initdb -D /var/lib/postgresql/data
+RUN /usr/lib/postgresql/*/bin/initdb -D /var/lib/postgresql/data
 EXPOSE 5432
 
 # -----------  End Postgres setup  -----------
@@ -26,8 +24,8 @@ USER root
 RUN wget https://dl.min.io/server/minio/release/linux-amd64/minio && \
     chmod +x minio && \
     mv minio /usr/local/bin/ && \
-    addgroup -S minio-user && \
-    adduser -S minio-user -G minio-user && \
+    groupadd -r minio-user && \
+    useradd -r -g minio-user minio-user && \
     mkdir -p /data && \
     chown -R minio-user:minio-user /data && \
     wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
@@ -41,10 +39,34 @@ ENV MINIO_VOLUMES="/data" \
 
 # ----------- End MINIO setup  -----------
 
+# ----------- Start Typesense setup  -----------
+
+RUN dpkg --add-architecture amd64 && \
+    apt-get update && \
+    apt-get install -y libc6:amd64 \
+    netcat-openbsd
+
+RUN apt-get update && apt-get install -y wget tar && \
+    wget https://dl.typesense.org/releases/28.0/typesense-server-28.0-linux-amd64.tar.gz && \
+    tar -xzf typesense-server-28.0-linux-amd64.tar.gz && \
+    ls -la && \
+    cp typesense-server /usr/local/bin/ && \
+    rm -rf typesense-server-28.0-linux-amd64.tar.gz typesense-server && \
+    groupadd -r typesense-user && \
+    useradd -r -g typesense-user typesense-user && \
+    mkdir -p /var/lib/typesense && \
+    chown -R typesense-user:typesense-user /var/lib/typesense
+
+ENV TYPESENSE_API_KEY="xyz" \
+    TYPESENSE_DATA_DIR="/var/lib/typesense"
+
+EXPOSE 8108
+
+# ----------- End Typesense setup  -----------
+
 # ----------- Setup FDR  -----------
 FROM base AS builder
-RUN apk add --no-cache libc6-compat && \
-    apk update
+RUN apt-get update && apt-get install -y libc6
 
 # Produce a pruned version of the monorepo
 WORKDIR /app
@@ -54,8 +76,7 @@ RUN turbo prune @fern-platform/fdr @fern-docs/bundle @fern-docs/edge-config --do
 
 # Add lockfile and package.json's
 FROM base AS installer
-RUN apk add --no-cache libc6-compat unzip bash && \
-    apk update && \
+RUN apt-get update && apt-get install -y libc6 unzip && \
     npm install -g pnpm@v9.4.0
 
 WORKDIR /app
@@ -85,13 +106,17 @@ WORKDIR /app
 RUN wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
     chmod +x mc && \
     mv mc /usr/local/bin/ && \
-    apk add --no-cache jq && \
+    apt-get update && apt-get install -y jq && \
     npm install -g prisma fern-api@latest pnpm
 
 RUN fern upgrade
 
 # Copy the built FDR application
-COPY --from=installer /app .
+COPY --from=installer /app/servers /app/servers
+COPY --from=installer /app/fern /app/fern
+COPY --from=installer /app/shared /app/shared
+COPY --from=installer /app/turbo.json /app/turbo.json
+COPY --from=installer /app/.gitignore /app/.gitignore
 
 # Copy both FDR and self-hosted directories
 COPY servers/fdr /app/servers/fdr

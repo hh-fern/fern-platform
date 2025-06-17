@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -eu pipefail
 
 if [ ! -d "/app/fern" ]; then
     echo "Fern folder not found. Please ensure you are mounting yours in."
@@ -8,7 +8,7 @@ fi
 
 # --------------------------------------------
 
-source /app/servers/self-hosted/.env
+. /app/servers/self-hosted/.env
 ORG_NAME=$(jq -r '.organization' < /app/fern/fern.config.json)
 MINIO_BUCKET_NAME=${ORG_NAME}.${MINIO_BUCKET_NAME_SUFFIX}
 NEXT_PUBLIC_DOCS_DOMAIN_URL=${ORG_NAME}.docs.buildwithfern.com
@@ -23,7 +23,7 @@ echo "::1 $ORG_NAME.docs.buildwithfern.com.localhost" >> /etc/hosts
 # -----------  Start run Postgres  -----------
 
 echo "Starting postgres..."
-su postgres -c "postgres -D /var/lib/postgresql/data" &
+su postgres -c "/usr/lib/postgresql/*/bin/postgres -D /var/lib/postgresql/data" &
 postgres_pid=$!
 
 echo "Waiting for postgres to start at localhost:5432..."
@@ -86,7 +86,8 @@ MINIO_PASSWORD=${MINIO_PASSWORD} \
 MINIO_URL=${MINIO_URL} \
 MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME} \
 ORG_NAME=${ORG_NAME} \
-node --loader /app/servers/fdr/ts-loader.js --experimental-specifier-resolution=node /app/servers/fdr/dist/server.js & fdr_pid=$!
+
+cd /app/servers/fdr && pnpm node --preserve-symlinks dist/server.js & fdr_pid=$!
 
 echo "Waiting for fdr to start at localhost:8080..."
 while ! nc -z localhost 8080; do
@@ -100,6 +101,26 @@ done
 echo "FDR is up and running at localhost:8080"
 
 # -----------  Finish run FDR  -----------
+
+
+# -----------  Start run Typesense  -----------
+
+echo "Starting Typesense server..."
+/usr/local/bin/typesense-server --data-dir=${TYPESENSE_DATA_DIR} --api-key=${TYPESENSE_API_KEY} --port=8108 & typesense_pid=$!
+
+echo "Waiting for Typesense to start at localhost:8108..."
+timeout=30
+while ! nc -z localhost 8108; do
+    if [ $timeout -le 0 ]; then
+        echo "Error: Typesense failed to start within 30 seconds"
+        exit 1
+    fi
+    sleep 1
+    timeout=$((timeout - 1))
+done
+echo "Typesense is up and running at localhost:8108"
+
+# -----------  Finish run Typesense  -----------
 
 cd /app/
 
@@ -146,3 +167,4 @@ wait $postgres_pid
 wait $minio_pid
 wait $fdr_pid
 wait $docs_pid
+wait $typesense_pid
