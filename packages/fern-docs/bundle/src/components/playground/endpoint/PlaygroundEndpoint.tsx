@@ -43,7 +43,6 @@ import {
   serializeFormStateBody,
 } from "../utils";
 import { usePlaygroundBaseUrl } from "../utils/select-environment";
-import { isLocal } from "../utils/utils";
 import { PlaygroundEndpointContent } from "./PlaygroundEndpointContent";
 import { PlaygroundEndpointPath } from "./PlaygroundEndpointPath";
 
@@ -151,10 +150,7 @@ export const PlaygroundEndpoint = ({
         }),
       };
       if (endpoint.responses?.[0]?.body.type === "stream") {
-        const [res, stream] = await executeProxyStream(
-          req,
-          isProxyDisabled || isLocal()
-        );
+        const [res, stream] = await executeProxyStream(req, isProxyDisabled);
 
         const time = Date.now();
         const reader = stream.getReader();
@@ -179,7 +175,7 @@ export const PlaygroundEndpoint = ({
           );
         }
       } else {
-        const res = await executeProxyRest(req, isProxyDisabled || isLocal());
+        const res = await executeProxyRest(req, isProxyDisabled);
         setResponse(loaded(res));
         if (res.type !== "stream") {
           track("api_playground_request_received", {

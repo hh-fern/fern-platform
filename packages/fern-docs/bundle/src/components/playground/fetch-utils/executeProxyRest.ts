@@ -11,14 +11,10 @@ export async function executeProxyRest(
   disableProxy: boolean = false
 ): Promise<PlaygroundResponse> {
   const requestHeaders = new Headers(req.headers);
-
-  // Only set proxy-specific headers when using the proxy
-  if (!disableProxy) {
-    requestHeaders.set(
-      "X-Fern-Proxy-Request-Headers",
-      Object.keys(req.headers).join(",")
-    );
-  }
+  requestHeaders.set(
+    "X-Fern-Proxy-Request-Headers",
+    Object.keys(req.headers).join(",")
+  );
 
   if (req.body?.type === "form-data") {
     requestHeaders.delete("Content-Type");
@@ -31,14 +27,12 @@ export async function executeProxyRest(
       headers: requestHeaders,
       body: await toBodyInit(req.body),
       mode: "cors",
-      credentials: "include", // Add credentials for CORS requests
     }
   );
 
-  // Only process proxy-specific headers when using the proxy
-  const responseHeadersList = disableProxy
-    ? Object.keys(req.headers)
-    : (res.headers.get("X-Fern-Proxy-Response-Headers") ?? "").split(",");
+  const responseHeadersList = (
+    res.headers.get("X-Fern-Proxy-Response-Headers") ?? ""
+  ).split(",");
 
   const responseHeaders: Record<string, string> = {};
   responseHeadersList.forEach((header) => {
