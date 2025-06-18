@@ -33,9 +33,6 @@ export class Read {
     /**
      * @param {string} domain
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v1.read.getDocsForDomainLegacy("domain")
      */
     public getDocsForDomainLegacy(
         domain: string,
@@ -121,11 +118,6 @@ export class Read {
     /**
      * @param {FernRegistry.docs.v1.read.LoadDocsForDomainRequest} request
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v1.read.getDocsForDomain({
-     *         domain: "domain"
-     *     })
      */
     public getDocsForDomain(
         request: FernRegistry.docs.v1.read.LoadDocsForDomainRequest,

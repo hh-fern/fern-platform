@@ -51,18 +51,6 @@ export class Generators {
      *
      * @param {FernRegistry.generators.Generator} request
      * @param {Generators.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.upsertGenerator({
-     *         id: FernRegistry.generators.GeneratorId("id"),
-     *         displayName: "displayName",
-     *         generatorType: {
-     *             type: "sdk"
-     *         },
-     *         generatorLanguage: undefined,
-     *         dockerImage: "dockerImage",
-     *         scripts: undefined
-     *     })
      */
     public upsertGenerator(
         request: FernRegistry.generators.Generator,
@@ -124,11 +112,6 @@ export class Generators {
      *
      * @param {FernRegistry.generators.GetGeneratorByImageRequest} request
      * @param {Generators.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.getGeneratorByImage({
-     *         dockerImage: "dockerImage"
-     *     })
      */
     public getGeneratorByImage(
         request: FernRegistry.generators.GetGeneratorByImageRequest,
@@ -202,9 +185,6 @@ export class Generators {
      *
      * @param {FernRegistry.generators.GeneratorId} generatorId
      * @param {Generators.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.getGenerator(FernRegistry.generators.GeneratorId("generatorId"))
      */
     public getGenerator(
         generatorId: FernRegistry.generators.GeneratorId,
@@ -270,9 +250,6 @@ export class Generators {
      * Get the all generators. This is currently not paginated since the list will be short, but there may in the future be need for pagination.
      *
      * @param {Generators.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.listGenerators()
      */
     public listGenerators(
         requestOptions?: Generators.RequestOptions,

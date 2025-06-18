@@ -4,63 +4,6 @@
 
 import * as FernRegistry from "../../../../index";
 
-/**
- * @example
- *     {
- *         orgId: FernRegistry.OrgId("orgId"),
- *         apiId: FernRegistry.ApiId("apiId"),
- *         apiDefinitionId: FernRegistry.ApiDefinitionId("d5e9c84f-c2b2-4bf4-b4b0-7ffd7a9ffc32"),
- *         snippets: [{
- *                 sdk: {
- *                     type: "typescript",
- *                     package: "package",
- *                     version: "version"
- *                 },
- *                 endpointId: {
- *                     path: FernRegistry.EndpointPathLiteral("path"),
- *                     method: "GET",
- *                     identifierOverride: undefined
- *                 },
- *                 snippetTemplate: {
- *                     type: "v1",
- *                     clientInstantiation: "clientInstantiation",
- *                     functionInvocation: {
- *                         type: "generic",
- *                         imports: undefined,
- *                         isOptional: true,
- *                         templateString: "templateString",
- *                         templateInputs: undefined,
- *                         inputDelimiter: undefined
- *                     }
- *                 },
- *                 additionalTemplates: undefined
- *             }, {
- *                 sdk: {
- *                     type: "typescript",
- *                     package: "package",
- *                     version: "version"
- *                 },
- *                 endpointId: {
- *                     path: FernRegistry.EndpointPathLiteral("path"),
- *                     method: "GET",
- *                     identifierOverride: undefined
- *                 },
- *                 snippetTemplate: {
- *                     type: "v1",
- *                     clientInstantiation: "clientInstantiation",
- *                     functionInvocation: {
- *                         type: "generic",
- *                         imports: undefined,
- *                         isOptional: true,
- *                         templateString: "templateString",
- *                         templateInputs: undefined,
- *                         inputDelimiter: undefined
- *                     }
- *                 },
- *                 additionalTemplates: undefined
- *             }]
- *     }
- */
 export interface RegisterSnippetTemplateBatchRequest {
     /** The organization to create snippets for. */
     orgId: FernRegistry.OrgId;

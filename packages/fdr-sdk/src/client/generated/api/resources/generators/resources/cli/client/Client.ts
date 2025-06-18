@@ -38,12 +38,6 @@ export class Cli {
      *
      * @param {FernRegistry.generators.GetLatestCliReleaseRequest} request
      * @param {Cli.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.cli.getLatestCliRelease({
-     *         releaseTypes: undefined,
-     *         irVersion: undefined
-     *     })
      */
     public getLatestCliRelease(
         request: FernRegistry.generators.GetLatestCliReleaseRequest = {},
@@ -125,18 +119,6 @@ export class Cli {
      *
      * @param {FernRegistry.generators.GetChangelogRequest} request
      * @param {Cli.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.cli.getChangelog({
-     *         fromVersion: {
-     *             type: "inclusive",
-     *             value: "fromVersion"
-     *         },
-     *         toVersion: {
-     *             type: "inclusive",
-     *             value: "toVersion"
-     *         }
-     *     })
      */
     public getChangelog(
         request: FernRegistry.generators.GetChangelogRequest,
@@ -207,9 +189,6 @@ export class Cli {
      *
      * @param {number} irVersion
      * @param {Cli.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.cli.getMinCliForIr(1)
      */
     public getMinCliForIr(
         irVersion: number,
@@ -290,16 +269,6 @@ export class Cli {
      *
      * @param {FernRegistry.generators.CliReleaseRequest} request
      * @param {Cli.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.cli.upsertCliRelease({
-     *         version: "version",
-     *         createdAt: undefined,
-     *         isYanked: undefined,
-     *         changelogEntry: undefined,
-     *         irVersion: 1,
-     *         tags: undefined
-     *     })
      */
     public upsertCliRelease(
         request: FernRegistry.generators.CliReleaseRequest,
@@ -361,9 +330,6 @@ export class Cli {
      *
      * @param {string} cliVersion
      * @param {Cli.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.cli.getCliRelease("cliVersion")
      */
     public getCliRelease(
         cliVersion: string,
@@ -444,9 +410,6 @@ export class Cli {
      *
      * @param {FernRegistry.generators.ListCliReleasesRequest} request
      * @param {Cli.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.cli.listCliReleases()
      */
     public listCliReleases(
         request: FernRegistry.generators.ListCliReleasesRequest = {},

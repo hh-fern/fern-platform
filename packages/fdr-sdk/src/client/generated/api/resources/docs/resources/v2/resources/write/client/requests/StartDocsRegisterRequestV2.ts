@@ -4,18 +4,6 @@
 
 import * as FernRegistry from "../../../../../../../../index";
 
-/**
- * @example
- *     {
- *         domain: "domain",
- *         customDomains: ["customDomains", "customDomains"],
- *         authConfig: undefined,
- *         orgId: FernRegistry.OrgId("orgId"),
- *         apiId: FernRegistry.ApiId("apiId"),
- *         filepaths: [FernRegistry.docs.v1.write.FilePath("filepaths"), FernRegistry.docs.v1.write.FilePath("filepaths")],
- *         images: undefined
- *     }
- */
 export interface StartDocsRegisterRequestV2 {
     /** A `buildwithfern.com` url */
     domain: string;

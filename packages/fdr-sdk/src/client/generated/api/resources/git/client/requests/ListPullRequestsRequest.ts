@@ -4,18 +4,6 @@
 
 import * as FernRegistry from "../../../../index";
 
-/**
- * @example
- *     {
- *         page: undefined,
- *         pageSize: undefined,
- *         repositoryName: undefined,
- *         repositoryOwner: undefined,
- *         organizationId: undefined,
- *         state: undefined,
- *         author: undefined
- *     }
- */
 export interface ListPullRequestsRequest {
     /** The page number to retrieve. Defaults to 0. */
     page?: number;

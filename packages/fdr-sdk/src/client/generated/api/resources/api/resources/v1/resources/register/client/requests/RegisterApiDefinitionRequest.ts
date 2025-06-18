@@ -4,16 +4,6 @@
 
 import * as FernRegistry from "../../../../../../../../index";
 
-/**
- * @example
- *     {
- *         orgId: FernRegistry.OrgId("orgId"),
- *         apiId: FernRegistry.ApiId("apiId"),
- *         definition: undefined,
- *         definitionV2: undefined,
- *         sources: undefined
- *     }
- */
 export interface RegisterApiDefinitionRequest {
     orgId: FernRegistry.OrgId;
     apiId: FernRegistry.ApiId;

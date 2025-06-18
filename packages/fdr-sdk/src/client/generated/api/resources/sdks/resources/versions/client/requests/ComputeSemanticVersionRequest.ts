@@ -4,14 +4,6 @@
 
 import * as FernRegistry from "../../../../../../index";
 
-/**
- * @example
- *     {
- *         package: "package",
- *         language: "Go",
- *         githubRepository: undefined
- *     }
- */
 export interface ComputeSemanticVersionRequest {
     /** The name of the package (e.g. `@org/sdk` or `com.org:org-java`) */
     package: string;

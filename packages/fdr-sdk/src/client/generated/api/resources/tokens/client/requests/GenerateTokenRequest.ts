@@ -4,13 +4,6 @@
 
 import * as FernRegistry from "../../../../index";
 
-/**
- * @example
- *     {
- *         orgId: FernRegistry.OrgId("orgId"),
- *         scope: "scope"
- *     }
- */
 export interface GenerateTokenRequest {
     /** The organization to generate a token for. */
     orgId: FernRegistry.OrgId;

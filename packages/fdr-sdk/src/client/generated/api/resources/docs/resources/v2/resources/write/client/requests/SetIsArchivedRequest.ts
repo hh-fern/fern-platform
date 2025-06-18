@@ -4,13 +4,6 @@
 
 import * as FernRegistry from "../../../../../../../../index";
 
-/**
- * @example
- *     {
- *         url: FernRegistry.Url("url"),
- *         isArchived: true
- *     }
- */
 export interface SetIsArchivedRequest {
     url: FernRegistry.Url;
     isArchived: boolean;

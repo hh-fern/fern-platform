@@ -4,41 +4,6 @@
 
 import * as FernRegistry from "../../../../index";
 
-/**
- * @example
- *     {
- *         orgId: FernRegistry.OrgId("orgId"),
- *         apiId: FernRegistry.ApiId("apiId"),
- *         snippets: {
- *             type: "typescript",
- *             sdk: {
- *                 package: "package",
- *                 version: "version"
- *             },
- *             snippets: [{
- *                     endpoint: {
- *                         path: FernRegistry.EndpointPathLiteral("path"),
- *                         method: "GET",
- *                         identifierOverride: undefined
- *                     },
- *                     exampleIdentifier: undefined,
- *                     snippet: {
- *                         client: "client"
- *                     }
- *                 }, {
- *                     endpoint: {
- *                         path: FernRegistry.EndpointPathLiteral("path"),
- *                         method: "GET",
- *                         identifierOverride: undefined
- *                     },
- *                     exampleIdentifier: undefined,
- *                     snippet: {
- *                         client: "client"
- *                     }
- *                 }]
- *         }
- *     }
- */
 export interface CreateSnippetRequest {
     /** The organization to create snippets for. */
     orgId: FernRegistry.OrgId;

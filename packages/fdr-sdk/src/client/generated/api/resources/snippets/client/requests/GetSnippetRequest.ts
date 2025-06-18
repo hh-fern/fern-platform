@@ -4,15 +4,6 @@
 
 import * as FernRegistry from "../../../../index";
 
-/**
- * @example
- *     {
- *         endpoint: {
- *             method: "GET",
- *             path: FernRegistry.EndpointPathLiteral("/v1/search")
- *         }
- *     }
- */
 export interface GetSnippetRequest {
     /**
      * If the same API is defined across multiple organization,

@@ -33,15 +33,6 @@ export class Register {
     /**
      * @param {FernRegistry.api.v1.register.RegisterApiDefinitionRequest} request
      * @param {Register.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.api.v1.register.registerApiDefinition({
-     *         orgId: FernRegistry.OrgId("orgId"),
-     *         apiId: FernRegistry.ApiId("apiId"),
-     *         definition: undefined,
-     *         definitionV2: undefined,
-     *         sources: undefined
-     *     })
      */
     public registerApiDefinition(
         request: FernRegistry.api.v1.register.RegisterApiDefinitionRequest,

@@ -38,13 +38,6 @@ export class Versions {
      *
      * @param {FernRegistry.sdks.ComputeSemanticVersionRequest} request
      * @param {Versions.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.sdks.versions.computeSemanticVersion({
-     *         package: "package",
-     *         language: "Go",
-     *         githubRepository: undefined
-     *     })
      */
     public computeSemanticVersion(
         request: FernRegistry.sdks.ComputeSemanticVersionRequest,

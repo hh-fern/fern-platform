@@ -35,12 +35,6 @@ export class Tokens {
      *
      * @param {FernRegistry.GenerateTokenRequest} request
      * @param {Tokens.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.tokens.generate({
-     *         orgId: FernRegistry.OrgId("orgId"),
-     *         scope: "scope"
-     *     })
      */
     public generate(
         request: FernRegistry.GenerateTokenRequest,
@@ -106,12 +100,6 @@ export class Tokens {
      *
      * @param {FernRegistry.RevokeTokenRequest} request
      * @param {Tokens.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.tokens.revoke({
-     *         orgId: FernRegistry.OrgId("orgId"),
-     *         tokenId: FernRegistry.TokenId("tokenId")
-     *     })
      */
     public revoke(
         request: FernRegistry.RevokeTokenRequest,

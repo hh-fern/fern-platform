@@ -35,14 +35,6 @@ export class Snippets {
      *
      * @param {FernRegistry.GetSnippetRequest} request
      * @param {Snippets.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.snippets.get({
-     *         endpoint: {
-     *             method: "GET",
-     *             path: FernRegistry.EndpointPathLiteral("/v1/search")
-     *         }
-     *     })
      */
     public get(
         request: FernRegistry.GetSnippetRequest,
@@ -124,17 +116,6 @@ export class Snippets {
     /**
      * @param {FernRegistry.ListSnippetsRequest} request
      * @param {Snippets.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.snippets.load({
-     *         page: 1,
-     *         orgId: FernRegistry.OrgId("vellum"),
-     *         apiId: FernRegistry.ApiId("vellum-ai"),
-     *         sdks: [{
-     *                 type: "python",
-     *                 package: "vellum-ai"
-     *             }]
-     *     })
      */
     public load(
         request: FernRegistry.ListSnippetsRequest = {},

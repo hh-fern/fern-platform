@@ -4,12 +4,6 @@
 
 import * as FernRegistry from "../../../../../../../../index";
 
-/**
- * @example
- *     {
- *         url: FernRegistry.Url("url")
- *     }
- */
 export interface LoadDocsForUrlRequest {
     url: FernRegistry.Url;
 }

@@ -4,13 +4,6 @@
 
 import * as FernRegistry from "../../../../index";
 
-/**
- * @example
- *     {
- *         orgId: FernRegistry.OrgId("orgId"),
- *         tokenId: FernRegistry.TokenId("tokenId")
- *     }
- */
 export interface RevokeTokenRequest {
     /** The organization to create snippets for. */
     orgId: FernRegistry.OrgId;

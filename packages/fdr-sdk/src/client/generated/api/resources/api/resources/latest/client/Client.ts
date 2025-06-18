@@ -33,9 +33,6 @@ export class Latest {
     /**
      * @param {FernRegistry.ApiDefinitionId} apiDefinitionId
      * @param {Latest.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.api.latest.getApiLatest(FernRegistry.ApiDefinitionId("d5e9c84f-c2b2-4bf4-b4b0-7ffd7a9ffc32"))
      */
     public getApiLatest(
         apiDefinitionId: FernRegistry.ApiDefinitionId,

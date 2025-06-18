@@ -4,14 +4,6 @@
 
 import * as FernRegistry from "../../../../../../../../index";
 
-/**
- * @example
- *     {
- *         domain: "domain",
- *         orgId: FernRegistry.OrgId("orgId"),
- *         filepaths: [FernRegistry.docs.v1.write.FilePath("filepaths"), FernRegistry.docs.v1.write.FilePath("filepaths")]
- *     }
- */
 export interface StartDocsRegisterRequest {
     domain: string;
     orgId: FernRegistry.OrgId;

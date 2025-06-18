@@ -33,13 +33,6 @@ export class Write {
     /**
      * @param {FernRegistry.docs.v1.write.StartDocsRegisterRequest} request
      * @param {Write.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v1.write.startDocsRegister({
-     *         domain: "domain",
-     *         orgId: FernRegistry.OrgId("orgId"),
-     *         filepaths: [FernRegistry.docs.v1.write.FilePath("filepaths"), FernRegistry.docs.v1.write.FilePath("filepaths")]
-     *     })
      */
     public startDocsRegister(
         request: FernRegistry.docs.v1.write.StartDocsRegisterRequest,
@@ -112,48 +105,6 @@ export class Write {
      * @param {FernRegistry.docs.v1.write.DocsRegistrationId} docsRegistrationId
      * @param {FernRegistry.docs.v1.write.RegisterDocsRequest} request
      * @param {Write.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v1.write.finishDocsRegister(FernRegistry.docs.v1.write.DocsRegistrationId("docsRegistrationId"), {
-     *         docsDefinition: {
-     *             pages: {
-     *                 "pages": {
-     *                     markdown: "markdown",
-     *                     editThisPageUrl: undefined
-     *                 }
-     *             },
-     *             config: {
-     *                 title: undefined,
-     *                 defaultLanguage: undefined,
-     *                 announcement: undefined,
-     *                 navigation: undefined,
-     *                 root: undefined,
-     *                 navbarLinks: undefined,
-     *                 footerLinks: undefined,
-     *                 hideNavLinks: undefined,
-     *                 logoHeight: undefined,
-     *                 logoHref: undefined,
-     *                 favicon: undefined,
-     *                 metadata: undefined,
-     *                 redirects: undefined,
-     *                 colorsV3: undefined,
-     *                 layout: undefined,
-     *                 typographyV2: undefined,
-     *                 analyticsConfig: undefined,
-     *                 integrations: undefined,
-     *                 css: undefined,
-     *                 js: undefined,
-     *                 aiChatConfig: undefined,
-     *                 backgroundImage: undefined,
-     *                 logoV2: undefined,
-     *                 logo: undefined,
-     *                 colors: undefined,
-     *                 colorsV2: undefined,
-     *                 typography: undefined
-     *             },
-     *             jsFiles: undefined
-     *         }
-     *     })
      */
     public finishDocsRegister(
         docsRegistrationId: FernRegistry.docs.v1.write.DocsRegistrationId,

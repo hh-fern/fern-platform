@@ -35,38 +35,6 @@ export class Templates {
      *
      * @param {FernRegistry.RegisterSnippetTemplateRequest} request
      * @param {Templates.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.templates.register({
-     *         orgId: FernRegistry.OrgId("orgId"),
-     *         apiId: FernRegistry.ApiId("apiId"),
-     *         apiDefinitionId: FernRegistry.ApiDefinitionId("d5e9c84f-c2b2-4bf4-b4b0-7ffd7a9ffc32"),
-     *         snippet: {
-     *             sdk: {
-     *                 type: "typescript",
-     *                 package: "package",
-     *                 version: "version"
-     *             },
-     *             endpointId: {
-     *                 path: FernRegistry.EndpointPathLiteral("path"),
-     *                 method: "GET",
-     *                 identifierOverride: undefined
-     *             },
-     *             snippetTemplate: {
-     *                 type: "v1",
-     *                 clientInstantiation: "clientInstantiation",
-     *                 functionInvocation: {
-     *                     type: "generic",
-     *                     imports: undefined,
-     *                     isOptional: true,
-     *                     templateString: "templateString",
-     *                     templateInputs: undefined,
-     *                     inputDelimiter: undefined
-     *                 }
-     *             },
-     *             additionalTemplates: undefined
-     *         }
-     *     })
      */
     public register(
         request: FernRegistry.RegisterSnippetTemplateRequest,
@@ -128,62 +96,6 @@ export class Templates {
      *
      * @param {FernRegistry.RegisterSnippetTemplateBatchRequest} request
      * @param {Templates.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.templates.registerBatch({
-     *         orgId: FernRegistry.OrgId("orgId"),
-     *         apiId: FernRegistry.ApiId("apiId"),
-     *         apiDefinitionId: FernRegistry.ApiDefinitionId("d5e9c84f-c2b2-4bf4-b4b0-7ffd7a9ffc32"),
-     *         snippets: [{
-     *                 sdk: {
-     *                     type: "typescript",
-     *                     package: "package",
-     *                     version: "version"
-     *                 },
-     *                 endpointId: {
-     *                     path: FernRegistry.EndpointPathLiteral("path"),
-     *                     method: "GET",
-     *                     identifierOverride: undefined
-     *                 },
-     *                 snippetTemplate: {
-     *                     type: "v1",
-     *                     clientInstantiation: "clientInstantiation",
-     *                     functionInvocation: {
-     *                         type: "generic",
-     *                         imports: undefined,
-     *                         isOptional: true,
-     *                         templateString: "templateString",
-     *                         templateInputs: undefined,
-     *                         inputDelimiter: undefined
-     *                     }
-     *                 },
-     *                 additionalTemplates: undefined
-     *             }, {
-     *                 sdk: {
-     *                     type: "typescript",
-     *                     package: "package",
-     *                     version: "version"
-     *                 },
-     *                 endpointId: {
-     *                     path: FernRegistry.EndpointPathLiteral("path"),
-     *                     method: "GET",
-     *                     identifierOverride: undefined
-     *                 },
-     *                 snippetTemplate: {
-     *                     type: "v1",
-     *                     clientInstantiation: "clientInstantiation",
-     *                     functionInvocation: {
-     *                         type: "generic",
-     *                         imports: undefined,
-     *                         isOptional: true,
-     *                         templateString: "templateString",
-     *                         templateInputs: undefined,
-     *                         inputDelimiter: undefined
-     *                     }
-     *                 },
-     *                 additionalTemplates: undefined
-     *             }]
-     *     })
      */
     public registerBatch(
         request: FernRegistry.RegisterSnippetTemplateBatchRequest,
@@ -245,22 +157,6 @@ export class Templates {
      *
      * @param {FernRegistry.GetSnippetTemplate} request
      * @param {Templates.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.templates.get({
-     *         orgId: FernRegistry.OrgId("orgId"),
-     *         apiId: FernRegistry.ApiId("apiId"),
-     *         sdk: {
-     *             type: "typescript",
-     *             package: "package",
-     *             version: undefined
-     *         },
-     *         endpointId: {
-     *             path: FernRegistry.EndpointPathLiteral("path"),
-     *             method: "GET",
-     *             identifierOverride: undefined
-     *         }
-     *     })
      */
     public get(
         request: FernRegistry.GetSnippetTemplate,

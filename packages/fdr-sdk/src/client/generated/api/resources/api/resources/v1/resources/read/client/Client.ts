@@ -33,9 +33,6 @@ export class Read {
     /**
      * @param {FernRegistry.ApiDefinitionId} apiDefinitionId
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.api.v1.read.getApi(FernRegistry.ApiDefinitionId("d5e9c84f-c2b2-4bf4-b4b0-7ffd7a9ffc32"))
      */
     public getApi(
         apiDefinitionId: FernRegistry.ApiDefinitionId,

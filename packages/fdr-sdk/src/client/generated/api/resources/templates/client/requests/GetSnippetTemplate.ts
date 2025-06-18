@@ -4,23 +4,6 @@
 
 import * as FernRegistry from "../../../../index";
 
-/**
- * @example
- *     {
- *         orgId: FernRegistry.OrgId("orgId"),
- *         apiId: FernRegistry.ApiId("apiId"),
- *         sdk: {
- *             type: "typescript",
- *             package: "package",
- *             version: undefined
- *         },
- *         endpointId: {
- *             path: FernRegistry.EndpointPathLiteral("path"),
- *             method: "GET",
- *             identifierOverride: undefined
- *         }
- *     }
- */
 export interface GetSnippetTemplate {
     /** The organization to create snippets for. */
     orgId: FernRegistry.OrgId;

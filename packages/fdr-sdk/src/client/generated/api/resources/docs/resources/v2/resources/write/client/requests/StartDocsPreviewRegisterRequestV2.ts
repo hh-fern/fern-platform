@@ -4,16 +4,6 @@
 
 import * as FernRegistry from "../../../../../../../../index";
 
-/**
- * @example
- *     {
- *         basePath: undefined,
- *         orgId: FernRegistry.OrgId("orgId"),
- *         authConfig: undefined,
- *         filepaths: [FernRegistry.docs.v1.write.FilePath("filepaths"), FernRegistry.docs.v1.write.FilePath("filepaths")],
- *         images: undefined
- *     }
- */
 export interface StartDocsPreviewRegisterRequestV2 {
     basePath?: string;
     orgId: FernRegistry.OrgId;

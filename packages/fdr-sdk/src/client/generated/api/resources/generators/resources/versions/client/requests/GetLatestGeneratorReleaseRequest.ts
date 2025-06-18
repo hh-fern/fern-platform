@@ -4,16 +4,6 @@
 
 import * as FernRegistry from "../../../../../../index";
 
-/**
- * @example
- *     {
- *         generator: FernRegistry.generators.GeneratorId("generator"),
- *         cliVersion: undefined,
- *         irVersion: undefined,
- *         generatorMajorVersion: undefined,
- *         releaseTypes: undefined
- *     }
- */
 export interface GetLatestGeneratorReleaseRequest {
     generator: FernRegistry.generators.GeneratorId;
     /** The version of the CLI that is requesting the latest generator version. This is used to determine the latest IR version the generator must respect. */

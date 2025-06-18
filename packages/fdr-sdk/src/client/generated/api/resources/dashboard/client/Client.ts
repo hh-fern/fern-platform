@@ -38,11 +38,6 @@ export class Dashboard {
      *
      * @param {FernRegistry.dashboard.GetDocsSitesForOrgRequest} request
      * @param {Dashboard.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.dashboard.getDocsSitesForOrg({
-     *         orgId: FernRegistry.OrgId("orgId")
-     *     })
      */
     public getDocsSitesForOrg(
         request: FernRegistry.dashboard.GetDocsSitesForOrgRequest,

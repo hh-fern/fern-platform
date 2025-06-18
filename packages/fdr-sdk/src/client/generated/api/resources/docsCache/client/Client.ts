@@ -33,11 +33,6 @@ export class DocsCache {
     /**
      * @param {FernRegistry.InvalidateCachedDocsRequest} request
      * @param {DocsCache.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docsCache.invalidate({
-     *         url: FernRegistry.Url("url")
-     *     })
      */
     public invalidate(
         request: FernRegistry.InvalidateCachedDocsRequest,

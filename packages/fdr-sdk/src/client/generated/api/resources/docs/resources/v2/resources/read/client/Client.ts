@@ -33,11 +33,6 @@ export class Read {
     /**
      * @param {FernRegistry.docs.v2.read.GetOrganizationForUrlRequest} request
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v2.read.getOrganizationForUrl({
-     *         url: FernRegistry.Url("url")
-     *     })
      */
     public getOrganizationForUrl(
         request: FernRegistry.docs.v2.read.GetOrganizationForUrlRequest,
@@ -117,11 +112,6 @@ export class Read {
     /**
      * @param {FernRegistry.docs.v2.read.GetMetadataForUrlRequest} request
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v2.read.getDocsUrlMetadata({
-     *         url: FernRegistry.Url("url")
-     *     })
      */
     public getDocsUrlMetadata(
         request: FernRegistry.docs.v2.read.GetMetadataForUrlRequest,
@@ -204,11 +194,6 @@ export class Read {
     /**
      * @param {FernRegistry.docs.v2.read.LoadDocsForUrlRequest} request
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v2.read.getDocsForUrl({
-     *         url: FernRegistry.Url("url")
-     *     })
      */
     public getDocsForUrl(
         request: FernRegistry.docs.v2.read.LoadDocsForUrlRequest,
@@ -295,11 +280,6 @@ export class Read {
     /**
      * @param {FernRegistry.docs.v2.read.LoadPrivateDocsForUrlRequest} request
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v2.read.getPrivateDocsForUrl({
-     *         url: FernRegistry.Url("url")
-     *     })
      */
     public getPrivateDocsForUrl(
         request: FernRegistry.docs.v2.read.LoadPrivateDocsForUrlRequest,
@@ -388,9 +368,6 @@ export class Read {
      *
      * @param {FernRegistry.docs.v2.read.ListAllDocsUrlsRequest} request
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v2.read.listAllDocsUrls()
      */
     public listAllDocsUrls(
         request: FernRegistry.docs.v2.read.ListAllDocsUrlsRequest = {},
@@ -492,9 +469,6 @@ export class Read {
      *
      * @param {FernRegistry.DocsConfigId} docsConfigId
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v2.read.getDocsConfigById(FernRegistry.DocsConfigId("docsConfigId"))
      */
     public getDocsConfigById(
         docsConfigId: FernRegistry.DocsConfigId,
@@ -580,9 +554,6 @@ export class Read {
      * Prepopulates the FDR read S3 bucket with docs definitions
      *
      * @param {Read.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.docs.v2.read.prepopulateFdrReadS3Bucket()
      */
     public prepopulateFdrReadS3Bucket(
         requestOptions?: Read.RequestOptions,

@@ -39,9 +39,6 @@ export class Git {
      * @param {string} repositoryOwner
      * @param {string} repositoryName
      * @param {Git.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.git.getRepository("repositoryOwner", "repositoryName")
      */
     public getRepository(
         repositoryOwner: string,
@@ -108,15 +105,6 @@ export class Git {
      *
      * @param {FernRegistry.ListRepositoriesRequest} request
      * @param {Git.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.git.listRepositories({
-     *         page: undefined,
-     *         pageSize: undefined,
-     *         organizationId: undefined,
-     *         repositoryName: undefined,
-     *         repositoryOwner: undefined
-     *     })
      */
     public listRepositories(
         request: FernRegistry.ListRepositoriesRequest = {},
@@ -184,50 +172,6 @@ export class Git {
      *
      * @param {FernRegistry.FernRepository} request
      * @param {Git.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.git.upsertRepository({
-     *         type: "sdk",
-     *         id: {
-     *             type: "github",
-     *             id: "id"
-     *         },
-     *         name: "name",
-     *         owner: "owner",
-     *         fullName: "fullName",
-     *         url: FernRegistry.Url("url"),
-     *         repositoryOwnerOrganizationId: FernRegistry.OrgId("repositoryOwnerOrganizationId"),
-     *         defaultBranchChecks: [{
-     *                 checkId: "checkId",
-     *                 repositoryOwner: "repositoryOwner",
-     *                 repositoryName: "repositoryName",
-     *                 ref: "ref",
-     *                 name: "name",
-     *                 status: "status",
-     *                 conclusion: "conclusion",
-     *                 checkRunUrl: "checkRunUrl",
-     *                 createdAt: "2024-01-15T09:30:00Z",
-     *                 completedAt: undefined,
-     *                 rawCheckRun: {
-     *                     "key": "value"
-     *                 }
-     *             }, {
-     *                 checkId: "checkId",
-     *                 repositoryOwner: "repositoryOwner",
-     *                 repositoryName: "repositoryName",
-     *                 ref: "ref",
-     *                 name: "name",
-     *                 status: "status",
-     *                 conclusion: "conclusion",
-     *                 checkRunUrl: "checkRunUrl",
-     *                 createdAt: "2024-01-15T09:30:00Z",
-     *                 completedAt: undefined,
-     *                 rawCheckRun: {
-     *                     "key": "value"
-     *                 }
-     *             }],
-     *         sdkLanguage: "sdkLanguage"
-     *     })
      */
     public upsertRepository(
         request: FernRegistry.FernRepository,
@@ -290,9 +234,6 @@ export class Git {
      * @param {string} repositoryOwner
      * @param {string} repositoryName
      * @param {Git.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.git.deleteRepository("repositoryOwner", "repositoryName")
      */
     public deleteRepository(
         repositoryOwner: string,
@@ -359,9 +300,6 @@ export class Git {
      * @param {string} repositoryName
      * @param {number} pullRequestNumber
      * @param {Git.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.git.getPullRequest("repositoryOwner", "repositoryName", 1)
      */
     public getPullRequest(
         repositoryOwner: string,
@@ -430,17 +368,6 @@ export class Git {
      *
      * @param {FernRegistry.ListPullRequestsRequest} request
      * @param {Git.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.git.listPullRequests({
-     *         page: undefined,
-     *         pageSize: undefined,
-     *         repositoryName: undefined,
-     *         repositoryOwner: undefined,
-     *         organizationId: undefined,
-     *         state: undefined,
-     *         author: undefined
-     *     })
      */
     public listPullRequests(
         request: FernRegistry.ListPullRequestsRequest = {},
@@ -508,61 +435,6 @@ export class Git {
      *
      * @param {FernRegistry.PullRequest} request
      * @param {Git.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.git.upsertPullRequest({
-     *         pullRequestNumber: 1,
-     *         repositoryName: "repositoryName",
-     *         repositoryOwner: "repositoryOwner",
-     *         author: undefined,
-     *         reviewers: [{
-     *                 type: "user",
-     *                 name: undefined,
-     *                 email: undefined,
-     *                 username: "username"
-     *             }, {
-     *                 type: "user",
-     *                 name: undefined,
-     *                 email: undefined,
-     *                 username: "username"
-     *             }],
-     *         title: "title",
-     *         url: FernRegistry.Url("url"),
-     *         checks: [{
-     *                 checkId: "checkId",
-     *                 repositoryOwner: "repositoryOwner",
-     *                 repositoryName: "repositoryName",
-     *                 ref: "ref",
-     *                 name: "name",
-     *                 status: "status",
-     *                 conclusion: "conclusion",
-     *                 checkRunUrl: "checkRunUrl",
-     *                 createdAt: "2024-01-15T09:30:00Z",
-     *                 completedAt: undefined,
-     *                 rawCheckRun: {
-     *                     "key": "value"
-     *                 }
-     *             }, {
-     *                 checkId: "checkId",
-     *                 repositoryOwner: "repositoryOwner",
-     *                 repositoryName: "repositoryName",
-     *                 ref: "ref",
-     *                 name: "name",
-     *                 status: "status",
-     *                 conclusion: "conclusion",
-     *                 checkRunUrl: "checkRunUrl",
-     *                 createdAt: "2024-01-15T09:30:00Z",
-     *                 completedAt: undefined,
-     *                 rawCheckRun: {
-     *                     "key": "value"
-     *                 }
-     *             }],
-     *         state: "open",
-     *         createdAt: "2024-01-15T09:30:00Z",
-     *         updatedAt: undefined,
-     *         mergedAt: undefined,
-     *         closedAt: undefined
-     *     })
      */
     public upsertPullRequest(
         request: FernRegistry.PullRequest,
@@ -626,9 +498,6 @@ export class Git {
      * @param {string} repositoryName
      * @param {number} pullRequestNumber
      * @param {Git.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.git.deletePullRequest("repositoryOwner", "repositoryName", 1)
      */
     public deletePullRequest(
         repositoryOwner: string,

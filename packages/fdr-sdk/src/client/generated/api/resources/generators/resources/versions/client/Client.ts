@@ -38,15 +38,6 @@ export class Versions {
      *
      * @param {FernRegistry.generators.GetLatestGeneratorReleaseRequest} request
      * @param {Versions.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.versions.getLatestGeneratorRelease({
-     *         generator: FernRegistry.generators.GeneratorId("generator"),
-     *         cliVersion: undefined,
-     *         irVersion: undefined,
-     *         generatorMajorVersion: undefined,
-     *         releaseTypes: undefined
-     *     })
      */
     public getLatestGeneratorRelease(
         request: FernRegistry.generators.GetLatestGeneratorReleaseRequest,
@@ -136,18 +127,6 @@ export class Versions {
      * @param {FernRegistry.generators.GeneratorId} generator
      * @param {FernRegistry.generators.GetChangelogRequest} request
      * @param {Versions.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.versions.getChangelog(FernRegistry.generators.GeneratorId("generator"), {
-     *         fromVersion: {
-     *             type: "inclusive",
-     *             value: "fromVersion"
-     *         },
-     *         toVersion: {
-     *             type: "inclusive",
-     *             value: "toVersion"
-     *         }
-     *     })
      */
     public getChangelog(
         generator: FernRegistry.generators.GeneratorId,
@@ -223,19 +202,6 @@ export class Versions {
      *
      * @param {FernRegistry.generators.GeneratorReleaseRequest} request
      * @param {Versions.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.versions.upsertGeneratorRelease({
-     *         version: "version",
-     *         createdAt: undefined,
-     *         isYanked: undefined,
-     *         changelogEntry: undefined,
-     *         generatorId: FernRegistry.generators.GeneratorId("generatorId"),
-     *         irVersion: 1,
-     *         migration: undefined,
-     *         customConfigSchema: undefined,
-     *         tags: undefined
-     *     })
      */
     public upsertGeneratorRelease(
         request: FernRegistry.generators.GeneratorReleaseRequest,
@@ -315,9 +281,6 @@ export class Versions {
      * @param {FernRegistry.generators.GeneratorId} generator
      * @param {string} version
      * @param {Versions.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.versions.getGeneratorRelease(FernRegistry.generators.GeneratorId("generator"), "version")
      */
     public getGeneratorRelease(
         generator: FernRegistry.generators.GeneratorId,
@@ -407,9 +370,6 @@ export class Versions {
      * @param {FernRegistry.generators.GeneratorId} generator
      * @param {FernRegistry.generators.ListGeneratorReleasesRequest} request
      * @param {Versions.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.generators.versions.listGeneratorReleases(FernRegistry.generators.GeneratorId("generator"))
      */
     public listGeneratorReleases(
         generator: FernRegistry.generators.GeneratorId,

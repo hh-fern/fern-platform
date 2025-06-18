@@ -35,40 +35,6 @@ export class SnippetsFactory {
      *
      * @param {FernRegistry.CreateSnippetRequest} request
      * @param {SnippetsFactory.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @example
-     *     await client.snippetsFactory.createSnippetsForSdk({
-     *         orgId: FernRegistry.OrgId("orgId"),
-     *         apiId: FernRegistry.ApiId("apiId"),
-     *         snippets: {
-     *             type: "typescript",
-     *             sdk: {
-     *                 package: "package",
-     *                 version: "version"
-     *             },
-     *             snippets: [{
-     *                     endpoint: {
-     *                         path: FernRegistry.EndpointPathLiteral("path"),
-     *                         method: "GET",
-     *                         identifierOverride: undefined
-     *                     },
-     *                     exampleIdentifier: undefined,
-     *                     snippet: {
-     *                         client: "client"
-     *                     }
-     *                 }, {
-     *                     endpoint: {
-     *                         path: FernRegistry.EndpointPathLiteral("path"),
-     *                         method: "GET",
-     *                         identifierOverride: undefined
-     *                     },
-     *                     exampleIdentifier: undefined,
-     *                     snippet: {
-     *                         client: "client"
-     *                     }
-     *                 }]
-     *         }
-     *     })
      */
     public createSnippetsForSdk(
         request: FernRegistry.CreateSnippetRequest,
