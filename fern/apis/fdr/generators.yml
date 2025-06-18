@@ -26,7 +26,7 @@ groups:
           outputSourceFiles: true
           neverThrowErrors: true
           timeoutInSeconds: infinity
-          disable-examples: true
+        disable-examples: true
   fdr-cjs-sdk:
     generators:
       - name: fernapi/fern-typescript-node-sdk
