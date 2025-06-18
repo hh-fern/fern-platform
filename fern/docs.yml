@@ -37,3 +37,6 @@ logo:
   height: 30
 
 favicon: ./docs/images/favicon.ico
+
+ai-chat:
+  model: claude-4
