@@ -64,6 +64,7 @@ export async function queryTurbopuffer(
   } catch (e) {
     ns = tpuf.namespace(namespace + "_backup");
     console.error(e);
+    // TODO: post to slack
   }
   const vector = await vectorizer(query);
 
