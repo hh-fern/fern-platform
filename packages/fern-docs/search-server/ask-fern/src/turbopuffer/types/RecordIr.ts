@@ -1,22 +1,7 @@
 import { z } from "zod";
 
-export const TurbopufferAttributeDataSchema = z.union([
-  z.string(), // string
-  z.number().positive().int(), // uint
-  z.string().uuid(), // uuid
-  z.boolean(), // bool
-  z.array(z.string()), // []string
-  z.array(z.number().positive().int()), // []uint
-  z.array(z.string().uuid()), // []uuid
-]);
-
-export type TurbopufferAttributeData = z.infer<
-  typeof TurbopufferAttributeDataSchema
->;
-
-export const TurbopufferRecordSchema = z.object({
+export const RecordIrSchema = z.object({
   id: z.string(),
-  vector: z.array(z.number()).optional(),
   attributes: z.object({
     type: z.union([z.literal("markdown"), z.literal("api-reference")]),
     chunk: z.string(),
@@ -30,7 +15,7 @@ export const TurbopufferRecordSchema = z.object({
     keywords: z.union([z.string(), z.array(z.string())]).optional(),
     authed: z.boolean().optional(),
 
-    // API reference
+    // API reference - Stringify to Document for TurbopufferRecord
     api_definition_id: z.string().optional(),
     api_endpoint_id: z.string().optional(),
     api_type: z.enum(["http", "webhook", "websocket"]).optional(),
@@ -46,13 +31,11 @@ export const TurbopufferRecordSchema = z.object({
   }),
 });
 
-export type TurbopufferRecord = z.infer<typeof TurbopufferRecordSchema>;
-export type TurbopufferAttributes = TurbopufferRecord["attributes"];
+export type RecordIr = z.infer<typeof RecordIrSchema>;
+export type RecordIrAttributes = RecordIr["attributes"];
 
-export type TurbopufferRecordWithoutVector = Omit<TurbopufferRecord, "vector">;
-
-export const FernTurbopufferAttributeSchema: Record<
-  keyof TurbopufferAttributes,
+export const RecordIrAttributeSchema: Record<
+  keyof RecordIrAttributes,
   {
     type:
       | "string"

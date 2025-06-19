@@ -1,16 +1,15 @@
 import {
   FilterCondition,
   Filters,
-  QueryResults,
   Turbopuffer,
 } from "@turbopuffer/turbopuffer";
 
 import { EVERYONE_ROLE } from "@fern-api/docs-utils";
-import { isNonNullish } from "@fern-api/ui-core-utils";
 import { createRoleFacet } from "@fern-docs/search-utils";
 import { createPermutations } from "@fern-docs/search-utils";
 
-import { TurbopufferRecord } from "./types";
+import { TurbopufferRecord } from "../types";
+import { reciprocalRankFusion } from "./reciprocal-rank-fusion";
 
 interface SemanticSearchOptions {
   vectorizer: (text: string) => Promise<number[]>;
@@ -96,7 +95,7 @@ export async function queryTurbopuffer(
       ? await ns.query({
           vector,
           distance_metric: "cosine_distance",
-          top_k: 1, // to get a single closest match, e.g. with "changelog april 29", semantic search returns other dates
+          top_k: 1,
           include_attributes: true,
           filters: queryFilters,
         })
@@ -114,8 +113,6 @@ export async function queryTurbopuffer(
               ["chunk", "BM25", query],
               ["title", "BM25", query],
               ["keywords", "BM25", query],
-              ["endpoint_path", "BM25", query],
-              ["endpoint_path_alternates", "BM25", query],
             ],
           ],
         })
@@ -125,45 +122,4 @@ export async function queryTurbopuffer(
     semanticResults,
     bm25Results
   ) as unknown as TurbopufferRecord[];
-}
-
-type ResultItem = QueryResults[number];
-
-function resultsToRanks(results: ResultItem[]): Record<string, number> {
-  return results.reduce<Record<string, number>>((acc, item, index) => {
-    acc[item.id] = index + 1;
-    return acc;
-  }, {});
-}
-
-function reciprocalRankFusion(
-  bm25: ResultItem[],
-  vector: ResultItem[],
-  k: number = 60
-): ResultItem[] {
-  const resultsById: Record<string | number, ResultItem> = {};
-  bm25.forEach((item) => (resultsById[item.id] = item));
-  vector.forEach((item) => (resultsById[item.id] = item));
-
-  const bm25Ranks = resultsToRanks(bm25);
-  const vectorRanks = resultsToRanks(vector);
-
-  const scores: Record<string, number> = {};
-
-  const allDocIds = new Set([
-    ...Object.keys(bm25Ranks),
-    ...Object.keys(vectorRanks),
-  ]);
-
-  allDocIds.forEach((docId) => {
-    const bm25Rank = bm25Ranks[docId] ?? Infinity;
-    const vectorRank = vectorRanks[docId] ?? Infinity;
-    scores[docId] = 1.0 / (k + bm25Rank) + 1.0 / (k + vectorRank);
-  });
-
-  return Object.entries(scores)
-    .map(([docId, score]) => ({ id: docId, score }))
-    .sort((a, b) => b.score - a.score)
-    .map(({ id }) => resultsById[id])
-    .filter(isNonNullish);
 }
