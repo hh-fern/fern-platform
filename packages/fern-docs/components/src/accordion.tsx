@@ -43,18 +43,31 @@ AccordionItem.displayName = "AccordionItem";
 const AccordionTrigger = React.forwardRef<
   React.ComponentRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Header asChild>
-    <AccordionPrimitive.Trigger
-      ref={ref}
-      className={cn("fern-accordion-trigger", className)}
-      {...props}
-    >
-      <ChevronRight className="fern-accordion-trigger-arrow" />
-      <h6 className="fern-accordion-trigger-title">{children}</h6>
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-));
+>(({ className, children, ...props }, ref) => {
+  children = <p>Immaculate heading with `code`</p>;
+  return (
+    <AccordionPrimitive.Header asChild>
+      <AccordionPrimitive.Trigger
+        ref={ref}
+        className={cn("fern-accordion-trigger", className)}
+        {...props}
+      >
+        <ChevronRight className="fern-accordion-trigger-arrow" />
+        {children && typeof children === "string" ? (
+          <h6 className="fern-accordion-trigger-title">{children}</h6>
+        ) : (
+          <div
+            className="fern-accordion-trigger-title"
+            role="heading"
+            aria-level={6}
+          >
+            {children}
+          </div>
+        )}
+      </AccordionPrimitive.Trigger>
+    </AccordionPrimitive.Header>
+  );
+});
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 const AccordionContent = React.forwardRef<
