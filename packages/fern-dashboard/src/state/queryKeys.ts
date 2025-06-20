@@ -41,7 +41,7 @@ export const ReactQueryKey = {
     queryKey<getDocsUrlOwner.Response>("docs-url-owner", docsUrl),
   orgSvgLogo: (svgUrl: string) => queryKey<string>("org-svg", svgUrl),
   userGithubRepos: () =>
-    queryKey<getUserGithubRepos.Response>("get-user-github-repos"),
+    queryKey<getUserGithubRepos.Response>("get-user-git-repos"),
 } as const;
 
 function queryKey<T>(...key: string[]) {

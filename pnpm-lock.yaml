@@ -739,8 +739,8 @@ importers:
   packages/fern-dashboard:
     dependencies:
       '@auth0/nextjs-auth0':
-        specifier: ^4.1.0
-        version: 4.1.0(next@15.3.0-canary.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^4.6.1
+        version: 4.6.1(next@15.3.0-canary.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@aws-sdk/client-s3':
         specifier: ^3.744.0
         version: 3.744.0
@@ -3223,10 +3223,10 @@ packages:
     peerDependencies:
       zod: ^3.20.2
 
-  '@auth0/nextjs-auth0@4.1.0':
-    resolution: {integrity: sha512-YGhwsP3EIzFIxUoJhY/Qu6zwki+gDMiIRVjjuvOII+QknqKy2SCu3ZGxrZcMVXgrtMWbwetPXPZ7whhVRHG+tw==}
+  '@auth0/nextjs-auth0@4.6.1':
+    resolution: {integrity: sha512-eSYLCPBzROheJL0gdI0hHCbV468yqyz/sBcuag7cm3dx6LMhRzzFmComPs8p+Y7OCblzblGfk/Hju8A1BkjZxw==}
     peerDependencies:
-      next: ^14.0.0 || ^15.0.0
+      next: ^14.2.25 || ^15.2.3
       react: 19.0.0
       react-dom: 19.0.0
 
@@ -20248,7 +20248,7 @@ snapshots:
       openapi3-ts: 4.4.0
       zod: 3.24.4
 
-  '@auth0/nextjs-auth0@4.1.0(next@15.3.0-canary.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+  '@auth0/nextjs-auth0@4.6.1(next@15.3.0-canary.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@edge-runtime/cookies': 5.0.2
       '@panva/hkdf': 1.2.1
