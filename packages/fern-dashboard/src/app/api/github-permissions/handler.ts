@@ -1,6 +1,8 @@
-import jwt from "jsonwebtoken";
+import { createTokenAuth } from "@octokit/auth-token";
+import { request } from "@octokit/request";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
+import { getUserGithubToken } from "@/app/services/auth0/management";
 import { Auth0UserID } from "@/app/services/auth0/types";
 
 export interface GitHubPermissionsResponse {
@@ -19,40 +21,44 @@ const REQUIRED_SCOPES = ["repo", "read:user", "read:org"];
  * refreshed properly after more permissions are added, so this always returns false.
  */
 export default async function checkGitHubPermissions(
-  _userId: Auth0UserID
+  userId: Auth0UserID
 ): Promise<GitHubPermissionsResponse> {
   const session = await getCurrentSession();
-
-  if (!session?.accessToken) {
-    return {
-      hasRepoAccess: false,
-      error: "GitHub not connected",
-    };
-  }
+  // const auth0 = await getAuth0Client();
 
   try {
-    // Decode the JWT access token to check scopes
-    const decodedToken = jwt.decode(session.accessToken);
-    console.log("decodedToken", decodedToken);
+    const gitHubToken = await getUserGithubToken(userId);
 
-    if (!decodedToken || typeof decodedToken !== "object") {
+    console.log("accessToken", session?.accessToken, gitHubToken);
+    if (!gitHubToken || !session?.accessToken) {
       return {
         hasRepoAccess: false,
-        error: "Invalid access token",
+        error: "GitHub not connected",
       };
     }
 
-    // Check if the token has the required scopes
-    // The scopes might be in different fields depending on the token structure
-    const scopes =
-      decodedToken.scope || decodedToken.scp || decodedToken.permissions || [];
+    // Use @octokit/auth-token to create authentication
+    const auth = createTokenAuth(gitHubToken);
+    const _authentication = await auth();
 
-    // Convert to array if it's a string (space-separated)
-    const scopeArray = typeof scopes === "string" ? scopes.split(" ") : scopes;
+    // Make a HEAD request to the GitHub API to get scopes from headers
+    const response = await request("HEAD /");
+
+    // Extract scopes from the response headers
+    const scopesHeader = response.headers["x-oauth-scopes"];
+    if (!scopesHeader) {
+      return {
+        hasRepoAccess: false,
+        error: "No scopes found in token response",
+      };
+    }
+
+    // Parse the scopes (they come as a comma-separated string)
+    const scopes = scopesHeader.split(/,\s+/);
 
     // Check if all required scopes are present
     const hasAllRequiredScopes = REQUIRED_SCOPES.every((requiredScope) =>
-      scopeArray.includes(requiredScope)
+      scopes.includes(requiredScope)
     );
 
     if (hasAllRequiredScopes) {
@@ -64,14 +70,34 @@ export default async function checkGitHubPermissions(
       return {
         hasRepoAccess: false,
         reauthorizeUrl,
-        error: `Missing required scopes. Required: ${REQUIRED_SCOPES.join(", ")}, Found: ${scopeArray.join(", ")}`,
+        error: `Missing required scopes. Required: ${REQUIRED_SCOPES.join(", ")}, Found: ${scopes.join(", ")}`,
       };
     }
   } catch (error: any) {
-    console.error("Error decoding access token:", error);
+    console.error("Error checking GitHub permissions:", error);
+
+    // Check if this is the specific refresh token error
+    if (
+      error.message?.includes("refresh token was not present") ||
+      error.message?.includes(
+        "Connection Access Token requires a refresh token"
+      )
+    ) {
+      // Return a reauthorize URL that will force re-authentication with the required scopes
+      const reauthorizeUrl = `/auth/login?connection=github&connection_scope=${REQUIRED_SCOPES.join(",")}`;
+
+      return {
+        hasRepoAccess: false,
+        reauthorizeUrl,
+        error:
+          "GitHub connection needs to be re-authenticated. Please log in again with GitHub.",
+      };
+    }
+
+    // For other errors, return a generic error
     return {
       hasRepoAccess: false,
-      error: "Failed to decode access token",
+      error: "Failed to check GitHub permissions",
     };
   }
 }

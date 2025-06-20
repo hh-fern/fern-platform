@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import React from "react";
 
+import checkGitHubPermissions from "@/app/api/github-permissions/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import * as auth0Management from "@/app/services/auth0/management";
 import { Auth0OrgName } from "@/app/services/auth0/types";
@@ -35,7 +36,11 @@ export const GithubExtendedAccessProtectedRoute = async ({
   }
 
   // TODO: hasRepoAccess is always false, so this needs to be fixed.
-  // const { hasRepoAccess } = await checkGitHubPermissions(session.user.sub);
+  const { hasRepoAccess, error } = await checkGitHubPermissions(
+    session.user.sub
+  );
+
+  console.log("hasRepoAccess", hasRepoAccess, error);
 
   // if (!hasRepoAccess) {
   //   return (
