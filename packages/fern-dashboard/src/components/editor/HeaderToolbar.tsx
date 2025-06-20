@@ -22,10 +22,12 @@ export function HeaderToolbar({
   const { name, picture } = session.user;
 
   const handleCommit = () => {
+    // TODO: Implement this.
     console.log("commit");
   };
 
   const handlePublish = () => {
+    // TODO: Implement this.
     console.log("publish");
   };
 

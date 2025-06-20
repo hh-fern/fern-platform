@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
 import { getLoadableValue } from "@fern-ui/loadable";
@@ -22,11 +24,14 @@ export declare namespace DocsSiteOverviewCard {
 
 export function DocsSiteOverviewCard({ docsUrl }: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
-
   const repos = getLoadableValue(useUserGithubRepos());
-  console.log("repos", repos);
+
+  useEffect(() => {
+    console.log("repos", repos);
+  }, [repos]);
 
   const createBranch = () => {
+    // TODO: Implement this.
     console.log("create branch");
   };
 
