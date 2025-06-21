@@ -79,6 +79,7 @@ export default async function Page({
           initialText={""} // TODO: get subtitle from page
           orgName={orgName}
           slug={slug}
+          fileName={page?.filename}
         />
         {html && (
           <PageEditor

@@ -7,6 +7,7 @@ import {
 import { ArrowLeftIcon, Globe, SettingsIcon } from "lucide-react";
 
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import { useMdxState } from "@/providers/MdxStateContext";
 
 import { GithubLogo } from "../auth/GithubLogo";
 import { ProfileImage } from "../layout/ProfileImage";
@@ -20,10 +21,11 @@ export function HeaderToolbar({
   session: Auth0SessionData;
 }) {
   const { name, picture } = session.user;
+  const { mdxState } = useMdxState();
 
   const handleCommit = () => {
     // TODO: Implement this.
-    console.log("commit");
+    console.log("commit", mdxState);
   };
 
   const handlePublish = () => {

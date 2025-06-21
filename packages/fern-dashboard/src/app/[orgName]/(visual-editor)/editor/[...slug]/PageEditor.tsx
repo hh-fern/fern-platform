@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
+
 import { EditorEvents } from "@tiptap/react";
 
+import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import TiptapEditor from "@/components/editor/TiptapEditor";
+import { Button } from "@/components/ui/button";
+import { useMdxState } from "@/providers/MdxStateContext";
 
 import { htmlToMdx } from "./htmlToMdx";
 import { savePageVersion } from "./savePageVersion";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 
 // TODO: hardcoded while developing
 const TEST_BRANCH = "mike/458bb34e";
@@ -20,7 +22,7 @@ export declare namespace PageEditor {
     orgName: string;
     slug: string;
     editThisPageUrl?: string;
-    filename: string;
+    fileName: string;
   }
 }
 
@@ -30,10 +32,13 @@ export default function PageEditor({
   initialHtml,
   orgName,
   slug,
-  filename,
+  fileName,
 }: PageEditor.Props) {
+  const { setMdxState } = useMdxState();
   const originalMdx = htmlToMdx(initialHtml);
-  const [mdxForCommit, setmdxForCommit] = useState<string | null>(htmlToMdx(initialHtml));
+  const [mdxForCommit, setmdxForCommit] = useState<string | null>(
+    htmlToMdx(initialHtml)
+  );
   const [isCommitting, setIsCommitting] = useState(false);
 
   function onTiptapEditorUpdate(props: EditorEvents["update"]) {
@@ -41,6 +46,7 @@ export default function PageEditor({
     const mdx = htmlToMdx(html);
     setmdxForCommit(mdx);
     void savePageVersion({ orgName, slug, mdx });
+    setMdxState(fileName, mdx);
   }
 
   async function handleCommit() {
@@ -57,23 +63,22 @@ export default function PageEditor({
         message: `Update ${slug}`,
         files: [
           {
-            path: `fern/${filename}`,
+            path: `fern/${fileName}`,
             content: mdxForCommit || "",
             mode: "100644",
           },
         ],
       });
-        if (response.success) {
-          console.log("Successfully committed changes:", response.commitSha);
-        } else {
-          console.error("Failed to commit changes:", response.error);
-        }
+      if (response.success) {
+        console.log("Successfully committed changes:", response.commitSha);
+      } else {
+        console.error("Failed to commit changes:", response.error);
+      }
     } catch (error) {
       console.error("Error committing changes:", error);
     } finally {
       setIsCommitting(false);
     }
-
   }
 
   async function handleCreatePr() {
@@ -92,8 +97,14 @@ export default function PageEditor({
       // This is a hack to open the PR in a new tab if it already exists
       // once state is managed, and if PR exists, should not enter this function.
       // TODO: instead raise error (ie PR already exists)
-      if(typeof response.error === "string" && response.error.includes("A pull request already exists")) {
-        window.open(`https://github.com/fern-api/fern/compare/main...${TEST_BRANCH}`, "_blank");
+      if (
+        typeof response.error === "string" &&
+        response.error.includes("A pull request already exists")
+      ) {
+        window.open(
+          `https://github.com/fern-api/fern/compare/main...${TEST_BRANCH}`,
+          "_blank"
+        );
       }
     }
   }
@@ -115,20 +126,27 @@ export default function PageEditor({
   return (
     <>
       <div className="flex flex-row gap-2">
-        <Button 
+        <Button
           onClick={handleCommit}
           disabled={isCommitting || mdxForCommit === originalMdx}
         >
           {isCommitting ? "Committing..." : "Commit"}
         </Button>
-        <a href={`https://github.com/fern-api/fern/compare/main...${TEST_BRANCH}`}>Compare on GitHub</a>
+        <a
+          href={`https://github.com/fern-api/fern/compare/main...${TEST_BRANCH}`}
+        >
+          Compare on GitHub
+        </a>
         <Button onClick={handleCreatePr}>Create PR</Button>
-        <Button onClick={handleGeneratePrDescription}>Generate PR Description</Button>
+        <Button onClick={handleGeneratePrDescription}>
+          Generate PR Description
+        </Button>
       </div>
       <TiptapEditor
-          className={className}
-          content={initialHtml}
-          onUpdate={onTiptapEditorUpdate} />
+        className={className}
+        content={initialHtml}
+        onUpdate={onTiptapEditorUpdate}
+      />
     </>
   );
 }
