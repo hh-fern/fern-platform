@@ -64,7 +64,6 @@ export default function PageEditor({
       });
         if (response.success) {
           console.log("Successfully committed changes:", response.commitSha);
-          setOriginalMdx(mdxForCommit);
         } else {
           console.error("Failed to commit changes:", response.error);
         }
@@ -73,8 +72,23 @@ export default function PageEditor({
     } finally {
       setIsCommitting(false);
     }
-  
 
+  }
+
+  async function handleCreatePr() {
+    const response = await DashboardApiClient.postCreatePr({
+      owner: "fern-api",
+      repo: "fern",
+      head: TEST_BRANCH,
+      base: "main",
+      title: `Update ${slug}`,
+    });
+    if (response.success) {
+      console.log("Successfully created PR:", response.prUrl);
+      window.open(response.prUrl, "_blank");
+    } else {
+      console.error("Failed to create PR:", response.error);
+    }
   }
 
   return (
@@ -87,6 +101,7 @@ export default function PageEditor({
           {isCommitting ? "Committing..." : "Commit"}
         </Button>
         <a href={`https://github.com/fern-api/fern/compare/main...${TEST_BRANCH}`}>Compare on GitHub</a>
+        <Button onClick={handleCreatePr}>Create PR</Button>
       </div>
       <TiptapEditor
           className={className}
