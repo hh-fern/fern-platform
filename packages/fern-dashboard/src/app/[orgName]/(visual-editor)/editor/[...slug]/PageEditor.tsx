@@ -10,7 +10,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 
-const TEST_BRANCH = "mike/8503561e";
+const TEST_BRANCH = "mike/458bb34e";
 
 export declare namespace PageEditor {
   export interface Props {
@@ -56,7 +56,7 @@ export default function PageEditor({
         message: `Update ${slug}`,
         files: [
           {
-            path: `fern/docs/${filename}`,
+            path: `fern/${filename}`,
             content: mdxForCommit || "",
             mode: "100644",
           },
@@ -94,6 +94,20 @@ export default function PageEditor({
     }
   }
 
+  async function handleGeneratePrDescription() {
+    const response = await DashboardApiClient.generatePrDescription({
+      owner: "fern-api",
+      repo: "fern",
+      branch: TEST_BRANCH,
+      baseBranch: "main",
+    });
+    if (response.success) {
+      console.log("Successfully generated PR description:", response.newTitle);
+    } else {
+      console.error("Failed to generate PR description:", response.error);
+    }
+  }
+
   return (
     <>
       <div className="flex flex-row gap-2">
@@ -105,6 +119,7 @@ export default function PageEditor({
         </Button>
         <a href={`https://github.com/fern-api/fern/compare/main...${TEST_BRANCH}`}>Compare on GitHub</a>
         <Button onClick={handleCreatePr}>Create PR</Button>
+        <Button onClick={handleGeneratePrDescription}>Generate PR Description</Button>
       </div>
       <TiptapEditor
           className={className}
