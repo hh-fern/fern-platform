@@ -7,6 +7,7 @@ import { getUserGithubRepos } from "@/app/api/get-user-git-repos/route";
 import { getGitHubPermissions } from "@/app/api/github-permissions/route";
 import { getHomepageImageUrl } from "@/app/api/homepage-images/get/route";
 import { postCreateBranch } from "@/app/api/post-git-create-branch/route";
+import { postGitCommit } from "@/app/api/post-git-commit/route";
 
 export const DashboardApiClient = {
   getMyDocsSites: (
@@ -34,6 +35,8 @@ export const DashboardApiClient = {
     typedFetch<getGitHubPermissions.Response>("/api/github-permissions"),
   postCreateBranch: (request: postCreateBranch.Request) =>
     typedFetch<postCreateBranch.Response>("/api/post-git-create-branch", request),
+  postGitCommit: (request: postGitCommit.Request) =>
+    typedFetch<postGitCommit.Response>("/api/post-git-commit", request),
 };
 
 async function typedFetch<T>(

@@ -72,6 +72,7 @@ export default async function Page({
           initialText={page?.filename ?? ""} // TODO: get title from page
           orgName={orgName}
           slug={slug}
+          filename={page?.filename ?? ""}
         />
         <PageSubtitle
           className="w-full max-w-2xl"
