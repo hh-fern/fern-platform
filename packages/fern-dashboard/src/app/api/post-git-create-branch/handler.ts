@@ -1,7 +1,7 @@
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getOctokit } from "@/app/services/auth0/octokit";
 import { Auth0UserID } from "@/app/services/auth0/types";
-import { Octokit } from "@octokit/core";
+
 
 export default async function postCreateBranch(
   userId: Auth0UserID,
@@ -11,7 +11,12 @@ export default async function postCreateBranch(
     branch: string;
     baseBranch: string;
   }
-) {
+): Promise<{
+  success: boolean;
+  error?: string;
+  baseSha?: string;
+  response?: any;
+}> {
   const session = await getCurrentSession();
   if (session == null) {
     return { success: false, error: "No session found" };
