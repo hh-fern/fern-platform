@@ -20,6 +20,7 @@ export const PostGitCommitRequest = z.object({
   files: z.array(z.object({
     path: z.string(),
     content: z.string(),
+    // 100644 is normal file, 100755 is executable file, 040000 is directory, 160000 is symlink, 120000 is submodule
     mode: z.enum(["100644", "100755", "040000", "160000", "120000"]).optional(),
   })),
 });

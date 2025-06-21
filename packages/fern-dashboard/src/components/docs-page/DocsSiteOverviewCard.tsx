@@ -33,13 +33,10 @@ export function DocsSiteOverviewCard({ docsUrl, session }: DocsSiteOverviewCard.
 
   useEffect(() => {
     console.log("repos", repos);
-    // console.log("session", session);
   }, [repos]);
 
   const createBranch = async () => {
-    // TODO: Implement this.
     console.log("create branch");
-    console.log("session", session);
     const randomHexString = crypto.randomUUID().split('-')[0];
 
     const branchName = session.user.name?.toLowerCase() + '/' + randomHexString;

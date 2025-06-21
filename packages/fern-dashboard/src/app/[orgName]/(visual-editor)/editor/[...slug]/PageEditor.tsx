@@ -6,7 +6,7 @@ import TiptapEditor from "@/components/editor/TiptapEditor";
 
 import { htmlToMdx } from "./htmlToMdx";
 import { savePageVersion } from "./savePageVersion";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 
@@ -88,6 +88,9 @@ export default function PageEditor({
       window.open(response.prUrl, "_blank");
     } else {
       console.error("Failed to create PR:", response.error);
+      // This is a hack to open the PR in a new tab if it already exists
+      // once state is managed, and if PR exists, should not enter this function.
+      // TODO: instead raise error (ie PR already exists)
       if(typeof response.error === "string" && response.error.includes("A pull request already exists")) {
         window.open(`https://github.com/fern-api/fern/compare/main...${TEST_BRANCH}`, "_blank");
       }

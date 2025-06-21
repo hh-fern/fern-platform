@@ -276,13 +276,12 @@ Please respond in the with the title on one line and the description lines there
       }
 
       try {
-        // Clean up the response to extract just the JSON
-        let cleanedContent = content.trim();
-        let lines = cleanedContent.split("\n");
-        let newTitle = lines[0];
-        let newDescription = lines.slice(1).join("\n");
-        console.log(newTitle);
-        console.log(newDescription);
+        // TODO: response should be a JSON object
+        //       was not working, used new lines instead
+        const cleanedContent = content.trim();
+        const lines = cleanedContent.split("\n");
+        const newTitle = lines[0];
+        const newDescription = lines.slice(1).join("\n");
 
         if (!newTitle || newTitle.length > 100 || !newDescription || newDescription.length > 1000) {
           return { newTitle: null, newDescription: null };
@@ -291,7 +290,6 @@ Please respond in the with the title on one line and the description lines there
         return { newTitle, newDescription };
       } catch (parseError) {
         console.error("Error parsing AI response:", parseError);
-        console.log("Raw content:", content);
         return { newTitle: null, newDescription: null };
       }
     } catch (error) {
