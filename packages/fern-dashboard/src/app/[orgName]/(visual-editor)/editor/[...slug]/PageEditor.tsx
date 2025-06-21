@@ -88,6 +88,9 @@ export default function PageEditor({
       window.open(response.prUrl, "_blank");
     } else {
       console.error("Failed to create PR:", response.error);
+      if(typeof response.error === "string" && response.error.includes("A pull request already exists")) {
+        window.open(`https://github.com/fern-api/fern/compare/main...${TEST_BRANCH}`, "_blank");
+      }
     }
   }
 
