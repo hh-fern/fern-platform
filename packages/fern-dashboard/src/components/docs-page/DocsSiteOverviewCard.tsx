@@ -15,24 +15,42 @@ import Card from "../ui/card";
 import { DocsSiteInfo } from "./DocsSiteInfo";
 import { DocsSiteImage } from "./docs-site-image/DocsSiteImage";
 import { SkeletonDocsSiteImage } from "./docs-site-image/SkeletonDocsSiteImage";
+import { DashboardApiClient } from "@/app/services/dashboard-api/client";
+import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+
+const TEST_REPO = "fern-api/fern";
 
 export declare namespace DocsSiteOverviewCard {
   export interface Props {
     docsUrl: DocsUrl;
+    session: Auth0SessionData;
   }
 }
 
-export function DocsSiteOverviewCard({ docsUrl }: DocsSiteOverviewCard.Props) {
+export function DocsSiteOverviewCard({ docsUrl, session }: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
   const repos = getLoadableValue(useUserGithubRepos());
 
   useEffect(() => {
     console.log("repos", repos);
+    // console.log("session", session);
   }, [repos]);
 
-  const createBranch = () => {
+  const createBranch = async () => {
     // TODO: Implement this.
     console.log("create branch");
+    console.log("session", session);
+    const randomHexString = crypto.randomUUID().split('-')[0];
+
+    const branchName = session.user.name?.toLowerCase() + '/' + randomHexString;
+
+    const response = await DashboardApiClient.postCreateBranch({
+      owner: TEST_REPO.split("/")[0]!,
+      repo: TEST_REPO.split("/")[1]!,
+      branch: branchName,
+      baseBranch: "main",
+    });
+    console.log("response", response);
   };
 
   return (
