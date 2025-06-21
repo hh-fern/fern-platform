@@ -9,6 +9,7 @@ import { getHomepageImageUrl } from "@/app/api/homepage-images/get/route";
 import { postCreateBranch } from "@/app/api/post-git-create-branch/route";
 import { postGitCommit } from "@/app/api/post-git-commit/route";
 import { postCreatePr } from "@/app/api/post-git-create-pr/route";
+import { generatePrDescription } from "@/app/api/generate-pr-description/route";
 
 export const DashboardApiClient = {
   getMyDocsSites: (
@@ -40,6 +41,8 @@ export const DashboardApiClient = {
     typedFetch<postGitCommit.Response>("/api/post-git-commit", request),
   postCreatePr: (request: postCreatePr.Request) =>
     typedFetch<postCreatePr.Response>("/api/post-git-create-pr", request),
+  generatePrDescription: (request: generatePrDescription.Request) =>
+    typedFetch<generatePrDescription.Response>("/api/generate-pr-description", request),
 };
 
 async function typedFetch<T>(

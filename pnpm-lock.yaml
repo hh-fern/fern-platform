@@ -738,6 +738,9 @@ importers:
 
   packages/fern-dashboard:
     dependencies:
+      '@anthropic-ai/sdk':
+        specifier: ^0.54.0
+        version: 0.54.0
       '@auth0/nextjs-auth0':
         specifier: ^4.6.1
         version: 4.6.1(next@15.3.0-canary.1(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(@playwright/test@1.50.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -3223,6 +3226,10 @@ packages:
 
   '@antfu/utils@0.7.10':
     resolution: {integrity: sha512-+562v9k4aI80m1+VuMHehNJWLOFjBnXn3tdOitzD0il5b7smkSBal4+a3oKiQTbrwMmN/TBUMDvbdoWDehgOww==}
+
+  '@anthropic-ai/sdk@0.54.0':
+    resolution: {integrity: sha512-xyoCtHJnt/qg5GG6IgK+UJEndz8h8ljzt/caKXmq3LfBF81nC/BW6E4x2rOWCZcvsLyVW+e8U5mtIr6UCE/kJw==}
+    hasBin: true
 
   '@arcanis/slice-ansi@1.1.1':
     resolution: {integrity: sha512-xguP2WR2Dv0gQ7Ykbdb7BNCnPnIPB94uTi0Z2NvkRBEnhbwjOQ7QyQKJXrVQg4qDpiD9hA5l5cCwy/z2OXgc3w==}
@@ -20261,6 +20268,8 @@ snapshots:
       tinyexec: 0.3.2
 
   '@antfu/utils@0.7.10': {}
+
+  '@anthropic-ai/sdk@0.54.0': {}
 
   '@arcanis/slice-ansi@1.1.1':
     dependencies:
