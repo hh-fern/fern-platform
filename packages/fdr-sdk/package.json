@@ -40,7 +40,7 @@
   ],
   "scripts": {
     "clean": "rm -rf ./dist && tsc --build --clean",
-    "compile": "tsc --build tsconfig.build.json",
+    "compile": "tsc --project ./tsconfig.esm.json && node scripts/rename-to-esm-files.cjs dist/esm",
     "dev": "tsc --watch tsconfig.build.json",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
@@ -69,6 +69,7 @@
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
     "@fern-platform/configs": "workspace:*",
+    "@types/jest": "^30.0.0",
     "@types/node-fetch": "2.6.9",
     "@types/qs": "6.9.14",
     "@types/tinycolor2": "^1.4.6",

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "extendedDiagnostics": true,
+    "strict": true,
+    "target": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": "src",
+    "lib": ["DOM", "ESNext"],
+    "types": ["vitest/globals"]
+  },
+  "include": ["src"],
+  "exclude": [],
+  "references": [{ "path": "../commons/core-utils" }]
+}
