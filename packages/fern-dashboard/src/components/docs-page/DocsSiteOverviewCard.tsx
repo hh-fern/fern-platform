@@ -6,6 +6,8 @@ import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
 import { getLoadableValue } from "@fern-ui/loadable";
 
+import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { useDocsSite } from "@/state/useMyDocsSites";
 import { useUserGithubRepos } from "@/state/useUserGithubRepos";
 import { DocsUrl } from "@/utils/types";
@@ -15,8 +17,6 @@ import Card from "../ui/card";
 import { DocsSiteInfo } from "./DocsSiteInfo";
 import { DocsSiteImage } from "./docs-site-image/DocsSiteImage";
 import { SkeletonDocsSiteImage } from "./docs-site-image/SkeletonDocsSiteImage";
-import { DashboardApiClient } from "@/app/services/dashboard-api/client";
-import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 
 const TEST_REPO = "fern-api/fern";
 
@@ -27,7 +27,10 @@ export declare namespace DocsSiteOverviewCard {
   }
 }
 
-export function DocsSiteOverviewCard({ docsUrl, session }: DocsSiteOverviewCard.Props) {
+export function DocsSiteOverviewCard({
+  docsUrl,
+  session,
+}: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
   const repos = getLoadableValue(useUserGithubRepos());
 
@@ -37,9 +40,9 @@ export function DocsSiteOverviewCard({ docsUrl, session }: DocsSiteOverviewCard.
 
   const createBranch = async () => {
     console.log("create branch");
-    const randomHexString = crypto.randomUUID().split('-')[0];
+    const randomHexString = crypto.randomUUID().split("-")[0];
 
-    const branchName = session.user.name?.toLowerCase() + '/' + randomHexString;
+    const branchName = session.user.name?.toLowerCase() + "/" + randomHexString;
 
     const response = await DashboardApiClient.postCreateBranch({
       owner: TEST_REPO.split("/")[0]!,
@@ -70,10 +73,10 @@ export function DocsSiteOverviewCard({ docsUrl, session }: DocsSiteOverviewCard.
             variant="outline"
             size="sm"
             className="text-primary hover:text-primary"
-            onClick={createBranch}
+            onClick={() => void createBranch()}
           >
             <PencilSquareIcon className="text-primary" />
-            Create a PR
+            Create a Branch
           </Button>
         </div>
         <p className="text-gray-1100 text-sm">TODO: List PRs</p>

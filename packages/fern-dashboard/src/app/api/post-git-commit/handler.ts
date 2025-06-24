@@ -1,6 +1,7 @@
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getOctokit } from "@/app/services/auth0/octokit";
 import { Auth0UserID } from "@/app/services/auth0/types";
+import { GithubCommitableFile } from "@/app/services/github/types";
 
 export default async function postGitCommit(
   userId: Auth0UserID,
@@ -9,11 +10,7 @@ export default async function postGitCommit(
     repo: string;
     branch: string;
     message: string;
-    files: Array<{
-      path: string;
-      content: string;
-      mode?: "100644" | "100755" | "040000" | "160000" | "120000";
-    }>;
+    files: GithubCommitableFile[];
   }
 ): Promise<{
   success: boolean;
@@ -36,58 +33,66 @@ export default async function postGitCommit(
     // Get the current tree SHA for the branch
     const {
       data: {
-        object: { sha: baseSha }
-      }
-    } = await octokit.request('GET /repos/{owner}/{repo}/git/ref/{ref}', {
+        object: { sha: baseSha },
+      },
+    } = await octokit.request("GET /repos/{owner}/{repo}/git/ref/{ref}", {
       owner: request.owner,
       repo: request.repo,
-      ref: `heads/${request.branch}`
+      ref: `heads/${request.branch}`,
     });
 
     // Get the current commit to get the tree SHA
     const {
-      data: { tree: { sha: baseTreeSha } }
-    } = await octokit.request('GET /repos/{owner}/{repo}/git/commits/{commit_sha}', {
-      owner: request.owner,
-      repo: request.repo,
-      commit_sha: baseSha
-    });
+      data: {
+        tree: { sha: baseTreeSha },
+      },
+    } = await octokit.request(
+      "GET /repos/{owner}/{repo}/git/commits/{commit_sha}",
+      {
+        owner: request.owner,
+        repo: request.repo,
+        commit_sha: baseSha,
+      }
+    );
 
     // Create a new tree with the files
-    const tree = request.files.map(file => ({
+    const tree = request.files.map((file) => ({
       path: file.path,
       mode: file.mode || "100644",
       type: "blob",
-      content: file.content
+      content: file.content,
     }));
 
     const {
-      data: { sha: newTreeSha }
-    } = await octokit.request('POST /repos/{owner}/{repo}/git/trees', {
+      data: { sha: newTreeSha },
+    } = await octokit.request("POST /repos/{owner}/{repo}/git/trees", {
       owner: request.owner,
       repo: request.repo,
       base_tree: baseTreeSha,
-      tree
+      tree,
     });
 
     // Create a new commit
     const {
-      data: { sha: commitSha }
-    } = await octokit.request('POST /repos/{owner}/{repo}/git/commits', {
+      data: { sha: commitSha },
+    } = await octokit.request("POST /repos/{owner}/{repo}/git/commits", {
       owner: request.owner,
       repo: request.repo,
       message: request.message,
       tree: newTreeSha,
-      parents: [baseSha]
+      parents: [baseSha],
     });
 
     // Update the branch reference to point to the new commit
-    const response = await octokit.request('PATCH /repos/{owner}/{repo}/git/refs/{ref}', {
-      owner: request.owner,
-      repo: request.repo,
-      ref: `heads/${request.branch}`,
-      sha: commitSha
-    });
+    const response = await octokit.request(
+      "PATCH /repos/{owner}/{repo}/git/refs/{ref}",
+      {
+        owner: request.owner,
+        repo: request.repo,
+        ref: `heads/${request.branch}`,
+        sha: commitSha,
+      }
+    );
 
     return {
       success: true,

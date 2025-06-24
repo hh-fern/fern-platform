@@ -6,24 +6,26 @@ type FilePath = string;
 type Markdown = string;
 
 export const MdxStateContext = createContext<{
-  mdxState: Record<FilePath, Markdown>;
+  updatedMarkdownFiles: Record<FilePath, Markdown>;
   setMdxState: (filePath: FilePath, markdown: Markdown) => void;
 }>({
-  mdxState: {},
+  updatedMarkdownFiles: {},
   setMdxState: (_filePath: FilePath, _markdown: Markdown) => {
     return;
   },
 });
 
 export function MdxStateProvider({ children }: { children: ReactNode }) {
-  const [mdxState, setMdxStateStore] = useState<Record<FilePath, Markdown>>({});
+  const [updatedMarkdownFiles, setMdxStateStore] = useState<
+    Record<FilePath, Markdown>
+  >({});
 
   function setMdxState(filePath: FilePath, markdown: Markdown) {
     setMdxStateStore((prev) => ({ ...prev, [filePath]: markdown }));
   }
 
   return (
-    <MdxStateContext.Provider value={{ mdxState, setMdxState }}>
+    <MdxStateContext.Provider value={{ updatedMarkdownFiles, setMdxState }}>
       {children}
     </MdxStateContext.Provider>
   );

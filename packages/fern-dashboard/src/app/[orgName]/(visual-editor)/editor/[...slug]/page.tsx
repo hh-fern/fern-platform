@@ -72,14 +72,12 @@ export default async function Page({
           initialText={page?.filename ?? ""} // TODO: get title from page
           orgName={orgName}
           slug={slug}
-          filename={page?.filename ?? ""}
         />
         <PageSubtitle
           className="w-full max-w-2xl"
           initialText={""} // TODO: get subtitle from page
           orgName={orgName}
           slug={slug}
-          fileName={page?.filename}
         />
         {html && (
           <PageEditor
@@ -87,6 +85,7 @@ export default async function Page({
             initialHtml={html}
             orgName={orgName}
             slug={slug}
+            fileName={page?.filename ?? ""}
           />
         )}
       </div>
