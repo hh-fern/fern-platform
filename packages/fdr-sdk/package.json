@@ -40,7 +40,7 @@
   ],
   "scripts": {
     "clean": "rm -rf ./dist && tsc --build --clean",
-    "compile": "tsc --project ./tsconfig.esm.json && node scripts/rename-to-esm-files.cjs dist/esm",
+    "compile": "tsc --project ./tsconfig.esm.json && node scripts/rename-to-esm-files.cjs dist",
     "dev": "tsc --watch tsconfig.build.json",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
