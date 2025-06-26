@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import React from "react";
+import { Link } from "react-transition-progress/next";
 
 import { ExternalLinkIcon } from "lucide-react";
 import { type UrlObject, format, parse, resolve } from "url";

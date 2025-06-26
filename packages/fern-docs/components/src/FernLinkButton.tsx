@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import {
   ComponentProps,
   PropsWithChildren,
   createElement,
   forwardRef,
 } from "react";
+import { Link } from "react-transition-progress/next";
 
 import {
   ButtonContent,

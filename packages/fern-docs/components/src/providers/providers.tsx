@@ -1,6 +1,7 @@
 "use client";
 
-import { ProgressProvider } from "@bprogress/next/app";
+import { ProgressBar, ProgressBarProvider } from "react-transition-progress";
+
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 import { Toaster } from "../FernToast";
@@ -13,17 +14,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <JotaiProvider>
         <TooltipProvider>
           <Toaster />
-          <ProgressProvider
-            height="3px"
-            color="var(--accent)"
-            options={{ showSpinner: false }}
-            disableSameURL
-            delay={300}
-            memo
-            shouldCompareComplexProps
-          >
+          <ProgressBarProvider>
+            <ProgressBar className="bg-accent shadow-accent absolute top-0 z-50 h-1 w-screen shadow-lg" />
             {children}
-          </ProgressProvider>
+          </ProgressBarProvider>
         </TooltipProvider>
       </JotaiProvider>
     </StyledJsxRegistry>

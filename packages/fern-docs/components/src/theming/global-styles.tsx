@@ -146,7 +146,6 @@ export function GlobalStyles({
         }
 
         ${scopeSelector} {
-         
           ${domain.includes("nominal") ? "--radius: 0px;" : ""}
 
           /* for backwards compatibility */
