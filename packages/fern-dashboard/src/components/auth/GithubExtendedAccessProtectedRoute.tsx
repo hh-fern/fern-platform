@@ -27,6 +27,8 @@ export const GithubExtendedAccessProtectedRoute = async ({
     redirect("/");
   }
 
+  console.log("Session token:", session.accessToken);
+
   const isUserInOrgFromUrl = await auth0Management.doesUserBelongsToOrg(
     session.user.sub,
     orgName
@@ -38,15 +40,24 @@ export const GithubExtendedAccessProtectedRoute = async ({
 
   // TODO: hasRepoAccess is always false, so this needs to be fixed.
   console.log("Checking GitHub permissions for user:", session.user.sub);
-  const { hasRepoAccess, error, reauthorizeUrl } = await checkGitHubPermissions(session.user.sub);
-  console.log("GitHub permissions result:", { hasRepoAccess, error, reauthorizeUrl });
+  const { hasRepoAccess, error, reauthorizeUrl } = await checkGitHubPermissions(
+    session.user.sub
+  );
+  console.log("GitHub permissions result:", {
+    hasRepoAccess,
+    error,
+    reauthorizeUrl,
+  });
 
   if (!hasRepoAccess) {
-    console.log("User does not have required GitHub permissions, showing reauthorization button");
+    console.log(
+      "User does not have required GitHub permissions, showing reauthorization button"
+    );
     return (
       <LoginButton
         additionalParams={{
-          scope: "repo read:user read:org",
+          connection: "github",
+          connection_scope: "read:user,read:org,repo", // Auth0 parameter
         }}
       />
     );
