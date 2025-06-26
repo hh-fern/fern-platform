@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0UserID } from "@/app/services/auth0/types";
+import { getAuth0ManagementClient } from "@/app/services/auth0/management";
 
 export interface GitHubPermissionsResponse {
   hasRepoAccess: boolean;
@@ -31,24 +32,52 @@ export default async function checkGitHubPermissions(
   }
 
   try {
-    // Decode the JWT access token to check scopes
-    const decodedToken = jwt.decode(session.accessToken);
-    console.log("decodedToken", decodedToken);
+    async function getUsersById(userId: Auth0UserID) {
+      const auth0 = getAuth0ManagementClient();
+      const user = (await auth0.users.get({ id: userId })).data;
+      return user;
+    }
 
-    if (!decodedToken || typeof decodedToken !== "object") {
+    async function getUserGithubToken(userId: Auth0UserID) {
+      const user = await getUsersById(userId);
+
+      const githubIdentity = user.identities.find(
+        (identity) => identity.provider === "github"
+      );
+
+      return githubIdentity?.access_token;
+    }
+
+    const githubToken = await getUserGithubToken(_userId);
+    console.log("GitHub token:", githubToken);
+
+    if (!githubToken) {
       return {
         hasRepoAccess: false,
-        error: "Invalid access token",
+        error: "GitHub access token not found",
       };
     }
 
-    // Check if the token has the required scopes
+    // Decode the GitHub JWT token to check scopes
+    const decodedGitHubToken = jwt.decode(githubToken);
+    console.log("decodedGitHubToken", decodedGitHubToken);
+
+    if (!decodedGitHubToken || typeof decodedGitHubToken !== "object") {
+      return {
+        hasRepoAccess: false,
+        error: "Invalid GitHub access token",
+      };
+    }
+
+    // Check if the GitHub token has the required scopes
     // The scopes might be in different fields depending on the token structure
     const scopes =
-      decodedToken.scope || decodedToken.scp || decodedToken.permissions || [];
+      decodedGitHubToken.scope || decodedGitHubToken.scp || decodedGitHubToken.permissions || [];
 
     // Convert to array if it's a string (space-separated)
     const scopeArray = typeof scopes === "string" ? scopes.split(" ") : scopes;
+
+    console.log("GitHub token scopes:", scopeArray);
 
     // Check if all required scopes are present
     const hasAllRequiredScopes = REQUIRED_SCOPES.every((requiredScope) =>
