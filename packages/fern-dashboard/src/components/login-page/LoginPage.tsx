@@ -19,7 +19,11 @@ export const LoginPage = () => {
           <div className="mb-8 text-sm text-gray-900">
             Sign in to your account
           </div>
-          <LoginButton />
+          <LoginButton
+            additionalParams={{
+              scope: "openid profile email repo workflow",
+            }}
+          />
         </div>
         <div className="absolute bottom-8 left-0 right-0 mx-[15%] text-center text-xs text-gray-900">
           By continuing, you agree to Fern&apos;s{" "}
