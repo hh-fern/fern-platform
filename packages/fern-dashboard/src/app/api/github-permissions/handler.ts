@@ -1,8 +1,8 @@
-import jwt from "jsonwebtoken";
+import { Octokit } from "@octokit/rest";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import { Auth0UserID } from "@/app/services/auth0/types";
 import { getAuth0ManagementClient } from "@/app/services/auth0/management";
+import { Auth0UserID } from "@/app/services/auth0/types";
 
 export interface GitHubPermissionsResponse {
   hasRepoAccess: boolean;
@@ -10,30 +10,20 @@ export interface GitHubPermissionsResponse {
   error?: string;
 }
 
-// Define the required scopes for repo access
-const REQUIRED_SCOPES = ["repo", "read:user", "read:org"];
+export interface CheckRepositoryWritePermissionsParams {
+  auth0UserId: Auth0UserID;
+  auth0Token: string;
+  githubRepoUrl: string;
+}
 
-/**
- * TODO -- FIX THIS:
- * Am thinking that we should have some sort of means to test whether or not a user
- * has given us enough permissions to do what we need. Seems like the JWT isn't getting
- * refreshed properly after more permissions are added, so this always returns false.
- */
-export default async function checkGitHubPermissions(
-  _userId: Auth0UserID
+export default async function checkRepositoryWritePermissions(
+  params: CheckRepositoryWritePermissionsParams
 ): Promise<GitHubPermissionsResponse> {
-  const session = await getCurrentSession();
-
-  if (!session?.accessToken) {
-    return {
-      hasRepoAccess: false,
-      error: "GitHub not connected",
-    };
-  }
+  const { auth0UserId, auth0Token, githubRepoUrl } = params;
 
   try {
     async function getUsersById(userId: Auth0UserID) {
-      const auth0 = getAuth0ManagementClient();
+      const auth0 = getAuth0ManagementClient(auth0Token);
       const user = (await auth0.users.get({ id: userId })).data;
       return user;
     }
@@ -48,7 +38,7 @@ export default async function checkGitHubPermissions(
       return githubIdentity?.access_token;
     }
 
-    const githubToken = await getUserGithubToken(_userId);
+    const githubToken = await getUserGithubToken(auth0UserId);
     console.log("GitHub token:", githubToken);
 
     if (!githubToken) {
@@ -58,49 +48,50 @@ export default async function checkGitHubPermissions(
       };
     }
 
-    // Decode the GitHub JWT token to check scopes
-    const decodedGitHubToken = jwt.decode(githubToken);
-    console.log("decodedGitHubToken", decodedGitHubToken);
-
-    if (!decodedGitHubToken || typeof decodedGitHubToken !== "object") {
+    // Parse the GitHub repo URL to extract owner and repo name
+    const repoUrlMatch = githubRepoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+    if (!repoUrlMatch) {
       return {
         hasRepoAccess: false,
-        error: "Invalid GitHub access token",
+        error: "Invalid GitHub repository URL",
       };
     }
 
-    // Check if the GitHub token has the required scopes
-    // The scopes might be in different fields depending on the token structure
-    const scopes =
-      decodedGitHubToken.scope || decodedGitHubToken.scp || decodedGitHubToken.permissions || [];
+    const [, owner, repo] = repoUrlMatch;
+    const repoName = repo?.replace(/\.git$/, "") || ""; // Remove .git suffix if present
 
-    // Convert to array if it's a string (space-separated)
-    const scopeArray = typeof scopes === "string" ? scopes.split(" ") : scopes;
+    // Use Octokit to check repository permissions
+    const octokit = new Octokit({
+      auth: githubToken,
+    });
 
-    console.log("GitHub token scopes:", scopeArray);
+    try {
+      const { data: repoData } = await octokit.repos.get({
+        owner: owner ?? "fern-api",
+        repo: repoName,
+      });
 
-    // Check if all required scopes are present
-    const hasAllRequiredScopes = REQUIRED_SCOPES.every((requiredScope) =>
-      scopeArray.includes(requiredScope)
-    );
-
-    if (hasAllRequiredScopes) {
-      return { hasRepoAccess: true };
-    } else {
-      // Return a reauthorize URL that will force re-authentication with the required scopes
-      const reauthorizeUrl = `/auth/login?connection=github&connection_scope=${REQUIRED_SCOPES.join(",")}`;
+      // Check if user has write permissions
+      const hasWritePermission = repoData.permissions?.push === true;
 
       return {
+        hasRepoAccess: hasWritePermission,
+        error: hasWritePermission
+          ? undefined
+          : "User does not have write permissions to this repository",
+      };
+    } catch (apiError: any) {
+      console.error("Error checking GitHub repository permissions:", apiError);
+      return {
         hasRepoAccess: false,
-        reauthorizeUrl,
-        error: `Missing required scopes. Required: ${REQUIRED_SCOPES.join(", ")}, Found: ${scopeArray.join(", ")}`,
+        error: "Failed to check repository permissions",
       };
     }
   } catch (error: any) {
-    console.error("Error decoding access token:", error);
+    console.error("Error checking repository permissions:", error);
     return {
       hasRepoAccess: false,
-      error: "Failed to decode access token",
+      error: "Failed to check repository permissions",
     };
   }
 }

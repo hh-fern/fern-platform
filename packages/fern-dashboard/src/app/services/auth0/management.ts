@@ -23,7 +23,21 @@ const FERN_ORG_NAME = Auth0OrgName("fern");
 
 let AUTH0_MANAGEMENT_CLIENT: ManagementClient | undefined;
 
-export function getAuth0ManagementClient() {
+export function getAuth0ManagementClient(auth0Token?: string) {
+  if (auth0Token != null) {
+    const { AUTH0_DOMAIN } = process.env;
+
+    if (AUTH0_DOMAIN == null) {
+      throw new Error("AUTH0_DOMAIN is not defined");
+    }
+
+    return new ManagementClient({
+      domain: AUTH0_DOMAIN,
+      token: auth0Token,
+      timeoutDuration: 60_000,
+    });
+  }
+
   if (AUTH0_MANAGEMENT_CLIENT == null) {
     const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } = process.env;
 
@@ -278,7 +292,8 @@ export async function addUserToOrg(userId: Auth0UserID, orgName: Auth0OrgName) {
 }
 
 export async function getUserGithubToken(
-  userId: Auth0UserID
+  userId: Auth0UserID,
+  auth0Token?: string
 ): Promise<string | undefined> {
   const auth0 = getAuth0ManagementClient();
   const user = (await auth0.users.get({ id: userId })).data;

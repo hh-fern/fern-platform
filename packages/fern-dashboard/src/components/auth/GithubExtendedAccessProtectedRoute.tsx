@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import React from "react";
 
+import { Octokit } from "@octokit/core";
+
 import checkGitHubPermissions from "@/app/api/github-permissions/handler";
+import checkRepositoryWritePermissions from "@/app/api/github-permissions/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import * as auth0Management from "@/app/services/auth0/management";
 import { Auth0OrgName } from "@/app/services/auth0/types";
@@ -27,8 +30,6 @@ export const GithubExtendedAccessProtectedRoute = async ({
     redirect("/");
   }
 
-  console.log("Session token:", session.accessToken);
-
   const isUserInOrgFromUrl = await auth0Management.doesUserBelongsToOrg(
     session.user.sub,
     orgName
@@ -38,21 +39,14 @@ export const GithubExtendedAccessProtectedRoute = async ({
     return <Page404 />;
   }
 
-  // TODO: hasRepoAccess is always false, so this needs to be fixed.
-  console.log("Checking GitHub permissions for user:", session.user.sub);
-  const { hasRepoAccess, error, reauthorizeUrl } = await checkGitHubPermissions(
-    session.user.sub
-  );
-  console.log("GitHub permissions result:", {
-    hasRepoAccess,
-    error,
-    reauthorizeUrl,
-  });
+  const { hasRepoAccess, error, reauthorizeUrl } =
+    await checkRepositoryWritePermissions({
+      auth0UserId: session.user.sub,
+      auth0Token: session.accessToken,
+      githubRepoUrl: "https://github.com/fern-api/fern", // Default repo for general permission check
+    });
 
   if (!hasRepoAccess) {
-    console.log(
-      "User does not have required GitHub permissions, showing reauthorization button"
-    );
     return (
       <LoginButton
         additionalParams={{
