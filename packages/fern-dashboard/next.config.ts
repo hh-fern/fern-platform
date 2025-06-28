@@ -44,6 +44,10 @@ const nextConfig: NextConfig = {
   // vercel chokes on monorepo compilation and we run compile before building
   typescript: { ignoreBuildErrors: true },
 
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // so it doesn't cover the theme toggle
   devIndicators: { position: "bottom-right" },
 
