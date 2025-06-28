@@ -22,6 +22,7 @@ export default async function checkRepositoryWritePermissions(
 
   try {
     async function getUsersById(userId: Auth0UserID) {
+      console.log("Auth0 token:", auth0Token);
       const auth0 = getAuth0ManagementClient(auth0Token);
       const user = (await auth0.users.get({ id: userId })).data;
       return user;
