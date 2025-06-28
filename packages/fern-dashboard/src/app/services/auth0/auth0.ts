@@ -12,7 +12,7 @@ export async function getAuth0Client() {
       };
     },
     authorizationParameters: {
-      audience: process.env.NEXT_PUBLIC_VENUS_AUDIENCE,
+      audience: `${process.env.NEXT_PUBLIC_VENUS_AUDIENCE} https://fern-prod.us.auth0.com/api/v2/`,
     },
     appBaseUrl: await getAppUrlServerSide(),
     httpTimeout: 60_000,
