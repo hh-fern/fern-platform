@@ -295,7 +295,7 @@ export async function getUserGithubToken(
   userId: Auth0UserID,
   auth0Token?: string
 ): Promise<string | undefined> {
-  const auth0 = getAuth0ManagementClient();
+  const auth0 = getAuth0ManagementClient(auth0Token);
   const user = (await auth0.users.get({ id: userId })).data;
   return user.identities.find((identity) => identity.provider === "github")
     ?.access_token;

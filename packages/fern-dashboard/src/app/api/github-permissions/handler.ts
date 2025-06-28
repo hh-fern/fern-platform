@@ -1,6 +1,5 @@
 import { Octokit } from "@octokit/rest";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getAuth0ManagementClient } from "@/app/services/auth0/management";
 import { Auth0UserID } from "@/app/services/auth0/types";
 

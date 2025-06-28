@@ -9,6 +9,7 @@
   },
   "sideEffects": false,
   "scripts": {
+    "clean": "rm -rf ./dist && tsc --build --clean",
     "codegen": "prisma generate",
     "compile": "tsc --build",
     "dashboard:build": "next build",

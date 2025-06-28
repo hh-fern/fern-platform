@@ -1,9 +1,6 @@
 import { redirect } from "next/navigation";
 import React from "react";
 
-import { Octokit } from "@octokit/core";
-
-import checkGitHubPermissions from "@/app/api/github-permissions/handler";
 import checkRepositoryWritePermissions from "@/app/api/github-permissions/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import * as auth0Management from "@/app/services/auth0/management";
@@ -39,12 +36,11 @@ export const GithubExtendedAccessProtectedRoute = async ({
     return <Page404 />;
   }
 
-  const { hasRepoAccess, error, reauthorizeUrl } =
-    await checkRepositoryWritePermissions({
-      auth0UserId: session.user.sub,
-      auth0Token: session.accessToken,
-      githubRepoUrl: "https://github.com/fern-api/fern", // Default repo for general permission check
-    });
+  const { hasRepoAccess } = await checkRepositoryWritePermissions({
+    auth0UserId: session.user.sub,
+    auth0Token: session.accessToken,
+    githubRepoUrl: "https://github.com/fern-api/fern", // Default repo for general permission check
+  });
 
   if (!hasRepoAccess) {
     return (
