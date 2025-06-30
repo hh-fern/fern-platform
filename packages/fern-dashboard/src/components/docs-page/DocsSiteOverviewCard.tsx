@@ -14,28 +14,25 @@ import { useGithubSourceRepo } from "@/state/useGithubSourceRepo";
 import { useDocsSite } from "@/state/useMyDocsSites";
 import { DocsUrl } from "@/utils/types";
 
+import { LoginButton } from "../auth/LoginButton";
 import { Button } from "../ui/button";
 import Card from "../ui/card";
 import { DocsSiteInfo } from "./DocsSiteInfo";
 import { DocsSiteImage } from "./docs-site-image/DocsSiteImage";
 import { SkeletonDocsSiteImage } from "./docs-site-image/SkeletonDocsSiteImage";
 
-export declare namespace DocsSiteOverviewCard {
-  export interface Props {
-    orgName: Auth0OrgName;
-    docsUrl: DocsUrl;
-    session: Auth0SessionData;
-  }
-}
-
-export function DocsSiteOverviewCard({
+// Client component for the Create Branch button
+function CreateBranchButton({
   orgName,
   docsUrl,
   session,
-}: DocsSiteOverviewCard.Props) {
-  const docsSite = getLoadableValue(useDocsSite(docsUrl));
-  const sourceRepo = getLoadableValue(useGithubSourceRepo(docsUrl));
-
+  sourceRepo,
+}: {
+  orgName: Auth0OrgName;
+  docsUrl: DocsUrl;
+  session: Auth0SessionData;
+  sourceRepo: any;
+}) {
   const createBranch = useCallback(async () => {
     console.log("create branch");
     if (sourceRepo?.owner == null || sourceRepo.repo == null) {
@@ -57,9 +54,79 @@ export function DocsSiteOverviewCard({
       branch: branchName,
       baseBranch: "main",
     });
+    if (response.success === false) {
+      console.error("Failed to create branch", response.error);
+      return;
+    }
     console.log("response", response);
     redirect(`/${orgName}/editor/${docsUrl}/${branchName}/root`);
   }, [sourceRepo, session.user.name, orgName, docsUrl]);
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className="text-primary hover:text-primary"
+      onClick={() => void createBranch()}
+    >
+      <PencilSquareIcon className="text-primary" />
+      Create a Branch
+    </Button>
+  );
+}
+
+// Client component for GitHub access protection
+function GithubProtectedButton({
+  orgName,
+  docsUrl,
+  session,
+  sourceRepo,
+}: {
+  orgName: Auth0OrgName;
+  docsUrl: DocsUrl;
+  session: Auth0SessionData;
+  sourceRepo: any;
+}) {
+  // For now, we'll show the login button since hasRepoAccess is always false
+  // TODO: Implement proper GitHub access checking on the client side
+  const hasRepoAccess = false;
+
+  if (!hasRepoAccess) {
+    return (
+      <LoginButton
+        additionalParams={{
+          connection: "github",
+          connection_scope: "read:user,read:org,repo",
+        }}
+      />
+    );
+  }
+
+  return (
+    <CreateBranchButton
+      orgName={orgName}
+      docsUrl={docsUrl}
+      session={session}
+      sourceRepo={sourceRepo}
+    />
+  );
+}
+
+export declare namespace DocsSiteOverviewCard {
+  export interface Props {
+    orgName: Auth0OrgName;
+    docsUrl: DocsUrl;
+    session: Auth0SessionData;
+  }
+}
+
+export function DocsSiteOverviewCard({
+  orgName,
+  docsUrl,
+  session,
+}: DocsSiteOverviewCard.Props) {
+  const docsSite = getLoadableValue(useDocsSite(docsUrl));
+  const sourceRepo = getLoadableValue(useGithubSourceRepo(docsUrl));
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -80,15 +147,12 @@ export function DocsSiteOverviewCard({
             <p>
               <b>Open Pull Requests</b>
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-primary hover:text-primary"
-              onClick={() => void createBranch()}
-            >
-              <PencilSquareIcon className="text-primary" />
-              Create a Branch
-            </Button>
+            <GithubProtectedButton
+              orgName={orgName}
+              docsUrl={docsUrl}
+              session={session}
+              sourceRepo={sourceRepo}
+            />
           </div>
           <p className="text-gray-1100 text-sm">TODO: List PRs</p>
         </Card>

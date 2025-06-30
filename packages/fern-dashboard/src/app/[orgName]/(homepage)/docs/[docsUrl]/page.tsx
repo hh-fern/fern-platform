@@ -7,6 +7,7 @@ import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
 
 import { parseDocsUrlParam } from "../../../../../utils/parseDocsUrlParam";
+import { GithubExtendedAccessProtectedRoute } from "@/components/auth/GithubExtendedAccessProtectedRoute";
 
 export default async function Page(props: {
   params: Promise<{ orgName: Auth0OrgName; docsUrl: string }>;
@@ -20,15 +21,17 @@ export default async function Page(props: {
   }
 
   return (
-    <FeatureFlaggedServerSide
-      flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
-      redirectWhenDisabled
-    >
-      <DocsSiteOverviewCard
-        orgName={orgName}
-        docsUrl={docsUrl}
-        session={session}
-      />
-    </FeatureFlaggedServerSide>
+    //<GithubExtendedAccessProtectedRoute orgName={orgName}>
+      <FeatureFlaggedServerSide
+        flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
+        redirectWhenDisabled
+      >
+        <DocsSiteOverviewCard
+          orgName={orgName}
+          docsUrl={docsUrl}
+          session={session}
+        />
+      </FeatureFlaggedServerSide>
+    //</GithubExtendedAccessProtectedRoute>
   );
 }

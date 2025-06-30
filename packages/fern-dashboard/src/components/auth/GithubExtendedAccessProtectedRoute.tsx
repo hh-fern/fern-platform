@@ -6,6 +6,7 @@ import * as auth0Management from "@/app/services/auth0/management";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 
 import { Page404 } from "../Page404";
+import { LoginButton } from "./LoginButton";
 
 export declare namespace GithubExtendedAccessProtectedRoute {
   export interface Props {
@@ -35,18 +36,18 @@ export const GithubExtendedAccessProtectedRoute = async ({
   }
 
   // TODO: hasRepoAccess is always false, so this needs to be fixed.
-  // const { hasRepoAccess } = await checkGitHubPermissions(session.user.sub);
+  const hasRepoAccess = false; //await checkGitHubPermissions(session.user.sub);
 
-  // if (!hasRepoAccess) {
-  //   return (
-  //     <LoginButton
-  //       additionalParams={{
-  //         connection: "github",
-  //         connection_scope: "read:user,read:org,repo",
-  //       }}
-  //     />
-  //   );
-  // }
+  if (!hasRepoAccess) {
+     return (
+       <LoginButton
+         additionalParams={{
+           connection: "github",
+           connection_scope: "read:user,read:org,repo",
+         }}
+       />
+     );
+  }
 
   return children;
 };
