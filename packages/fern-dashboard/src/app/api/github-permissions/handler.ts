@@ -2,10 +2,11 @@ import jwt from "jsonwebtoken";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0UserID } from "@/app/services/auth0/types";
+import { getUserGithubToken } from "@/app/services/auth0/management";
 
 export interface GitHubPermissionsResponse {
   hasRepoAccess: boolean;
-  reauthorizeUrl?: string;
+  // reauthorizeUrl?: string;
   error?: string;
 }
 
@@ -19,17 +20,40 @@ const REQUIRED_SCOPES = ["repo", "read:user", "read:org"];
  * refreshed properly after more permissions are added, so this always returns false.
  */
 export default async function checkGitHubPermissions(
-  _userId: Auth0UserID
+  userId: Auth0UserID
 ): Promise<GitHubPermissionsResponse> {
-  const session = await getCurrentSession();
 
+  // get the user's github token
+  const gitHubToken = await getUserGithubToken(userId);
+  if (!gitHubToken) {
+    return {
+      hasRepoAccess: false,
+      error: "GitHub access token not found",
+    };
+  }
+  console.log("================================================")
+  console.log("gitHubToken", gitHubToken);
+  console.log("================================================")
+
+  return {
+    hasRepoAccess: false,
+  }
+
+  // get the Auth0 user
+
+  // get the user's github token
+
+  // check if the user has the required scopes
+
+  // return a bool with the result
+
+  /**const session = await getCurrentSession();
   if (!session?.accessToken) {
     return {
       hasRepoAccess: false,
       error: "GitHub not connected",
     };
   }
-
   try {
     // Decode the JWT access token to check scopes
     const decodedToken = jwt.decode(session.accessToken);
@@ -41,7 +65,6 @@ export default async function checkGitHubPermissions(
         error: "Invalid access token",
       };
     }
-
     // Check if the token has the required scopes
     // The scopes might be in different fields depending on the token structure
     const scopes =
@@ -73,5 +96,5 @@ export default async function checkGitHubPermissions(
       hasRepoAccess: false,
       error: "Failed to decode access token",
     };
-  }
+  }**/
 }

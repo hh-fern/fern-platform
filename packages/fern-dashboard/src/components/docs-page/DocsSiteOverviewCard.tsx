@@ -1,7 +1,7 @@
 "use client";
 
 import { redirect } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
@@ -55,6 +55,7 @@ function CreateBranchButton({
       baseBranch: "main",
     });
     if (response.success === false) {
+      // todo maybe show a toast here?
       console.error("Failed to create branch", response.error);
       return;
     }
@@ -87,10 +88,7 @@ function GithubProtectedButton({
   session: Auth0SessionData;
   sourceRepo: any;
 }) {
-  // For now, we'll show the login button since hasRepoAccess is always false
-  // TODO: Implement proper GitHub access checking on the client side
-  const hasRepoAccess = false;
-
+  const hasRepoAccess = true; // await checkGitHubPermissions(session.user.sub);
   if (!hasRepoAccess) {
     return (
       <LoginButton
@@ -126,6 +124,8 @@ export function DocsSiteOverviewCard({
   session,
 }: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
+
+  // todo the source repo doesn't work without the correct permissions either...
   const sourceRepo = getLoadableValue(useGithubSourceRepo(docsUrl));
 
   return (

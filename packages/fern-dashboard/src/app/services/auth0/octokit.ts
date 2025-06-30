@@ -9,8 +9,6 @@ export async function getOctokit(userId: Auth0UserID) {
       return null;
   }
 
-  /* eslint-disable turbo/no-undeclared-env-vars */
-
   if (gitHubToken == null) {
     throw new Error("GITHUB_TOKEN is not defined in the current environment");
   }

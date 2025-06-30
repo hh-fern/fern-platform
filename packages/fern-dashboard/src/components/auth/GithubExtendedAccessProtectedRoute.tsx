@@ -7,6 +7,8 @@ import { Auth0OrgName } from "@/app/services/auth0/types";
 
 import { Page404 } from "../Page404";
 import { LoginButton } from "./LoginButton";
+import checkGitHubPermissions from "@/app/api/github-permissions/handler";
+import { getUserGithubToken } from "@/app/services/auth0/management";
 
 export declare namespace GithubExtendedAccessProtectedRoute {
   export interface Props {
@@ -35,8 +37,19 @@ export const GithubExtendedAccessProtectedRoute = async ({
     return <Page404 />;
   }
 
-  // TODO: hasRepoAccess is always false, so this needs to be fixed.
-  const hasRepoAccess = false; //await checkGitHubPermissions(session.user.sub);
+  const hasRepoAccess = true; //await checkGitHubPermissions(session.user.sub);
+
+  const gitHubToken = await getUserGithubToken(session.user.sub);
+  if (!gitHubToken) {
+    return {
+      hasRepoAccess: false,
+      error: "GitHub access token not found",
+    };
+  }
+  console.log("================================================")
+  console.log("gitHubToken", gitHubToken);
+  console.log("================================================")
+
 
   if (!hasRepoAccess) {
      return (

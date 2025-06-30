@@ -21,7 +21,7 @@ export default async function Page(props: {
   }
 
   return (
-    //<GithubExtendedAccessProtectedRoute orgName={orgName}>
+    <GithubExtendedAccessProtectedRoute orgName={orgName}>
       <FeatureFlaggedServerSide
         flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
         redirectWhenDisabled
@@ -32,6 +32,6 @@ export default async function Page(props: {
           session={session}
         />
       </FeatureFlaggedServerSide>
-    //</GithubExtendedAccessProtectedRoute>
+    </GithubExtendedAccessProtectedRoute>
   );
 }

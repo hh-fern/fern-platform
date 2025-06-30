@@ -23,19 +23,7 @@ const FERN_ORG_NAME = Auth0OrgName("fern");
 
 let AUTH0_MANAGEMENT_CLIENT: ManagementClient | undefined;
 
-export function getAuth0ManagementClient(auth0Token?: string) {
-  if (auth0Token != null) {
-    const { AUTH0_DOMAIN } = process.env;
-    console.log("AUTH0_DOMAIN", AUTH0_DOMAIN);
-    if (AUTH0_DOMAIN == null) {
-      throw new Error("AUTH0_DOMAIN is not defined");
-    }
-    return new ManagementClient({
-      domain: AUTH0_DOMAIN,
-      token: auth0Token,
-      timeoutDuration: 60_000,
-    });
-  }
+export function getAuth0ManagementClient() {
   if (AUTH0_MANAGEMENT_CLIENT == null) {
     const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } = process.env;
 
@@ -290,30 +278,10 @@ export async function addUserToOrg(userId: Auth0UserID, orgName: Auth0OrgName) {
 }
 
 export async function getUserGithubToken(
-  userId: Auth0UserID,
-  auth0Token?: string
+  userId: Auth0UserID
 ): Promise<string | undefined> {
-  try {
-    const auth0 = getAuth0ManagementClient(); // maybe pass in auth0Token?
-    const user = (await auth0.users.get({ id: userId })).data;
-    
-    const githubIdentity = user.identities.find(
-      (identity) => identity.provider === "github"
-    );
-    
-    if (!githubIdentity) {
-      return undefined;
-    }
-    
-    // Check if the token exists and is not empty
-    if (!githubIdentity.access_token) {
-      return undefined;
-    }
-    
-    return githubIdentity.access_token;
-  } catch (error) {
-    // Log the error for debugging but don't expose sensitive information
-    console.error(`Failed to get GitHub token for user ${userId}:`, error);
-    return undefined;
-  }
+  const auth0 = getAuth0ManagementClient();
+  const user = (await auth0.users.get({ id: userId })).data;
+  return user.identities.find((identity) => identity.provider === "github")
+    ?.access_token;
 }
