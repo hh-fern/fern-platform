@@ -4,7 +4,6 @@ import React from "react";
 import checkGitHubPermissions from "@/app/api/github-permissions/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import * as auth0Management from "@/app/services/auth0/management";
-import { getUserGithubToken } from "@/app/services/auth0/management";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 
 import { Page404 } from "../Page404";

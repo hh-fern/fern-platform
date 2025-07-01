@@ -1,6 +1,6 @@
 import { getUserGithubToken } from "@/app/services/auth0/management";
-import { Auth0UserID } from "@/app/services/auth0/types";
 import { getOctokit } from "@/app/services/auth0/octokit";
+import { Auth0UserID } from "@/app/services/auth0/types";
 
 export interface GitHubPermissionsResponse {
   hasRepoAccess: boolean;
