@@ -11,13 +11,6 @@ const REQUIRED_SCOPES = ["repo", "read:user", "read:org"];
 export default async function checkGitHubPermissions(
   userId: Auth0UserID
 ): Promise<GitHubPermissionsResponse> {
-  const gitHubToken = await getUserGithubToken(userId);
-  if (!gitHubToken) {
-    return {
-      hasRepoAccess: false,
-      error: "GitHub access token not found",
-    };
-  }
   const octokit = await getOctokit(userId);
   if (octokit == null) {
     return {
