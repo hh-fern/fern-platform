@@ -8,3 +8,4 @@ export { createCohereSystemPrompt } from "./utils/cohere-system-prompt";
 export { getLanguageModel } from "./utils/get-model-from-config";
 export { createChatSystemPrompt } from "./utils/create-chat-system-prompt";
 export * from "./turbopuffer";
+export { type CustomAskFernConfig } from "./custom/types";

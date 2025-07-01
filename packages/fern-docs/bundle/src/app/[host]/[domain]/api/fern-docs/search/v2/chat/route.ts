@@ -4,6 +4,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import {
   EmbeddingModel,
   InvalidToolArgumentsError,
+  LanguageModelV1,
   NoSuchToolError,
   ToolExecutionError,
   embed,
@@ -24,6 +25,7 @@ import {
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { DocsV1Read } from "@fern-api/fdr-sdk";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
   buildCustomConfig,
@@ -33,8 +35,11 @@ import {
   getTurbopufferNamespace,
   queryTurbopuffer,
 } from "@fern-docs/search-ask-fern";
+import { CustomAskFernConfig } from "@fern-docs/search-ask-fern";
 
 import { getFernToken } from "@/app/fern-token";
+
+import { getBedrockLanguageModel } from "../../../../../../../../../../search-server/ask-fern/src/utils/get-model-from-config";
 
 export const maxDuration = 60;
 export const revalidate = 0;
@@ -82,6 +87,64 @@ export async function POST(req: NextRequest) {
   const chatSource = source ?? "chat"; // distinguish between chat and mcp server request
 
   const languageModel = getLanguageModel(config.aiChatConfig?.model);
+
+  try {
+    const response = await streamChatCompletion({
+      domain,
+      authEdgeConfig,
+      messages,
+      url,
+      source,
+      conversationId,
+      config,
+      customConfig,
+      chatSource,
+      languageModel,
+    });
+    if (!response.ok) {
+      throw new Error("Failed to stream, falling back to bedrock");
+    }
+  } catch (error) {
+    // Fallback to Bedrock model if the primary model fails
+    const bedrockModel = getBedrockLanguageModel(config.aiChatConfig?.model);
+    return await streamChatCompletion({
+      domain,
+      authEdgeConfig,
+      messages,
+      url,
+      source,
+      conversationId,
+      config,
+      customConfig,
+      chatSource,
+      languageModel: bedrockModel,
+    });
+  }
+}
+
+async function streamChatCompletion(args: {
+  domain: string;
+  authEdgeConfig: any;
+  messages: any[];
+  url: string;
+  source: string | undefined;
+  conversationId: string;
+  config: Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">;
+  customConfig: CustomAskFernConfig;
+  chatSource: string;
+  languageModel: LanguageModelV1;
+}) {
+  const {
+    domain,
+    authEdgeConfig,
+    messages,
+    config,
+    customConfig,
+    chatSource,
+    conversationId,
+    languageModel,
+  } = args;
+
   const openai = createOpenAI({ apiKey: openaiApiKey() });
   const embeddingModel = openai.embedding("text-embedding-3-large");
 
