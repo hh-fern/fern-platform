@@ -36,7 +36,6 @@ export const GithubExtendedAccessProtectedRoute = async ({
     return <Page404 />;
   }
   const { hasRepoAccess } = await checkGitHubPermissions(session.user.sub);
-  console.log("hasRepoAccess protected route", hasRepoAccess);
   if (!hasRepoAccess) {
     return (
       <LoginButton
