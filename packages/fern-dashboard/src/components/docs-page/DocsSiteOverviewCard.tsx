@@ -22,7 +22,6 @@ import { DocsSiteImage } from "./docs-site-image/DocsSiteImage";
 import { SkeletonDocsSiteImage } from "./docs-site-image/SkeletonDocsSiteImage";
 import { toast } from "sonner";
 
-// Client component for the Create Branch button
 function CreateBranchButton({
   orgName,
   docsUrl,
@@ -83,7 +82,6 @@ function CreateBranchButton({
   );
 }
 
-// Client component for GitHub access protection
 function GithubProtectedButton({
   orgName,
   docsUrl,
@@ -134,8 +132,6 @@ export function DocsSiteOverviewCard({
   hasRepoAccess,
 }: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
-
-  // todo the source repo doesn't work without the correct permissions either...
   const sourceRepo = getLoadableValue(useGithubSourceRepo(docsUrl));
 
   return (
