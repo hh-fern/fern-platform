@@ -1,6 +1,7 @@
-import { Auth0UserID } from "@/app/services/auth0/types";
-import { getUserGithubToken } from "@/app/services/auth0/management";
 import { Octokit } from "@octokit/rest";
+
+import { getUserGithubToken } from "@/app/services/auth0/management";
+import { Auth0UserID } from "@/app/services/auth0/types";
 
 export interface GitHubPermissionsResponse {
   hasRepoAccess: boolean;
@@ -27,8 +28,10 @@ export default async function checkGitHubPermissions(
       error: "Missing scopes header",
     };
   }
-  const actualScopes = scopesHeader.split(",").map(s => s.trim());
-  const missing = REQUIRED_SCOPES.filter(scope => !actualScopes.includes(scope));
+  const actualScopes = scopesHeader.split(",").map((s) => s.trim());
+  const missing = REQUIRED_SCOPES.filter(
+    (scope) => !actualScopes.includes(scope)
+  );
   if (missing.length > 0) {
     return {
       hasRepoAccess: false,

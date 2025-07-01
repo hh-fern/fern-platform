@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState} from "react";
+import { useCallback, useState } from "react";
 
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { toast } from "sonner";
 
 import { getLoadableValue } from "@fern-ui/loadable";
 
@@ -20,7 +21,6 @@ import Card from "../ui/card";
 import { DocsSiteInfo } from "./DocsSiteInfo";
 import { DocsSiteImage } from "./docs-site-image/DocsSiteImage";
 import { SkeletonDocsSiteImage } from "./docs-site-image/SkeletonDocsSiteImage";
-import { toast } from "sonner";
 
 function CreateBranchButton({
   orgName,
@@ -35,7 +35,7 @@ function CreateBranchButton({
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const createBranch = useCallback(async () => {
     if (sourceRepo?.owner == null || sourceRepo.repo == null) {
       return;
