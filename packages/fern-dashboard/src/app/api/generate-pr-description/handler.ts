@@ -22,10 +22,7 @@ export default async function generatePrDescription(
   }
 
   const octokit = await getOctokit(userId);
-  if (octokit == null) {
-    return { success: false, error: "Failed to get GitHub client" };
-  }
-
+  
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
   if (!anthropicApiKey) {
     return { success: false, error: "ANTHROPIC_API_KEY not configured" };

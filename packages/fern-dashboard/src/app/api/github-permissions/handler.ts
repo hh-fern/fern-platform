@@ -1,7 +1,6 @@
-import { Octokit } from "@octokit/rest";
-
 import { getUserGithubToken } from "@/app/services/auth0/management";
 import { Auth0UserID } from "@/app/services/auth0/types";
+import { getOctokit } from "@/app/services/auth0/octokit";
 
 export interface GitHubPermissionsResponse {
   hasRepoAccess: boolean;
@@ -19,7 +18,13 @@ export default async function checkGitHubPermissions(
       error: "GitHub access token not found",
     };
   }
-  const octokit = new Octokit({ auth: gitHubToken });
+  const octokit = await getOctokit(userId);
+  if (octokit == null) {
+    return {
+      hasRepoAccess: false,
+      error: "Github access token not found",
+    };
+  }
   const response = await octokit.request("GET /user");
   const scopesHeader = response.headers["x-oauth-scopes"];
   if (!scopesHeader) {

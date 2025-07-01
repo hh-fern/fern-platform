@@ -8,10 +8,5 @@ export async function getOctokit(userId: Auth0UserID) {
   if (gitHubToken == null) {
     return null;
   }
-
-  if (gitHubToken == null) {
-    throw new Error("GITHUB_TOKEN is not defined in the current environment");
-  }
-
   return new Octokit({ auth: gitHubToken });
 }
