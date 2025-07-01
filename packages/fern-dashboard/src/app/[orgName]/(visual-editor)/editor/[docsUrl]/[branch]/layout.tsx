@@ -7,6 +7,8 @@ import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { BranchProvider } from "@/providers/BranchContext";
 import { MdxStateProvider } from "@/providers/MdxStateContext";
 import { DocsUrl } from "@/utils/types";
+import { DashboardApiClient } from "@/app/services/dashboard-api/client";
+import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
 
 export default async function AuthedLayout({
   params,
@@ -25,18 +27,14 @@ export default async function AuthedLayout({
   if (!session) {
     redirect("/");
   }
-
-  // console.log("docsUrl", docsUrl);
-  // const githubSource = await DashboardApiClient.getDocsGithubSource({
-  //   url: docsUrl,
-  // });
-  // console.log("githubSource", githubSource);
-  // if (githubSource.githubUrl == null) {
-  //   redirect(`/${orgName}/docs/${docsUrl}`);
-  // }
+  const sourceRepo = await getDocsGithubSourceHandler({
+    url: docsUrl,
+    token: session.accessToken,
+    userId: session.user.sub,
+  });
 
   return (
-    <GithubExtendedAccessProtectedRoute orgName={orgName}>
+    <GithubExtendedAccessProtectedRoute orgName={orgName} owner={sourceRepo.owner} repo={sourceRepo.repo}>
       <MdxStateProvider>
         <BranchProvider branch={branch}>
           <div className="flex w-full flex-col overflow-hidden">

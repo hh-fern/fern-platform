@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { ExclamationCircleIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
 import { getLoadableValue } from "@fern-ui/loadable";
@@ -88,13 +88,23 @@ function GithubProtectedButton({
   session,
   sourceRepo,
   hasRepoAccess,
+  writePermission,
 }: {
   orgName: Auth0OrgName;
   docsUrl: DocsUrl;
   session: Auth0SessionData;
   sourceRepo: any;
   hasRepoAccess: boolean;
+  writePermission: boolean | undefined;
 }) {
+  if (!writePermission) {
+    return (
+      <div className="flex items-center gap-2 text-red-600">
+        <ExclamationCircleIcon className="h-4 w-4" />
+        <p>You do not have write permission to this repo</p>
+      </div>
+    );
+  }
   if (!hasRepoAccess) {
     return (
       <LoginButton
@@ -122,6 +132,8 @@ export declare namespace DocsSiteOverviewCard {
     docsUrl: DocsUrl;
     session: Auth0SessionData;
     hasRepoAccess: boolean;
+    sourceRepo: any;
+    writePermission: boolean | undefined;
   }
 }
 
@@ -130,9 +142,10 @@ export function DocsSiteOverviewCard({
   docsUrl,
   session,
   hasRepoAccess,
+  sourceRepo,
+  writePermission,
 }: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
-  const sourceRepo = getLoadableValue(useGithubSourceRepo(docsUrl));
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -159,6 +172,7 @@ export function DocsSiteOverviewCard({
               session={session}
               sourceRepo={sourceRepo}
               hasRepoAccess={hasRepoAccess}
+              writePermission={writePermission}
             />
           </div>
           <p className="text-gray-1100 text-sm">TODO: List PRs</p>
