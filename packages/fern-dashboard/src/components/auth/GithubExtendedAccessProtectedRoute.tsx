@@ -36,21 +36,7 @@ export const GithubExtendedAccessProtectedRoute = async ({
   if (!isUserInOrgFromUrl) {
     return <Page404 />;
   }
-
-  const hasRepoAccess = true; //await checkGitHubPermissions(session.user.sub);
-
-  const gitHubToken = await getUserGithubToken(session.user.sub);
-  if (!gitHubToken) {
-    return {
-      hasRepoAccess: false,
-      error: "GitHub access token not found",
-    };
-  }
-  console.log("================================================")
-  console.log("gitHubToken", gitHubToken);
-  console.log("================================================")
-
-
+  const hasRepoAccess = await checkGitHubPermissions(session.user.sub);
   if (!hasRepoAccess) {
      return (
        <LoginButton

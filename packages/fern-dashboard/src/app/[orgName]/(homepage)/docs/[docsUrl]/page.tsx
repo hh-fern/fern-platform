@@ -5,6 +5,7 @@ import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
 import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
+import checkGitHubPermissions from "@/app/api/github-permissions/handler";
 
 import { parseDocsUrlParam } from "../../../../../utils/parseDocsUrlParam";
 import { GithubExtendedAccessProtectedRoute } from "@/components/auth/GithubExtendedAccessProtectedRoute";
@@ -20,6 +21,8 @@ export default async function Page(props: {
     redirect("/");
   }
 
+  const githubPermissions = await checkGitHubPermissions(session.user.sub);
+
   return (
     <GithubExtendedAccessProtectedRoute orgName={orgName}>
       <FeatureFlaggedServerSide
@@ -30,6 +33,7 @@ export default async function Page(props: {
           orgName={orgName}
           docsUrl={docsUrl}
           session={session}
+          hasRepoAccess={githubPermissions.hasRepoAccess}
         />
       </FeatureFlaggedServerSide>
     </GithubExtendedAccessProtectedRoute>

@@ -1,7 +1,7 @@
 "use client";
 
-import { redirect } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useState} from "react";
 
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
@@ -20,6 +20,7 @@ import Card from "../ui/card";
 import { DocsSiteInfo } from "./DocsSiteInfo";
 import { DocsSiteImage } from "./docs-site-image/DocsSiteImage";
 import { SkeletonDocsSiteImage } from "./docs-site-image/SkeletonDocsSiteImage";
+import { toast } from "sonner";
 
 // Client component for the Create Branch button
 function CreateBranchButton({
@@ -33,8 +34,10 @@ function CreateBranchButton({
   session: Auth0SessionData;
   sourceRepo: any;
 }) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  
   const createBranch = useCallback(async () => {
-    console.log("create branch");
     if (sourceRepo?.owner == null || sourceRepo.repo == null) {
       return;
     }
@@ -55,20 +58,24 @@ function CreateBranchButton({
       baseBranch: "main",
     });
     if (response.success === false) {
-      // todo maybe show a toast here?
-      console.error("Failed to create branch", response.error);
+      toast.error("Failed to create branch");
+      setIsLoading(false);
       return;
     }
-    console.log("response", response);
-    redirect(`/${orgName}/editor/${docsUrl}/${branchName}/root`);
-  }, [sourceRepo, session.user.name, orgName, docsUrl]);
+    router.push(`/${orgName}/editor/${docsUrl}/${branchName}/root`);
+    setIsLoading(false);
+  }, [sourceRepo, session.user.name, orgName, docsUrl, router]);
 
   return (
     <Button
       variant="outline"
       size="sm"
       className="text-primary hover:text-primary"
-      onClick={() => void createBranch()}
+      onClick={() => {
+        setIsLoading(true);
+        void createBranch();
+      }}
+      disabled={isLoading}
     >
       <PencilSquareIcon className="text-primary" />
       Create a Branch
@@ -82,13 +89,14 @@ function GithubProtectedButton({
   docsUrl,
   session,
   sourceRepo,
+  hasRepoAccess,
 }: {
   orgName: Auth0OrgName;
   docsUrl: DocsUrl;
   session: Auth0SessionData;
   sourceRepo: any;
+  hasRepoAccess: boolean;
 }) {
-  const hasRepoAccess = true; // await checkGitHubPermissions(session.user.sub);
   if (!hasRepoAccess) {
     return (
       <LoginButton
@@ -115,6 +123,7 @@ export declare namespace DocsSiteOverviewCard {
     orgName: Auth0OrgName;
     docsUrl: DocsUrl;
     session: Auth0SessionData;
+    hasRepoAccess: boolean;
   }
 }
 
@@ -122,6 +131,7 @@ export function DocsSiteOverviewCard({
   orgName,
   docsUrl,
   session,
+  hasRepoAccess,
 }: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
 
@@ -152,6 +162,7 @@ export function DocsSiteOverviewCard({
               docsUrl={docsUrl}
               session={session}
               sourceRepo={sourceRepo}
+              hasRepoAccess={hasRepoAccess}
             />
           </div>
           <p className="text-gray-1100 text-sm">TODO: List PRs</p>
