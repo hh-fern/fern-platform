@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 
-import checkGitHubPermissions, { checkWritePermissionToRepo } from "@/app/api/github-permissions/handler";
+import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
+import checkGitHubPermissions, {
+  checkWritePermissionToRepo,
+} from "@/app/api/github-permissions/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
@@ -8,7 +11,6 @@ import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
 
 import { parseDocsUrlParam } from "../../../../../utils/parseDocsUrlParam";
-import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
 
 export default async function Page(props: {
   params: Promise<{ orgName: Auth0OrgName; docsUrl: string }>;
@@ -27,10 +29,15 @@ export default async function Page(props: {
     token: session.accessToken,
     userId: session.user.sub,
   });
-  
-  const writePermission = sourceRepo?.owner && sourceRepo?.repo 
-    ? await checkWritePermissionToRepo(session.user.sub, sourceRepo.owner, sourceRepo.repo)
-    : undefined;
+
+  const writePermission =
+    sourceRepo?.owner && sourceRepo?.repo
+      ? await checkWritePermissionToRepo(
+          session.user.sub,
+          sourceRepo.owner,
+          sourceRepo.repo
+        )
+      : undefined;
 
   return (
     <FeatureFlaggedServerSide

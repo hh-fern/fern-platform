@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-import { ExclamationCircleIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import {
+  ExclamationCircleIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
 import { getLoadableValue } from "@fern-ui/loadable";

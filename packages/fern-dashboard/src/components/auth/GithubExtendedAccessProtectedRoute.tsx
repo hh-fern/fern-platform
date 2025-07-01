@@ -1,14 +1,17 @@
 import { redirect } from "next/navigation";
 import React from "react";
 
-import checkGitHubPermissions, { checkWritePermissionToRepo } from "@/app/api/github-permissions/handler";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+
+import checkGitHubPermissions, {
+  checkWritePermissionToRepo,
+} from "@/app/api/github-permissions/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import * as auth0Management from "@/app/services/auth0/management";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 
 import { Page404 } from "../Page404";
 import { LoginButton } from "./LoginButton";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 export declare namespace GithubExtendedAccessProtectedRoute {
   export interface Props {
@@ -42,7 +45,11 @@ export const GithubExtendedAccessProtectedRoute = async ({
   }
 
   if (owner && repo) {
-    const writePermission = await checkWritePermissionToRepo(session.user.sub, owner, repo);
+    const writePermission = await checkWritePermissionToRepo(
+      session.user.sub,
+      owner,
+      repo
+    );
     if (!writePermission) {
       return (
         <div className="flex items-center gap-2 text-red-600">

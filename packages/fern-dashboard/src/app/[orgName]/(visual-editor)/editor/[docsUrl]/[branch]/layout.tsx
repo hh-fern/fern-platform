@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 
+import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
+import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { GithubExtendedAccessProtectedRoute } from "@/components/auth/GithubExtendedAccessProtectedRoute";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { BranchProvider } from "@/providers/BranchContext";
 import { MdxStateProvider } from "@/providers/MdxStateContext";
 import { DocsUrl } from "@/utils/types";
-import { DashboardApiClient } from "@/app/services/dashboard-api/client";
-import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
 
 export default async function AuthedLayout({
   params,
@@ -34,7 +34,11 @@ export default async function AuthedLayout({
   });
 
   return (
-    <GithubExtendedAccessProtectedRoute orgName={orgName} owner={sourceRepo.owner} repo={sourceRepo.repo}>
+    <GithubExtendedAccessProtectedRoute
+      orgName={orgName}
+      owner={sourceRepo.owner}
+      repo={sourceRepo.repo}
+    >
       <MdxStateProvider>
         <BranchProvider branch={branch}>
           <div className="flex w-full flex-col overflow-hidden">
