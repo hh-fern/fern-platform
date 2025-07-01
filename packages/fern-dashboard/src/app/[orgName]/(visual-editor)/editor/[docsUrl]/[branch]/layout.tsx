@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { GithubExtendedAccessProtectedRoute } from "@/components/auth/GithubExtendedAccessProtectedRoute";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { BranchProvider } from "@/providers/BranchContext";

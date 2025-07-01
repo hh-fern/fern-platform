@@ -56,7 +56,7 @@ export async function checkWritePermissionToRepo(
     });
     const perms = response.data.permissions;
     return perms?.push;
-  } catch (error) {
+  } catch (_error) {
     return false;
   }
 }

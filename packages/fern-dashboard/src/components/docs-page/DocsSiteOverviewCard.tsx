@@ -14,7 +14,6 @@ import { getLoadableValue } from "@fern-ui/loadable";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
-import { useGithubSourceRepo } from "@/state/useGithubSourceRepo";
 import { useDocsSite } from "@/state/useMyDocsSites";
 import { DocsUrl } from "@/utils/types";
 
