@@ -1,29 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-
-import {
-  ExclamationCircleIcon,
-  PencilSquareIcon,
-} from "@heroicons/react/24/outline";
-import { toast } from "sonner";
-
 import { getLoadableValue } from "@fern-ui/loadable";
 
-import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { Auth0OrgName } from "@/app/services/auth0/types";
-import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { useDocsSite } from "@/state/useMyDocsSites";
 import { DocsUrl } from "@/utils/types";
 
-import { LoginButton } from "../auth/LoginButton";
-import { Button } from "../ui/button";
 import Card from "../ui/card";
-import { DocsSiteInfo } from "./DocsSiteInfo";
+import { DocsSiteLink } from "./DocsSiteLink";
 import { DocsSiteImage } from "./docs-site-image/DocsSiteImage";
 import { SkeletonDocsSiteImage } from "./docs-site-image/SkeletonDocsSiteImage";
 
+/**
 function CreateBranchButton({
   orgName,
   docsUrl,
@@ -127,26 +114,18 @@ function GithubProtectedButton({
       sourceRepo={sourceRepo}
     />
   );
-}
+} */
 
 export declare namespace DocsSiteOverviewCard {
   export interface Props {
-    orgName: Auth0OrgName;
     docsUrl: DocsUrl;
-    session: Auth0SessionData;
-    hasRepoAccess: boolean;
-    sourceRepo: any;
-    writePermission: boolean | undefined;
+    githubProtectedArea: React.ReactNode;
   }
 }
 
 export function DocsSiteOverviewCard({
-  orgName,
   docsUrl,
-  session,
-  hasRepoAccess,
-  sourceRepo,
-  writePermission,
+  githubProtectedArea,
 }: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
 
@@ -159,10 +138,25 @@ export function DocsSiteOverviewCard({
           <SkeletonDocsSiteImage />
         )}
         {docsSite != null && (
-          <DocsSiteInfo docsUrl={docsUrl} docsSite={docsSite} />
+          <div className="flex min-w-0 flex-col gap-4 text-gray-900">
+            <div className="flex flex-col gap-2">
+              <p>Domains</p>
+              <div className="flex flex-col items-start gap-1">
+                {docsSite.urls.map((url) => (
+                  <DocsSiteLink
+                    key={`${url.domain}${url.path}`}
+                    docsSiteUrl={url}
+                  />
+                ))}
+              </div>
+            </div>
+            {githubProtectedArea}
+          </div>
         )}
       </Card>
 
+      {/* 
+      TODO: Add open branches here once we have a way to preview branches
       {sourceRepo?.repoName != null && sourceRepo.owner != null && (
         <Card className="flex flex-col gap-2">
           <div className="flex flex-row items-center justify-between">
@@ -180,7 +174,7 @@ export function DocsSiteOverviewCard({
           </div>
           <p className="text-gray-1100 text-sm">TODO: List PRs</p>
         </Card>
-      )}
+      )} */}
     </div>
   );
 }

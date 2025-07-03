@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
 
 import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
-import checkGitHubPermissions, {
-  checkWritePermissionToRepo,
-} from "@/app/api/github-permissions/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
+import { GithubProtectedArea } from "@/components/docs-page/GithubProtectedArea";
+import { GithubSource } from "@/components/docs-page/GithubSource";
 import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
 
@@ -22,22 +21,11 @@ export default async function Page(props: {
   if (!session) {
     redirect("/");
   }
-
-  const githubPermissions = await checkGitHubPermissions(session.user.sub);
   const sourceRepo = await getDocsGithubSourceHandler({
     url: docsUrl,
     token: session.accessToken,
     userId: session.user.sub,
   });
-
-  const writePermission =
-    sourceRepo?.owner && sourceRepo?.repo
-      ? await checkWritePermissionToRepo(
-          session.user.sub,
-          sourceRepo.owner,
-          sourceRepo.repo
-        )
-      : undefined;
 
   return (
     <FeatureFlaggedServerSide
@@ -45,12 +33,19 @@ export default async function Page(props: {
       redirectWhenDisabled
     >
       <DocsSiteOverviewCard
-        orgName={orgName}
         docsUrl={docsUrl}
-        session={session}
-        hasRepoAccess={githubPermissions.hasRepoAccess}
-        writePermission={writePermission}
-        sourceRepo={sourceRepo}
+        githubProtectedArea={
+          <div className="flex w-fit flex-col gap-2">
+            <p>Source</p>
+            <GithubProtectedArea sourceRepo={sourceRepo}>
+              <GithubSource
+                docsUrl={docsUrl}
+                orgName={orgName}
+                session={session}
+              />
+            </GithubProtectedArea>
+          </div>
+        }
       />
     </FeatureFlaggedServerSide>
   );
