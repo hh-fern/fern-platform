@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import React from "react";
-
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-
 import checkGitHubPermissions, {
   checkWritePermissionToRepo,
 } from "@/app/api/github-permissions/handler";
@@ -19,7 +17,6 @@ export declare namespace GithubExtendedAccessProtectedRoute {
     owner: string | undefined;
     repo: string | undefined;
     children: React.JSX.Element;
-    requireRepoAccess?: boolean;
   }
 }
 
@@ -59,16 +56,28 @@ export const GithubExtendedAccessProtectedRoute = async ({
       );
     }
   }
-
   const { hasRepoAccess } = await checkGitHubPermissions(session.user.sub);
   if (!hasRepoAccess) {
     return (
-      <LoginButton
-        additionalParams={{
-          connection: "github",
-          connection_scope: "read:user,read:org,repo",
-        }}
-      />
+      <div className="bg-background flex h-full w-full items-center justify-center bg-gray-200">
+        <div className="border-1 border-border flex w-[400px] max-w-full flex-col items-center justify-center gap-6 rounded-lg bg-gray-100 p-6 text-center shadow-lg">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <h2 className="text-lg font-semibold">
+              Additional Permissions Required
+            </h2>
+            <p className="text-gray-1100 text-sm">
+              This page requires additional permissions to view. Please
+              authorize to continue.
+            </p>
+          </div>
+          <LoginButton
+            additionalParams={{
+              connection: "github",
+              connection_scope: "read:user,read:org,repo",
+            }}
+          />
+        </div>
+      </div>
     );
   }
 
