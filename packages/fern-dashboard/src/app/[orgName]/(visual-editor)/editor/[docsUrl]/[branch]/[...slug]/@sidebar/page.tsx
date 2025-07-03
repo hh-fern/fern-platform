@@ -21,7 +21,7 @@ export default async function SidebarPage({
   const { docsUrl, slug } = await params;
   const session = await getCurrentSession();
   const loader = await createEditableDocsLoader(
-    "localhost:3000",
+    docsUrl,
     docsUrl,
     session?.accessToken
   );

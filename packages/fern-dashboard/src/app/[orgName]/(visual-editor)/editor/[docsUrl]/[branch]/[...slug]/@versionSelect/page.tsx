@@ -20,7 +20,7 @@ export default async function VersionSelectPage({
   const session = await getCurrentSession();
   const { docsUrl, slug } = await params;
   const loader = await createEditableDocsLoader(
-    "localhost:3000",
+    docsUrl,
     docsUrl,
     session?.accessToken
   );

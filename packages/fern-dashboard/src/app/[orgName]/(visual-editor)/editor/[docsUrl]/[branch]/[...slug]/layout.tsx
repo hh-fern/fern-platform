@@ -14,7 +14,6 @@ import AbstractDefaultDocs from "@fern-docs/components/theming/AbstractDefaultDo
 import { GlobalStyles } from "@fern-docs/components/theming/global-styles";
 import { DesktopSearchButton } from "@fern-docs/search-ui/components/desktop/desktop-search-button";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { PreviewHeader } from "@/components/docs-preview/PreviewHeader";
 import { EditorLinkInterceptor } from "@/components/editor/EditorLinkInterceptor";
@@ -42,11 +41,11 @@ export default async function VisualEditorPreviewLayout({
 }>) {
   const { orgName, docsUrl, branch } = await params;
 
-  const session = await getCurrentSession();
+  // const session = await getCurrentSession();
   const loader = await createEditableDocsLoader(
-    "localhost:3000",
     docsUrl,
-    session?.accessToken
+    docsUrl
+    // session?.accessToken
   );
   const [colors, layout, fonts, config, root, unsafe_fullRoot] =
     await Promise.all([

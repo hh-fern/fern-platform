@@ -35,7 +35,7 @@ export default async function Page({
 
   // TODO: dynamically read host value
   const loader = await createEditableDocsLoader(
-    "localhost:3000",
+    docsUrl,
     docsUrl,
     session?.accessToken
   );

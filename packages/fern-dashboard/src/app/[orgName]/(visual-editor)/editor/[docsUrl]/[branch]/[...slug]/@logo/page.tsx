@@ -6,7 +6,6 @@ import { getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { AbstractLogo } from "@fern-docs/components/abstract/logo";
 import { getFrontmatter } from "@fern-docs/mdx";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { DocsUrl } from "@/utils/types";
 
 export default async function LogoPage({
@@ -14,13 +13,8 @@ export default async function LogoPage({
 }: {
   params: Promise<{ docsUrl: DocsUrl; slug: string }>;
 }) {
-  const session = await getCurrentSession();
   const { docsUrl, slug } = await params;
-  const loader = await createEditableDocsLoader(
-    "localhost:3000",
-    docsUrl,
-    session?.accessToken
-  );
+  const loader = await createEditableDocsLoader(docsUrl, docsUrl);
 
   const [{ basePath }, config, files, root] = await Promise.all([
     loader.getMetadata(),
