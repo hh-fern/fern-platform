@@ -86,7 +86,7 @@ export async function EndpointContent({
         }
         footer={<FooterLayout bottomNavigation={bottomNavigation} />}
       >
-        <PlaygroundKeyboardTrigger />
+        {endpoint.protocol?.type !== "grpc" && <PlaygroundKeyboardTrigger />}
         <MdxServerComponentProseSuspense mdx={endpoint.description} />
       </ReferenceLayout>
     </EndpointContextProvider>

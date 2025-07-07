@@ -38,4 +38,17 @@ export function isHttpMethod(value: string): value is HttpMethod {
 
 export type WssProtocol = "WSS";
 
-export type HttpOrWss = HttpMethod | WssProtocol;
+export type GrpcMethod =
+  | "UNARY"
+  | "CLIENT_STREAM"
+  | "SERVER_STREAM"
+  | "BIDIRECTIONAL_STREAM";
+
+export const GrpcMethod: Record<GrpcMethod, GrpcMethod> = {
+  UNARY: "UNARY",
+  CLIENT_STREAM: "CLIENT_STREAM",
+  SERVER_STREAM: "SERVER_STREAM",
+  BIDIRECTIONAL_STREAM: "BIDIRECTIONAL_STREAM",
+} as const;
+
+export type HttpOrWssOrGrpc = HttpMethod | WssProtocol | GrpcMethod;

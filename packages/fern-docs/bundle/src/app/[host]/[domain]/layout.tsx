@@ -88,6 +88,8 @@ export default async function Layout({
   const sidebarRootNodesToChildToParentsMap =
     getSidebarRootNodeIdToChildToParentsMap(sidebarRootNodes);
 
+  
+
   return (
     <FernThemeProvider
       hasLight={Boolean(colors.light)}

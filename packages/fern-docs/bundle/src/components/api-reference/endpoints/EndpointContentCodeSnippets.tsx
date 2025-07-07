@@ -130,7 +130,7 @@ const UnmemoizedEndpointContentCodeSnippets: React.FC<
             examples[0]?.name != null)
       );
   }, [examplesByKeyAndStatusCode]);
-
+  
   return (
     <div
       className={cn(
@@ -162,7 +162,7 @@ const UnmemoizedEndpointContentCodeSnippets: React.FC<
         title={
           <EndpointUrlWithOverflow
             path={endpoint.path}
-            method={endpoint.method}
+            method={endpoint.protocol?.type === "grpc" ? endpoint.protocol.methodType ?? endpoint.method : endpoint.method}
             environmentId={environmentId}
             baseUrl={baseUrl}
           />
@@ -172,10 +172,9 @@ const UnmemoizedEndpointContentCodeSnippets: React.FC<
         }}
         tryIt={
           <>
-            {node != null && (
+            {node != null && endpoint.protocol?.type !== "grpc" && (
               <PlaygroundButtonTray
                 state={node}
-
                 // example={selectedExample?.exampleCall}
               />
             )}
