@@ -25,7 +25,7 @@ export function DocsSiteOverviewCard({
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <Card className="flex flex-col overflow-auto md:flex-row">
+      <Card className="flex flex-col md:flex-row">
         {docsSite != null ? (
           <DocsSiteImage docsSite={docsSite} />
         ) : (
