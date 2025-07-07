@@ -12,14 +12,15 @@ import { DocsUrl } from "@/utils/types";
 export default async function ProductSelectPage({
   params,
 }: {
-  params: Promise<{ docsUrl: DocsUrl; slug: string }>;
+  params: Promise<{ docsUrl: DocsUrl; branch: string; slug: string }>;
 }) {
   const session = await getCurrentSession();
-  const { docsUrl, slug } = await params;
+  const { docsUrl, branch, slug } = await params;
   const loader = await createEditableDocsLoader(
     docsUrl,
     docsUrl,
-    session?.accessToken
+    session?.accessToken,
+    branch
   );
 
   // preload:

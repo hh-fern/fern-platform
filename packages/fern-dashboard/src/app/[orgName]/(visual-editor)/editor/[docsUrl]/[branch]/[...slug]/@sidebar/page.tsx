@@ -16,14 +16,15 @@ import { DocsUrl } from "@/utils/types";
 export default async function SidebarPage({
   params,
 }: {
-  params: Promise<{ docsUrl: DocsUrl; slug: string }>;
+  params: Promise<{ docsUrl: DocsUrl; branch: string; slug: string }>;
 }) {
-  const { docsUrl, slug } = await params;
+  const { docsUrl, branch, slug } = await params;
   const session = await getCurrentSession();
   const loader = await createEditableDocsLoader(
     docsUrl,
     docsUrl,
-    session?.accessToken
+    session?.accessToken,
+    branch
   );
   const [config, root] = await Promise.all([
     loader.getConfig(),

@@ -37,7 +37,8 @@ export default async function Page({
   const loader = await createEditableDocsLoader(
     docsUrl,
     docsUrl,
-    session?.accessToken
+    session?.accessToken,
+    branch
   );
   const root = await loader.getRoot();
 
