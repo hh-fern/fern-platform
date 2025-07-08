@@ -11,7 +11,6 @@ import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { handleCreatePr } from "@/app/services/github/github";
 import { useBranch } from "@/providers/BranchContext";
-import { useMdxState } from "@/providers/MdxStateContext";
 import { useGithubSourceRepo } from "@/state/useGithubSourceRepo";
 import { DocsUrl } from "@/utils/types";
 
@@ -31,13 +30,14 @@ export function HeaderToolbar({
   orgName,
   session,
   docsUrl,
+  changedMdxFiles,
 }: {
   orgName: string;
   session: Auth0SessionData;
   docsUrl: DocsUrl;
+  changedMdxFiles: Record<string, string>;
 }) {
   const { name, picture } = session.user;
-  const { changedMdxFiles } = useMdxState();
   const { branch } = useBranch();
   const githubSource = getLoadableValue(useGithubSourceRepo(docsUrl));
 

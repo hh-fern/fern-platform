@@ -34,6 +34,7 @@
     "@fern-api/docs-utils": "workspace:*",
     "@fern-api/ui-core-utils": "workspace:*",
     "@fern-docs/edge-config": "workspace:*",
+    "@fern-docs/mdx": "workspace:*",
     "@types/react": "19.0.10",
     "@vercel/kv": "^2.0.0",
     "es-toolkit": "^1.33.0",

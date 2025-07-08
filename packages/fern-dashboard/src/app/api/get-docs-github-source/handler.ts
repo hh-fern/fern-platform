@@ -1,3 +1,5 @@
+import { FdrAPI } from "@fern-api/fdr-sdk";
+
 import { getOctokit } from "@/app/services/auth0/octokit";
 import { Auth0UserID } from "@/app/services/auth0/types";
 import { GithubSourceRepo } from "@/app/services/github/types";
@@ -21,7 +23,11 @@ export default async function getDocsGithubSourceHandler({
   token: string;
   userId: Auth0UserID;
 }): Promise<GithubSourceRepo> {
-  const docsUrlMetadata = await getDocsUrlMetadata({ url, token });
+  const docsUrlMetadata = await getDocsUrlMetadata({
+    url: FdrAPI.Url(url),
+    token,
+  });
+  console.log("[1] docsUrlMetadata", docsUrlMetadata);
   if (!docsUrlMetadata.ok) {
     // the docs url is user-supplied (parsed from the page url) so it's ok if it
     // doesn't exist

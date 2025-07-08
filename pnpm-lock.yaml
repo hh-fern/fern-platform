@@ -344,6 +344,9 @@ importers:
       '@fern-docs/edge-config':
         specifier: workspace:*
         version: link:../../fern-docs/edge-config
+      '@fern-docs/mdx':
+        specifier: workspace:*
+        version: link:../../fern-docs/mdx
       '@types/react':
         specifier: 19.0.10
         version: 19.0.10

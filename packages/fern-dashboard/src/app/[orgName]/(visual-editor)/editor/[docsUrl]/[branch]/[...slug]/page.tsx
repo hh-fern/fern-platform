@@ -11,6 +11,7 @@ import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { DocsUrl } from "@/utils/types";
 
 import PageContents from "./PageContents";
+import { setCurrentLoader } from "./actions";
 
 const ROOT_SLUG_ALIAS = "root";
 
@@ -39,6 +40,10 @@ export default async function Page({
     docsUrl,
     session?.accessToken
   );
+
+  // Sets the loader instance for server actions to use
+  await setCurrentLoader(loader);
+
   const root = await loader.getRoot();
 
   const slug = slugAlias === ROOT_SLUG_ALIAS ? root.slug : slugAlias;

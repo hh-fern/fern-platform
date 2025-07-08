@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
+import { createEditableDocsLoader } from "@fern-api/docs-loader";
+
 import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
@@ -33,6 +35,12 @@ export default async function AuthedLayout({
     userId: session.user.sub,
   });
 
+  const loader = await createEditableDocsLoader(
+    "localhost:3000",
+    docsUrl,
+    session.accessToken
+  );
+
   return (
     <GithubExtendedAccessProtectedRoute
       orgName={orgName}
@@ -46,6 +54,7 @@ export default async function AuthedLayout({
               orgName={orgName}
               session={session}
               docsUrl={docsUrl}
+              changedMdxFiles={loader.modifiedMdxFiles}
             />
             {children}
           </div>

@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { AuthEdgeConfig } from "@fern-api/docs-auth";
 import { AuthState } from "@fern-api/docs-server";
 import { FernFonts } from "@fern-api/docs-server";
@@ -24,12 +26,26 @@ import {
   RootNode,
   Slug,
 } from "@fern-api/fdr-sdk/navigation";
+import { MdxToHtmlResponse, htmlToMdx } from "@fern-docs/mdx";
 
 import { createCachedDocsLoader } from "./readonly-docs-loader";
 
+type FilePath = string;
+type Markdown = string;
+
 export interface EditableDocsLoader extends DocsLoader {
-  modifiedMdxFiles: Record<string, string>;
-  setMdxFile: (filename: string, content: string) => Promise<void>;
+  modifiedMdxFiles: Record<FilePath, Markdown>;
+  getModifiedMdxFiles: () => Record<FilePath, Markdown>;
+  setMdxFile: (filePath: FilePath, content: Markdown) => Promise<void>;
+  updateDependencies: (filePath: FilePath, state: MdxDependencies) => void;
+  stageChanges: (filePath: FilePath, state: MdxDependencies) => void;
+}
+
+export interface MdxDependencies {
+  html?: MdxToHtmlResponse["html"];
+  frontmatter?: MdxToHtmlResponse["frontmatter"];
+  customElements?: MdxToHtmlResponse["customElements"];
+  changed?: boolean;
 }
 
 /**
@@ -38,15 +54,42 @@ export interface EditableDocsLoader extends DocsLoader {
  */
 class EditableDocsLoaderImpl implements EditableDocsLoader {
   modifiedMdxFiles: Record<string, string>;
+  private mdxDepsStore: Record<string, MdxDependencies>;
+  private readOnlyDocsLoader: DocsLoader;
   domain: string;
   fern_token: string | undefined;
-  private readOnlyDocsLoader: DocsLoader;
 
   constructor(docsLoader: DocsLoader) {
     this.modifiedMdxFiles = {};
     this.readOnlyDocsLoader = docsLoader;
+    this.mdxDepsStore = {};
     this.domain = docsLoader.domain;
     this.fern_token = docsLoader.fern_token;
+  }
+
+  // Stablilize updateMdxState identity to prevent unnecessary re-renders
+  updateDependencies(filePath: FilePath, state: MdxDependencies) {
+    console.log("[1] updateDependencies", filePath, state);
+    this.mdxDepsStore = {
+      ...this.mdxDepsStore,
+      [filePath]: {
+        html: state.html ?? this.mdxDepsStore[filePath]?.html,
+        frontmatter: {
+          // Merge existing frontmatter with new frontmatter
+          ...this.mdxDepsStore[filePath]?.frontmatter,
+          // Only override frontmatter properties that are newly provided
+          ...state.frontmatter,
+        },
+        customElements:
+          state.customElements ?? this.mdxDepsStore[filePath]?.customElements,
+        changed: state.changed ?? this.mdxDepsStore[filePath]?.changed,
+      },
+    };
+    console.log("[2] updateDependencies", this.mdxDepsStore);
+  }
+  stageChanges(filePath: FilePath, state: MdxDependencies) {
+    this.updateDependencies(filePath, { ...state, changed: true });
+    console.log("stageChanges", filePath, state);
   }
 
   setMdxFile(filename: string, content: string): Promise<void> {
@@ -77,7 +120,7 @@ class EditableDocsLoaderImpl implements EditableDocsLoader {
   }
 
   async getMdxBundlerFiles(): Promise<Record<string, string>> {
-    return this.modifiedMdxFiles;
+    return this.readOnlyDocsLoader.getMdxBundlerFiles();
   }
   async getPrunedApi(
     id: string,
@@ -130,13 +173,23 @@ class EditableDocsLoaderImpl implements EditableDocsLoader {
     markdown: string;
     editThisPageUrl?: string;
   }> {
-    // if (this.modifiedMdxFiles[pageId] != null) {
-    //   return {
-    //     filename: pageId,
-    //     markdown: this.modifiedMdxFiles[pageId],
-    //     editThisPageUrl: `https://${this.domain}/docs/edit/${pageId}`,
-    //   };
-    // }
+    if (this.modifiedMdxFiles[pageId] != null) {
+      console.log("GET PAGE 1", pageId);
+      return {
+        filename: pageId,
+        markdown: this.modifiedMdxFiles[pageId],
+        editThisPageUrl: `https://${this.domain}/docs/edit/${pageId}`,
+      };
+    }
+    if (this.mdxDepsStore[pageId] != null) {
+      console.log("GET PAGE 2", pageId);
+      return {
+        filename: pageId,
+        markdown: this.convertMdxDependenciesToMarkdown(pageId),
+        editThisPageUrl: `https://${this.domain}/docs/edit/${pageId}`,
+      };
+    }
+    console.log("GET PAGE 3", pageId);
     return this.readOnlyDocsLoader.getPage(pageId);
   }
 
@@ -167,22 +220,48 @@ class EditableDocsLoaderImpl implements EditableDocsLoader {
     return this.readOnlyDocsLoader.getBaseUrl();
   }
 
-  async getModifiedMdxFiles(): Promise<Record<string, string>> {
-    return this.modifiedMdxFiles;
+  convertMdxDependenciesToMarkdown(filePath: FilePath): Markdown {
+    const state = this.mdxDepsStore[filePath];
+    if (state == null) {
+      return "";
+    }
+    if (
+      state.changed &&
+      state.html &&
+      state.frontmatter &&
+      state.customElements
+    ) {
+      return htmlToMdx(state.html, state.frontmatter, state.customElements).mdx;
+    }
+    return "";
+  }
+
+  getModifiedMdxFiles(): Record<FilePath, Markdown> {
+    return Object.entries(this.mdxDepsStore).reduce<Record<FilePath, Markdown>>(
+      (acc, [filePath, state]) => {
+        if (
+          state.changed &&
+          state.html &&
+          state.frontmatter &&
+          state.customElements
+        ) {
+          acc[filePath] = htmlToMdx(
+            state.html,
+            state.frontmatter,
+            state.customElements
+          ).mdx;
+        }
+        return acc;
+      },
+      {}
+    );
   }
 }
 
-export const createEditableDocsLoader = async (
-  host: string,
-  docsUrl: string,
-  fern_token?: string
-) => {
-  // TODO: derive the domain from the workspace
-  const docsLoader = await createCachedDocsLoader(
-    host,
-    docsUrl,
-    // process.env.NEXT_PUBLIC_DOCS_DOMAIN ?? "fern.docs.buildwithfern.com",
-    fern_token
-  );
-  return new EditableDocsLoaderImpl(docsLoader);
-};
+export const createEditableDocsLoader = cache(
+  async (host: string, docsUrl: string, fern_token?: string) => {
+    // TODO: derive the domain from the workspace
+    const docsLoader = await createCachedDocsLoader(host, docsUrl, fern_token);
+    return new EditableDocsLoaderImpl(docsLoader);
+  }
+);

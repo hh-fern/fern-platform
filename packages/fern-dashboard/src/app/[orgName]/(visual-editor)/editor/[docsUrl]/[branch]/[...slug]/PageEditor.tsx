@@ -5,7 +5,8 @@ import React from "react";
 import { EditorEvents } from "@tiptap/react";
 
 import TiptapEditor from "@/components/editor/TiptapEditor";
-import { useMdxState } from "@/providers/MdxStateContext";
+
+import { stageChanges } from "./actions";
 
 export declare namespace PageEditor {
   export interface Props {
@@ -21,11 +22,17 @@ export default function PageEditor({
   fileName,
   initialHtml,
 }: PageEditor.Props) {
-  const { stageChanges } = useMdxState();
+  // const memoStageChanges = useCallback(
+  //   async (fileName: string, dependencies: any) => {
+
+  //   },
+  //   []
+  // );
 
   function onTiptapEditorUpdate(props: EditorEvents["update"]) {
     const html = props.editor.getHTML();
-    stageChanges(fileName, { html });
+    // stageChanges(fileName, { html });
+    void stageChanges(fileName, { html });
   }
 
   // TODO: add a loading state, possibly as a Suspense boundary

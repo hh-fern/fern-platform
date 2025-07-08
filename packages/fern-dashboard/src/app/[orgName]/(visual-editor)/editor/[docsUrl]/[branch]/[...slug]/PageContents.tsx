@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 import { MdxToHtmlResponse } from "@fern-docs/mdx";
-
-import { useMdxState } from "@/providers/MdxStateContext";
 
 import PageEditor from "./PageEditor";
 import PageSubtitle from "./PageSubtitle";
 import PageTitle from "./PageTitle";
+import { updateDependencies } from "./actions";
 
 export declare namespace PageContents {
   export interface Props {
@@ -27,16 +26,27 @@ export default function PageContents({
 }: PageContents.Props) {
   const { title, subtitle } = frontmatter ?? {};
 
-  const { updateDependencies } = useMdxState();
+  const memoUpdateDependencies = useCallback(
+    async (fileName: string, dependencies: any) => {
+      await updateDependencies(fileName, dependencies);
+    },
+    []
+  );
 
   useEffect(() => {
     // Set up initial mdx dependencies
-    updateDependencies(fileName, {
+    void memoUpdateDependencies(fileName, {
       html: initialHtml,
       frontmatter: frontmatter,
       customElements: customElements,
     });
-  }, [fileName, initialHtml, frontmatter, customElements, updateDependencies]);
+  }, [
+    fileName,
+    initialHtml,
+    frontmatter,
+    customElements,
+    memoUpdateDependencies,
+  ]);
 
   return (
     <>
