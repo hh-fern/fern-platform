@@ -14,7 +14,11 @@
     "depcheck": "turbo depcheck",
     "docs:build": "turbo docs:build",
     "docs:dev": "turbo docs:dev",
+    "docs:local-bundle:build": "NODE_ENV=production bash scripts/build-local-bundle.sh",
+    "docs:self-hosted-bundle:build": "NODE_ENV=production bash scripts/build-selfhosted-bundle.sh",
+    "docs:self-hosted-fdr:compile": "bash scripts/compile-selfhosted-fdr.sh",
     "docs:start": "turbo docs:start",
+    "fai:dev": "bash scripts/run-local-fai.sh",
     "fdr:generate": "pnpm fern generate --api fdr --local && pnpm turbo --filter=@fern-api/fdr-sdk compile",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
@@ -78,6 +82,7 @@
     "@typescript/vfs": "^1.6.1",
     "@yarnpkg/sdks": "^3.2.0",
     "chalk": "^5.4.1",
+    "cors": "^2.8.5",
     "depcheck": "^1.4.7",
     "dotenv": "^16.4.7",
     "eslint": "^9.21.0",
@@ -148,7 +153,10 @@
       "serverless",
       "sharp",
       "workerd"
-    ]
+    ],
+    "overrides": {
+      "webpack-bundle-analyzer>ws": "^7.5.10"
+    }
   },
   "nextBundleAnalysis": {
     "buildOutputDirectory": "packages/fern-docs/bundle/.next",

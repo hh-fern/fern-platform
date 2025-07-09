@@ -8,6 +8,21 @@ import { mapValues } from "es-toolkit/object";
 import { escapeRegExp } from "es-toolkit/string";
 import { UnreachableCaseError } from "ts-essentials";
 
+import {
+  convertResponseToRootNode,
+  createEndpointCacheKey,
+  getMetadataFromResponse,
+} from "@fern-api/docs-loader";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { loadWithUrl } from "@fern-api/docs-server/loadWithUrl";
+import { pruneWithAuthState } from "@fern-api/docs-server/withRbac";
+import {
+  EdgeFlags,
+  HEADER_X_FERN_HOST,
+  slugToHref,
+  withoutStaging,
+} from "@fern-api/docs-utils";
 import { ApiDefinition, DocsV2Read, FernNavigation } from "@fern-api/fdr-sdk";
 import {
   ApiDefinitionV1ToLatest,
@@ -18,33 +33,19 @@ import {
 } from "@fern-api/fdr-sdk/api-definition";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
-import {
-  EdgeFlags,
-  HEADER_X_FERN_HOST,
-  slugToHref,
-  withoutStaging,
-} from "@fern-docs/utils";
 
-import {
-  convertResponseToRootNode,
-  createEndpointCacheKey,
-  getMetadataFromResponse,
-} from "@/server/docs-loader";
-import { isLocal } from "@/server/isLocal";
-import { loadWithUrl } from "@/server/loadWithUrl";
 import {
   queueAlgoliaReindex,
   queueTurbopufferReindex,
 } from "@/server/queue-reindex";
-import { pruneWithAuthState } from "@/server/withRbac";
 
-export const maxDuration = 300; // 5 minutes timeout
+export const maxDuration = 600; // 10 minutes timeout
 
 export async function GET(
   req: NextRequest,
   props: { params: Promise<{ host: string; domain: string }> }
 ): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     throw new Error("revalidation is only available in production");
   }
 
@@ -100,7 +101,7 @@ export async function GET(
               );
             })
             .catch((e: unknown) => {
-              console.error(e);
+              console.error(`[revalidate:reindex] ${JSON.stringify(e)}`);
               controller.enqueue(
                 `reindex-failed:error=${escapeRegExp(String(e))}\n`
               );
@@ -114,13 +115,16 @@ export async function GET(
             method: "GET",
             cache: "no-store",
             headers: { [HEADER_X_FERN_HOST]: domain },
+            signal: AbortSignal.timeout(600_000),
           }
         )
           .then(() => {
             controller.enqueue(`llms-full-revalidated\n`);
           })
           .catch((e: unknown) => {
-            console.error(e);
+            console.error(
+              `[revalidate:llms-full-revalidate] error: ${JSON.stringify(e)}`
+            );
             controller.enqueue(
               `llms-full-revalidate-failed:error=${escapeRegExp(String(e))}\n`
             );
@@ -180,11 +184,23 @@ export async function GET(
             (file) => {
               if (file.type === "url") {
                 return {
-                  src: file.url,
+                  src:
+                    process.env.NEXT_PUBLIC_ASSET_HOSTING === "1"
+                      ? file.url.replace(
+                          getFileCDN(),
+                          `${metadata.basePath ?? ""}/_files`
+                        )
+                      : file.url,
                 };
               } else if (file.type === "image") {
                 return {
-                  src: file.url,
+                  src:
+                    process.env.NEXT_PUBLIC_ASSET_HOSTING === "1"
+                      ? file.url.replace(
+                          getFileCDN(),
+                          `${metadata.basePath ?? ""}/_files`
+                        )
+                      : file.url,
                   width: file.width,
                   height: file.height,
                   blurDataURL: file.blurDataUrl,
@@ -217,7 +233,7 @@ export async function GET(
             `revalidate-kv-keys-set:${Object.keys(keys).length}\n`
           );
         } catch (e) {
-          console.error(e);
+          console.error(`[revalidate:start] ${JSON.stringify(e)}`);
           controller.enqueue(
             `revalidate-kv-keys-set-failed:error=${escapeRegExp(String(e))}\n`
           );
@@ -247,39 +263,15 @@ export async function GET(
                   "page"
                 );
                 try {
-                  let res;
-                  let attempts = 0;
-                  while (attempts < 3) {
-                    try {
-                      res = await fetch(
-                        `${req.nextUrl.origin}${slugToHref(slug)}`,
-                        {
-                          method: "HEAD",
-                          cache: "no-store",
-                          headers: { [HEADER_X_FERN_HOST]: domain },
-                        }
-                      );
-                      // break if we get a successful response
-                      if (res.ok) {
-                        break;
-                      }
-                    } catch (e) {
-                      console.debug(
-                        `Failed to revalidate URL ${req.nextUrl.origin}${slugToHref(slug)}, trying again...`
-                      );
-                      attempts++;
-                      if (attempts === 3) throw e;
-                      // Add exponential backoff with jitter
-                      const backoffMs = Math.min(
-                        1000 * Math.pow(2, attempts - 1),
-                        4000
-                      );
-                      const jitter = Math.random() * 200;
-                      await new Promise((resolve) =>
-                        setTimeout(resolve, backoffMs + jitter)
-                      );
+                  const res = await fetch(
+                    `${req.nextUrl.origin}${slugToHref(slug)}`,
+                    {
+                      method: "HEAD",
+                      cache: "no-store",
+                      headers: { [HEADER_X_FERN_HOST]: domain },
+                      signal: AbortSignal.timeout(600_000),
                     }
-                  }
+                  );
                   if (!res?.ok) {
                     throw new Error(
                       `Failed to revalidate ${url}. Status code: ${res?.status}`
@@ -287,7 +279,9 @@ export async function GET(
                   }
                   controller.enqueue(`revalidated:${url}\n`);
                 } catch (e) {
-                  console.error(e);
+                  console.error(
+                    `[revalidate:page-revalidate] error: ${JSON.stringify(e)}`
+                  );
                   controller.enqueue(
                     `revalidate-failed:url=${url}:error=${escapeRegExp(String(e))}\n`
                   );
@@ -303,7 +297,10 @@ export async function GET(
           console.warn(
             "Did not generate homepage images because no auth header present on request"
           );
-        } else if (process.env.NEXT_PUBLIC_DASHBOARD_URL == null) {
+        } else if (
+          process.env.NEXT_PUBLIC_DASHBOARD_URL == null ||
+          process.env.NEXT_PUBLIC_DASHBOARD_URL === ""
+        ) {
           console.warn(
             "Did not generate homepage images because NEXT_PUBLIC_DASHBOARD_URL is not defined in the environment"
           );
@@ -325,10 +322,13 @@ export async function GET(
                     docs.baseUrl.domain
                   ).toString(),
                 }),
+                signal: AbortSignal.timeout(600_000),
               }
             );
-          } catch (error) {
-            console.error("Failed to regenerate homepage images", error);
+          } catch (e) {
+            console.error(
+              `[revalidate:homepage-image-revalidate] error: ${JSON.stringify(e)}`
+            );
           }
         }
 
@@ -341,7 +341,7 @@ export async function GET(
         console.log(`Reindex took ${end - start}ms`);
         controller.enqueue(`revalidate-finished:${end - start}ms\n`);
       } catch (e) {
-        console.error(e);
+        console.error(`[revalidate] ${JSON.stringify(e)}`);
         controller.enqueue(
           `revalidate-failed:error=${escapeRegExp(String(e))}\n`
         );
@@ -407,4 +407,12 @@ function createPrunedApi(api: ApiDefinition.ApiDefinition) {
     );
   });
   return apis;
+}
+
+function getFileCDN() {
+  return (
+    (typeof process !== "undefined"
+      ? process.env.NEXT_PUBLIC_FILES_ORIGIN
+      : undefined) ?? "https://files.buildwithfern.com"
+  );
 }

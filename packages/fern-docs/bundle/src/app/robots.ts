@@ -3,20 +3,20 @@ import { headers } from "next/headers";
 
 import urlJoin from "url-join";
 
-import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import {
   HEADER_HOST,
   HEADER_X_FERN_HOST,
   conformTrailingSlash,
-} from "@fern-docs/utils";
-
-import { isLocal } from "@/server/isLocal";
+} from "@fern-api/docs-utils";
+import { withDefaultProtocol } from "@fern-api/ui-core-utils";
+import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
 
 export const runtime = "edge";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return {
       rules: {
         userAgent: "*",
@@ -37,12 +37,9 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     };
   }
   const canonicalUrl = await getCanonicalUrl(domain);
-  const basepath = headersList.get("x-fern-basepath") ?? "";
-  const sitemap = urlJoin(
-    withDefaultProtocol(canonicalUrl ?? domain),
-    basepath,
-    "sitemap.xml"
-  );
+  const basepath = headersList.get("x-fern-basepath")?.replace(/\/$/, "") ?? "";
+  const baseUrl = withDefaultProtocol(canonicalUrl ?? domain);
+  const sitemap = urlJoin(baseUrl, basepath, "sitemap.xml");
 
   if (await getSeoDisabled(domain)) {
     return {
@@ -55,11 +52,12 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     };
   }
 
+  // disallow all query strings
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: conformTrailingSlash("*/~explorer"),
+      disallow: conformTrailingSlash("/*?*"),
     },
     sitemap,
     host: canonicalUrl ? canonicalUrl : domain,

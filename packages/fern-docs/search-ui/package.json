@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./src/index.css": "./src/index.css"
+    "./styles": "./src/index.css",
+    "./*": "./src/*.tsx"
   },
   "scripts": {
     "demo:build": "next build",
@@ -15,9 +16,13 @@
   },
   "dependencies": {
     "@algolia/client-search": "^5.20.3",
+    "@fern-api/docs-server": "workspace:*",
+    "@fern-api/docs-utils": "workspace:*",
     "@fern-api/ui-core-utils": "workspace:*",
     "@fern-docs/components": "workspace:*",
-    "@fern-docs/search-server": "workspace:*",
+    "@fern-docs/search-ask-fern": "workspace:*",
+    "@fern-docs/search-keyword": "workspace:*",
+    "@fern-docs/search-utils": "workspace:*",
     "@fern-ui/react-commons": "workspace:*",
     "@radix-ui/primitive": "^1.1.1",
     "@radix-ui/react-compose-refs": "^1.1.1",
@@ -50,14 +55,14 @@
     "server-only": "^0.0.1",
     "ts-essentials": "^10.0.4",
     "unist-util-visit": "^5.0.0",
-    "zod": "^3.24.1"
+    "zod": "3.25.49"
   },
   "devDependencies": {
-    "@ai-sdk/anthropic": "^1.2.10",
-    "@ai-sdk/cohere": "^1.2.8",
-    "@ai-sdk/openai": "^1.3.13",
-    "@ai-sdk/provider": "^1.1.3",
-    "@ai-sdk/react": "^1.2.9",
+    "@ai-sdk/anthropic": "^2.0.0-beta.2",
+    "@ai-sdk/cohere": "^2.0.0-beta.2",
+    "@ai-sdk/openai": "^2.0.0-beta.2",
+    "@ai-sdk/provider": "^2.0.0-beta.2",
+    "@ai-sdk/react": "2.0.0-beta.2",
     "@tailwindcss/postcss": "^4.0.9",
     "@tailwindcss/typography": "^0.5.16",
     "@types/hast": "^3.0.4",
@@ -65,7 +70,7 @@
     "@types/react": "19.0.10",
     "@types/react-dom": "19.0.4",
     "@upstash/qstash": "^2.7.16",
-    "ai": "^4.3.8",
+    "ai": "5.0.0-beta.2",
     "cssnano": "^6.0.3",
     "jotai": "^2.12.1",
     "next": "15.3.0-canary.1",
@@ -75,10 +80,11 @@
     "swr": "^2.2.5",
     "tailwindcss": "^4.0.9",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5"
+    "typescript": "^5",
+    "zod": "3.25.49"
   },
   "peerDependencies": {
-    "ai": "^4",
+    "ai": "5.0.0-beta.2",
     "jotai": "^2",
     "next": "15.3.0-canary.1",
     "react": "^19",

@@ -5,8 +5,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { Key, User } from "lucide-react";
 import urlJoin from "url-join";
 
+import { APIKeyInjectionConfigEnabled } from "@fern-api/docs-auth";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
-import { APIKeyInjectionConfigEnabled } from "@fern-docs/auth";
 import { FernButton, FernCard } from "@fern-docs/components";
 
 import { Callout } from "@/mdx/components/callout";
@@ -119,12 +119,25 @@ export function PlaygroundCardTriggerApiKeyInjected({
                   config.returnToQueryParam,
                   returnTo.toString()
                 );
+
+                // invalidate bearer token cookie
+                document.cookie =
+                  "fern_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                // invalidate access token cookie
+                document.cookie =
+                  "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+                // remove bearer token from state
+                setBearerAuth({ token: "" });
+
                 fetch(url)
                   .then(() => {
                     window.location.reload();
                   })
                   .catch((error: unknown) => {
-                    console.error(error);
+                    console.error(
+                      `[playground-card-trigger-api-key-injected] ${JSON.stringify(error)}`
+                    );
                   });
               }}
               size="normal"

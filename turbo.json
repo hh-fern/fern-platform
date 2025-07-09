@@ -36,6 +36,7 @@
     "test-ete": {
       "dependsOn": ["compile"]
     },
+    "test:self-hosted": {},
     "dev": {
       "persistent": true
     },
@@ -80,6 +81,7 @@
         "NEXT_PUBLIC_FONTAWESOME_CDN_HOST",
         "NEXT_PUBLIC_IS_LOCAL",
         "NEXT_PUBLIC_TRAILING_SLASH",
+        "OAUTH_JWT_SECRET",
         "OPENAI_API_KEY",
         "QSTASH_CURRENT_SIGNING_KEY",
         "QSTASH_NEXT_SIGNING_KEY",
@@ -88,7 +90,8 @@
         "SLACK_TOKEN",
         "TURBOPUFFER_API_KEY",
         "WORKOS_API_KEY",
-        "WORKOS_CLIENT_ID"
+        "WORKOS_CLIENT_ID",
+        "NEXT_PUBLIC_IS_SELF_HOSTED"
       ],
       "passThroughEnv": [
         "ANALYZE",

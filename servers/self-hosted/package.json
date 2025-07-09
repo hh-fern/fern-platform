@@ -1,0 +1,19 @@
+{
+  "name": "@fern-platform/self-hosted",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "scripts": {
+    "docker:build": "sh create_self_hosted_docker.sh",
+    "docker:run": "docker run -p 9000:9000 -p 9001:9001 -p 8080:8080 -p 3000:3000 -it -v $(pwd)/fern:/app/fern -v $(pwd)/../..:/app/fern-platform -e RUN_MODE=shell fern-self-hosted:latest",
+    "test:self-hosted": "vitest src/__test__ --globals --config src/__test__/vitest.config.ts"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "execa": "^9.5.1",
+    "vitest": "^3.0.5"
+  }
+}

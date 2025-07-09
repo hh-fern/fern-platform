@@ -304,7 +304,11 @@ export class ReadmeGenerator {
     writer.writeLine("## Reference");
     writer.writeLine();
     writer.writeLine(
-      `A full reference for this library is available [here](${referenceFile}).`
+      `A full reference for this library is available [here](${
+        this.readmeConfig.remote?.repoUrl != null
+          ? `${this.readmeConfig.remote.repoUrl}/blob/HEAD/${referenceFile}`
+          : referenceFile
+      }).`
     );
     writer.writeLine();
     return new Block({
@@ -383,6 +387,12 @@ export class ReadmeGenerator {
         this.writeInstallationForNuget({
           writer,
           nuget: language.publishInfo,
+        });
+        break;
+      case "php":
+        this.writeInstallationForComposer({
+          writer,
+          composer: language.publishInfo,
         });
         break;
       default:
@@ -497,6 +507,19 @@ export class ReadmeGenerator {
     writer.writeLine();
   }
 
+  private writeInstallationForComposer({
+    writer,
+    composer,
+  }: {
+    writer: Writer;
+    composer: FernGeneratorCli.ComposerPublishInfo;
+  }): void {
+    writer.writeLine("```sh");
+    writer.writeLine(`composer require ${composer.packageName}`);
+    writer.writeLine("```");
+    writer.writeLine();
+  }
+
   private writeShield({
     writer,
     language,
@@ -568,6 +591,17 @@ export class ReadmeGenerator {
         this.writeShieldForNuget({
           writer,
           nuget,
+        });
+        return;
+      }
+      case "php": {
+        const composer = language.publishInfo;
+        if (composer == null) {
+          return;
+        }
+        this.writeShieldForComposer({
+          writer,
+          composer,
         });
         return;
       }
@@ -650,9 +684,23 @@ export class ReadmeGenerator {
     writer.writeLine(`(https://nuget.org/packages/${nuget.packageName})`);
   }
 
+  private writeShieldForComposer({
+    writer,
+    composer,
+  }: {
+    writer: Writer;
+    composer: FernGeneratorCli.ComposerPublishInfo;
+  }): void {
+    writer.write("[![php shield]");
+    writer.write("(https://img.shields.io/badge/php-packagist-pink)]");
+    writer.writeLine(
+      `(https://packagist.org/packages/${composer.packageName})`
+    );
+  }
+
   private generateContributing(): Block {
     return new Block({
-      id: "contributing",
+      id: "CONTRIBUTING",
       content: `## Contributing
 
 While we value open-source contributions to this SDK, this library is generated programmatically.
@@ -700,6 +748,8 @@ function languageToTitle(language: FernGeneratorCli.LanguageInfo): string {
       return "Ruby";
     case "csharp":
       return "C#";
+    case "php":
+      return "PHP";
     default:
       assertNever(language);
   }

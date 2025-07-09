@@ -2,21 +2,22 @@ import "server-only";
 
 import React, { ReactElement } from "react";
 
+import { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import { slugToHref } from "@fern-api/docs-utils";
 import type { FernNavigation } from "@fern-api/fdr-sdk";
 import { Badge } from "@fern-docs/components";
-import { slugToHref } from "@fern-docs/utils";
+import { FernLink } from "@fern-docs/components/FernLink";
+import { Separator } from "@fern-docs/components/Separator";
+import { AsideAwareDiv } from "@fern-docs/components/layouts/AsideAwareDiv";
+import { SetLayout } from "@fern-docs/components/state/layout";
 
-import { FernLink } from "@/components/FernLink";
-import { Separator } from "@/components/Separator";
 import { HideBuiltWithFern } from "@/components/built-with-fern";
-import { DocsLoader } from "@/server/docs-loader";
+import { FooterLayout } from "@/components/layouts/FooterLayout";
 import { MdxSerializer } from "@/server/mdx-serializer";
-import { HideAsides, SetLayout } from "@/state/layout";
 
-import { AsideAwareDiv } from "../layouts/AsideAwareDiv";
-import { FooterLayout } from "../layouts/FooterLayout";
 import { ChangelogContentLayout } from "./ChangelogContentLayout";
 
+// sidebar is always hidden on changelog entry pages
 export default function ChangelogEntryPage({
   loader,
   serialize,
@@ -33,9 +34,8 @@ export default function ChangelogEntryPage({
   children: React.ReactNode;
 }): ReactElement<any> {
   return (
-    <AsideAwareDiv className="fern-layout-changelog">
+    <AsideAwareDiv className="fern-layout-changelog" isFullPage={true}>
       <SetLayout value="page" />
-      <HideAsides force />
       <article className="fern-layout-page">
         <HideBuiltWithFern>
           <ChangelogContentLayout as="section" className="mb-8">

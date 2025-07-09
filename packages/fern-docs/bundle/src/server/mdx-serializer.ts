@@ -5,14 +5,12 @@ import { cache } from "react";
 
 import { Semaphore } from "es-toolkit/compat";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { cacheSeed } from "@fern-api/docs-server/cache-seed";
 import { Frontmatter } from "@fern-api/fdr-sdk/docs";
 
 import { serializeMdx as internalSerializeMdx } from "@/mdx/bundler/serialize";
 import { RehypeLinksOptions } from "@/mdx/plugins/rehype-links";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-
-import { cacheSeed } from "./cache-seed";
-import { postToEngineeringNotifs } from "./slack";
 
 export type MdxSerializerOptions = {
   /**
@@ -49,7 +47,7 @@ export type MdxSerializer = (
   | undefined
 >;
 
-const monitor = new Semaphore(10);
+const monitor = new Semaphore(20);
 
 export function createCachedMdxSerializer(
   loader: Awaited<ReturnType<typeof createCachedDocsLoader>>,
@@ -70,38 +68,38 @@ export function createCachedMdxSerializer(
       return;
     }
 
+    if (isPlainText(content)) {
+      return content;
+    }
+
     await monitor.acquire();
 
     // this lets us key on just
     const cachedSerializer = unstable_cache(
-      async ({ filename, toc, scope, slug }: MdxSerializerOptions) => {
+      async ({ filename, toc, scope }: MdxSerializerOptions) => {
         const authState = await loader.getAuthState();
 
         try {
-          return await internalSerializeMdx(content, {
-            filename,
-            loader,
-            toc,
-            scope: {
-              authed: authState.authed,
-              user: authState.authed ? authState.user : undefined,
-              ...scope,
+          return await internalSerializeMdx(
+            content,
+            {
+              filename,
+              loader,
+              toc,
+              scope: {
+                authed: authState.authed,
+                user: authState.authed ? authState.user : undefined,
+                ...scope,
+              },
+              replaceHref,
             },
-            replaceHref,
-          });
+            domain
+          );
         } catch (error) {
           console.error("Error serializing mdx", error);
 
-          postToEngineeringNotifs(
-            `:rotating_light: [${domain}] \`Serialize MDX\` encountered an error: \`${String(error)}\` (url: \`https://${domain}/${slug ?? "UNKNOWN"}\`)`,
-            "serialize-mdx",
-            {
-              message: content,
-              mrkdwn: true,
-            }
-          );
-
-          return undefined;
+          // Instead of returning raw content, throw the error to be handled by the caller
+          throw error;
         }
       },
       [domain, content, cacheSeed()],
@@ -128,4 +126,12 @@ export function createCachedMdxSerializer(
   };
 
   return cache(serializer);
+}
+
+function isPlainText(content: string): boolean {
+  if (content.length === 0) {
+    return true;
+  }
+
+  return /^[a-zA-Z0-9\s.,'"!?]*$/.test(content);
 }

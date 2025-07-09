@@ -62,6 +62,7 @@ export async function EndpointContentLeft({
           hidden: false,
           valueShape: stringShape,
           availability: undefined,
+          propertyAccess: undefined,
         };
       },
       bearerAuth: (bearerAuth) => {
@@ -73,6 +74,7 @@ export async function EndpointContentLeft({
           hidden: false,
           valueShape: stringShape,
           availability: undefined,
+          propertyAccess: undefined,
         };
       },
       header: (value) => {
@@ -85,6 +87,7 @@ export async function EndpointContentLeft({
           hidden: false,
           valueShape: stringShape,
           availability: undefined,
+          propertyAccess: undefined,
         };
       },
       oAuth: (value) => {
@@ -104,6 +107,7 @@ export async function EndpointContentLeft({
                 hidden: false,
                 valueShape: stringShape,
                 availability: undefined,
+                propertyAccess: undefined,
               }),
             }),
         });
@@ -190,6 +194,11 @@ export async function EndpointContentLeft({
         {endpoint.requests?.[0] != null && (
           <EndpointSection
             title="Request"
+            titleOverride={
+              isGrpcTypeAlias(endpoint.requests[0], endpoint.protocol?.type)
+                ? types[endpoint.requests[0].body.value.id]?.displayName
+                : undefined
+            }
             description={
               <MdxServerComponentProseSuspense
                 size="sm"
@@ -216,6 +225,11 @@ export async function EndpointContentLeft({
           {endpoint.responses?.[0] != null && (
             <EndpointSection
               title="Response"
+              titleOverride={
+                isGrpcTypeAlias(endpoint.responses[0], endpoint.protocol?.type)
+                  ? types[endpoint.responses[0].body.value.id]?.displayName
+                  : undefined
+              }
               description={
                 <MdxServerComponentProseSuspense
                   size="sm"
@@ -249,4 +263,34 @@ export async function EndpointContentLeft({
       </TypeDefinitionResponse>
     </>
   );
+}
+
+type GrpcTypeAlias =
+  | (ApiDefinition.HttpRequest & {
+      contentType: "application/proto";
+      body: ApiDefinition.HttpRequestBodyShape.Alias & {
+        value: ApiDefinition.TypeReference.Id;
+      };
+    })
+  | (ApiDefinition.HttpResponse & {
+      statusCode: number;
+      body: ApiDefinition.HttpResponseBodyShape.Alias & {
+        value: ApiDefinition.TypeReference.Id;
+      };
+    });
+
+function isGrpcTypeAlias(
+  item: ApiDefinition.HttpRequest | ApiDefinition.HttpResponse,
+  protocolType: string | undefined
+): item is GrpcTypeAlias {
+  const hasAliasId =
+    item.body?.type === "alias" && item.body.value?.type === "id";
+  const isGrpc = protocolType === "grpc";
+  if (!hasAliasId || !isGrpc) return false;
+
+  if ("contentType" in item) {
+    return item.contentType === "application/proto";
+  }
+
+  return "statusCode" in item;
 }

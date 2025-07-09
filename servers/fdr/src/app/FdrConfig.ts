@@ -24,11 +24,6 @@ const API_DEFINITION_SOURCE_BUCKET_URL_OVERRIDE_ENV_VAR =
   "API_DEFINITION_SOURCE_BUCKET_URL_OVERRIDE";
 
 const DOMAIN_SUFFIX_ENV_VAR = "DOMAIN_SUFFIX";
-const ALGOLIA_APP_ID_ENV_VAR = "ALGOLIA_APP_ID";
-const ALGOLIA_ADMIN_API_KEY_ENV_VAR = "ALGOLIA_ADMIN_API_KEY";
-const ALGOLIA_SEARCH_INDEX_ENV_VAR = "ALGOLIA_SEARCH_INDEX";
-const ALGOLIA_SEARCH_API_KEY_ENV_VAR = "ALGOLIA_SEARCH_API_KEY";
-const ALGOLIA_SEARCH_V2_DOMAINS_ENV_VAR = "ALGOLIA_SEARCH_V2_DOMAINS";
 const SLACK_TOKEN_ENV_VAR = "SLACK_TOKEN";
 const LOG_LEVEL_ENV_VAR = "LOG_LEVEL";
 const DOCS_CACHE_ENDPOINT_ENV_VAR = "DOCS_CACHE_ENDPOINT";
@@ -38,6 +33,12 @@ const REDIS_CLUSTERING_ENABLED_ENV_VAR = "REDIS_CLUSTERING_ENABLED";
 const APPLICATION_ENVIRONMENT_ENV_VAR = "APPLICATION_ENVIRONMENT";
 const PUBLIC_DOCS_CDN_URL = "PUBLIC_DOCS_CDN_URL";
 
+// Self-hosted env variables
+const MINIO_USERNAME = "MINIO_USERNAME";
+const MINIO_PASSWORD = "MINIO_PASSWORD";
+const MINIO_URL = "MINIO_URL";
+const MINIO_BUCKET_NAME = "MINIO_BUCKET_NAME";
+
 export interface S3Config {
   bucketName: string;
   bucketRegion: string;
@@ -45,6 +46,7 @@ export interface S3Config {
 }
 
 export interface FdrConfig {
+  localModeOverride: boolean;
   venusUrl: string;
   awsAccessKey: string;
   awsSecretKey: string;
@@ -54,11 +56,6 @@ export interface FdrConfig {
   dbDocsDefinitionS3: S3Config;
   privateApiDefinitionSourceS3: S3Config;
   domainSuffix: string;
-  algoliaAppId: string;
-  algoliaAdminApiKey: string;
-  algoliaSearchApiKey: string;
-  algoliaSearchIndex: string;
-  algoliaSearchV2Domains: string[];
   slackToken: string;
   logLevel: string;
   docsCacheEndpoint: string;
@@ -68,8 +65,47 @@ export interface FdrConfig {
   applicationEnvironment: string;
 }
 
-export function getConfig(): FdrConfig {
+function getSelfHostedS3Config(): S3Config {
   return {
+    bucketName: getEnvironmentVariableOrThrow(MINIO_BUCKET_NAME),
+    bucketRegion: "global",
+    urlOverride: getEnvironmentVariableOrThrow(MINIO_URL),
+  };
+}
+
+function getConfigForLocalMode(): FdrConfig {
+  const selfHostedS3Config = getSelfHostedS3Config();
+
+  return {
+    localModeOverride: true,
+    venusUrl: "",
+    awsAccessKey: getEnvironmentVariableOrThrow(MINIO_USERNAME),
+    awsSecretKey: getEnvironmentVariableOrThrow(MINIO_PASSWORD),
+    publicDocsS3: selfHostedS3Config,
+    privateDocsS3: selfHostedS3Config,
+    dbDocsDefinitionS3: selfHostedS3Config,
+    privateApiDefinitionSourceS3: selfHostedS3Config,
+    domainSuffix: "docs.buildwithfern.com",
+    slackToken: "local",
+    logLevel: "info",
+    docsCacheEndpoint: "local",
+    enableCustomerNotifications: false,
+    redisEnabled: false,
+    redisClusteringEnabled: false,
+    applicationEnvironment: "local",
+    cdnPublicDocsUrl: "local",
+  };
+}
+
+export function getConfig(): FdrConfig {
+  const localMode = process.env["LOCAL_MODE_OVERRIDE"] ?? "false";
+  const shouldOverride = localMode === "true";
+  if (shouldOverride) {
+    return getConfigForLocalMode();
+  }
+
+  return {
+    localModeOverride: false,
     venusUrl: getEnvironmentVariableOrThrow(VENUS_URL_ENV_VAR),
     awsAccessKey: getEnvironmentVariableOrThrow(AWS_ACCESS_KEY_ENV_VAR),
     awsSecretKey: getEnvironmentVariableOrThrow(AWS_SECRET_KEY_ENV_VAR),
@@ -107,20 +143,6 @@ export function getConfig(): FdrConfig {
         process.env[API_DEFINITION_SOURCE_BUCKET_URL_OVERRIDE_ENV_VAR],
     },
     domainSuffix: getEnvironmentVariableOrThrow(DOMAIN_SUFFIX_ENV_VAR),
-    algoliaAppId: getEnvironmentVariableOrThrow(ALGOLIA_APP_ID_ENV_VAR),
-    algoliaAdminApiKey: getEnvironmentVariableOrThrow(
-      ALGOLIA_ADMIN_API_KEY_ENV_VAR
-    ),
-    algoliaSearchIndex: getEnvironmentVariableOrThrow(
-      ALGOLIA_SEARCH_INDEX_ENV_VAR
-    ),
-    algoliaSearchApiKey: getEnvironmentVariableOrThrow(
-      ALGOLIA_SEARCH_API_KEY_ENV_VAR
-    ),
-    algoliaSearchV2Domains:
-      getEnvironmentVariableOrThrow(ALGOLIA_SEARCH_V2_DOMAINS_ENV_VAR).split(
-        ","
-      ) ?? [],
     slackToken: getEnvironmentVariableOrThrow(SLACK_TOKEN_ENV_VAR),
     logLevel: process.env[LOG_LEVEL_ENV_VAR] ?? "info",
     docsCacheEndpoint: getEnvironmentVariableOrThrow(

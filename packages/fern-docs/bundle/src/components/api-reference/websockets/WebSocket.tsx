@@ -8,10 +8,10 @@ import { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { FernScrollArea } from "@fern-docs/components";
 import { AvailabilityBadge } from "@fern-docs/components/badges";
+import { ReferenceLayout } from "@fern-docs/components/layouts/ReferenceLayout";
 
 import { PageHeader } from "@/components/PageHeader";
 import { FooterLayout } from "@/components/layouts/FooterLayout";
-import { ReferenceLayout } from "@/components/layouts/ReferenceLayout";
 import { PlaygroundButton } from "@/components/playground/PlaygroundButton";
 import { PlaygroundKeyboardTrigger } from "@/components/playground/PlaygroundKeyboardTrigger";
 import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
@@ -102,6 +102,7 @@ export async function WebSocketContent({
           <EndpointUrlWithPlaygroundBaseUrl
             endpoint={channel}
             className="hidden lg:flex"
+            method="WSS"
           />
         </PageHeader>
       }
@@ -159,7 +160,10 @@ export async function WebSocketContent({
               slug={node.slug}
               headingElement={
                 <div className="border-border-default rounded-3 -mx-2 flex items-center justify-between border px-2 py-1 transition-colors">
-                  <EndpointUrlWithPlaygroundBaseUrl endpoint={channel} />
+                  <EndpointUrlWithPlaygroundBaseUrl
+                    endpoint={channel}
+                    method="WSS"
+                  />
                   <CopyWithBaseUrl channel={channel} />
                 </div>
               }

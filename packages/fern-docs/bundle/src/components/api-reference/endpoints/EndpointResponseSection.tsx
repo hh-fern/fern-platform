@@ -17,8 +17,20 @@ export function EndpointResponseSection({
     case "streamingText":
       return null;
     case "stream":
-      return <TypeReferenceDefinitions shape={body.shape} types={types} />;
+      return (
+        <TypeReferenceDefinitions
+          shape={body.shape}
+          types={types}
+          location="response"
+        />
+      );
     default:
-      return <TypeReferenceDefinitions shape={body} types={types} />;
+      return (
+        <TypeReferenceDefinitions
+          shape={body}
+          types={types}
+          location="response"
+        />
+      );
   }
 }

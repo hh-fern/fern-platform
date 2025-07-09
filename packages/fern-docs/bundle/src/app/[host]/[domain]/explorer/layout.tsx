@@ -1,12 +1,11 @@
 import "server-only";
 
-import { Metadata } from "next";
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
 
 import { getFernToken } from "@/app/fern-token";
 import { PlaygroundCloseButton } from "@/components/playground/PlaygroundCloseButton";
 import { PlaygroundKeyboardTrigger } from "@/components/playground/PlaygroundKeyboardTrigger";
 import { HorizontalSplitPane } from "@/components/playground/VerticalSplitPane";
-import { createCachedDocsLoader } from "@/server/docs-loader";
 import { ApiExplorerFlags } from "@/state/api-explorer-flags";
 
 export default async function Layout({
@@ -35,7 +34,6 @@ export default async function Layout({
       <ApiExplorerFlags
         isFileForgeHackEnabled={edgeFlags.isFileForgeHackEnabled}
         isProxyDisabled={edgeFlags.isProxyDisabled}
-        hasVoiceIdPlaygroundForm={edgeFlags.hasVoiceIdPlaygroundForm}
         usesApplicationJsonInFormDataValue={
           edgeFlags.usesApplicationJsonInFormDataValue
         }
@@ -53,22 +51,4 @@ export default async function Layout({
       </HorizontalSplitPane>
     </main>
   );
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ host: string; domain: string }>;
-}): Promise<Metadata> {
-  const { host, domain } = await params;
-  const loader = await createCachedDocsLoader(host, domain);
-  const config = await loader.getConfig();
-  return {
-    title: {
-      default: "API Explorer",
-      template: config.title ? "%s | " + config.title : "%s",
-    },
-    description:
-      "Browse, explore, and try out API endpoints without leaving the documentation.",
-  };
 }

@@ -1,14 +1,13 @@
 import { ArrowLeft } from "lucide-react";
 
+import { createPruneKey } from "@fern-api/docs-loader";
+import { DocsLoader } from "@fern-api/docs-server/docs-loader";
 import { ApiDefinition, FernNavigation } from "@fern-api/fdr-sdk";
 import {
   createEndpointContext,
   createWebSocketContext,
 } from "@fern-api/fdr-sdk/api-definition";
 import { NavigationNodePage } from "@fern-api/fdr-sdk/navigation";
-
-import { DocsLoader, createPruneKey } from "@/server/docs-loader";
-import { revalidate } from "@/server/revalidate";
 
 import { PlaygroundAuthorizationFormCard } from "./auth";
 import { PlaygroundEndpoint } from "./endpoint";
@@ -30,9 +29,9 @@ export async function ExplorerContent({
   try {
     api = await loader.getPrunedApi(node.apiDefinitionId, createPruneKey(node));
   } catch (error) {
-    console.error(error);
+    console.error(`[explorer-content] ${JSON.stringify(error)}`);
     // TODO: don't revalidate too often
-    revalidate(await loader.getBaseUrl());
+    // revalidate(await loader.getBaseUrl());
   }
 
   if (api == null) {

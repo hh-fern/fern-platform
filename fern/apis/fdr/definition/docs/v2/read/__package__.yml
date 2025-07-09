@@ -92,18 +92,6 @@ service:
       response: GetDocsConfigByIdResponse
       errors:
         - DocsDefinitionNotFoundError
-
-    getSearchApiKeyForIndexSegment:
-      method: POST
-      path: /search-api-key-with-index-segment
-      request:
-        name: GetSearchApiKeyForIndexSegmentRequest
-        body:
-          properties:
-            indexSegmentId: string
-      response: GetSearchApiKeyForIndexSegmentResponse
-      errors:
-        - IndexSegmentNotFoundError 
     
     prepopulateFdrReadS3Bucket:
       method: POST
@@ -116,6 +104,7 @@ types:
       url: rootCommons.Url
       org: rootCommons.OrgId
       isPreviewUrl: boolean
+      gitUrl: optional<rootCommons.Url>
 
   GetDocsConfigByIdResponse:
     properties:
@@ -128,10 +117,6 @@ types:
       baseUrl: BaseUrl
       definition: v1DocsRead.DocsDefinition
       lightModeEnabled: boolean
-
-  GetSearchApiKeyForIndexSegmentResponse:
-    properties:
-      searchApiKey: string
 
   BaseUrl:
     properties:
@@ -154,7 +139,4 @@ errors:
     status-code: 404
 
   DomainNotRegisteredError:
-    status-code: 404
-
-  IndexSegmentNotFoundError:
     status-code: 404

@@ -305,19 +305,6 @@ export class FdrDeployStack extends Stack {
             API_DEFINITION_SOURCE_BUCKET_REGION:
               privateApiDefinitionSourceBucket.stack.region,
             DOMAIN_SUFFIX: getDomainSuffix(environmentType),
-            ALGOLIA_APP_ID: getEnvironmentVariableOrThrow("ALGOLIA_APP_ID"),
-            ALGOLIA_ADMIN_API_KEY: getEnvironmentVariableOrThrow(
-              "ALGOLIA_ADMIN_API_KEY"
-            ),
-            ALGOLIA_SEARCH_INDEX: getEnvironmentVariableOrThrow(
-              "ALGOLIA_SEARCH_INDEX"
-            ),
-            ALGOLIA_SEARCH_API_KEY: getEnvironmentVariableOrThrow(
-              "ALGOLIA_SEARCH_API_KEY"
-            ),
-            ALGOLIA_SEARCH_V2_DOMAINS: getEnvironmentVariableOrThrow(
-              "ALGOLIA_SEARCH_V2_DOMAINS"
-            ),
             SLACK_TOKEN: getEnvironmentVariableOrThrow(
               "FERNIE_SLACK_APP_TOKEN"
             ),
@@ -508,14 +495,27 @@ export class FdrDeployStack extends Stack {
       {
         serviceName: MDX_BUNDLER_SERVICE_NAME,
         cluster,
-        cpu: 512,
-        memoryLimitMiB: 1024,
-        desiredCount: 1,
+        cpu: 4096,
+        memoryLimitMiB: 8192,
+        desiredCount: 4, // for fallback on failure
         securityGroups: [mdxBundlerSg],
         taskImageOptions: {
-          image: ContainerImage.fromTarball(
-            `../../docker/build/tar/mdx-bundler:${version}.tar`
-          ),
+          image: (() => {
+            const imagePath = `../../docker/build/tar/mdx-bundler:${version}.tar`;
+            console.log(
+              `[MDX Bundler] Attempting to load image from path: ${imagePath}`
+            );
+            console.log(
+              `[MDX Bundler] Current working directory: ${process.cwd()}`
+            );
+            console.log(`[MDX Bundler] Version: ${version}`);
+            try {
+              return ContainerImage.fromTarball(imagePath);
+            } catch (error) {
+              console.error(`[MDX Bundler] Failed to load image: ${error}`);
+              throw error;
+            }
+          })(),
           environment: {
             NODE_ENV: "production",
           },
@@ -546,7 +546,7 @@ export class FdrDeployStack extends Stack {
 
     mdxBundlerService.targetGroup.setAttribute(
       "deregistration_delay.timeout_seconds",
-      "30"
+      "120" // allow bundling to finish if deregistered
     );
 
     mdxBundlerService.loadBalancer.setAttribute(
@@ -556,7 +556,7 @@ export class FdrDeployStack extends Stack {
 
     mdxBundlerService.targetGroup.configureHealthCheck({
       healthyHttpCodes: "200",
-      path: "/",
+      path: "/health",
       port: "8080",
       timeout: Duration.seconds(120),
       interval: Duration.seconds(150),

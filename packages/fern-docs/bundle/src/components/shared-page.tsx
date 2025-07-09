@@ -6,35 +6,29 @@ import {
   redirect,
   unauthorized,
 } from "next/navigation";
-import { Metadata } from "next/types";
 import React from "react";
 
 import { compact } from "es-toolkit/array";
 
-import { FernNavigation } from "@fern-api/fdr-sdk";
-import { Slug } from "@fern-api/fdr-sdk/navigation";
-import { withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
-import { getFrontmatter, markdownToString } from "@fern-docs/mdx";
+import { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import { withPrunedNavigationLoader } from "@fern-api/docs-server/withPrunedNavigation";
 import {
   addLeadingSlash,
   conformTrailingSlash,
   getRedirectForPath,
   slugToHref,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
+import { FernNavigation } from "@fern-api/fdr-sdk";
+import { Slug } from "@fern-api/fdr-sdk/navigation";
+import { withDefaultProtocol } from "@fern-api/ui-core-utils";
+import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 
-import { toImageDescriptor } from "@/app/seo";
 import FeedbackPopover from "@/components/feedback/FeedbackPopover";
-import { DocsLoader } from "@/server/docs-loader";
-import { createFindNode } from "@/server/find-node";
 import { withLaunchDarkly } from "@/server/ld-adapter";
 import {
   MdxSerializer,
   createCachedMdxSerializer,
 } from "@/server/mdx-serializer";
-import { withPrunedNavigationLoader } from "@/server/withPrunedNavigation";
-import { SetIsLandingPage } from "@/state/layout";
-import { SetCurrentNavigationNode } from "@/state/navigation";
 
 import { DocsMainContent } from "../app/[host]/[domain]/main";
 
@@ -81,6 +75,18 @@ export default async function SharedPage({
     .getSlugMapWithParents()
     .get(slug);
 
+  const authState = await authStatePromise;
+
+  // this is a special case for when the user is not authenticated, but the not-found status originates from an authed node
+  // must be checked before pruning auth tree
+  if (
+    currentNode?.node.authed &&
+    !authState.authed &&
+    authState.authorizationUrl != null
+  ) {
+    redirect(prepareRedirect(authState.authorizationUrl));
+  }
+
   const visibleNodeIds = compact([
     ...(currentNode?.parents.map((node) => node.id) ?? []),
     currentNode?.node.id ?? undefined,
@@ -97,27 +103,12 @@ export default async function SharedPage({
   // find the node that is currently being viewed
   const found = FernNavigation.utils.findNode(root, slug);
 
-  const authState = await authStatePromise;
-
-  // this is a special case for when the user is not authenticated, but the not-found status originates from an authed node
-  if (
-    found.type === "notFound" &&
-    found.authed &&
-    !authState.authed &&
-    authState.authorizationUrl != null
-  ) {
-    redirect(prepareRedirect(authState.authorizationUrl));
-  }
-
   const edgeFlags = await edgeFlagsPromise;
 
   if (found.type === "notFound") {
     console.error(`[${loader.domain}] Not found: ${slug}`);
 
-    // TODO: returning "notFound: true" here will render vercel's default 404 page
-    // this is better than following redirects, since it will signal a proper 404 status code.
-    // however, we should consider rendering a custom 404 page in the future using the customer's branding.
-    // see: https://nextjs.org/docs/app/api-reference/file-conventions/not-found
+    // returning "notFound: true" here renders our custom 404 page (not-found.tsx)
     if (edgeFlags.is404PageHidden && found.redirect != null) {
       redirect(prepareRedirect(found.redirect));
     }
@@ -160,8 +151,10 @@ export default async function SharedPage({
 
   const serialize = createCachedMdxSerializer(loader, {
     scope: {
+      product: found?.currentProduct?.productId,
       version: found?.currentVersion?.versionId,
       tab: found?.currentTab?.title,
+      path: found.node.slug,
     },
     replaceHref,
   });
@@ -223,11 +216,13 @@ export default async function SharedPage({
         nodeId={found.node.id}
         sidebarRootNodeId={found.sidebar?.id}
         tabId={found.currentTab?.id}
+        productId={found.currentProduct?.productId}
+        productSlug={found.currentProduct?.slug}
         versionId={found.currentVersion?.versionId}
         versionSlug={found.currentVersion?.slug}
         versionIsDefault={found.isCurrentVersionDefault}
+        productIsDefault={found.isCurrentProductDefault}
       />
-      <SetIsLandingPage value={found.node.type === "landingPage"} />
       <DocsMainContent
         loader={loader}
         serialize={serialize}
@@ -238,110 +233,6 @@ export default async function SharedPage({
       />
     </FeedbackPopoverProvider>
   );
-}
-
-export async function generateMetadata({
-  loader,
-  slug,
-}: {
-  loader: DocsLoader;
-  slug: Slug;
-}): Promise<Metadata> {
-  const findNode = createFindNode(loader);
-  const [files, node, config, isSeoDisabled] = await Promise.all([
-    loader.getFiles(),
-    findNode(slug),
-    loader.getConfig(),
-    getSeoDisabled(loader.domain),
-  ]);
-  const pageId = node != null ? FernNavigation.getPageId(node) : undefined;
-  const page = pageId ? await loader.getPage(pageId) : undefined;
-  const frontmatter = page ? getFrontmatter(page.markdown)?.data : undefined;
-
-  const noindex =
-    node == null ||
-    (FernNavigation.hasMarkdown(node) && node.noindex) ||
-    node.hidden ||
-    isSeoDisabled ||
-    frontmatter?.noindex ||
-    false;
-  const nofollow =
-    node?.hidden || isSeoDisabled || frontmatter?.nofollow || false;
-
-  const canonicalHost = await getCanonicalUrl(loader.domain);
-  const baseUrl = withDefaultProtocol(canonicalHost ?? loader.domain);
-
-  let canonicalUrl: string | undefined;
-
-  if (frontmatter?.["canonical-url"]) {
-    canonicalUrl = frontmatter["canonical-url"];
-  } else if (node != null) {
-    canonicalUrl = `${baseUrl}${slugToHref(node.canonicalSlug ?? node.slug)}`;
-  } else if (canonicalHost) {
-    canonicalUrl = baseUrl;
-  }
-
-  return {
-    title:
-      markdownToString(
-        frontmatter?.headline || frontmatter?.title || node?.title
-      ) ?? node?.title,
-    description: markdownToString(
-      frontmatter?.description || frontmatter?.subtitle || frontmatter?.excerpt
-    ),
-    keywords: frontmatter?.keywords,
-    robots: {
-      index: noindex ? false : undefined,
-      follow: nofollow ? false : undefined,
-    },
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    openGraph: {
-      title: frontmatter?.["og:title"] ?? config.metadata?.["og:title"],
-      description:
-        frontmatter?.["og:description"] ?? config.metadata?.["og:description"],
-      locale: frontmatter?.["og:locale"] ?? config.metadata?.["og:locale"],
-      url: frontmatter?.["og:url"] ?? config.metadata?.["og:url"],
-      siteName:
-        frontmatter?.["og:site_name"] ?? config.metadata?.["og:site_name"],
-      images:
-        toImageDescriptor(
-          files,
-          frontmatter?.["og:image"],
-          frontmatter?.["og:image:width"],
-          frontmatter?.["og:image:height"]
-        ) ??
-        toImageDescriptor(files, frontmatter?.image) ??
-        toImageDescriptor(
-          files,
-          config.metadata?.["og:image"],
-          config.metadata?.["og:image:width"],
-          config.metadata?.["og:image:height"]
-        ),
-    },
-    twitter: {
-      site: frontmatter?.["twitter:site"] ?? config.metadata?.["twitter:site"],
-      creator:
-        frontmatter?.["twitter:handle"] ?? config.metadata?.["twitter:handle"],
-      title:
-        frontmatter?.["twitter:title"] ?? config.metadata?.["twitter:title"],
-      description:
-        frontmatter?.["twitter:description"] ??
-        config.metadata?.["twitter:description"],
-      images:
-        toImageDescriptor(files, frontmatter?.["twitter:image"]) ??
-        toImageDescriptor(files, config.metadata?.["twitter:image"]),
-    },
-    icons: {
-      icon: config.favicon
-        ? toImageDescriptor(files, {
-            type: "fileId",
-            value: config.favicon,
-          })?.url
-        : undefined,
-    },
-  };
 }
 
 function prepareRedirect(destination: string): string {
@@ -391,7 +282,7 @@ async function getNeighbor(
       excerpt,
     };
   } catch (error) {
-    console.error(error);
+    console.error(`[shared-page:get-neighbor] ${JSON.stringify(error)}`);
     return {
       href: slugToHref(node.slug),
       title: node.title,

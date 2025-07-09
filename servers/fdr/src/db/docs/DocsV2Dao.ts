@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import {
   APIV1Db,
-  Algolia,
   DocsV1Db,
   DocsV2Read,
   FdrAPI,
@@ -12,7 +11,6 @@ import {
 } from "@fern-api/fdr-sdk";
 
 import { DocsRegistrationInfo } from "../../controllers/docs/v2/getDocsWriteV2Service";
-import type { IndexSegment } from "../../services/algolia";
 import { WithoutQuestionMarks, readBuffer, writeBuffer } from "../../util";
 import { ParsedBaseUrl } from "../../util/ParsedBaseUrl";
 import { sort } from "../../util/sort";
@@ -23,7 +21,6 @@ import {
 } from "../types";
 
 export interface StoreDocsDefinitionResponse {
-  // previousAlogliaIndex?: string;
   docsDefinitionId: string;
   domains: ParsedBaseUrl[];
 }
@@ -32,7 +29,6 @@ export interface LoadDocsDefinitionByUrlResponse {
   orgId: FdrAPI.OrgId;
   domain: string;
   path: string;
-  algoliaIndex: Algolia.AlgoliaSearchIndex | undefined;
   docsDefinition: WithoutQuestionMarks<DocsV1Db.DocsDefinitionDb.V3>;
   indexSegmentIds: string[];
   docsConfigInstanceId: APIV1Db.DocsConfigId | null;
@@ -47,6 +43,11 @@ export interface LoadDocsMetadata {
   domain: string;
   path: string;
   isPreview: boolean;
+  gitUrl?: string;
+}
+
+export interface SetDocsMetadataRequest {
+  githubUrl?: string;
 }
 
 export interface LoadDocsConfigResponse {
@@ -95,24 +96,28 @@ export interface DocsV2Dao {
 
   loadDocsMetadata(url: URL): Promise<LoadDocsMetadata | undefined>;
 
+  setDocsMetadata({
+    url,
+    metadata,
+  }: {
+    url: ParsedBaseUrl;
+    metadata: SetDocsMetadataRequest;
+  }): Promise<void>;
+
   storeDocsDefinition({
     docsRegistrationInfo,
     dbDocsDefinition,
-    indexSegments,
   }: {
     docsRegistrationInfo: DocsRegistrationInfo;
     dbDocsDefinition: DocsV1Db.DocsDefinitionDb.V3;
-    indexSegments: IndexSegment[];
   }): Promise<StoreDocsDefinitionResponse>;
 
   replaceDocsDefinition({
     instanceId,
     dbDocsDefinition,
-    indexSegments,
   }: {
     instanceId: string;
     dbDocsDefinition: DocsV1Db.DocsDefinitionDb.V3;
-    indexSegments: IndexSegment[];
   }): Promise<StoreDocsDefinitionResponse>;
 
   listAllDocsUrls(opts: {
@@ -149,6 +154,23 @@ export interface DocsV2Dao {
 
 export class DocsV2DaoImpl implements DocsV2Dao {
   constructor(private readonly prisma: PrismaClient) {}
+
+  public async setDocsMetadata({
+    url,
+    metadata,
+  }: {
+    url: ParsedBaseUrl;
+    metadata: SetDocsMetadataRequest;
+  }): Promise<void> {
+    await this.prisma.docsV2.updateMany({
+      where: {
+        domain: url.getFullUrl(),
+      },
+      data: {
+        githubUrl: metadata.githubUrl,
+      },
+    });
+  }
 
   public async transferDomainOwner({
     domain,
@@ -212,6 +234,7 @@ export class DocsV2DaoImpl implements DocsV2Dao {
         isPreview: true,
         domain: true,
         path: true,
+        githubUrl: true,
       },
     });
 
@@ -224,6 +247,7 @@ export class DocsV2DaoImpl implements DocsV2Dao {
       domain: docsDomain.domain,
       path: docsDomain.path,
       isPreview: docsDomain.isPreview,
+      gitUrl: docsDomain.githubUrl ?? undefined,
     };
   }
 
@@ -244,10 +268,6 @@ export class DocsV2DaoImpl implements DocsV2Dao {
       return undefined;
     }
     return {
-      algoliaIndex:
-        docsDomain.algoliaIndex != null
-          ? Algolia.AlgoliaSearchIndex(docsDomain.algoliaIndex)
-          : undefined,
       orgId: FdrAPI.OrgId(docsDomain.orgID),
       docsDefinition: migrateDocsDbDefinition(
         readBuffer(docsDomain.docsDefinition)
@@ -315,22 +335,13 @@ export class DocsV2DaoImpl implements DocsV2Dao {
   public async storeDocsDefinition({
     docsRegistrationInfo,
     dbDocsDefinition,
-    indexSegments,
   }: {
     docsRegistrationInfo: DocsRegistrationInfo;
     dbDocsDefinition: DocsV1Db.DocsDefinitionDb.V3;
-    indexSegments: IndexSegment[];
   }): Promise<StoreDocsDefinitionResponse> {
     const bufferDocsDefinition = writeBuffer(dbDocsDefinition);
 
-    // Step 1: Create new index segments associated with docs
-    const indexSegmentIds = indexSegments.map((s) => s.id);
-    await this.prisma.indexSegment.createMany({
-      data: indexSegments.map((seg) => ({
-        id: seg.id,
-        version: seg.type === "versioned" ? seg.version.id : null,
-      })),
-    });
+    // Step 1 (deprecated): Create new index segments associated with docs
 
     // Step 2: Store Docs Config Instance
     const instanceId = generateDocsDefinitionInstanceId();
@@ -353,7 +364,6 @@ export class DocsV2DaoImpl implements DocsV2Dao {
             path: url.path ?? "",
             orgId: docsRegistrationInfo.orgId,
             bufferDocsDefinition,
-            indexSegmentIds,
             isPreview: docsRegistrationInfo.isPreview,
             authType: docsRegistrationInfo.authType,
           })
@@ -463,11 +473,9 @@ export class DocsV2DaoImpl implements DocsV2Dao {
   async replaceDocsDefinition({
     instanceId,
     dbDocsDefinition,
-    indexSegments,
   }: {
     instanceId: string;
     dbDocsDefinition: DocsV1Db.DocsDefinitionDb.V3;
-    indexSegments: IndexSegment[];
   }): Promise<StoreDocsDefinitionResponse> {
     return this.prisma.$transaction(async (tx) => {
       const bufferDocsDefinition = writeBuffer(dbDocsDefinition);
@@ -489,25 +497,7 @@ export class DocsV2DaoImpl implements DocsV2Dao {
         },
       });
 
-      // Step 2: Create new index segments associated with docs
-      const indexSegmentIds = indexSegments.map((s) => s.id);
-      await tx.indexSegment.createMany({
-        data: indexSegments.map((seg) => ({
-          id: seg.id,
-          version: seg.type === "versioned" ? seg.version.id : null,
-        })),
-      });
-
-      // Step 3: Store Docs Config Instance
-      await tx.docsConfigInstances.update({
-        where: {
-          docsConfigInstanceId: instanceId,
-        },
-        data: {
-          docsConfig: writeBuffer(dbDocsDefinition.config),
-          referencedApiDefinitionIds: dbDocsDefinition.referencedApis,
-        },
-      });
+      // Step 2 (deprecated): Create new index segments associated with docs
 
       // Step 4: Upsert the fern docs domain + custom domain url with the docs definition + algolia index
       await Promise.all(
@@ -519,7 +509,6 @@ export class DocsV2DaoImpl implements DocsV2Dao {
             path: previousDoc.path,
             orgId: previousDoc.orgID,
             bufferDocsDefinition,
-            indexSegmentIds,
             isPreview: previousDoc.isPreview,
             authType: previousDoc.authType,
           })
@@ -610,7 +599,6 @@ async function createOrUpdateDocsDefinition({
   domain,
   path,
   orgId,
-  indexSegmentIds,
   isPreview,
   authType,
 }: {
@@ -620,7 +608,6 @@ async function createOrUpdateDocsDefinition({
   domain: string;
   path: string;
   orgId: string;
-  indexSegmentIds: IndexSegmentIds;
   isPreview: boolean;
   authType: AuthType;
 }): Promise<void> {
@@ -640,17 +627,16 @@ async function createOrUpdateDocsDefinition({
       algoliaIndex: null,
       isPreview,
       authType,
+      isArchived: false,
       hasPublicS3Assets: authType === "PUBLIC",
     },
     update: {
       docsDefinition: bufferDocsDefinition,
       orgID: orgId,
       docsConfigInstanceId: instanceId,
-      indexSegmentIds,
       isPreview,
       authType,
       hasPublicS3Assets: authType === "PUBLIC",
-      isArchived: false,
     },
   });
 }

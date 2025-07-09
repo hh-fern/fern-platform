@@ -1,5 +1,9 @@
 import "server-only";
 
+import { after } from "next/server";
+
+import { kv } from "@vercel/kv";
+import { createHash } from "crypto";
 import { mapKeys } from "es-toolkit/object";
 import fs from "fs";
 import { gracefulify } from "graceful-fs";
@@ -15,6 +19,12 @@ import remarkSmartypants from "remark-smartypants";
 import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
 import { noop } from "ts-essentials";
 
+import { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { postToSlack } from "@fern-api/docs-server/slack";
+import { isDevelopment, isPreviewDomain } from "@fern-api/docs-utils";
+import { FileData } from "@fern-api/docs-utils/types/file-data";
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
 import {
   Hast,
@@ -33,9 +43,6 @@ import {
   remarkSanitizeAcorn,
 } from "@fern-docs/mdx/plugins";
 
-import { DocsLoader } from "@/server/docs-loader";
-import { FileData } from "@/server/types";
-
 import { getMDXExport } from "../get-mdx-export";
 import { rehypeAccordionNestedHeaders } from "../plugins/rehype-accordion-nested-headers";
 import { rehypeAccordions } from "../plugins/rehype-accordions";
@@ -49,12 +56,16 @@ import { rehypeExtractAsides } from "../plugins/rehype-extract-asides";
 import { rehypeFiles } from "../plugins/rehype-files";
 import { RehypeLinksOptions, rehypeLinks } from "../plugins/rehype-links";
 import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
+import { rehypeParamField } from "../plugins/rehype-param-field";
 import { rehypeSteps } from "../plugins/rehype-steps";
 import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
 
 // gracefulify fs to avoid EMFILE errors on Vercel
 gracefulify(fs);
+
+const TWOSLASH_TIMEOUT = 240_000;
+const SERIALIZATION_TIMEOUT = 10_000;
 
 export interface SerializeMdxResponse {
   code: string;
@@ -76,10 +87,14 @@ async function serializeMdxImpl(
     filename?: string;
     toc?: boolean;
     replaceHref?: RehypeLinksOptions["replaceHref"];
-  } = {}
+  } = {},
+  domain: string
 ): Promise<SerializeMdxResponse> {
   content = sanitizeBreaks(content);
   content = sanitizeMdxExpression(content)[0];
+
+  // Process twoslash blocks if present
+  content = await processTwoslashBlocks(content);
 
   let cwd: string | undefined;
   if (filename != null) {
@@ -161,7 +176,11 @@ async function serializeMdxImpl(
         rehypeAccordions,
         rehypeTabs,
         rehypeCards,
-        [rehypeSlug, { additionalJsxElements: ["Step", "Accordion", "Tab"] }],
+        rehypeParamField,
+        [
+          rehypeSlug,
+          { additionalJsxElements: ["Step", "Accordion", "Tab", "ParamField"] },
+        ],
         [rehypeLinks, { replaceHref }],
         rehypeAccordionNestedHeaders,
         [
@@ -249,7 +268,15 @@ async function serializeMdxImpl(
 
   if (bundled.errors.length > 0) {
     bundled.errors.forEach((error) => {
-      console.error(error);
+      if (!isPreviewDomain(domain) && !isDevelopment(domain)) {
+        postToSlack(
+          "#docs-notifs",
+          `:rotating_light: Error serializing mdx for ${domain}${path ? "/" + path : ""} with ${String(error)}`,
+          "mdx-serializer",
+          { message: content, mrkdwn: true }
+        );
+      }
+      console.error(`[serializer:bundle-mdx] ${JSON.stringify(error)}`);
     });
     console.debug("content", content, "code", bundled.code);
   }
@@ -266,7 +293,8 @@ async function serializeMdxImpl(
 
 export function serializeMdx(
   content: string | undefined,
-  options?: Parameters<typeof serializeMdxImpl>[1]
+  options?: Parameters<typeof serializeMdxImpl>[1],
+  domain?: string
 ): Promise<SerializeMdxResponse | undefined> {
   const abortController = new AbortController();
   const { signal } = abortController;
@@ -277,15 +305,22 @@ export function serializeMdx(
       return;
     }
 
+    let serializeTimeout = SERIALIZATION_TIMEOUT;
+    if (content.includes("twoslash")) {
+      serializeTimeout = TWOSLASH_TIMEOUT;
+    }
+
     const timeoutId = setTimeout(() => {
       if (!signal.aborted) {
         abortController.abort();
-        console.error("Serialize MDX timed out after 10 seconds");
+        console.error(
+          `Serialize MDX timed out after ${serializeTimeout / 1000} seconds`
+        );
         reject(new Error("Serialize MDX timed out"));
       }
-    }, 60_000);
+    }, serializeTimeout);
 
-    serializeMdxImpl(content, { ...options }).then(
+    serializeMdxImpl(content, { ...options }, domain ?? "").then(
       (result) => {
         clearTimeout(timeoutId);
         resolve(result);
@@ -293,7 +328,7 @@ export function serializeMdx(
       (error: unknown) => {
         clearTimeout(timeoutId);
         reject(error instanceof Error ? error : new Error(String(error)));
-        console.error(error);
+        console.error(`[serialize:serialize-mdx] ${JSON.stringify(error)}`);
       }
     );
   });
@@ -304,4 +339,238 @@ function rehypeLog() {
   return (_tree: Hast.Root) => {
     // console.debug(JSON.stringify(tree));
   };
+}
+
+function getMdxBundlerService() {
+  return (
+    process.env.NEXT_PUBLIC_MDX_BUNDLER_ORIGIN ??
+    "https://mdx-bundler-dev2.buildwithfern.com"
+  );
+}
+
+// if no domain is provided, store in a twoslash cache
+// if block fails to process, returns the original code, unformatted
+async function processTwoslashBlocks(content: string): Promise<string> {
+  if (
+    !content.includes("twoslash") ||
+    process.env.NEXT_PUBLIC_TWOSLASH_ENABLED !== "1"
+  ) {
+    return content;
+  }
+
+  const originalContent = content;
+
+  // check for twoslash anywhere in the code meta
+  const twoslashRegex =
+    /(?:[ \t]*)```(?:ts|tsx)(?:[^`\n]*?)twoslash(?:[^`\n]*?)\n([\s\S]*?)\n(?:[ \t]*)```/g;
+  const twoslashBlocks: { fullMatch: string; codeContent: string }[] = [];
+
+  let match;
+  while ((match = twoslashRegex.exec(originalContent)) != null) {
+    if (match[0] && match[1]) {
+      const fullMatch = match[0];
+      const codeContent = match[1].trim();
+      const endIndex = fullMatch.lastIndexOf("```");
+      const actualFullMatch = fullMatch.substring(0, endIndex + 3);
+
+      twoslashBlocks.push({
+        fullMatch: actualFullMatch,
+        codeContent,
+      });
+    }
+  }
+
+  if (twoslashBlocks.length === 0) {
+    return content;
+  }
+
+  // Process all blocks within TwoSlash timeout limit (leave time for serialization fallback)
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(
+      () =>
+        reject(new Error("TwoSlash processing timed out after 200 seconds")),
+      TWOSLASH_TIMEOUT - SERIALIZATION_TIMEOUT
+    )
+  );
+
+  try {
+    await Promise.race([
+      Promise.all(
+        twoslashBlocks.map(async (block) => {
+          const ignoreErrors = block.codeContent.includes("noErrors")
+            ? ""
+            : "// @noErrors\n";
+
+          const serviceContent = `\`\`\`${block.fullMatch.includes("tsx") ? "tsx" : "ts"} twoslash\n${ignoreErrors}${block.codeContent}\n\`\`\``;
+
+          try {
+            let result;
+            const cached = await kvGet(block.codeContent);
+
+            if (cached != null) {
+              result = cached.value;
+            } else {
+              console.log("Sending request to serialize service...");
+              const response = await fetch(
+                `${getMdxBundlerService()}/serialize`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ code: serviceContent }),
+                }
+              );
+
+              if (!response.ok) {
+                console.error(
+                  "Serialize service returned error:",
+                  response.statusText
+                );
+                throw new Error(
+                  `Failed to serialize TwoSlash: ${response.statusText}`
+                );
+              }
+
+              result = await response.json();
+              kvSet(block.codeContent, result);
+            }
+
+            // Replace only this specific block
+            const twoSlashContent = `<TwoSlash content={${JSON.stringify(result)}} />`;
+            content = content.replace(block.fullMatch, twoSlashContent);
+          } catch (error) {
+            console.error("Error processing twoslash block:", error);
+          }
+        })
+      ),
+      timeoutPromise,
+    ]);
+  } catch (error) {
+    console.error("TwoSlash processing timed out:", error);
+  }
+
+  if (content.includes("<CodeBlocks>") && content.includes("<TwoSlash")) {
+    return removeCodeBlocks(content);
+  }
+
+  return content;
+}
+
+const removeCodeBlocks = (content: string): string => {
+  const lines = content.split("\n");
+  const twoSlashIndices: number[] = [];
+
+  // find all instances
+  lines.forEach((line, index) => {
+    if (line.includes("<TwoSlash")) {
+      twoSlashIndices.push(index);
+    }
+  });
+
+  // process each instance in reverse order to maintain correct indices
+  for (const twoSlashLineIndex of twoSlashIndices.reverse()) {
+    let topLine = null;
+    let bottomLine = null;
+    let codeBlockDepth = 0;
+
+    // look backwards for opening tag
+    for (let i = twoSlashLineIndex; i >= 0; i--) {
+      const line = lines[i]?.trim();
+      if (!line) continue;
+
+      if (line === "<CodeBlocks>") {
+        if (codeBlockDepth === 0) {
+          topLine = i;
+          break;
+        }
+      } else if (line === "</CodeBlocks>") {
+        codeBlockDepth++;
+      } else if (line.includes("```")) {
+        // skip over code blocks
+        while (i >= 0 && !lines[i]?.trim().includes("```")) {
+          i--;
+        }
+      }
+    }
+
+    codeBlockDepth = 0;
+
+    // look forwards for closing tag
+    for (let i = twoSlashLineIndex; i < lines.length; i++) {
+      const line = lines[i]?.trim();
+      if (!line) continue;
+
+      if (line === "</CodeBlocks>") {
+        if (codeBlockDepth === 0) {
+          bottomLine = i;
+          break;
+        }
+        codeBlockDepth--;
+      } else if (line === "<CodeBlocks>") {
+        codeBlockDepth++;
+      } else if (line.includes("```")) {
+        // skip over code blocks
+        while (i < lines.length && !lines[i]?.trim().includes("```")) {
+          i++;
+        }
+      }
+    }
+
+    if (bottomLine != null && topLine != null) {
+      lines.splice(bottomLine, 1);
+      lines.splice(topLine, 1);
+    }
+  }
+
+  return lines.join("\n");
+};
+
+const TWOSLASH_SEMANTIC_VERSION = "1";
+
+function hashKey(key: string): string {
+  return createHash("sha256").update(key).digest("hex");
+}
+
+function kvSet(key: string, value: unknown) {
+  if (isLocal() || isSelfHosted()) {
+    return;
+  }
+
+  after(async () => {
+    try {
+      const hashedKey = hashKey(key);
+      await kv.hset("twoslash", {
+        [hashedKey]: {
+          value: value,
+          version: TWOSLASH_SEMANTIC_VERSION,
+          createdAt: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      console.warn(`Failed to set kv key ${key}: ${value}`, error);
+    }
+  });
+}
+
+async function kvGet(key: string): Promise<Record<string, string> | null> {
+  if (isLocal() || isSelfHosted()) {
+    return null;
+  }
+
+  try {
+    const hashedKey = hashKey(key);
+    const cached = await kv.hget<Record<string, string>>("twoslash", hashedKey);
+    if (cached && cached.version === TWOSLASH_SEMANTIC_VERSION) {
+      return cached;
+    }
+
+    console.debug(
+      `Could not find key ${hashedKey}. Using MDX service instead...`
+    );
+    return null;
+  } catch (error) {
+    console.warn(`Failed to get kv key ${key}`, error);
+    return null;
+  }
 }

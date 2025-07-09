@@ -6,11 +6,11 @@ import { composeEventHandlers } from "@radix-ui/primitive";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { FERN_SEARCH_BUTTON_ID } from "@fern-docs/components/constants";
 import { DesktopSearchButton } from "@fern-docs/search-ui";
 import { useIsMobile } from "@fern-ui/react-commons";
-
-import { FERN_SEARCH_BUTTON_ID } from "@/components/constants";
-import { isLocal } from "@/server/isLocal";
 
 export const searchDialogOpenAtom = atom(false);
 export const searchInitializedAtom = atom(false);
@@ -31,12 +31,29 @@ export const useIsAskAiEnabled = () => {
   return useAtomValue(isAskAiEnabledAtom);
 };
 
+export const isDefaultSearchFilterOffAtom = atom(false);
+
+export const SetIsDefaultSearchFilterOff = ({
+  isDefaultSearchFilterOff,
+}: {
+  isDefaultSearchFilterOff: boolean;
+}) => {
+  useHydrateAtoms([[isDefaultSearchFilterOffAtom, isDefaultSearchFilterOff]], {
+    dangerouslyForceHydrate: true,
+  });
+  return null;
+};
+
+export const useIsDefaultSearchFilterOff = () => {
+  return useAtomValue(isDefaultSearchFilterOffAtom);
+};
+
 searchInitializedAtom.onMount = (setInitialized) => {
   if (typeof window === "undefined") {
     return;
   }
 
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return;
   }
 

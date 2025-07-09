@@ -1,10 +1,7 @@
 "use client";
 
-import * as Tabs from "@radix-ui/react-tabs";
+import { AbstractHeaderTabsRoot } from "@fern-docs/components/abstract/AbstractHeaderTabsRoot";
 
-import { cn } from "@fern-docs/components";
-
-import { useCurrentTabId } from "@/state/navigation";
 import { SearchV2Trigger } from "@/state/search";
 
 export function HeaderTabsRoot({
@@ -16,20 +13,20 @@ export function HeaderTabsRoot({
   showSearchBar: boolean;
   className?: string;
 }) {
-  const currentTabId = useCurrentTabId();
   return (
-    <Tabs.Root
-      value={currentTabId}
-      className={cn("fern-header-tabs", className)}
+    <AbstractHeaderTabsRoot
+      className={className}
+      searchBar={
+        showSearchBar && (
+          <SearchV2Trigger
+            aria-label="Search"
+            className="max-w-sidebar-width overflow-hidden"
+            isSearchInSidebar={false}
+          />
+        )
+      }
     >
       {children}
-      {showSearchBar && (
-        <SearchV2Trigger
-          aria-label="Search"
-          className="max-w-sidebar-width overflow-hidden"
-          isSearchInSidebar={false}
-        />
-      )}
-    </Tabs.Root>
+    </AbstractHeaderTabsRoot>
   );
 }

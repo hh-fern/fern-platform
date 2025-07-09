@@ -4,11 +4,11 @@ import {
   AvailabilityBadge,
   HttpMethodBadge,
 } from "@fern-docs/components/badges";
-import type { FacetsResponse } from "@fern-docs/search-server/algolia";
+import type { FacetsResponse } from "@fern-docs/search-keyword";
 import {
   type FacetName,
   SEARCHABLE_FACET_ATTRIBUTES,
-} from "@fern-docs/search-server/algolia/types";
+} from "@fern-docs/search-keyword/types";
 
 import { FilterOption } from "../types";
 
@@ -209,6 +209,7 @@ export const FACET_DISPLAY_NAME_MAP: Record<string, Record<string, string>> = {
     PUT: "PUT requests",
     PATCH: "PATCH requests",
     DELETE: "DELETE requests",
+    HEAD: "HEAD requests",
   },
   api_type: {
     http: "HTTP",
@@ -250,6 +251,7 @@ export const FACET_DISPLAY_NAME_TITLE_CASE_MAP: Record<
     PUT: "PUT requests",
     PATCH: "PATCH requests",
     DELETE: "DELETE requests",
+    HEAD: "HEAD requests",
   },
   api_type: {
     http: "HTTP",

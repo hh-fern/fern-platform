@@ -1,19 +1,19 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+import { FernNextResponse } from "@fern-api/docs-server/FernNextResponse";
+import { preferPreview } from "@fern-api/docs-server/auth/origin";
+import { getReturnToQueryParam } from "@fern-api/docs-server/auth/return-to";
+import { withSecureCookie } from "@fern-api/docs-server/auth/with-secure-cookie";
+import { getWorkOSClientId, workos } from "@fern-api/docs-server/auth/workos";
+import { encryptSession } from "@fern-api/docs-server/auth/workos-session";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { safeUrl } from "@fern-api/docs-server/safeUrl";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { COOKIE_FERN_TOKEN, withoutStaging } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig } from "@fern-docs/edge-config";
-import { COOKIE_FERN_TOKEN, withoutStaging } from "@fern-docs/utils";
-
-import { FernNextResponse } from "@/server/FernNextResponse";
-import { preferPreview } from "@/server/auth/origin";
-import { getReturnToQueryParam } from "@/server/auth/return-to";
-import { withSecureCookie } from "@/server/auth/with-secure-cookie";
-import { getWorkOSClientId, workos } from "@/server/auth/workos";
-import { encryptSession } from "@/server/auth/workos-session";
-import { isLocal } from "@/server/isLocal";
-import { safeUrl } from "@/server/safeUrl";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 export const runtime = "edge";
 
@@ -24,7 +24,7 @@ const ERROR_QUERY = "error";
 const ERROR_URI_QUERY = "error_uri";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return new NextResponse("sso is not accessible in local preview mode", {
       status: 400,
     });
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   if (error != null) {
     // TODO: store this login attempt in posthog
 
-    console.error(error, errorDescription, errorUri);
+    console.error(`[sso:callback] ${error}, ${errorDescription}, ${errorUri}`);
     return new NextResponse(null, { status: 400 });
   }
 
@@ -93,7 +93,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const code = req.nextUrl.searchParams.get(CODE_QUERY);
 
   if (code == null) {
-    console.error("No code param provided");
+    console.error("[sso:callback] No code param provided");
     return new NextResponse(null, { status: 400 });
   }
 
@@ -126,7 +126,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       error: error instanceof Error ? error.message : String(error),
     };
 
-    console.error(errorRes);
+    console.error(`[sso:callback] ${JSON.stringify(errorRes)}`);
 
     return errorResponse();
   }

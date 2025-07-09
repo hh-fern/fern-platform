@@ -7,6 +7,9 @@ import { isEqual } from "es-toolkit/predicate";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { z } from "zod";
 
+import { useCurrentPathname } from "@fern-docs/components/hooks/use-current-pathname";
+import { useFernUser } from "@fern-docs/components/state/fern-user";
+import { useCurrentVersionId } from "@fern-docs/components/state/navigation";
 import {
   CommandActions,
   CommandEmpty,
@@ -25,15 +28,13 @@ import { useEventCallback, useLazyRef } from "@fern-ui/react-commons";
 import { Feedback } from "@/components/feedback/Feedback";
 import { useApiRoute } from "@/components/hooks/useApiRoute";
 import { useApiRouteSWRImmutable } from "@/components/hooks/useApiRouteSWR";
-import { useCurrentPathname } from "@/hooks/use-current-pathname";
 import { useSetTheme, useThemeSwitchEnabled } from "@/hooks/use-theme";
 import { useIsDarkCode } from "@/state/dark-code";
-import { useFernUser } from "@/state/fern-user";
-import { useCurrentVersionId } from "@/state/navigation";
 import {
   searchDialogOpenAtom,
   searchInitializedAtom,
   useIsAskAiEnabled,
+  useIsDefaultSearchFilterOff,
 } from "@/state/search";
 import { atomWithStorageString } from "@/state/utils/atomWithStorageString";
 
@@ -43,6 +44,25 @@ const ApiKeySchema = z.object({
   appId: z.string(),
   apiKey: z.string(),
 });
+
+export const generateConversationId = () => {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (let i = 0; i < 32; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+export const conversationIdAtom = atom<string>(generateConversationId());
+export function useConversationId() {
+  const [conversationId, setConversationId] = useAtom(conversationIdAtom);
+  return {
+    conversationId,
+    setConversationId,
+    resetConversationId: () => setConversationId(generateConversationId()),
+  };
+}
 
 function useAlgoliaUserToken() {
   const userTokenRef = useLazyRef(() =>
@@ -55,7 +75,7 @@ function useAlgoliaUserToken() {
   return useAtomValue(userTokenRef.current);
 }
 
-const askAiAtom = atom(false);
+export const askAiAtom = atom(false);
 
 export const SearchV2 = React.memo(function SearchV2({
   domain,
@@ -68,6 +88,7 @@ export const SearchV2 = React.memo(function SearchV2({
   const userToken = useAlgoliaUserToken();
   const user = useFernUser();
   const isAskAiEnabled = useIsAskAiEnabled();
+  const isDefaultSearchFilterOff = useIsDefaultSearchFilterOff();
 
   const [open, setOpen] = useCommandTrigger();
   const [askAi, setAskAi] = useAtom(askAiAtom);
@@ -80,6 +101,9 @@ export const SearchV2 = React.memo(function SearchV2({
     refreshInterval: 60 * 60 * 1000,
     preload: true,
   });
+
+  const shouldApplyVersionFilter =
+    currentVersion != null && !isDefaultSearchFilterOff;
 
   const facetApiEndpoint = useApiRoute("/api/fern-docs/search/v2/facet");
   let chatEndpoint = useApiRoute("/api/fern-docs/search/v2/chat");
@@ -147,7 +171,11 @@ export const SearchV2 = React.memo(function SearchV2({
         domain={domain}
       />
       <CommandActions>
-        <CommandTheme onClose={() => setOpen(false)} />
+        <CommandTheme
+          onClose={() => {
+            setOpen(false);
+          }}
+        />
       </CommandActions>
     </>
   );
@@ -161,13 +189,16 @@ export const SearchV2 = React.memo(function SearchV2({
       fetchFacets={facetFetcher}
       authenticatedUserToken={user?.email}
       initialFilters={
-        currentVersion != null ? { "version.title": currentVersion } : undefined
+        shouldApplyVersionFilter
+          ? { "version.title": currentVersion }
+          : undefined
       }
       analyticsTags={["search-v2-dialog"]}
     >
       <DesktopSearchDialog open={open} onOpenChange={setOpen}>
         {isAskAiEnabled ? (
           <DesktopCommandWithAskAI
+            useConversationId={useConversationId}
             domain={domain}
             askAI={askAi}
             setAskAI={setAskAi}
@@ -193,7 +224,7 @@ export const SearchV2 = React.memo(function SearchV2({
                     user: user?.content,
                     assistant: assistant.content,
                   })}
-                  feedbackPrepend="[AI Chat] "
+                  feedbackPrepend="[Ask Fern] "
                 />
               );
             }}

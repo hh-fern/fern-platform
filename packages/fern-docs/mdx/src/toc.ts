@@ -47,7 +47,8 @@ type HastNode = Hast.RootContent | Hast.Root | Hast.Doctype;
 // TODO: add tests for this function
 export function makeToc(
   tree: Root,
-  isTocDefaultEnabled = false
+  isTocDefaultEnabled = false,
+  maxDepth?: number
 ): TableOfContentsItem[] {
   const headings: FoundHeading[] = [];
 
@@ -163,7 +164,7 @@ export function makeToc(
           });
         });
       } catch (e) {
-        console.error(e);
+        console.error(`[make-toc:tabs-group] ${JSON.stringify(e)}`);
       }
     }
 
@@ -193,8 +194,42 @@ export function makeToc(
           });
         });
       } catch (e) {
-        console.error(e);
+        console.error(`[make-toc:accordion-group] ${JSON.stringify(e)}`);
       }
+    }
+
+    if (isMdxJsxElementHast(node) && node.name === "ParamField") {
+      const attributes = node.attributes.filter(isMdxJsxAttribute);
+      const tocAttr = attributes.find((attr) => attr.name === "toc");
+      const isTocEnabled =
+        hastGetBooleanValue(tocAttr?.value) ?? isTocDefaultEnabled;
+
+      if (!isTocEnabled) {
+        return;
+      }
+
+      // id attribute (set by rehype-slug plugin)
+      const idAttr = attributes.find((attr) => attr.name === "id")?.value;
+      if (idAttr == null || typeof idAttr !== "string") {
+        return;
+      }
+
+      // title attribute (set by rehype-param-field plugin)
+      const titleAttr = attributes.find((attr) => attr.name === "title")?.value;
+      if (
+        titleAttr == null ||
+        typeof titleAttr !== "string" ||
+        titleAttr.trim().length === 0
+      ) {
+        return;
+      }
+
+      headings.push({
+        depth: 6,
+        id: idAttr,
+        title: titleAttr,
+        featureFlags: findFlag(parents),
+      });
     }
 
     return;
@@ -203,17 +238,23 @@ export function makeToc(
   visitParents(tree, visitor);
 
   const minDepth = Math.min(...headings.map((heading) => heading.depth));
-  return makeTree(headings, minDepth);
+  return makeTree(headings, minDepth, maxDepth);
 }
 
 function makeTree(
   headings: FoundHeading[],
-  depth: number = 1
+  depth: number = 1,
+  maxDepth?: number
 ): TableOfContentsItem[] {
   const tree: TableOfContentsItem[] = [];
 
-  while (headings.length > 0) {
-    const firstToken = headings[0];
+  const filteredHeadings =
+    maxDepth != null
+      ? headings.filter((heading) => heading.depth <= maxDepth)
+      : headings;
+
+  while (filteredHeadings.length > 0) {
+    const firstToken = filteredHeadings[0];
     if (!firstToken) {
       break;
     }
@@ -224,17 +265,17 @@ function makeTree(
     }
 
     if (firstToken.depth === depth) {
-      const token = headings.shift();
+      const token = filteredHeadings.shift();
       if (token != null) {
         tree.push({
           simpleString: token.title.trim(),
           anchorString: token.id.trim(),
-          children: makeTree(headings, depth + 1),
+          children: makeTree(filteredHeadings, depth + 1),
           featureFlags: token.featureFlags,
         });
       }
     } else {
-      tree.push(...makeTree(headings, depth + 1));
+      tree.push(...makeTree(filteredHeadings, depth + 1));
     }
   }
 

@@ -1,19 +1,18 @@
 import { compact } from "es-toolkit/array";
 import { pick } from "es-toolkit/object";
 
+import { FernUser } from "@fern-api/docs-auth";
 import type {
   ObjectProperty,
   WebSocketContext,
 } from "@fern-api/fdr-sdk/api-definition";
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
-import { FernUser } from "@fern-docs/auth";
 
 import { PlaygroundWebSocketRequestFormState } from "../types";
 import {
   getEmptyValueForObjectProperties,
   getEmptyValueForType,
 } from "./default-values";
-import { pascalCaseHeaderKeys } from "./header-key-case";
 
 export function getInitialWebSocketRequestFormState(
   context: WebSocketContext,
@@ -24,23 +23,13 @@ export function getInitialWebSocketRequestFormState(
   return {
     type: "websocket",
     headers: {
-      ...pascalCaseHeaderKeys(
-        getEmptyValueForObjectProperties(
-          compact([
-            context.globalHeaders,
-            context.channel.requestHeaders,
-          ]).flat(),
-          context.types ?? EMPTY_OBJECT
-        )
+      ...getEmptyValueForObjectProperties(
+        compact([context.globalHeaders, context.channel.requestHeaders]).flat(),
+        context.types ?? EMPTY_OBJECT
       ),
-      ...pascalCaseHeaderKeys(
-        filterParams(
-          playgroundInitialState?.headers ?? {},
-          compact([
-            context.globalHeaders,
-            context.channel.requestHeaders,
-          ]).flat()
-        )
+      ...filterParams(
+        playgroundInitialState?.headers ?? {},
+        compact([context.globalHeaders, context.channel.requestHeaders]).flat()
       ),
     },
     pathParameters: {

@@ -9,6 +9,7 @@ import { DocsSiteNavBarItem } from "./DocsSiteNavBarItem";
 
 export declare namespace DocsSiteNavBar {
   export interface Props {
+    orgName: string;
     featureFlags: PosthogFeatureFlags;
   }
 }
@@ -24,7 +25,7 @@ export function DocsSiteNavBar({ featureFlags }: DocsSiteNavBar.Props) {
         <DocsSiteNavBarItem title="Analytics" href="analytics" />
       </FeatureFlaggedClientSide>
       <FeatureFlaggedClientSide
-        flag={PosthogFeatureFlag.ENABLE_DOCS_ANALYTICS_TAB}
+        flag={PosthogFeatureFlag.ENABLE_DOCS_AI_SEARCH_TAB}
         featureFlags={featureFlags}
       >
         <DocsSiteNavBarItem title="AI Search" href="ai-search" />

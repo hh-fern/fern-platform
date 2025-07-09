@@ -54,46 +54,107 @@ export function hasInternalTypeReference(
   });
 }
 
+export type PropertyLocation = "request" | "response";
+
 export const TypeReferenceDefinitions = React.memo(
   function TypeReferenceDefinitions({
     shape,
     types,
+    location,
+    additionalProperties,
   }: {
     shape: ApiDefinition.TypeShapeOrReference;
     types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    location?: PropertyLocation;
+    additionalProperties?: ApiDefinition.ObjectProperty[];
   }) {
     switch (shape.type) {
       case "id":
-        return <TypeDefinitionSlot id={shape.id} />;
+        if (additionalProperties) {
+          const newTypeShape = types[shape.id]?.shape;
+          if (newTypeShape && newTypeShape.type === "object") {
+            const updatedShape = {
+              ...newTypeShape,
+              properties: [
+                ...(additionalProperties ?? []),
+                ...(newTypeShape.properties ?? []),
+              ],
+            };
+            return (
+              <TypeReferenceDefinitions
+                shape={updatedShape}
+                types={types}
+                location={location}
+              />
+            );
+          }
+        }
+        return <TypeDefinitionSlot id={shape.id} location={location} />;
       case "object":
       case "enum":
       case "primitive":
       case "undiscriminatedUnion":
       case "discriminatedUnion":
-        return <InternalTypeDefinition shape={shape} types={types} />;
+        return (
+          <InternalTypeDefinition
+            shape={shape}
+            types={types}
+            location={location}
+            additionalProperties={additionalProperties}
+          />
+        );
       case "list":
       case "set":
         return (
           <TypeDefinitionPathPart part={{ type: "listItem" }}>
-            <TypeReferenceDefinitions shape={shape.itemShape} types={types} />
+            <TypeReferenceDefinitions
+              shape={shape.itemShape}
+              types={types}
+              location={location}
+              additionalProperties={additionalProperties}
+            />
           </TypeDefinitionPathPart>
         );
       case "map":
         return (
           <TypeDefinitionPathPart part={{ type: "objectProperty" }}>
-            <TypeReferenceDefinitions shape={shape.keyShape} types={types} />
-            <TypeReferenceDefinitions shape={shape.valueShape} types={types} />
+            <TypeReferenceDefinitions
+              shape={shape.keyShape}
+              types={types}
+              location={location}
+              additionalProperties={additionalProperties}
+            />
+            <TypeReferenceDefinitions
+              shape={shape.valueShape}
+              types={types}
+              location={location}
+              additionalProperties={additionalProperties}
+            />
           </TypeDefinitionPathPart>
         );
       case "literal":
       case "unknown":
         return null;
       case "alias": {
-        return <TypeReferenceDefinitions shape={shape.value} types={types} />;
+        return (
+          <TypeReferenceDefinitions
+            shape={shape.value}
+            types={types}
+            location={location}
+            additionalProperties={additionalProperties}
+          />
+        );
       }
       case "optional":
       case "nullable": {
-        return <TypeReferenceDefinitions shape={shape.shape} types={types} />;
+        return (
+          <TypeReferenceDefinitions
+            shape={shape.shape}
+            types={types}
+            location={location}
+            additionalProperties={additionalProperties}
+          />
+        );
       }
       default:
         throw new UnreachableCaseError(shape);

@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --radius: 0.625rem;
+@theme {
+  --spacing: 0.25rem;
+  --radius: 0.25rem;
   --background: oklch(1 0 0);
   --foreground: var(--gray-1200);
   --card: oklch(1 0 0);
@@ -198,10 +200,6 @@
 }
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -307,4 +305,12 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.noise {
+  z-index: 1;
+  opacity: 1;
+  background-image: url(https://cdn.prod.website-files.com/67880ff570cdb1a85eee946f/6789751936e0c7bd371e8cf2_noise-full.webp);
+  background-position: 5px 0;
+  background-size: 5rem 10rem;
 }

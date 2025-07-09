@@ -4,12 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { uniqBy } from "es-toolkit/array";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { slugToHref } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish } from "@fern-api/ui-core-utils";
-import { slugToHref } from "@fern-docs/utils";
 
-import { createCachedDocsLoader } from "@/server/docs-loader";
+import { generateHtml } from "@/app/utils";
 import { getMarkdownForPath } from "@/server/getMarkdownForPath";
 import { getSectionRoot } from "@/server/getSectionRoot";
 
@@ -23,10 +24,18 @@ export async function GET(
 
   const path = slugToHref(req.nextUrl.searchParams.get("slug") ?? "");
 
-  return new NextResponse(await getLlmsFullTxt(host, domain, path), {
+  const content = await getLlmsFullTxt(host, domain, path);
+
+  const html = await generateHtml({
+    host,
+    domain,
+    content,
+  });
+
+  return new NextResponse(html, {
     status: 200,
     headers: {
-      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Type": "text/html; charset=utf-8",
       "X-Robots-Tag": "noindex",
       "Cache-Control": "s-maxage=60",
     },

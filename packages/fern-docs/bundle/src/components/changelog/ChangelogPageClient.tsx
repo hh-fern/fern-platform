@@ -5,23 +5,23 @@ import React, { Fragment, ReactElement, useEffect, useMemo } from "react";
 import { chunk } from "es-toolkit/array";
 import { useAtomValue } from "jotai";
 
+import { slugToHref } from "@fern-api/docs-utils";
 import type { FernNavigation } from "@fern-api/fdr-sdk";
 import { EMPTY_ARRAY } from "@fern-api/ui-core-utils";
 import { Badge } from "@fern-docs/components";
-import { slugToHref } from "@fern-docs/utils";
+import { FernLink } from "@fern-docs/components/FernLink";
+import { Separator } from "@fern-docs/components/Separator";
+import { useCurrentAnchor } from "@fern-docs/components/hooks/use-anchor";
+import { AsideAwareDiv } from "@fern-docs/components/layouts/AsideAwareDiv";
+import { TableOfContentsLayout } from "@fern-docs/components/layouts/TableOfContentsLayout";
+import { SetLayout } from "@fern-docs/components/state/layout";
+import { SCROLL_BODY_ATOM } from "@fern-docs/components/state/viewport";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 
-import { FernLink } from "@/components/FernLink";
-import { Separator } from "@/components/Separator";
 import { HideBuiltWithFern } from "@/components/built-with-fern";
-import { useCurrentAnchor } from "@/hooks/use-anchor";
-import { SetLayout } from "@/state/layout";
-import { SCROLL_BODY_ATOM } from "@/state/viewport";
+import { FooterLayout } from "@/components/layouts/FooterLayout";
 
 import { BottomNavigationClient } from "../bottom-nav-client";
-import { AsideAwareDiv } from "../layouts/AsideAwareDiv";
-import { FooterLayout } from "../layouts/FooterLayout";
-import { TableOfContentsLayout } from "../layouts/TableOfContentsLayout";
 import { ChangelogContentLayout } from "./ChangelogContentLayout";
 
 function flattenChangelogEntries(
@@ -39,11 +39,13 @@ export default function ChangelogPageClient({
   anchorIds,
   overview,
   entries,
+  isFullPage,
 }: {
   node: FernNavigation.ChangelogNode;
   anchorIds: Record<string, FernNavigation.PageId>;
   overview: React.ReactNode;
   entries: Record<string, React.ReactNode>;
+  isFullPage: boolean;
 }): ReactElement<any> {
   const flattenedEntries = useMemo(() => flattenChangelogEntries(node), [node]);
   const chunkedEntries = useMemo(
@@ -146,7 +148,7 @@ export default function ChangelogPageClient({
         hideTableOfContents={true}
       />
       {/* TODO(cd): treat as a guide for now, update for large-screen changelog */}
-      <AsideAwareDiv className="fern-layout-changelog">
+      <AsideAwareDiv className="fern-layout-changelog" isFullPage={isFullPage}>
         <article className="max-w-full">
           <SetLayout value="guide" />
           <HideBuiltWithFern>

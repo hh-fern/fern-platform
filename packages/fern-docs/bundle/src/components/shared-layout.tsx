@@ -2,16 +2,20 @@ import "server-only";
 
 import React from "react";
 
+import { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { cn } from "@fern-docs/components";
+import { NavbarLinks } from "@fern-docs/components/header/NavbarLinks";
+import { SidebarContainer } from "@fern-docs/components/sidebar/SidebarContainer";
+
 import { Announcement } from "@/components/header/Announcement";
 import { HeaderContent } from "@/components/header/HeaderContent";
-import { NavbarLinks } from "@/components/header/NavbarLinks";
-import { SidebarContainer } from "@/components/sidebar/SidebarContainer";
 import { ThemedDocs } from "@/components/themes/ThemedDocs";
 import { setMdxSerializer } from "@/context/MdxSerializerContext";
 import { MdxServerComponent } from "@/mdx/components/server-component";
-import { DocsLoader } from "@/server/docs-loader";
-import { isLocal } from "@/server/isLocal";
 import { createCachedMdxSerializer } from "@/server/mdx-serializer";
+import { SearchV2Trigger } from "@/state/search";
 
 import { LoginButton } from "./login-button";
 
@@ -20,6 +24,7 @@ export default async function SharedLayout({
   headertabs,
   sidebar,
   versionSelect,
+  productSelect,
   loader,
   logo,
 }: {
@@ -27,21 +32,27 @@ export default async function SharedLayout({
   headertabs: React.ReactNode;
   sidebar?: React.ReactNode;
   versionSelect: React.ReactNode;
+  productSelect: React.ReactNode;
   loader: DocsLoader;
   logo: React.ReactNode;
 }) {
-  const isLocalEnvironment = isLocal();
+  const isLocalEnvironment = isLocal() || isSelfHosted();
   const serialize = createCachedMdxSerializer(loader);
   setMdxSerializer(serialize);
 
-  const [config, edgeFlags, colors, layout] = await Promise.all([
+  const [config, edgeFlags, colors, layout, root] = await Promise.all([
     loader.getConfig(),
     loader.getEdgeFlags(),
     loader.getColors(),
     loader.getLayout(),
+    loader.getRoot(),
   ]);
   const theme = edgeFlags.isCohereTheme ? "cohere" : "default";
   const announcementText = config.announcement?.text;
+
+  const hasProductsOrVersions =
+    root.child.type === "productgroup" || root.child.type === "versioned";
+  const showHeaderInSidebar = layout.isHeaderDisabled;
 
   return (
     <ThemedDocs
@@ -81,7 +92,14 @@ export default async function SharedLayout({
           className="max-w-page-width mx-auto"
           logo={<React.Suspense fallback={null}>{logo}</React.Suspense>}
           versionSelect={
-            <React.Suspense fallback={null}>{versionSelect}</React.Suspense>
+            <React.Suspense fallback={null} key="version-select-1">
+              {versionSelect}
+            </React.Suspense>
+          }
+          productSelect={
+            <React.Suspense fallback={null} key="product-select-1">
+              {productSelect}
+            </React.Suspense>
           }
           showSearchBar={layout.searchbarPlacement === "HEADER"}
           navbarLinks={<NavbarLinks loader={loader} />}
@@ -95,7 +113,13 @@ export default async function SharedLayout({
               />
             </React.Suspense>
           }
+          forceHeader={edgeFlags.isCohereTheme}
         />
+      }
+      productSelect={
+        <React.Suspense fallback={null} key="product-select-2">
+          {productSelect}
+        </React.Suspense>
       }
       tabs={headertabs}
       showSearchBarInTabs={layout.searchbarPlacement === "HEADER_TABS"}
@@ -103,9 +127,16 @@ export default async function SharedLayout({
         <SidebarContainer
           logo={<React.Suspense fallback={null}>{logo}</React.Suspense>}
           showSearchBar={layout.searchbarPlacement === "SIDEBAR"}
-          showHeaderInSidebar={layout.isHeaderDisabled}
+          showHeaderInSidebar={showHeaderInSidebar}
+          productSelect={
+            <React.Suspense fallback={null} key="product-select-3">
+              {productSelect}
+            </React.Suspense>
+          }
           versionSelect={
-            <React.Suspense fallback={null}>{versionSelect}</React.Suspense>
+            <React.Suspense fallback={null} key="version-select-3">
+              {versionSelect}
+            </React.Suspense>
           }
           navbarLinks={
             <React.Suspense fallback={null}>
@@ -121,9 +152,28 @@ export default async function SharedLayout({
               />
             </React.Suspense>
           }
+          searchBar={
+            <SearchV2Trigger
+              aria-label="Search"
+              className={cn(
+                "w-full overflow-hidden",
+                !showHeaderInSidebar && "mt-3 lg:mt-2",
+                {
+                  "mt-3": showHeaderInSidebar && hasProductsOrVersions,
+                }
+              )}
+              isSearchInSidebar={true}
+            />
+          }
         >
           {sidebar}
         </SidebarContainer>
+      }
+      hasProductsOrVersions={hasProductsOrVersions}
+      versionSelect={
+        <React.Suspense fallback={null} key="version-select-2">
+          {versionSelect}
+        </React.Suspense>
       }
     >
       {children}

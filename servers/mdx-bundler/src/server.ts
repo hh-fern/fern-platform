@@ -1,51 +1,49 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
 
-import { serializeTwoslash } from "./serialize";
+import { serializeTwoslash } from "./serialize.js";
 
-const expressApp = express();
+const app = express();
 
-expressApp.use(cors());
-expressApp.use(express.json());
+app.use(cors());
+app.use(express.json());
 
-// serializes codeblocks using shiki + twoslash
-expressApp.post("/serialize", (req: Request, res: Response) => {
-  if (!req.body.code) {
-    return res.status(400).json({ error: "No code provided" });
-  }
+const asyncHandler =
+  (
+    fn: (
+      req: Request,
+      res: Response,
+      next: (err?: unknown) => void
+    ) => Promise<unknown>
+  ) =>
+  (req: Request, res: Response, next: (err?: unknown) => void) => {
+    void Promise.resolve(fn(req, res, next)).catch(next);
+  };
 
-  serializeTwoslash(req.body.code)
-    .then((result) => {
-      if (!result) {
-        return res.status(400).json({ error: "Failed to serialize MDX" });
-      }
-      return res.json(result);
-    })
-    .catch((error: unknown) => {
-      console.error("Error serializing MDX:", error);
-      return res.status(500).json({ error: "Failed to serialize MDX" });
-    });
-});
-
-expressApp.all("*", (_req: Request, res: Response) => {
+app.get("/health", (_req: Request, res: Response) => {
   res.sendStatus(200);
 });
 
-expressApp.listen(8080);
+app.post(
+  "/serialize",
+  asyncHandler(async (req: Request, res: Response) => {
+    if (!req.body.code) {
+      res.status(400).json({ error: "No code provided" });
+      return;
+    }
 
-/*
-curl -X POST \
-  http://localhost:8080/serialize \
-  -H "Content-Type: application/json" \
-  -d '{"code":"```ts twoslash\nconst hi = \"Hello\";\nconst msg = `${hi}, world`;\n//    ^?\n```"}'
-  
-curl -X POST \
-  https://mdx-bundler-dev2.buildwithfern.com/serialize \
-  -H "Content-Type: application/json" \
-  -d '{"code":"```ts twoslash\n// alchemy-specific twoslash code block\nimport { createAlchemySmartAccountClient } from \"@account-kit/infra\";\nconst client = createAlchemySmartAccountClient({\n// configuration\n});\n```"}'
-  
-curl -X POST \
-  http://localhost:8080/serialize \
-  -H "Content-Type: application/json" \
-  -d '{"code":"```ts twoslash\n// alchemy-specific twoslash code block\nimport { createAlchemySmartAccountClient } from \"@account-kit/infra\";\nconst client = createAlchemySmartAccountClient({\n// configuration\n});\n```"}'
-*/
+    try {
+      const result = await serializeTwoslash(req.body.code);
+      if (!result) {
+        res.status(400).json({ error: "Failed to serialize MDX" });
+        return;
+      }
+      res.json(result);
+    } catch (error: unknown) {
+      console.error("Error serializing MDX:", error);
+      res.status(500).json({ error: "Failed to serialize MDX" });
+    }
+  })
+);
+
+app.listen(8080);

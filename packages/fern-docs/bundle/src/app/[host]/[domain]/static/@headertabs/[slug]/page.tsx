@@ -1,10 +1,10 @@
 import "server-only";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { getHeaderTabs } from "@fern-api/docs-server/handle-node-fallbacks";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
-
-import { HeaderTabsList } from "@/components/header/HeaderTabsList";
-import { createCachedDocsLoader } from "@/server/docs-loader";
+import { HeaderTabsList } from "@fern-docs/components/HeaderTabsList";
 
 export default async function HeaderTabsPage({
   params,
@@ -13,21 +13,21 @@ export default async function HeaderTabsPage({
 }) {
   const { host, domain, slug } = await params;
   const loader = await createCachedDocsLoader(host, domain);
-  const rootPromise = loader.getRoot();
   const layout = await loader.getLayout();
 
   if (layout.tabsPlacement !== "HEADER") {
     return null;
   }
 
-  const findNode = FernNavigation.utils.findNode(
-    await rootPromise,
-    slugjoin(slug)
-  );
+  const root = await loader.getRoot();
 
-  if (findNode.type !== "found") {
+  const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));
+
+  const tabs = getHeaderTabs(foundNode, root, slug);
+
+  if (tabs == null) {
     return null;
   }
 
-  return <HeaderTabsList tabs={findNode.tabs} />;
+  return <HeaderTabsList tabs={tabs} />;
 }

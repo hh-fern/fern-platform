@@ -3,13 +3,14 @@ import "server-only";
 import React from "react";
 
 import type { FernNavigation } from "@fern-api/fdr-sdk";
+import { FernLink } from "@fern-docs/components/FernLink";
 
 import { MdxServerComponent } from "@/mdx/components/server-component";
 import { MdxSerializer } from "@/server/mdx-serializer";
 
 import { FernBreadcrumbs } from "./FernBreadcrumbs";
-import { FernLink } from "./FernLink";
 import { PageActionsDropdown } from "./PageActionsDropdown";
+import { RSSFeedButton } from "./RSSFeedButton";
 
 export function PageHeader({
   slug,
@@ -23,6 +24,7 @@ export function PageHeader({
   children,
   markdown,
   includeDropdown,
+  showRssFeedButton,
 }: {
   slug: string;
   serialize: MdxSerializer;
@@ -35,6 +37,7 @@ export function PageHeader({
   children?: React.ReactNode;
   markdown?: string;
   includeDropdown?: boolean;
+  showRssFeedButton?: boolean;
 }) {
   return (
     <header className="my-8 space-y-2">
@@ -45,7 +48,7 @@ export function PageHeader({
       )}
 
       <WithAction action={action}>
-        <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-row items-center justify-between gap-2">
           <div className="flex flex-row items-center gap-4">
             {titleHref == null ? (
               <h1 className="fern-page-heading text-balance break-words">
@@ -71,6 +74,11 @@ export function PageHeader({
           {includeDropdown && markdown && (
             <div className="hidden md:flex">
               <PageActionsDropdown markdown={markdown} />
+            </div>
+          )}
+          {showRssFeedButton && (
+            <div className="hidden md:flex">
+              <RSSFeedButton />
             </div>
           )}
         </div>

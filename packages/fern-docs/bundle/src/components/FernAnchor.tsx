@@ -8,14 +8,14 @@ import { Check, Link2 } from "lucide-react";
 import { AnimatePresence, LazyMotion, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 
+import { FernLink } from "@fern-docs/components/FernLink";
 import { useCopyToClipboard } from "@fern-ui/react-commons";
-
-import { FernLink } from "./FernLink";
 
 interface FernAnchorProps {
   href: string;
   sideOffset?: number;
   asChild?: boolean;
+  fullTarget?: boolean;
 }
 
 const DisableFernAnchorCtx = React.createContext<boolean>(false);
@@ -37,6 +37,7 @@ export function FernAnchor({
   sideOffset = 12,
   children,
   asChild = false,
+  fullTarget = false,
 }: React.PropsWithChildren<FernAnchorProps>) {
   const isDisabled = useIsFernAnchorDisabled();
   const { copyToClipboard, wasJustCopied } = useCopyToClipboard(() =>
@@ -57,6 +58,10 @@ export function FernAnchor({
     setIsMounted(undefined);
   };
 
+  const handleClick = () => {
+    void copyToClipboard?.();
+  };
+
   if (isDisabled) {
     return <>{children}</>;
   }
@@ -64,7 +69,13 @@ export function FernAnchor({
   return (
     <Tooltip.Provider>
       <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild={asChild}>{children}</Tooltip.Trigger>
+        <Tooltip.Trigger
+          asChild={asChild}
+          style={fullTarget ? { cursor: "pointer" } : undefined}
+          onClick={fullTarget ? handleClick : undefined}
+        >
+          {children}
+        </Tooltip.Trigger>
         <Tooltip.Portal forceMount={forceMount}>
           <Tooltip.Content
             sideOffset={sideOffset}
@@ -77,9 +88,7 @@ export function FernAnchor({
               shallow={true}
               scroll={false}
               replace={true}
-              onClick={() => {
-                void copyToClipboard?.();
-              }}
+              onClick={handleClick}
               tabIndex={-1}
             >
               {!wasJustCopied && !forceMount && (

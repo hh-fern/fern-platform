@@ -1,18 +1,19 @@
 import React from "react";
 
 import { cn } from "@fern-docs/components";
+import { FernLink } from "@fern-docs/components/FernLink";
+import { NoZoom } from "@fern-docs/components/contexts/NoZoom";
 
 import { DisableFernAnchor, FernAnchor } from "@/components/FernAnchor";
-import { FernLink } from "@/components/FernLink";
 
-import { NoZoom, isImageElement } from "./image";
+import { isImageElement } from "./image";
 
 export const HeadingRenderer = (
   level: number,
   props: React.ComponentProps<"h1">
 ) => {
   return (
-    <FernAnchor href={`#${props.id}`} asChild>
+    <FernAnchor href={`#${props.id}`} asChild fullTarget>
       {React.createElement(`h${level}`, props)}
     </FernAnchor>
   );

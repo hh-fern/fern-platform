@@ -5916,7 +5916,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode filters={\"string\":\"string\"}",
+                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"filters[string]=string\"",
                   "generated": true
                 }
               ],
@@ -5969,7 +5969,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode filters={\"string\":\"string\"}",
+                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"filters[string]=string\"",
                   "generated": true
                 }
               ],
@@ -46040,7 +46040,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode filters={\"string\":\"string\"}",
+                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"filters[string]=string\"",
                   "generated": true
                 }
               ]
@@ -46072,7 +46072,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode filters={\"string\":\"string\"}",
+                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"filters[string]=string\"",
                   "generated": true
                 }
               ]
@@ -86033,7 +86033,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode filters={\"string\":\"string\"}",
+                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"filters[string]=string\"",
                   "generated": true
                 }
               ],
@@ -86086,7 +86086,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode filters={\"string\":\"string\"}",
+                  "code": "curl -G https://app.polytomic.com/api/bulk/syncs/:id/schemas \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"filters[string]=string\"",
                   "generated": true
                 }
               ],
@@ -91812,7 +91812,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -91870,7 +91870,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -91925,7 +91925,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -91980,7 +91980,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -92035,7 +92035,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/enrichment-source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -95899,7 +95899,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -95957,7 +95957,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -96012,7 +96012,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -96067,7 +96067,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -96122,7 +96122,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -96412,7 +96412,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -96470,7 +96470,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -96525,7 +96525,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -96580,7 +96580,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],
@@ -96635,7 +96635,7 @@
               "curl": [
                 {
                   "language": "curl",
-                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     --data-urlencode params={\"string\":[\"string\"]}",
+                  "code": "curl -G https://app.polytomic.com/api/connections/:id/modelsync/source/fields \\\n     -H \"X-Polytomic-Version: string\" \\\n     -H \"Authorization: Bearer <token>\" \\\n     -d \"params[string]=string\"",
                   "generated": true
                 }
               ],

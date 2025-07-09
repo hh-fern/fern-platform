@@ -6,16 +6,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { Feed, Item } from "feed";
 import urlJoin from "url-join";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { FernNextResponse } from "@fern-api/docs-server/FernNextResponse";
+import { preferPreview } from "@fern-api/docs-server/auth/origin";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import {
+  COOKIE_FERN_TOKEN,
+  getRedirectForPath,
+  slugToHref,
+} from "@fern-api/docs-utils";
+import { FileData } from "@fern-api/docs-utils/types/file-data";
 import type { DocsV1Read } from "@fern-api/fdr-sdk/client/types";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { NodeCollector } from "@fern-api/fdr-sdk/navigation";
 import { assertNever, withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { getFrontmatter } from "@fern-docs/mdx";
-import { COOKIE_FERN_TOKEN, slugToHref } from "@fern-docs/utils";
-
-import { createCachedDocsLoader } from "@/server/docs-loader";
-import { isLocal } from "@/server/isLocal";
-import { FileData } from "@/server/types";
+import { getEdgeFlags } from "@fern-docs/edge-config";
+import { getFrontmatter, mdxToHtml } from "@fern-docs/mdx";
 
 const FORMATS = ["rss", "atom", "json"] as const;
 type Format = (typeof FORMATS)[number];
@@ -24,7 +31,7 @@ export async function GET(
   req: NextRequest,
   props: { params: Promise<{ host: string; domain: string }> }
 ): Promise<NextResponse> {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return new NextResponse(
       "changelog is not accessible in local preview mode",
       {
@@ -40,17 +47,49 @@ export async function GET(
 
   const fernToken = (await cookies()).get(COOKIE_FERN_TOKEN)?.value;
 
+  const redirect = await checkRedirect(
+    host,
+    domain,
+    req.nextUrl.pathname,
+    fernToken
+  );
+  if (redirect) {
+    const nextUrl = req.nextUrl.clone();
+    nextUrl.host = preferPreview(host, domain);
+    nextUrl.pathname = redirect.destination;
+    nextUrl.search = "";
+    return FernNextResponse.redirect(req, {
+      destination: nextUrl,
+      allowedDestinations: [withDefaultProtocol(preferPreview(host, domain))],
+    });
+  }
+
+  const accessHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
   if (format === "json") {
     return new NextResponse(await getJsonFeed(host, domain, path, fernToken), {
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...accessHeaders,
+      },
     });
   } else if (format === "atom") {
     return new NextResponse(await getAtomFeed(host, domain, path, fernToken), {
-      headers: { "Content-Type": "application/atom+xml" },
+      headers: {
+        "Content-Type": "application/atom+xml",
+        ...accessHeaders,
+      },
     });
   } else {
     return new NextResponse(await getRssFeed(host, domain, path, fernToken), {
-      headers: { "Content-Type": "application/rss+xml" },
+      headers: {
+        "Content-Type": "application/rss+xml",
+        ...accessHeaders,
+      },
     });
   }
 }
@@ -140,7 +179,7 @@ async function createFeed(
               await toFeedItem(entry, domain, (id) => loader.getPage(id), files)
             );
           } catch (e) {
-            console.error(e);
+            console.error(`[changelog:to-feed] ${JSON.stringify(e)}`);
             // TODO: sentry
           }
         });
@@ -178,11 +217,13 @@ async function toFeedItem(
   try {
     const { markdown } = await getPage(entry.pageId);
     const { data: frontmatter, content } = getFrontmatter(markdown);
+    if (frontmatter.title) {
+      item.title = frontmatter.title;
+    }
     item.description =
       frontmatter.description ?? frontmatter.subtitle ?? frontmatter.excerpt;
 
-    // TODO: content should be converted into HTML markup
-    item.content = content;
+    item.content = mdxToHtml(content).html;
 
     let image: string | undefined;
 
@@ -198,7 +239,7 @@ async function toFeedItem(
       item.image = { url: image };
     }
   } catch (e) {
-    console.error(e);
+    console.error(`[changlelog:to-feed-item] ${JSON.stringify(e)}`);
     // TODO: sentry
   }
   return item;
@@ -224,4 +265,36 @@ function validateExternalUrl(url: string): void {
   if (!url.startsWith("https://")) {
     throw new Error(`Invalid external URL: ${url}`);
   }
+}
+
+// hack: since redirects are handled in shared-page.tsx,
+// this catches the any redirects specifically for changelogs
+async function checkRedirect(
+  host: string,
+  domain: string,
+  path: string,
+  fernToken?: string
+): Promise<{ destination: string; permanent: boolean } | undefined> {
+  const checkForRedirects = (await getEdgeFlags(domain)).isChangelogRedirects;
+
+  if (!checkForRedirects) {
+    return undefined;
+  }
+
+  const loader = await createCachedDocsLoader(host, domain, fernToken);
+  const redirects = (await loader.getConfig()).redirects;
+  const { basePath } = await loader.getMetadata();
+
+  const jsonRedirects = redirects?.filter(
+    (redirect) =>
+      redirect.source.endsWith(".json") ||
+      redirect.source.endsWith(".atom") ||
+      redirect.source.endsWith(".rss")
+  );
+
+  return getRedirectForPath(
+    path,
+    { domain: domain, basePath: basePath },
+    jsonRedirects
+  );
 }

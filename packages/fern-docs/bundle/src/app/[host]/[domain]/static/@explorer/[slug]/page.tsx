@@ -1,18 +1,17 @@
 import "server-only";
 
-import { Metadata } from "next";
 import { RedirectType, redirect } from "next/navigation";
 import React from "react";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { conformTrailingSlash } from "@fern-api/docs-utils";
+import { conformExplorerRoute } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
-import { conformTrailingSlash } from "@fern-docs/utils";
 
 import {
   ExplorerContent,
   NoEndpointSelected,
 } from "@/components/playground/ExplorerContent";
-import { conformExplorerRoute } from "@/components/playground/utils/explorer-route";
-import { createCachedDocsLoader } from "@/server/docs-loader";
 
 export default async function ExplorerPage({
   params,
@@ -22,10 +21,6 @@ export default async function ExplorerPage({
   const { host, domain, slug: slugProp } = await params;
 
   const slug = FernNavigation.slugjoin(slugProp);
-
-  console.debug(
-    `[${domain}] Loading intercepted API Explorer page for ${slug}`
-  );
 
   const loader = await createCachedDocsLoader(host, domain);
   const root = await loader.getRoot();
@@ -49,22 +44,4 @@ export default async function ExplorerPage({
   const node = found.node;
 
   return <ExplorerContent loader={loader} node={node} />;
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ host: string; domain: string; slug: string }>;
-}): Promise<Metadata> {
-  const { host, domain, slug: slugProp } = await params;
-  const slug = FernNavigation.slugjoin(slugProp);
-  const loader = await createCachedDocsLoader(host, domain);
-  const root = await loader.getRoot();
-  const found = FernNavigation.utils.findNode(root, slug);
-  if (found.type !== "found") {
-    return {};
-  }
-  return {
-    title: `${found.node.title} (API Explorer)`,
-  };
 }

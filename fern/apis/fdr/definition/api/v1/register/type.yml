@@ -12,6 +12,7 @@ types:
     properties:
       name: string
       shape: TypeShape
+      displayName: optional<string>
 
   TypeShape:
     union:
@@ -26,6 +27,7 @@ types:
       id: TypeReferenceId
       primitive: PrimitiveType
       optional: OptionalType
+      nullable: NullableType
       list: ListType
       set: SetType
       map: MapType
@@ -54,6 +56,13 @@ types:
     properties:
       key: rootCommons.PropertyKey
       valueType: TypeReference
+      propertyAccess: optional<ObjectPropertyAccess>
+
+  ObjectPropertyAccess:
+    enum:
+      - READ_ONLY
+      - WRITE_ONLY
+
 
   PrimitiveType:
     union:
@@ -126,6 +135,10 @@ types:
       itemType: TypeReference
       defaultValue: optional<unknown>
 
+  NullableType:
+    properties:
+      itemType: TypeReference
+
   ListType:
     properties:
       itemType: TypeReference
@@ -162,6 +175,7 @@ types:
     properties:
       typeName: optional<string>
       type: TypeReference
+      displayName: optional<string>
 
   DiscriminatedUnionType:
     properties:

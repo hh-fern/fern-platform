@@ -43,6 +43,7 @@ const endpoint1: Latest.EndpointDefinition = {
       },
       description: undefined,
       availability: undefined,
+      propertyAccess: undefined,
     },
   ],
   requestHeaders: undefined,
@@ -87,6 +88,7 @@ const endpoint2: Latest.EndpointDefinition = {
       },
       description: undefined,
       availability: undefined,
+      propertyAccess: undefined,
     },
   ],
   responseHeaders: undefined,
@@ -154,6 +156,7 @@ const type1: Latest.TypeDefinition = {
     type: "alias",
     value: PRIMITIVE_SHAPE,
   },
+  displayName: undefined,
 };
 
 const type2: Latest.TypeDefinition = {
@@ -164,6 +167,7 @@ const type2: Latest.TypeDefinition = {
     type: "alias",
     value: PRIMITIVE_SHAPE,
   },
+  displayName: undefined,
 };
 
 const type3: Latest.TypeDefinition = {
@@ -174,6 +178,7 @@ const type3: Latest.TypeDefinition = {
     type: "alias",
     value: PRIMITIVE_SHAPE,
   },
+  displayName: undefined,
 };
 
 const type4: Latest.TypeDefinition = {
@@ -184,6 +189,7 @@ const type4: Latest.TypeDefinition = {
     type: "alias",
     value: PRIMITIVE_SHAPE,
   },
+  displayName: undefined,
 };
 
 const authScheme: Latest.AuthScheme = {
@@ -218,6 +224,7 @@ const api1: Latest.ApiDefinition = {
       },
       description: undefined,
       availability: undefined,
+      propertyAccess: undefined,
     },
   ],
   snippetsConfiguration: undefined,
@@ -251,6 +258,7 @@ const api2: Latest.ApiDefinition = {
       },
       description: undefined,
       availability: undefined,
+      propertyAccess: undefined,
     },
   ],
   snippetsConfiguration: undefined,
@@ -282,6 +290,7 @@ const api3: Latest.ApiDefinition = {
       },
       description: undefined,
       availability: undefined,
+      propertyAccess: undefined,
     },
   ],
   snippetsConfiguration: undefined,
@@ -315,6 +324,7 @@ describe("join", () => {
         },
         description: undefined,
         availability: undefined,
+        propertyAccess: undefined,
       },
     ]);
   });

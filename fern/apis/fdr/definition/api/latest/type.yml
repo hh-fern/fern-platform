@@ -19,7 +19,8 @@ types:
     properties:
       name: string
       shape: TypeShape
-
+      displayName: optional<string>
+      
   TypeReference:
     union:
       id: TypeReferenceId
@@ -62,6 +63,12 @@ types:
     properties:
       key: rootCommons.PropertyKey
       valueShape: TypeShape
+      propertyAccess: optional<ObjectPropertyAccess>
+
+  ObjectPropertyAccess:
+    enum:
+      - READ_ONLY
+      - WRITE_ONLY
 
   EnumType:
     properties:

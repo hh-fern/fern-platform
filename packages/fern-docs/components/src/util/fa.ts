@@ -41,14 +41,6 @@ export function getIconUrl(icon: string | undefined): string {
   return `${getCdnHost()}/${style}/${iconName}.svg`;
 }
 
-function getCdnHost() {
-  return (
-    (typeof process !== "undefined"
-      ? process.env.NEXT_PUBLIC_FONTAWESOME_CDN_HOST
-      : undefined) ?? "https://icons.ferndocs.com"
-  );
-}
-
 // parse any font awesome icon into two parts: style and icon name
 function parseFontAwesomeIcon(icon: string): [string, string] | undefined {
   const parts = icon.replaceAll("fa-", "").split(" ");
@@ -69,4 +61,12 @@ function parseFontAwesomeIcon(icon: string): [string, string] | undefined {
   // if multiple styles are specified, join them with a dash
   const style = parts.join("-");
   return [style, iconName];
+}
+
+function getCdnHost() {
+  return (
+    (typeof process !== "undefined"
+      ? process.env.NEXT_PUBLIC_FONTAWESOME_CDN_HOST
+      : undefined) ?? "https://icons.ferndocs.com"
+  );
 }

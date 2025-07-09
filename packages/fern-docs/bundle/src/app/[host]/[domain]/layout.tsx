@@ -7,41 +7,42 @@ import { preload } from "react-dom";
 import { getEnv } from "@vercel/functions";
 import { compact } from "es-toolkit/array";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { DocsV1Read, DocsV2Read } from "@fern-api/fdr-sdk/client/types";
-import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { isNonNullish } from "@fern-api/ui-core-utils";
+import { FeatureFlagProvider } from "@fern-docs/components/feature-flags/FeatureFlagProvider";
+import { Domain } from "@fern-docs/components/state/domain";
+import { LaunchDarklyInfo } from "@fern-docs/components/state/feature-flags";
+import {
+  RootNodeProvider,
+  SetBasePath,
+} from "@fern-docs/components/state/navigation";
+import {
+  getAllSidebarRootNodes,
+  getSidebarRootNodeIdToChildToParentsMap,
+} from "@fern-docs/components/state/navigation-server";
+import { FernThemeProvider } from "@fern-docs/components/theme";
+import { GlobalStyles } from "@fern-docs/components/theming/global-styles";
 import {
   getCustomerAnalytics as deprecated_getCustomerAnalytics,
-  getCanonicalUrl,
   getLaunchDarklySettings,
-  getSeoDisabled,
 } from "@fern-docs/edge-config";
 
 import { JavascriptProvider } from "@/components/JavascriptProvider";
 import { CustomerAnalytics } from "@/components/analytics/CustomerAnalytics";
-import { FeatureFlagProvider } from "@/components/feature-flags/FeatureFlagProvider";
 import { FernUser } from "@/components/fern-user";
 import SearchV2 from "@/components/search";
+import { generateMetadataFromConfig } from "@/components/seo";
 import { withJsConfig } from "@/components/with-js-config";
-import { DocsLoader, createCachedDocsLoader } from "@/server/docs-loader";
-import { isLocal } from "@/server/isLocal";
 import { SetColors } from "@/state/colors";
 import { DarkCode } from "@/state/dark-code";
-import { Domain } from "@/state/domain";
-import { LaunchDarklyInfo } from "@/state/feature-flags";
 import { DefaultLanguage } from "@/state/language";
 import { SetLogoText } from "@/state/logo-text";
-import { RootNodeProvider, SetBasePath } from "@/state/navigation";
-import {
-  getAllSidebarRootNodes,
-  getSidebarRootNodeIdToChildToParentsMap,
-} from "@/state/navigation-server";
-import { SetIsAskAiEnabled } from "@/state/search";
+import { SetIsAskAiEnabled, SetIsDefaultSearchFilterOff } from "@/state/search";
 import { Whitelabeled } from "@/state/whitelabeled";
-
-import { GlobalStyles } from "../../global-styles";
-import { toImageDescriptor } from "../../seo";
-import { ThemeProvider } from "../../theme";
 
 export default async function Layout({
   children,
@@ -51,7 +52,7 @@ export default async function Layout({
   params: Promise<{ host: string; domain: string }>;
 }) {
   const { host, domain } = await params;
-  const isLocalEnvironment = isLocal();
+  const isLocalEnvironment = isLocal() || isSelfHosted();
   const loader = await createCachedDocsLoader(host, domain);
   const [
     { basePath },
@@ -78,12 +79,9 @@ export default async function Layout({
   ]);
 
   generatePreloadHrefs(config.typographyV2, files);
-
   const { VERCEL_ENV } = getEnv();
 
-  const jsConfig = isLocalEnvironment
-    ? undefined
-    : withJsConfig(config.js, files);
+  const jsConfig = withJsConfig(config.js, files);
 
   // this creates a safe id mapping, so we can send it to the client:
   const sidebarRootNodes = getAllSidebarRootNodes(unsafe_fullRoot);
@@ -91,7 +89,7 @@ export default async function Layout({
     getSidebarRootNodeIdToChildToParentsMap(sidebarRootNodes);
 
   return (
-    <ThemeProvider
+    <FernThemeProvider
       hasLight={Boolean(colors.light)}
       hasDark={Boolean(colors.dark)}
       lightThemeColor={colors.light?.themeColor}
@@ -103,7 +101,7 @@ export default async function Layout({
         }
       >
         <Domain value={domain} />
-        <SetBasePath value={basePath} />
+        <SetBasePath value={basePath || "/"} />
         {/** HACKHACK: this is a hack to set the logo text to "Docs" for Cohere, this needs to be moved into docs.yml */}
         <SetLogoText text={domain.includes("cohere") ? "Docs" : undefined} />
         {config.defaultLanguage != null && (
@@ -113,6 +111,9 @@ export default async function Layout({
         <Whitelabeled value={edgeFlags.isWhitelabeled} />
         <SetColors colors={colors} />
         <SetIsAskAiEnabled isAskAiEnabled={edgeFlags.isAskAiEnabled} />
+        <SetIsDefaultSearchFilterOff
+          isDefaultSearchFilterOff={edgeFlags.isDefaultSearchFilterOff}
+        />
         <FernUser domain={domain} host={host} />
         <GlobalStyles
           domain={domain}
@@ -137,10 +138,11 @@ export default async function Layout({
               deprecated_customerAnalytics,
               config.analyticsConfig
             )}
+            isPosthogDisabled={edgeFlags.isPosthogDisabled}
           />
         )}
       </RootNodeProvider>
-    </ThemeProvider>
+    </FernThemeProvider>
   );
 }
 
@@ -190,63 +192,7 @@ async function getLaunchDarklyInfo(
 export async function generateMetadata(props: {
   params: Promise<{ host: string; domain: string }>;
 }): Promise<Metadata> {
-  const { host, domain } = await props.params;
-
-  const loader = await createCachedDocsLoader(host, domain);
-  const [files, config, seoDisabled] = await Promise.all([
-    loader.getFiles(),
-    loader.getConfig(),
-    getSeoDisabled(domain),
-  ]);
-
-  let index = config.metadata?.noindex ? false : undefined;
-  let follow = config.metadata?.nofollow ? false : undefined;
-  if (seoDisabled) {
-    index = false;
-    follow = false;
-  }
-
-  const canonicalUrl = await getCanonicalUrl(domain);
-
-  return {
-    metadataBase: canonicalUrl
-      ? new URL(withDefaultProtocol(canonicalUrl))
-      : undefined,
-    applicationName: config.title,
-    title: {
-      template: config.title ? "%s | " + config.title : "%s",
-      default: "Documentation",
-    },
-    robots: { index, follow },
-    openGraph: {
-      title: config.metadata?.["og:title"],
-      description: config.metadata?.["og:description"],
-      locale: config.metadata?.["og:locale"],
-      url: config.metadata?.["og:url"],
-      siteName: config.metadata?.["og:site_name"],
-      images: toImageDescriptor(
-        files,
-        config.metadata?.["og:image"],
-        config.metadata?.["og:image:width"],
-        config.metadata?.["og:image:height"]
-      ),
-    },
-    twitter: {
-      site: config.metadata?.["twitter:site"],
-      creator: config.metadata?.["twitter:handle"],
-      title: config.metadata?.["twitter:title"],
-      description: config.metadata?.["twitter:description"],
-      images: toImageDescriptor(files, config.metadata?.["twitter:image"]),
-    },
-    icons: {
-      icon: config.favicon
-        ? toImageDescriptor(files, {
-            type: "fileId",
-            value: config.favicon,
-          })?.url
-        : undefined,
-    },
-  };
+  return await generateMetadataFromConfig({ params: props.params });
 }
 
 function generatePreloadHrefs(

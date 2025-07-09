@@ -1,67 +1,60 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
-import { createCohere } from "@ai-sdk/cohere";
 import { createOpenAI } from "@ai-sdk/openai";
-import { WebClient } from "@slack/web-api";
-import {
-  EmbeddingModel,
-  InvalidToolArgumentsError,
-  NoSuchToolError,
-  ToolExecutionError,
-  embed,
-  streamText,
-  tool,
-} from "ai";
-import { initLogger, wrapAISDKModel } from "braintrust";
-import { z } from "zod";
+import { UIMessage } from "ai";
+import { initLogger } from "braintrust";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { openaiApiKey } from "@fern-api/docs-server/env-variables";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { postNewQueryToFai } from "@fern-api/docs-server/postNewQueryToFai";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
-  createDefaultSystemPrompt,
-  createWebflowSystemPrompt,
-} from "@fern-docs/search-server";
-import {
-  queryTurbopuffer,
-  toDocuments,
-} from "@fern-docs/search-server/turbopuffer";
-import { FacetFilter } from "@fern-docs/search-ui";
-import { withoutStaging } from "@fern-docs/utils";
+  getLanguageModel,
+  getTurbopufferNamespace,
+  runRouteForAnthropic,
+  runRouteForCohere,
+} from "@fern-docs/search-ask-fern";
+import { MAX_AI_CHAT_MESSAGE_LENGTH } from "@fern-docs/search-ui";
 
-import { getFernToken } from "@/app/fern-token";
-import { track } from "@/server/analytics/posthog";
-import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-import {
-  cohereApiKey,
-  openaiApiKey,
-  turbopufferApiKey,
-} from "@/server/env-variables";
-import { isLocal } from "@/server/isLocal";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+import { ModelProvider } from "@/app/utils";
 
 export const maxDuration = 60;
 export const revalidate = 0;
-const engNotifsSlackChannel = "#engineering-notifs";
-
-const modelMap: Record<string, { modelId: string; region: string }> = {
-  "claude-3.5": {
-    modelId: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-    region: "us-west-2",
-  },
-  "claude-3.7": {
-    modelId: "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-    region: "us-east-1",
-  },
-  // command-a is not supported by bedrock
-};
 
 export async function POST(req: NextRequest) {
-  if (isLocal()) {
+  if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
-      "ai chat is not accessible in local preview mode",
+      "Ask Fern is not available in local preview mode or self-hosted mode",
       { status: 400 }
     );
+  }
+  const queryId = crypto.randomUUID();
+  const createdAt = new Date();
+  const host = req.nextUrl.host;
+  const domain = getDocsDomainEdge(req);
+  const loader = await createCachedDocsLoader(host, domain);
+  const metadata = await loader.getMetadata();
+  if (metadata == null) {
+    return NextResponse.json("Not found", { status: 404 });
+  }
+  if (metadata.isPreview) {
+    return NextResponse.json("Chat is not enabled for preview environments", {
+      status: 404,
+    });
+  }
+
+  const [_, edgeFlags] = await Promise.all([
+    getAuthEdgeConfig(domain),
+    getEdgeFlags(domain),
+  ]);
+
+  if (!edgeFlags.isAskAiEnabled) {
+    return NextResponse.json("Ask AI is not enabled for this domain", {
+      status: 404,
+    });
   }
 
   initLogger({
@@ -69,215 +62,93 @@ export async function POST(req: NextRequest) {
     apiKey: process.env.BRAINTRUST_API_KEY,
   });
 
-  const host = req.nextUrl.host;
-  const domain = getDocsDomainEdge(req);
-  const loader = await createCachedDocsLoader(host, domain);
-  const metadata = await loader.getMetadata();
-  const config = await loader.getConfig();
+  const {
+    messages,
+    source,
+    conversationId,
+  }: {
+    url: string;
+    messages: UIMessage[];
+    source: string;
+    conversationId: string;
+  } = await req.json();
 
-  const { messages, url, filters } = await req.json();
-
-  // TODO: remove this once webflow adds model/system-prompt to docs.yml
-  const isWebflow = url.includes("webflow");
-
-  const model: string = config.aiChatConfig?.model || "claude-3.5";
-  let languageModel;
-  if (model === "command-a" || model === "command-r-plus") {
-    // TODO: remove command-r-plus once fern generate change is resolved
-    const cohere = createCohere({ apiKey: cohereApiKey() });
-    languageModel = wrapAISDKModel(cohere("command-a-03-2025"));
-  } else {
-    let modelId = modelMap["claude-3.5"]?.modelId || ""; // defaults for improper docs.yml entries
-    let region = modelMap["claude-3.5"]?.region || "";
-    if (modelMap[model] != null) {
-      // fallback
-      ({ modelId, region } = modelMap[model]);
-    }
-    const bedrock = createAmazonBedrock({
-      region: isWebflow ? "us-east-1" : region,
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    });
-
-    languageModel = isWebflow
-      ? wrapAISDKModel(bedrock("us.anthropic.claude-3-7-sonnet-20250219-v1:0"))
-      : wrapAISDKModel(bedrock(modelId));
+  const lastUserMessage = getLastUserMessage(messages);
+  if (lastUserMessage.length > MAX_AI_CHAT_MESSAGE_LENGTH) {
+    return NextResponse.json(
+      `User message exceeds maximum length of ${MAX_AI_CHAT_MESSAGE_LENGTH} characters`,
+      { status: 400 }
+    );
   }
+
+  const config = await loader.getConfig();
+  const chatSource = source ?? "chat";
+
+  const modelId = config.aiChatConfig?.model ?? "claude-3.5";
+  let modelProvider: ModelProvider = "anthropic";
+  if (modelId === "claude-4" || modelId === "claude-3.5")
+    modelProvider = "anthropic";
+  if (modelId === "command-a") modelProvider = "cohere";
+  const languageModel = getLanguageModel(modelId);
 
   const openai = createOpenAI({ apiKey: openaiApiKey() });
   const embeddingModel = openai.embedding("text-embedding-3-large");
-  const namespace = `${withoutStaging(domain)}_${embeddingModel.modelId}`;
 
-  const promptTemplate = config.aiChatConfig?.systemPrompt;
-  if (metadata == null) {
-    return NextResponse.json("Not found", { status: 404 });
-  }
+  await postNewQueryToFai({
+    queryId,
+    domain,
+    conversationId,
+    text: lastUserMessage,
+    role: "USER",
+    createdAt,
+    timeToFirstToken: null,
+  });
 
-  if (metadata.isPreview) {
-    return NextResponse.json("Chat is not enabled for preview environments", {
-      status: 404,
+  if (modelProvider === "anthropic") {
+    return runRouteForAnthropic({
+      domain,
+      chatSource,
+      promptTemplate: config.aiChatConfig?.systemPrompt,
+      conversationId,
+      lastUserMessage,
+      messages,
+      embeddingModel,
+      turbopufferNamespace: getTurbopufferNamespace(domain, embeddingModel),
+      languageModel,
+    });
+  } else if (modelProvider === "cohere") {
+    return runRouteForCohere({
+      domain,
+      chatSource,
+      promptTemplate: config.aiChatConfig?.systemPrompt,
+      conversationId,
+      lastUserMessage,
+      messages,
+      embeddingModel,
+      turbopufferNamespace: getTurbopufferNamespace(domain, embeddingModel),
+      languageModel,
+    });
+  } else {
+    return NextResponse.json(`Invalid model provider: ${modelProvider}`, {
+      status: 400,
     });
   }
-
-  const start = Date.now();
-  const [authEdgeConfig, edgeFlags] = await Promise.all([
-    getAuthEdgeConfig(domain),
-    getEdgeFlags(domain),
-  ]);
-
-  if (!edgeFlags.isAskAiEnabled) {
-    throw new Error(`Ask AI is not enabled for ${domain}`);
-  }
-
-  const fern_token = await getFernToken();
-  const user = await safeVerifyFernJWTConfig(fern_token, authEdgeConfig);
-
-  const lastUserMessage: string | undefined = messages.findLast(
-    (message: any) => message.role === "user"
-  )?.content;
-
-  const searchResults = await runQueryTurbopuffer(lastUserMessage, {
-    embeddingModel,
-    namespace,
-    authed: user != null,
-    roles: user?.roles ?? [],
-    topK: 3,
-    filters,
-  });
-  const documents = toDocuments(searchResults).join("\n\n");
-  const system = isWebflow
-    ? createWebflowSystemPrompt({
-        domain,
-        date: new Date().toDateString(),
-        documents,
-      })
-    : createDefaultSystemPrompt({
-        domain,
-        date: new Date().toDateString(),
-        documents,
-        promptTemplate,
-      });
-  const result = streamText({
-    model: languageModel,
-    system,
-    messages,
-    maxSteps: 5,
-    maxRetries: 3,
-    tools: {
-      search: tool({
-        description:
-          "Search the knowledge base for the user's query. Semantic search is enabled.",
-        parameters: z.object({
-          query: z.string(),
-        }),
-        async execute({ query }) {
-          const response = await runQueryTurbopuffer(query, {
-            embeddingModel,
-            namespace,
-            authed: user != null,
-            roles: user?.roles ?? [],
-            filters,
-            topK: 5,
-          });
-          return response.map((hit) => {
-            const { domain, pathname, hash, chunk } = hit.attributes;
-            const url = `https://${domain}${pathname}${hash ?? ""}`;
-            if (chunk.length > 20000) {
-              return {
-                url,
-                chunk: chunk.slice(0, 20000),
-                ...(hit.attributes as Omit<typeof hit.attributes, "chunk">),
-              };
-            }
-            return { url, ...hit.attributes };
-          });
-        },
-      }),
-    },
-    onFinish: async (e) => {
-      const end = Date.now();
-      track("ask_ai", {
-        languageModel: languageModel.modelId,
-        embeddingModel: embeddingModel.modelId,
-        durationMs: end - start,
-        domain,
-        namespace,
-        numToolCalls: e.toolCalls.length,
-        finishReason: e.finishReason,
-        ...e.usage,
-      });
-      e.warnings?.forEach((warning) => {
-        console.warn(warning);
-      });
-    },
-  });
-
-  const response = result.toDataStreamResponse({
-    getErrorMessage: (error) => {
-      if (error == null) {
-        return "";
-      }
-
-      let errorKind = "UnknownError";
-      if (NoSuchToolError.isInstance(error)) {
-        errorKind = "NoSuchToolError";
-      } else if (InvalidToolArgumentsError.isInstance(error)) {
-        errorKind = "InvalidToolArgumentsError";
-      } else if (ToolExecutionError.isInstance(error)) {
-        errorKind = "ToolExecutionError";
-      }
-
-      const msg = `encountered a ${errorKind} for query '${lastUserMessage}: ${error}'`;
-      console.error(msg);
-      const slackToken = process.env.SLACK_TOKEN;
-      if (slackToken) {
-        const slackMsg = `:rotating_light: [${domain}] \`Ask AI\` encountered a ${errorKind} for query '${lastUserMessage}': \`${error}\``;
-        const webClient = new WebClient(slackToken);
-        webClient.chat
-          .postMessage({
-            channel: engNotifsSlackChannel,
-            text: slackMsg,
-          })
-          .catch((err: unknown) => {
-            console.error(err);
-          });
-      }
-      return msg;
-    },
-  });
-
-  response.headers.set("Access-Control-Allow-Origin", "*");
-  response.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type");
-  return response;
 }
 
-async function runQueryTurbopuffer(
-  query: string | null | undefined,
-  opts: {
-    embeddingModel: EmbeddingModel<string>;
-    namespace: string;
-    topK?: number;
-    authed?: boolean;
-    roles?: string[];
-    filters?: FacetFilter[];
+function getLastUserMessage(messages: UIMessage[]): string {
+  let lastUserMessageText = "";
+  const lastUserMessage = messages.findLast((message: UIMessage, _: number) => {
+    return message.role === "user";
+  });
+
+  if (lastUserMessage == null) {
+    return "";
   }
-) {
-  return query == null || query.trimStart().length === 0
-    ? []
-    : await queryTurbopuffer(query, {
-        namespace: opts.namespace,
-        apiKey: turbopufferApiKey(),
-        topK: opts.topK ?? 5,
-        vectorizer: async (text) => {
-          const embedding = await embed({
-            model: opts.embeddingModel,
-            value: text,
-          });
-          return embedding.embedding;
-        },
-        authed: opts.authed,
-        roles: opts.roles,
-        filters: opts.filters,
-      });
+
+  for (const part of lastUserMessage.parts) {
+    if (part.type === "text") {
+      lastUserMessageText += part.text;
+    }
+  }
+  return lastUserMessageText;
 }

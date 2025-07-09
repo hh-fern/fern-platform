@@ -35,6 +35,7 @@ types:
     union:
       rest: RestProtocol
       openrpc: OpenRpcProtocol
+      grpc: GrpcProtocol
 
   RestProtocol:
     properties: {}
@@ -42,3 +43,15 @@ types:
   OpenRpcProtocol:
     properties:
       methodName: string
+
+  GrpcProtocol:
+    properties:
+      methodName: string
+      methodType: optional<GrpcMethodType>
+
+  GrpcMethodType:
+    enum:
+      - UNARY
+      - CLIENT_STREAM
+      - SERVER_STREAM
+      - BIDIRECTIONAL_STREAM

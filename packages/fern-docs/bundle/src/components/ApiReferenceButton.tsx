@@ -1,9 +1,11 @@
 import { ArrowUpRight } from "lucide-react";
 
-import { FernTooltip, FernTooltipProvider } from "@fern-docs/components";
-import { slugToHref } from "@fern-docs/utils";
-
-import { FernLinkButton } from "./FernLinkButton";
+import { slugToHref } from "@fern-api/docs-utils";
+import {
+  FernLinkButton,
+  FernTooltip,
+  FernTooltipProvider,
+} from "@fern-docs/components";
 
 export const ApiReferenceButton: React.FC<{ slug: string }> = ({ slug }) => {
   return (

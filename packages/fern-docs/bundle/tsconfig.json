@@ -20,13 +20,13 @@
       "path": "../../commons/core-utils"
     },
     {
+      "path": "../../commons/docs-auth"
+    },
+    {
       "path": "../../commons/fdr-utils"
     },
     {
-      "path": "../../fdr-sdk/tsconfig.build.json"
-    },
-    {
-      "path": "../auth"
+      "path": "../../fdr-sdk"
     },
     {
       "path": "../components"
@@ -38,10 +38,19 @@
       "path": "../mdx"
     },
     {
-      "path": "../search-server"
+      "path": "../search-server/keyword"
     },
     {
-      "path": "../utils"
+      "path": "../search-server/ask-fern"
+    },
+    {
+      "path": "../../commons/docs-utils"
+    },
+    {
+      "path": "../../commons/docs-server"
+    },
+    {
+      "path": "../../commons/docs-loader"
     }
   ]
 }

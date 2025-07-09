@@ -2,12 +2,13 @@ import { unstable_cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { addLeadingSlash, slugToHref } from "@fern-api/docs-utils";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, withDefaultProtocol } from "@fern-api/ui-core-utils";
-import { addLeadingSlash, slugToHref } from "@fern-docs/utils";
 
-import { createCachedDocsLoader } from "@/server/docs-loader";
+import { generateHtml } from "@/app/utils";
 import { getMarkdownForPath } from "@/server/getMarkdownForPath";
 import { getSectionRoot } from "@/server/getSectionRoot";
 import { getLlmTxtMetadata } from "@/server/llm-txt-md";
@@ -32,7 +33,6 @@ import { getLlmTxtMetadata } from "@/server/llm-txt-md";
  * - hidden and noindexed nodes are not included in the list
  * - should hidden pages be included under an `## Optional` heading?
  */
-
 export async function GET(
   req: NextRequest,
   props: { params: Promise<{ host: string; domain: string }> }
@@ -40,12 +40,18 @@ export async function GET(
   const { host, domain } = await props.params;
 
   const path = slugToHref(req.nextUrl.searchParams.get("slug") ?? "");
+  const content = await getLlmsTxt(host, domain, path);
 
-  return new NextResponse(await getLlmsTxt(host, domain, path), {
+  const html = await generateHtml({
+    host,
+    domain,
+    content,
+  });
+
+  return new NextResponse(html, {
     status: 200,
     headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "X-Robots-Tag": "noindex",
+      "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "s-maxage=60",
     },
   });

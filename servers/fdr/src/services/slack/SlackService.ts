@@ -67,11 +67,20 @@ export class SlackServiceImpl implements SlackService {
 
   async notify(message: string, err: unknown): Promise<void> {
     try {
-      await this.client.chat.postMessage({
-        channel: "#activity",
-        text: `:rotating_light: Encountered failure in FDR: ${message}.\n ${stringifyError(err)}`,
+      const result = await this.client.chat.postMessage({
+        channel: "#docs-notifs",
+        text: `:rotating_light: Encountered failure in FDR: ${message}.`,
         blocks: [],
       });
+
+      if (result.ts) {
+        await this.client.chat.postMessage({
+          channel: "#docs-notifs",
+          thread_ts: result.ts,
+          text: `${JSON.stringify(err)}`,
+          blocks: [],
+        });
+      }
     } catch (err) {
       this.logger.debug("Failed to send slack message: ", err);
     }
@@ -84,7 +93,7 @@ export class SlackServiceImpl implements SlackService {
       const failedRevalidations = request.paths.failed;
       if (request.paths.failed.length > 0) {
         const { ts } = await this.client.chat.postMessage({
-          channel: "#engineering-notifs",
+          channel: "#docs-notifs",
           text: `:rotating_light: \`${request.domain}\` encountered ${failedRevalidations.length} revalidation failurs. }`,
           blocks: [],
         });
@@ -92,13 +101,13 @@ export class SlackServiceImpl implements SlackService {
           .map((e) => `${(e as any).url} : ${(e as any).message}`)
           .join("\n")}`;
         await this.client.chat.postMessage({
-          channel: "#engineering-notifs",
+          channel: "#docs-notifs",
           text: failedUrlsMessage,
           thread_ts: ts,
         });
       } else if (request.paths.revalidationFailed) {
         await this.client.chat.postMessage({
-          channel: "#engineering-notifs",
+          channel: "#docs-notifs",
           text: `:rotating_light: \`${request.domain}\` revalidation *completely* failed.`,
           blocks: [],
         });
@@ -113,7 +122,7 @@ export class SlackServiceImpl implements SlackService {
   ): Promise<void> {
     try {
       await this.client.chat.postMessage({
-        channel: "#engineering-notifs",
+        channel: "#docs-notifs",
         text: `:rotating_light: Docs failed to register \`${request.domain}\`: ${stringifyError(request.err)}`,
         blocks: [],
       });
@@ -129,7 +138,7 @@ export class SlackServiceImpl implements SlackService {
 
     try {
       await this.client.chat.postMessage({
-        channel: "#engineering-notifs",
+        channel: "#search-notifs",
         text: `:rotating_light: Failed to delete index segment \`${indexSegmentId}\`: ${stringifyError(err)}`,
         blocks: [],
       });

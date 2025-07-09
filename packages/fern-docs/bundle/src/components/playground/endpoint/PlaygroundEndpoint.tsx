@@ -10,6 +10,8 @@ import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { buildEndpointUrl } from "@fern-api/fdr-sdk/api-definition";
 import { unknownToString } from "@fern-api/ui-core-utils";
 import { FernTooltipProvider } from "@fern-docs/components";
+import { fernUserAtom } from "@fern-docs/components/state/fern-user";
+import { jotaiStore } from "@fern-docs/components/state/jotai-provider";
 import {
   Loadable,
   failed,
@@ -23,8 +25,6 @@ import {
   isProxyDisabledAtom,
   usesApplicationJsonInFormDataValueAtom,
 } from "@/state/api-explorer-flags";
-import { fernUserAtom } from "@/state/fern-user";
-import { jotaiStore } from "@/state/jotai-provider";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   PLAYGROUND_AUTH_STATE_OAUTH_ATOM,
@@ -43,6 +43,7 @@ import {
   serializeFormStateBody,
 } from "../utils";
 import { usePlaygroundBaseUrl } from "../utils/select-environment";
+import { isLocal } from "../utils/utils";
 import { PlaygroundEndpointContent } from "./PlaygroundEndpointContent";
 import { PlaygroundEndpointPath } from "./PlaygroundEndpointPath";
 
@@ -150,7 +151,10 @@ export const PlaygroundEndpoint = ({
         }),
       };
       if (endpoint.responses?.[0]?.body.type === "stream") {
-        const [res, stream] = await executeProxyStream(req, isProxyDisabled);
+        const [res, stream] = await executeProxyStream(
+          req,
+          isProxyDisabled || isLocal()
+        );
 
         const time = Date.now();
         const reader = stream.getReader();
@@ -175,7 +179,7 @@ export const PlaygroundEndpoint = ({
           );
         }
       } else {
-        const res = await executeProxyRest(req, isProxyDisabled);
+        const res = await executeProxyRest(req, isProxyDisabled || isLocal());
         setResponse(loaded(res));
         if (res.type !== "stream") {
           track("api_playground_request_received", {

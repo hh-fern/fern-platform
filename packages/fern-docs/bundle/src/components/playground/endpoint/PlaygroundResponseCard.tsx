@@ -37,6 +37,7 @@ export function PlaygroundResponseCard({
   const isBinaryOctetStreamAudioPlayer = useAtomValue(
     isBinaryOctetStreamAudioPlayerAtom
   );
+
   return (
     <FernCard className="rounded-3 flex min-w-0 flex-1 shrink flex-col overflow-hidden">
       <div className="border-border-default flex h-10 w-full shrink-0 items-center justify-between border-b px-3 py-2">
@@ -137,14 +138,6 @@ export function PlaygroundResponseCard({
             </div>
           ),
         loaded: (response) => {
-          // Handle JSON content type
-          try {
-            JSON.parse(JSON.stringify(response.response.body));
-            return <PlaygroundResponsePreview response={response} />;
-          } catch {
-            // If JSON parsing fails, continue to next handler
-          }
-
           // Handle text-based content
           if (
             response.type !== "file" ||
@@ -180,6 +173,15 @@ export function PlaygroundResponseCard({
             );
           }
 
+          // Handle JSON content type
+
+          try {
+            JSON.parse(JSON.stringify(response.response.body));
+            return <PlaygroundResponsePreview response={response} />;
+          } catch {
+            // If JSON parsing fails, continue to next handler
+          }
+
           // Handle 204 status
           if (response.response.status === 204) {
             return <PlaygroundResponsePreview response={response} />;
@@ -197,7 +199,7 @@ export function PlaygroundResponseCard({
           );
         },
         failed: (e) => {
-          console.error(e);
+          console.error(`[playground-response-card] ${JSON.stringify(e)}`);
           return <ErrorBoundaryFallback error={new Error(String(e))} />;
         },
       })}

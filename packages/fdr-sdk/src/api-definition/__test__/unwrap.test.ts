@@ -62,6 +62,7 @@ describe("unwrapReference", () => {
         shape: PRIMITIVE_SHAPE,
         description: undefined,
         availability: undefined,
+        displayName: undefined,
       },
     };
     expect(unwrapReference(shape, types)).toMatchInlineSnapshot(
@@ -134,6 +135,7 @@ describe("unwrapReference", () => {
         },
         description: undefined,
         availability: undefined,
+        displayName: undefined,
       },
     };
     expect(unwrapReference(shape, types)).toMatchInlineSnapshot(
@@ -182,6 +184,7 @@ describe("unwrapReference", () => {
         },
         description: undefined,
         availability: undefined,
+        displayName: undefined,
       },
     };
     expect(unwrapReference(shape, types).default).toBe("testing-a");
@@ -213,6 +216,7 @@ describe("unwrapReference", () => {
         },
         description: undefined,
         availability: undefined,
+        displayName: undefined,
       },
     };
     expect(unwrapReference(shape, types).default).toBe("testing-b");
@@ -230,6 +234,7 @@ describe("unwrapReference", () => {
         shape: { type: "alias", value: shape },
         description: undefined,
         availability: undefined,
+        displayName: undefined,
       },
     };
     expect(unwrapReference(shape, types).shape.type).toBe("unknown");
@@ -250,6 +255,7 @@ describe("unwrapReference", () => {
         },
         description: "a",
         availability: "Stable",
+        displayName: undefined,
       },
       [TypeId("b")]: {
         name: "b",
@@ -270,12 +276,14 @@ describe("unwrapReference", () => {
         },
         description: "b",
         availability: "Deprecated",
+        displayName: undefined,
       },
       [TypeId("c")]: {
         name: "c",
         shape: PRIMITIVE_SHAPE,
         description: "c",
         availability: "InDevelopment",
+        displayName: undefined,
       },
     };
     const unwrapped = unwrapReference(shape, types);
@@ -307,6 +315,7 @@ describe("unwrapReference", () => {
         },
         description: undefined,
         availability: undefined,
+        displayName: undefined,
       },
     };
 
@@ -356,6 +365,7 @@ describe("unwrapObjectType", () => {
           },
           description: undefined,
           availability: undefined,
+          propertyAccess: undefined,
         },
         {
           key: PropertyKey("a"),
@@ -369,18 +379,21 @@ describe("unwrapObjectType", () => {
           },
           description: undefined,
           availability: undefined,
+          propertyAccess: undefined,
         },
         {
           key: PropertyKey("c"),
           valueShape: PRIMITIVE_SHAPE,
           description: undefined,
           availability: undefined,
+          propertyAccess: undefined,
         },
         {
           key: PropertyKey("b"),
           valueShape: PRIMITIVE_SHAPE,
           description: undefined,
           availability: undefined,
+          propertyAccess: undefined,
         },
       ],
       extraProperties: undefined,
@@ -406,6 +419,7 @@ describe("unwrapObjectType", () => {
           valueShape: PRIMITIVE_SHAPE,
           description: undefined,
           availability: undefined,
+          propertyAccess: undefined,
         },
         {
           key: PropertyKey("d"),
@@ -419,6 +433,7 @@ describe("unwrapObjectType", () => {
           },
           description: undefined,
           availability: undefined,
+          propertyAccess: undefined,
         },
       ],
       extraProperties: undefined,
@@ -435,12 +450,14 @@ describe("unwrapObjectType", () => {
               valueShape: PRIMITIVE_SHAPE,
               description: undefined,
               availability: undefined,
+              propertyAccess: undefined,
             },
           ],
           extraProperties: undefined,
         },
         description: undefined,
         availability: undefined,
+        displayName: undefined,
       },
       [TypeId("c")]: {
         name: "c",
@@ -453,12 +470,14 @@ describe("unwrapObjectType", () => {
               valueShape: PRIMITIVE_SHAPE,
               description: undefined,
               availability: undefined,
+              propertyAccess: undefined,
             },
           ],
           extraProperties: undefined,
         },
         description: undefined,
         availability: undefined,
+        displayName: undefined,
       },
     };
     expect(
@@ -481,6 +500,7 @@ describe("unwrapObjectType", () => {
           valueShape: PRIMITIVE_SHAPE,
           description: undefined,
           availability: undefined,
+          propertyAccess: undefined,
         },
       ],
       extraProperties: undefined,
@@ -505,6 +525,7 @@ describe("unwrapObjectType", () => {
         },
         description: "description-1",
         availability: "GenerallyAvailable",
+        displayName: undefined,
       },
       [TypeId("c")]: {
         name: "b",
@@ -524,18 +545,21 @@ describe("unwrapObjectType", () => {
               },
               description: undefined,
               availability: "Deprecated",
+              propertyAccess: undefined,
             },
             {
               key: PropertyKey("c"),
               valueShape: PRIMITIVE_SHAPE,
               description: undefined,
               availability: undefined,
+              propertyAccess: undefined,
             },
           ],
           extraProperties: undefined,
         },
         description: "description-2",
         availability: undefined,
+        displayName: undefined,
       },
     };
 
@@ -547,6 +571,7 @@ describe("unwrapObjectType", () => {
         valueShape: PRIMITIVE_SHAPE,
         description: undefined,
         availability: undefined,
+        propertyAccess: undefined,
       },
       {
         key: PropertyKey("c"),
@@ -561,6 +586,7 @@ describe("unwrapObjectType", () => {
         description: undefined,
         // availability is the least stable of the extended object
         availability: "GenerallyAvailable",
+        propertyAccess: undefined,
       },
       {
         key: PropertyKey("b"),
@@ -576,6 +602,7 @@ describe("unwrapObjectType", () => {
         // availability is the least stable of the extended object
         // and Deprecated is sorted after GenerallyAvailable
         availability: "Deprecated",
+        propertyAccess: undefined,
       },
     ]);
 
@@ -603,6 +630,7 @@ describe("unwrapObjectType", () => {
           },
           description: undefined,
           availability: undefined,
+          displayName: undefined,
         },
       }
     );

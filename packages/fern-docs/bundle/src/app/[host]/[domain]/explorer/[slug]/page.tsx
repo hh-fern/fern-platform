@@ -3,22 +3,21 @@ import "server-only";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { conformTrailingSlash } from "@fern-api/docs-utils";
+import { conformExplorerRoute } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
-import { conformTrailingSlash } from "@fern-docs/utils";
 
 import { getFernToken } from "@/app/fern-token";
 import {
   ExplorerContent,
   NoEndpointSelected,
 } from "@/components/playground/ExplorerContent";
-import { conformExplorerRoute } from "@/components/playground/utils/explorer-route";
-import { createCachedDocsLoader } from "@/server/docs-loader";
 
 export default async function Page(props: {
   params: Promise<{ host: string; domain: string; slug: string }>;
 }) {
   const { host, domain, slug: slugProp } = await props.params;
-  console.debug(`[${domain}] Loading API Explorer page`);
 
   const slug = FernNavigation.slugjoin(slugProp);
   const loader = await createCachedDocsLoader(
@@ -66,10 +65,11 @@ export async function generateMetadata({
   );
   const root = await loader.getRoot();
   const found = FernNavigation.utils.findNode(root, slug);
+
   if (found.type !== "found") {
     return {};
   }
   return {
-    title: `${found.node.title} (API Explorer)`,
+    title: found.node.title,
   };
 }

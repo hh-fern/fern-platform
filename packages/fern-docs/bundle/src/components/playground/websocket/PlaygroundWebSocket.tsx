@@ -11,9 +11,9 @@ import {
   buildRequestUrl,
 } from "@fern-api/fdr-sdk/api-definition";
 import { FernTooltipProvider } from "@fern-docs/components";
+import { jotaiStore } from "@fern-docs/components/state/jotai-provider";
 import { usePrevious } from "@fern-ui/react-commons";
 
-import { jotaiStore } from "@/state/jotai-provider";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
   usePlaygroundWebsocketFormState,
@@ -160,7 +160,7 @@ export const PlaygroundWebSocket: FC<PlaygroundWebSocketProps> = ({
       };
 
       socket.current.onerror = (event) => {
-        console.error(event);
+        console.error(`[playground-websocket] ${JSON.stringify(event)}`);
       };
     });
   }, [

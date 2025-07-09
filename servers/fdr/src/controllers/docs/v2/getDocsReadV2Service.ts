@@ -2,6 +2,7 @@ import {
   convertDbAPIDefinitionsToRead,
   convertDbDocsConfigToRead,
 } from "@fern-api/fdr-sdk";
+import { DocsV1Write } from "@fern-api/fdr-sdk";
 
 import { Cache } from "../../../Cache";
 import { DocsV2Read, DocsV2ReadService } from "../../../api";
@@ -54,6 +55,10 @@ export function getDocsReadV2Service(app: FdrApplication): DocsV2ReadService {
       } catch (e) {
         // if the auth header does not belong to fern, check the org id for the docs url, and check if the user belongs to that org
         if (e instanceof UserNotInOrgError) {
+          // do not parse placeholder domain
+          if (req.body.url.includes("[") || req.body.url.includes("]")) {
+            throw new DocsV2Read.DomainNotRegisteredError();
+          }
           const parsedUrl = ParsedBaseUrl.parse(req.body.url);
           const orgId = await app.dao
             .docsV2()
@@ -67,6 +72,10 @@ export function getDocsReadV2Service(app: FdrApplication): DocsV2ReadService {
           });
         }
         throw e;
+      }
+      // do not parse placeholder domain
+      if (req.body.url.includes("[") || req.body.url.includes("]")) {
+        throw new DocsV2Read.DomainNotRegisteredError();
       }
       const parsedUrl = ParsedBaseUrl.parse(req.body.url);
       const response = await app.docsDefinitionCache.getDocsForUrl({
@@ -151,32 +160,6 @@ export function getDocsReadV2Service(app: FdrApplication): DocsV2ReadService {
       }
       return res.send(docsConfig);
     },
-    // TODO: deprecate this:
-    getSearchApiKeyForIndexSegment: async (req, res) => {
-      await app.services.auth.checkUserBelongsToOrg({
-        authHeader: req.headers.authorization,
-        orgId: "fern",
-      });
-      const { indexSegmentId } = req.body;
-      const cachedKey =
-        app.services.algoliaIndexSegmentManager.getSearchApiKeyForIndexSegment(
-          indexSegmentId
-        );
-      if (cachedKey != null) {
-        return res.send({ searchApiKey: cachedKey });
-      }
-      const indexSegment = await app.dao
-        .indexSegment()
-        .loadIndexSegment(indexSegmentId);
-      if (indexSegment == null) {
-        throw new DocsV2Read.IndexSegmentNotFoundError();
-      }
-      const searchApiKey =
-        app.services.algoliaIndexSegmentManager.generateAndCacheApiKey(
-          indexSegmentId
-        );
-      return res.send({ searchApiKey });
-    },
     listAllDocsUrls: async (req, res) => {
       // must be a fern employee
       await app.services.auth.checkUserBelongsToOrg({
@@ -203,6 +186,10 @@ export function getDocsReadV2Service(app: FdrApplication): DocsV2ReadService {
           isPreviewUrl: metadata.isPreview,
           org: metadata.orgId,
           url: req.body.url,
+          gitUrl:
+            metadata.gitUrl != null
+              ? DocsV1Write.Url(metadata.gitUrl)
+              : undefined,
         });
       }
       throw new DomainNotRegisteredError();

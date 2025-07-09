@@ -1,8 +1,8 @@
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
-import { isLocal } from "@/server/isLocal";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 
 export async function GET(req: NextRequest) {
   if (!isLocal()) {

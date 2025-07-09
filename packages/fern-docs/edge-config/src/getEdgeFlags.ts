@@ -1,14 +1,16 @@
-import type { EdgeFlags } from "@fern-docs/utils";
+import type { EdgeFlags } from "@fern-api/docs-utils";
 import {
   DEFAULT_EDGE_FLAGS,
+  DEFAULT_SELF_HOSTED_EDGE_FLAGS,
   isCustomDomain,
   isDevelopment,
   isFern,
   withoutStaging,
-} from "@fern-docs/utils";
+} from "@fern-api/docs-utils";
 
 import { getAllEdge } from "./getEdge";
 import { isLocal } from "./isLocal";
+import { isSelfHosted } from "./isSelfHosted";
 
 export const runtime = "edge";
 
@@ -36,7 +38,6 @@ const EDGE_FLAGS = [
   "audio-example-internal" as const,
   "uses-application-json-in-form-data-value" as const,
   "binary-octet-stream-audio-player" as const,
-  "voice-id-playground-form" as const,
   "cohere-theme" as const,
   "file-forge-hack-enabled" as const,
   "hide-404-page" as const,
@@ -46,6 +47,9 @@ const EDGE_FLAGS = [
   "search-v2" as const,
   "authed-previews" as const,
   "search-disabled" as const,
+  "default-search-filter-off" as const,
+  "changelog-redirects" as const,
+  "posthog-disabled" as const,
 ];
 
 type EdgeFlag = (typeof EDGE_FLAGS)[number];
@@ -55,6 +59,8 @@ type EdgeConfigResponse = Record<EdgeFlag, string[] | Record<string, unknown>>;
 export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
   if (isLocal()) {
     return DEFAULT_EDGE_FLAGS;
+  } else if (isSelfHosted()) {
+    return DEFAULT_SELF_HOSTED_EDGE_FLAGS;
   }
 
   try {
@@ -155,10 +161,6 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       domain,
       config["binary-octet-stream-audio-player"]
     );
-    const hasVoiceIdPlaygroundForm = checkDomainMatchesCustomers(
-      domain,
-      config["voice-id-playground-form"]
-    );
     const isCohereTheme = checkDomainMatchesCustomers(
       domain,
       config["cohere-theme"]
@@ -191,6 +193,18 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       domain,
       config["search-disabled"]
     );
+    const isDefaultSearchFilterOff = checkDomainMatchesCustomers(
+      domain,
+      config["default-search-filter-off"]
+    );
+    const isChangelogRedirects = checkDomainMatchesCustomers(
+      domain,
+      config["changelog-redirects"]
+    );
+    const isPosthogDisabled = checkDomainMatchesCustomers(
+      domain,
+      config["posthog-disabled"]
+    );
 
     return {
       isApiPlaygroundEnabled: isDevelopment(domain) || isApiPlaygroundEnabled,
@@ -217,7 +231,6 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isAudioExampleInternal,
       usesApplicationJsonInFormDataValue,
       isBinaryOctetStreamAudioPlayer,
-      hasVoiceIdPlaygroundForm,
       isCohereTheme,
       isFileForgeHackEnabled,
       is404PageHidden,
@@ -226,9 +239,12 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isSearchV2Enabled,
       isAuthedPreview,
       isSearchDisabled,
+      isDefaultSearchFilterOff,
+      isChangelogRedirects,
+      isPosthogDisabled,
     };
   } catch (e) {
-    console.error(e);
+    console.error(`[get-edge-flags] ${JSON.stringify(e)}`);
     return {
       isApiPlaygroundEnabled: isDevelopment(domain),
       isApiScrollingDisabled: false,
@@ -252,7 +268,6 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isAudioExampleInternal: false,
       usesApplicationJsonInFormDataValue: false,
       isBinaryOctetStreamAudioPlayer: false,
-      hasVoiceIdPlaygroundForm: false,
       isCohereTheme: false,
       isFileForgeHackEnabled: false,
       is404PageHidden: false,
@@ -261,6 +276,9 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isSearchV2Enabled: domain === "buildwithfern.com",
       isAuthedPreview: false,
       isSearchDisabled: false,
+      isDefaultSearchFilterOff: false,
+      isChangelogRedirects: false,
+      isPosthogDisabled: false,
     };
   }
 }

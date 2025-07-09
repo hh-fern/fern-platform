@@ -7,21 +7,23 @@ import { useSetAtom } from "jotai";
 
 import { cn } from "@fern-docs/components";
 import { FernScrollArea } from "@fern-docs/components";
+import {
+  FERN_COHERE_CONTENT_ID,
+  FERN_FOOTER_ID,
+} from "@fern-docs/components/constants";
+import { useCurrentPathname } from "@fern-docs/components/hooks/use-current-pathname";
+import { SCROLL_BODY_ATOM } from "@fern-docs/components/state/viewport";
+import { FernHeader } from "@fern-docs/components/theming/fern-header";
+import { MainCtx } from "@fern-docs/components/theming/mobile-menu";
+import { SidebarNav } from "@fern-docs/components/theming/side-nav";
 
-import { FERN_COHERE_CONTENT_ID, FERN_FOOTER_ID } from "@/components/constants";
 import { HeaderTabsRoot } from "@/components/header/HeaderTabsRoot";
-import { useCurrentPathname } from "@/hooks/use-current-pathname";
-import { SCROLL_BODY_ATOM } from "@/state/viewport";
-
-import { FernHeader } from "../default/fern-header";
-import { MainCtx } from "../default/mobile-menu";
-import { SidebarNav } from "../default/side-nav";
 
 const CohereDocsStyle = () => {
   return (
     <style jsx global>
       {`
-        :root {
+        @theme {
           --header-offset: 0px;
           --card-border: #d8cfc1;
           --bg-color-search-dialog: #fafafa;
