@@ -4,20 +4,19 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { EmbeddingModel, embed } from "ai";
 import { initLogger } from "braintrust";
 
-import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import {
+  openaiApiKey,
+  turbopufferApiKey,
+} from "@fern-api/docs-server/env-variables";
+import { isLocal } from "@fern-api/docs-server/isLocal";
+import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import {
+  convertTpufRecordsToDocuments,
+  getTurbopufferNamespace,
   queryTurbopuffer,
-  toDocuments,
-} from "@fern-docs/search-server/turbopuffer";
+} from "@fern-docs/search-ask-fern";
 import { FacetFilter } from "@fern-docs/search-ui";
-import { withoutStaging } from "@fern-docs/utils";
-
-import { getFernToken } from "@/app/fern-token";
-import { safeVerifyFernJWTConfig } from "@/server/auth/FernJWT";
-import { createCachedDocsLoader } from "@/server/docs-loader";
-import { openaiApiKey, turbopufferApiKey } from "@/server/env-variables";
-import { isLocal } from "@/server/isLocal";
-import { getDocsDomainEdge } from "@/server/xfernhost/edge";
 
 export const maxDuration = 60;
 export const revalidate = 0;
@@ -53,7 +52,7 @@ export async function POST(req: NextRequest) {
   const metadata = await loader.getMetadata();
   const config = await loader.getConfig();
 
-  const { messages, _, filters } = await req.json();
+  const { messages, _, _filters } = await req.json();
 
   // TODO: remove this once webflow adds model/system-prompt to docs.yml
   //   const isWebflow = url.includes("webflow");
@@ -80,7 +79,8 @@ export async function POST(req: NextRequest) {
 
   const openai = createOpenAI({ apiKey: openaiApiKey() });
   const embeddingModel = openai.embedding("text-embedding-3-large");
-  const namespace = `${withoutStaging(domain)}_${embeddingModel.modelId}`;
+  const namespace = getTurbopufferNamespace(domain, embeddingModel);
+  console.log("namespace", namespace);
 
   if (metadata.isPreview) {
     return NextResponse.json("Chat is not enabled for preview environments", {
@@ -88,31 +88,30 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const [authEdgeConfig, edgeFlags] = await Promise.all([
-    getAuthEdgeConfig(domain),
-    getEdgeFlags(domain),
-  ]);
+  // const fern_token = await getFernToken();
+  // const user = await safeVerifyFernJWTConfig(fern_token, authEdgeConfig);
 
-  if (!edgeFlags.isAskAiEnabled) {
-    throw new Error(`Ask AI is not enabled for ${domain}`);
-  }
-
-  const fern_token = await getFernToken();
-  const user = await safeVerifyFernJWTConfig(fern_token, authEdgeConfig);
-
-  const lastUserMessage: string | undefined = messages.findLast(
-    (message: any) => message.role === "user"
-  )?.content;
+  const lastUserMessage: string | undefined = messages
+    .findLast((message: any) => message.role === "user")
+    ?.parts.map((part: any) => part.text)
+    .join("");
 
   const searchResults = await runQueryTurbopuffer(lastUserMessage, {
     embeddingModel,
     namespace,
-    authed: user != null,
-    roles: user?.roles ?? [],
     topK: 5,
-    filters,
   });
-  const documents = toDocuments(searchResults).join("\n\n");
+
+  const systemPromptDocuments = convertTpufRecordsToDocuments(searchResults);
+  // const systemPrompt = createChatSystemPrompt({
+  //   modelProvider: "anthropic",
+  //   domain,
+  //   date: new Date().toDateString(),
+  //   documents: systemPromptDocuments.join("\n\n"),
+  //   promptTemplate: config.aiChatConfig?.systemPrompt,
+  // });
+
+  const documents = systemPromptDocuments.join("\n\n");
   return NextResponse.json(documents, {
     status: 200,
     headers: {
@@ -145,8 +144,5 @@ async function runQueryTurbopuffer(
           });
           return embedding.embedding;
         },
-        authed: opts.authed,
-        roles: opts.roles,
-        filters: opts.filters,
       });
 }
