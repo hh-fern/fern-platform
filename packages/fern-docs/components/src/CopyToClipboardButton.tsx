@@ -6,6 +6,7 @@ import { useCopyToClipboard } from "@fern-ui/react-commons";
 
 import { Button } from "./FernButtonV2";
 import { FernTooltip, FernTooltipProvider } from "./FernTooltip";
+import { track } from "./analytics/track";
 import { cn } from "./cn";
 
 export declare namespace CopyToClipboardButton {
@@ -33,23 +34,29 @@ export const CopyToClipboardButton: React.FC<CopyToClipboardButton.Props> = ({
     return null;
   }
 
+  const handleCopy = async (e: React.MouseEvent) => {
+    onClick?.(e);
+
+    const contentToCopy =
+      typeof content === "function" ? await content() : content;
+    track("copied_to_clipboard", {
+      content: contentToCopy,
+    });
+
+    void copyToClipboard?.();
+  };
+
   return (
     <FernTooltipProvider>
       <FernTooltip
         content={wasJustCopied ? "Copied!" : "Copy to clipboard"}
         open={wasJustCopied ? true : undefined}
       >
-        {children?.((e) => {
-          onClick?.(e);
-          void copyToClipboard?.();
-        }) ?? (
+        {children?.(handleCopy) ?? (
           <Button
             className={cn("fern-copy-button group", className)}
             disabled={copyToClipboard == null}
-            onClickCapture={(e) => {
-              onClick?.(e);
-              void copyToClipboard?.();
-            }}
+            onClickCapture={handleCopy}
             data-testid={testId}
             variant={wasJustCopied ? "success" : "ghost"}
             size="iconSm"
