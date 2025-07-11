@@ -18,6 +18,7 @@ import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
 import { FernLink } from "../FernLink";
 import { FernTooltip } from "../FernTooltip";
+import { track } from "../analytics/track";
 import { cn } from "../cn";
 import { useScrollSidebarNodeIntoView } from "../hooks/sidebar-scroll";
 import { useIsSelectedSidebarNode } from "../state/navigation";
@@ -125,6 +126,10 @@ const SidebarLinkInternal = React.forwardRef<
         rel={rel}
         className={sharedClassName}
         onClick={(e) => {
+          track("sidebar_link_clicked", {
+            href: String(href),
+          });
+
           onClick?.(e);
 
           if (e.isDefaultPrevented()) {
@@ -148,6 +153,10 @@ const SidebarLinkInternal = React.forwardRef<
         ref={forwardRef as React.ForwardedRef<HTMLButtonElement>}
         className={sharedClassName}
         onClick={(e) => {
+          track("sidebar_link_clicked", {
+            href: "button",
+          });
+
           onClick?.(e);
 
           if (e.isDefaultPrevented()) {
