@@ -43,7 +43,7 @@ export const CopyToClipboardButton: React.FC<CopyToClipboardButton.Props> = ({
       content: contentToCopy,
     });
 
-    void copyToClipboard?.();
+    await copyToClipboard?.();
   };
 
   return (
