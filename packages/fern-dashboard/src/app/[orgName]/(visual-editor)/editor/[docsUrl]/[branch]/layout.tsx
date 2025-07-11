@@ -7,10 +7,11 @@ import { GithubExtendedAccessProtectedRoute } from "@/components/auth/GithubExte
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { BranchProvider } from "@/providers/BranchContext";
 import { MdxStateProvider } from "@/providers/MdxStateContext";
+import { throwDigestibleError } from "@/utils/errors";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import { EncodedDocsUrl } from "@/utils/types";
 
-export default async function AuthedLayout({
+export default async function EditorLayout({
   params,
   children,
 }: Readonly<{
@@ -34,6 +35,39 @@ export default async function AuthedLayout({
     token: session.accessToken,
     userId: session.user.sub,
   });
+
+  if (
+    sourceRepo.owner == null ||
+    sourceRepo.repo == null ||
+    sourceRepo.githubUrl == null
+  ) {
+    throwDigestibleError(
+      "We were unable to find the source repo for this domain. Please confirm that you have linked a repo to this domain.",
+      "SOURCE_REPO_NOT_FOUND"
+    );
+  }
+
+  if (sourceRepo.baseBranch == null) {
+    throwDigestibleError(
+      "Looks like your source repo is not configured correctly. Please set a base branch on your Github repo.",
+      "BASE_BRANCH_NOT_SET"
+    );
+  }
+
+  // TODO: validate branch elsewhere
+  // const response = await validateGithubBranchHandler({
+  //   owner: sourceRepo.owner,
+  //   repo: sourceRepo.repo,
+  //   branchName: branch,
+  //   userId: session.user.sub,
+  // });
+
+  // if (!response.exists) {
+  //   throwDigestibleError(
+  //     `We were unable to find your working branch. Please confirm that the Github branch "${branch}" exists and has not been deleted.`,
+  //     "BRANCH_NOT_FOUND"
+  //   );
+  // }
 
   return (
     <GithubExtendedAccessProtectedRoute

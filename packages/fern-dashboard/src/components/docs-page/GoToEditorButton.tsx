@@ -1,0 +1,152 @@
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useCallback } from "react";
+
+import {
+  ExclamationCircleIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/outline";
+import { Loader2 } from "lucide-react";
+
+import {
+  FernTooltip,
+  FernTooltipProvider,
+} from "@fern-docs/components/FernTooltip";
+
+import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import { Auth0OrgName } from "@/app/services/auth0/types";
+import { DashboardApiClient } from "@/app/services/dashboard-api/client";
+import { GithubSourceRepo } from "@/app/services/github/types";
+import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
+import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
+
+import {
+  ErrorCreateBranchToast,
+  ErrorNoBaseBranchToast,
+  ErrorNoGithubSourceToast,
+} from "../editor/EditorToasts";
+import { Button } from "../ui/button";
+
+export function GoToEditorButton({
+  orgName,
+  docsUrl,
+  session,
+  sourceRepo,
+  disabled = false,
+  disabledReason,
+}: {
+  orgName: Auth0OrgName;
+  docsUrl: DocsUrl;
+  session: Auth0SessionData;
+  sourceRepo: GithubSourceRepo;
+  disabled?: boolean;
+  disabledReason?: string;
+}) {
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const newBranchName = useMemo(() => {
+    const randomHexString = crypto.randomUUID().split("-")[0];
+    return (
+      new Date().toISOString().split("T")[0] +
+      "-" +
+      session.user.name?.toLowerCase().replaceAll(" ", "_") +
+      "-" +
+      randomHexString
+    );
+  }, [session.user.name]);
+
+  const editorSlug = useMemo(() => {
+    return constructEditorSlug({
+      orgName,
+      docsUrl: encodeURIComponent(docsUrl) as EncodedDocsUrl,
+      branchName: newBranchName,
+      slug: ROOT_SLUG_ALIAS,
+    });
+  }, [orgName, docsUrl, newBranchName]);
+
+  // Prefetch the editor URL when the component mounts or dependencies change
+  useEffect(() => {
+    if (!disabled) {
+      router.prefetch(editorSlug);
+    }
+  }, [router, editorSlug, disabled]);
+
+  const createBranch = useCallback(() => {
+    if (sourceRepo?.owner == null || sourceRepo.repo == null) {
+      ErrorNoGithubSourceToast();
+      return;
+    }
+    if (sourceRepo.baseBranch == null) {
+      ErrorNoBaseBranchToast();
+      return;
+    }
+
+    // do not await -- we can let this run in the background
+    DashboardApiClient.postCreateBranch({
+      owner: sourceRepo.owner,
+      repo: sourceRepo.repo,
+      branch: newBranchName,
+      baseBranch: sourceRepo.baseBranch,
+    }).then((response) => {
+      if (!response.success) {
+        ErrorCreateBranchToast();
+        return;
+      }
+    });
+  }, [sourceRepo, newBranchName]);
+
+  return (
+    <div className="flex flex-row items-center gap-1">
+      <Button
+        size="sm"
+        className="text-primary hover:text-primary w-fit"
+        variant="outline"
+        onClick={() => {
+          setIsLoading(true);
+          createBranch();
+        }}
+        disabled={isLoading || disabled}
+        asChild
+      >
+        <a href={editorSlug}>
+          {isLoading ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <>
+              <PencilSquareIcon />
+              Go to Editor
+            </>
+          )}
+        </a>
+      </Button>
+      {disabled && disabledReason && (
+        <FernTooltipProvider delayDuration={0}>
+          <FernTooltip content={disabledReason}>
+            <button
+              type="button"
+              className="cursor-help border-0 bg-transparent p-0"
+              aria-label="More information"
+            >
+              <ExclamationCircleIcon className="h-4 w-4 text-red-600" />
+            </button>
+          </FernTooltip>
+        </FernTooltipProvider>
+      )}
+    </div>
+    // NOTE: This is the UI we want when we have a way to preview branches.
+    // <Button
+    //   variant="outline"
+    //   size="sm"
+    //   className="text-primary hover:text-primary"
+    //   onClick={() => {
+    //     setIsLoading(true);
+    //     void createBranch();
+    //   }}
+    //   disabled={isLoading}
+    // >
+    //   <PencilSquareIcon className="text-primary" />
+    //   Create a Branch
+    // </Button>
+  );
+}

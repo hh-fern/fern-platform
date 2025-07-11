@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createOpenAI } from "@ai-sdk/openai";
 import { UIMessage } from "ai";
-import { initLogger } from "braintrust";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
-import { openaiApiKey } from "@fern-api/docs-server/env-variables";
+import {
+  getFaiOrigin,
+  openaiApiKey,
+} from "@fern-api/docs-server/env-variables";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
-import { postNewQueryToFai } from "@fern-api/docs-server/postNewQueryToFai";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
+import { FernFaiClient } from "@fern-api/fai-sdk";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
   getLanguageModel,
@@ -57,11 +59,6 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  initLogger({
-    projectName: "Braintrust Evaluation",
-    apiKey: process.env.BRAINTRUST_API_KEY,
-  });
-
   const {
     messages,
     source,
@@ -82,7 +79,7 @@ export async function POST(req: NextRequest) {
   }
 
   const config = await loader.getConfig();
-  const chatSource = source ?? "chat";
+  const chatSource = source ?? "CHAT";
 
   const modelId = config.aiChatConfig?.model ?? "claude-3.5";
   let modelProvider: ModelProvider = "anthropic";
@@ -94,14 +91,19 @@ export async function POST(req: NextRequest) {
   const openai = createOpenAI({ apiKey: openaiApiKey() });
   const embeddingModel = openai.embedding("text-embedding-3-large");
 
-  await postNewQueryToFai({
-    queryId,
+  const faiClient = new FernFaiClient({
+    baseUrl: getFaiOrigin(),
+    token: () => "",
+  });
+  await faiClient.createQuery({
+    query_id: queryId,
+    conversation_id: conversationId,
     domain,
-    conversationId,
     text: lastUserMessage,
     role: "USER",
-    createdAt,
-    timeToFirstToken: null,
+    source: chatSource.toUpperCase(),
+    created_at: createdAt.toISOString(),
+    time_to_first_token: undefined,
   });
 
   if (modelProvider === "anthropic") {
