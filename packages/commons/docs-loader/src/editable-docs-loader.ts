@@ -32,6 +32,8 @@ import { createCachedDocsLoader } from "./readonly-docs-loader";
 export interface EditableDocsLoader extends DocsLoader {
   modifiedMdxFiles: Record<string, string>;
   setMdxFile: (filename: string, content: string) => Promise<void>;
+  addedNavigationNodes: FernNavigation.NavigationNode[];
+  addNavigationNode: (node: FernNavigation.NavigationNode) => void;
 }
 
 /**
@@ -43,17 +45,23 @@ class EditableDocsLoaderImpl implements EditableDocsLoader {
   domain: string;
   fern_token: string | undefined;
   private readOnlyDocsLoader: DocsLoader;
+  addedNavigationNodes: FernNavigation.NavigationNode[];
 
   constructor(docsLoader: DocsLoader) {
     this.modifiedMdxFiles = {};
     this.readOnlyDocsLoader = docsLoader;
     this.domain = docsLoader.domain;
     this.fern_token = docsLoader.fern_token;
+    this.addedNavigationNodes = [];
   }
 
   setMdxFile(filename: string, content: string): Promise<void> {
     this.modifiedMdxFiles[filename] = content;
     return Promise.resolve();
+  }
+
+  addNavigationNode(node: FernNavigation.NavigationNode): void {
+    this.addedNavigationNodes.push(node);
   }
 
   async unsafe_getFullRoot(): Promise<FernNavigation.RootNode> {
@@ -119,6 +127,10 @@ class EditableDocsLoaderImpl implements EditableDocsLoader {
   }
 
   async getNavigationNode(id: string): Promise<NavigationNode> {
+    const addedNode = this.addedNavigationNodes.find((node) => node.id === id);
+    if (addedNode != null) {
+      return addedNode;
+    }
     return this.readOnlyDocsLoader.getNavigationNode(id);
   }
 

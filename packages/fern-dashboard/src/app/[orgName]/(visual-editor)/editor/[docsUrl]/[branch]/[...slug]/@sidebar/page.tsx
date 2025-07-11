@@ -20,6 +20,8 @@ export default async function SidebarPage({
   params: Promise<{ docsUrl: EncodedDocsUrl; slug: string }>;
 }) {
   const { docsUrl, slug } = await params;
+
+  // const decodedDocsUrl = parseDocsUrlParam({ docsUrl });
   const session = await getCurrentSession();
   const host = await getHostFromHeaders();
   const loader = await createEditableDocsLoader(
@@ -54,11 +56,14 @@ export default async function SidebarPage({
       {isSingleOverviewPage && !isSidebarFixed ? (
         <HiddenSidebar />
       ) : (
-        <SidebarRootNode
-          root={found.sidebar}
-          visibleNodeIds={visibleNodeIds}
-          loader={loader}
-        />
+        <>
+          {/* <AddNewPageButton docsUrl={decodedDocsUrl} /> */}
+          <SidebarRootNode
+            root={found.sidebar}
+            visibleNodeIds={visibleNodeIds}
+            loader={loader}
+          />
+        </>
       )}
     </>
   );
