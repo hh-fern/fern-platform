@@ -1,6 +1,7 @@
 "use client";
 
 import { FernLink } from "./FernLink";
+import { track } from "./analytics/track";
 import { useDispatchSidebarAction } from "./state/navigation";
 
 export function FernLinkTab({
@@ -12,6 +13,9 @@ export function FernLinkTab({
     <FernLink
       {...props}
       onClick={() => {
+        track("tab_clicked", {
+          href: props.href,
+        });
         dispatch({ type: "collapse-all" });
       }}
     >

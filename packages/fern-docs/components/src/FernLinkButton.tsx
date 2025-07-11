@@ -15,6 +15,7 @@ import {
 } from "./FernButton";
 import { Button } from "./FernButtonV2";
 import { FernLink } from "./FernLink";
+import { track } from "./analytics/track";
 
 interface FernLinkButtonProps
   extends ComponentProps<typeof Link>,
@@ -58,6 +59,9 @@ export const FernLinkButton = forwardRef<
                 e.preventDefault();
                 e.stopPropagation();
               } else {
+                track("link_button_clicked", {
+                  href: String(props.href),
+                });
                 props.onClick?.(e);
               }
             }
