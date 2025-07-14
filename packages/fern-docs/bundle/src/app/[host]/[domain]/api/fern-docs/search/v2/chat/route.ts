@@ -10,6 +10,7 @@ import {
 } from "@fern-api/docs-server/env-variables";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
+import { postToSlack } from "@fern-api/docs-server/slack";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { FernFaiClient } from "@fern-api/fai-sdk";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
@@ -95,16 +96,24 @@ export async function POST(req: NextRequest) {
     baseUrl: getFaiOrigin(),
     token: () => "",
   });
-  await faiClient.queries.createQuery({
-    query_id: queryId,
-    conversation_id: conversationId,
-    domain,
-    text: lastUserMessage,
-    role: "USER",
-    source: chatSource.toUpperCase(),
-    created_at: createdAt.toISOString(),
-    time_to_first_token: undefined,
-  });
+  try {
+    await faiClient.queries.createQuery({
+      query_id: queryId,
+      conversation_id: conversationId,
+      domain,
+      text: lastUserMessage,
+      role: "USER",
+      source: chatSource.toUpperCase(),
+      created_at: createdAt.toISOString(),
+      time_to_first_token: undefined,
+    });
+  } catch (error) {
+    console.error(error);
+    postToSlack(
+      "#search-notifs",
+      `:rotating_light: [${domain}] Failed to send query to FAI: '${lastUserMessage}': \`${JSON.stringify(error)}\``
+    );
+  }
 
   if (modelProvider === "anthropic") {
     return runRouteForAnthropic({

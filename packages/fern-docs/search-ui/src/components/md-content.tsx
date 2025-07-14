@@ -83,7 +83,9 @@ export function MarkdownContent({
       remarkPlugins={remarkPlugins}
       remarkRehypeOptions={{}}
     >
-      {cleanedContent.replaceAll("```[^", "```\n[^")}
+      {cleanedContent
+        .replaceAll("```[^", "```\n[^")
+        .replace(/``` *```/g, "```\n```")}
     </Markdown>
   );
 }
