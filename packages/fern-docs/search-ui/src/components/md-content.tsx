@@ -81,9 +81,7 @@ export function MarkdownContent({
   // it will break the code rendering, so we clean manually by moving the footnote to a new line
   cleanedContent = cleanedContent.replace(/```[ \t]*\[\^/g, "```\n[^");
 
-  // fix for code-blocks within code-blocks
-  cleanedContent = cleanedContent.replace(/``` *```/g, "```\n```");
-
+  console.log(cleanedContent);
   return (
     <Markdown
       components={components}
