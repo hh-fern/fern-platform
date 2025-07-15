@@ -40,21 +40,21 @@ export function ConversationsDataTable<TData, TValue>({
           <span className="text-lg font-semibold">Conversations</span>
         </div>
         <div>
-        <Input
-              placeholder="Search..."
-              value={
-                (table
-                  .getColumn("firstUserMessage")
-                  ?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table
-                  .getColumn("firstUserMessage")
-                  ?.setFilterValue(event.target.value)
-              }
-              className="h-9 max-w-sm rounded-full"
-              autoFocus
-            />
+          <Input
+            placeholder="Search..."
+            value={
+              (table
+                .getColumn("firstUserMessage")
+                ?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table
+                .getColumn("firstUserMessage")
+                ?.setFilterValue(event.target.value)
+            }
+            className="h-9 max-w-sm rounded-full"
+            autoFocus
+          />
         </div>
       </div>
       <div className="">
