@@ -15,6 +15,7 @@ export default async function AnalyticsPage({ docsUrl }: { docsUrl: string }) {
       baseDocsUrl,
       getRequestParams(TimeRange.LAST_WEEK)
     );
+
   const queriesData = await client.queries.getRecentQueries(baseDocsUrl);
 
   return (

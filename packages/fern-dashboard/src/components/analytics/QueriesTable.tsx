@@ -2,9 +2,9 @@
 
 import { FernFai } from "@fern-api/fai-sdk";
 
-import { QueriesDataTable, columns } from "./ConversationsDataTable";
+import { QueriesDataTable, columns } from "./QueriesDataTable";
 
-export function ConversationsTable({
+export function QueriesTable({
   queries,
   baseDocsUrl,
 }: {

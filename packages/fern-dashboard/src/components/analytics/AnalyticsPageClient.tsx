@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 
 import { FernFai } from "@fern-api/fai-sdk";
 
+import { getDomainAnalytics } from "@/app/actions/getAnalytics";
+
 import { AnalyticsHistogram } from "./AnalyticsHistogram";
 import { TimeRangeSelect } from "./AnalyticsHistogramRangeSelector";
 import { AnalyticsHistogramTabBar } from "./AnalyticsHistogramTabBar";
-import { ConversationsTable } from "./ConversationsTable";
+import { QueriesTable } from "./QueriesTable";
 import { TimeRange } from "./get-request-params";
 
 export type RenderType = "QUESTIONS" | "CONVERSATIONS";
@@ -27,17 +29,14 @@ export function AnalyticsPageClient({
 
   useEffect(() => {
     async function fetchHistogramData() {
-      const res = await fetch("/api/analytics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ docsUrl: baseDocsUrl, timeRange }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
+      try {
+        const data = await getDomainAnalytics({
+          docsUrl: baseDocsUrl,
+          timeRange,
+        });
         setHistogramData(data);
-      } else {
-        console.error("Failed to fetch histogram data");
+      } catch (error) {
+        console.error("Failed to fetch histogram data:", error);
       }
     }
 
@@ -57,35 +56,9 @@ export function AnalyticsPageClient({
   }));
 
   return (
-    <div
-      style={{
-        display: "flex",
-        width: "100%",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "16px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          width: "80%",
-          flexDirection: "column",
-          alignItems: "center",
-          border: "1px solid #ccc",
-          borderRadius: "16px",
-          padding: "16px",
-          marginBottom: "16px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            width: "100%",
-            justifyContent: "space-between",
-            borderBottom: "1px solid #ccc",
-          }}
-        >
+    <div className="flex w-full flex-col items-center p-4">
+      <div className="border-gray-0 mb-4 flex w-4/5 flex-col items-center rounded-2xl border p-4">
+        <div className="border-gray-0 mb-4 flex w-full justify-between border-b">
           <AnalyticsHistogramTabBar
             renderType={renderType}
             onChangeRenderType={setRenderType}
@@ -98,21 +71,8 @@ export function AnalyticsPageClient({
           chartConfig={chartConfig}
         />
       </div>
-      <div
-        style={{
-          display: "flex",
-          width: "80%",
-          flexDirection: "column",
-          alignItems: "center",
-          border: "1px solid #ccc",
-          borderRadius: "16px",
-          padding: "16px",
-        }}
-      >
-        <ConversationsTable
-          queries={initialQueriesData}
-          baseDocsUrl={baseDocsUrl}
-        />
+      <div className="border-gray-0 flex w-4/5 flex-col items-center rounded-2xl border p-4">
+        <QueriesTable queries={initialQueriesData} baseDocsUrl={baseDocsUrl} />
       </div>
     </div>
   );

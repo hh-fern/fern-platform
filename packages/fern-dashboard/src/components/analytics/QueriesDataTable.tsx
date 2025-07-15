@@ -57,7 +57,7 @@ export function QueriesDataTable<TData, TValue>({
       <div className="">
         <Table className="table-fixed">
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table?.getRowModel()?.rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -69,6 +69,7 @@ export function QueriesDataTable<TData, TValue>({
                       conversationId: (row.original as FernFai.Query)
                         .conversation_id,
                     });
+                    // TODO: Replace with side panel
                     console.log(conversation);
                   }}
                 >
