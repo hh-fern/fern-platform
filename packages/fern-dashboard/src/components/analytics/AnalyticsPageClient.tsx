@@ -42,7 +42,7 @@ export function AnalyticsPageClient({
     }
 
     void fetchHistogramData();
-  }, [timeRange]);
+  }, [baseDocsUrl, timeRange]);
 
   const chartConfig = {
     queries: {
