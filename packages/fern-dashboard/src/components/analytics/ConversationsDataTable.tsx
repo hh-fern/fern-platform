@@ -12,7 +12,6 @@ import { ArrowRight, MessageSquare } from "lucide-react";
 
 import { FernFai } from "@fern-api/fai-sdk";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
@@ -34,15 +33,14 @@ export function ConversationsDataTable<TData, TValue>({
   });
 
   return (
-    <div className="rounded-md border p-4">
+    <div className="rounded-md p-4">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            <span className="text-lg font-semibold">Conversations</span>
-          </div>
-          <div>
-            <Input
+          <MessageSquare className="h-5 w-5" />
+          <span className="text-lg font-semibold">Conversations</span>
+        </div>
+        <div>
+        <Input
               placeholder="Search..."
               value={
                 (table
@@ -57,10 +55,6 @@ export function ConversationsDataTable<TData, TValue>({
               className="h-9 max-w-sm rounded-full"
               autoFocus
             />
-          </div>
-        </div>
-        <div>
-          <Button variant="outline">Last week</Button>
         </div>
       </div>
       <div className="">

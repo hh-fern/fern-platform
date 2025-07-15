@@ -75,13 +75,11 @@ async def get_histogram_analytics(
                 )
                 current += timedelta(days=1)
         else:
-            step: timedelta | None = None
             if groupBy == "WEEK":
                 current = current - timedelta(days=current.weekday())
                 step = timedelta(weeks=1)
             elif groupBy == "MONTH":
                 current = current.replace(day=1)
-                step = None
 
             while current <= ed:
                 label = current.strftime("%Y-%m-%d")
