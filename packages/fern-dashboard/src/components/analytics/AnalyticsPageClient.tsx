@@ -41,7 +41,7 @@ export function AnalyticsPageClient({
       }
     }
 
-    fetchHistogramData();
+    void fetchHistogramData();
   }, [timeRange]);
 
   const chartConfig = {
@@ -75,6 +75,7 @@ export function AnalyticsPageClient({
           border: "1px solid #ccc",
           borderRadius: "16px",
           padding: "16px",
+          marginBottom: "16px",
         }}
       >
         <div
@@ -97,7 +98,19 @@ export function AnalyticsPageClient({
           chartConfig={chartConfig}
         />
       </div>
-      <ConversationsTable conversations={initialConversationsData} />
+      <div
+        style={{
+          display: "flex",
+          width: "80%",
+          flexDirection: "column",
+          alignItems: "center",
+          border: "1px solid #ccc",
+          borderRadius: "16px",
+          padding: "16px",
+        }}
+      >
+        <ConversationsTable conversations={initialConversationsData} />
+      </div>
     </div>
   );
 }
