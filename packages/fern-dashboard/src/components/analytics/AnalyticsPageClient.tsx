@@ -14,11 +14,11 @@ export type RenderType = "QUESTIONS" | "CONVERSATIONS";
 
 export function AnalyticsPageClient({
   baseDocsUrl,
-  initialConversationsData,
+  initialQueriesData,
   initialHistogramData,
 }: {
   baseDocsUrl: string;
-  initialConversationsData: FernFai.Conversation[];
+  initialQueriesData: FernFai.Query[];
   initialHistogramData: FernFai.HistogramAnalytics;
 }) {
   const [renderType, setRenderType] = useState<RenderType>("QUESTIONS");
@@ -109,7 +109,10 @@ export function AnalyticsPageClient({
           padding: "16px",
         }}
       >
-        <ConversationsTable conversations={initialConversationsData} />
+        <ConversationsTable
+          queries={initialQueriesData}
+          baseDocsUrl={baseDocsUrl}
+        />
       </div>
     </div>
   );

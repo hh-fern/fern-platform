@@ -12,18 +12,21 @@ import { ArrowRight, MessageSquare } from "lucide-react";
 
 import { FernFai } from "@fern-api/fai-sdk";
 
+import { getConversation } from "@/app/actions/getConversation";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-interface ConversationsDataTableProps<TData, TValue> {
+interface QueriesDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  baseDocsUrl: string;
 }
 
-export function ConversationsDataTable<TData, TValue>({
+export function QueriesDataTable<TData, TValue>({
   columns,
   data,
-}: ConversationsDataTableProps<TData, TValue>) {
+  baseDocsUrl,
+}: QueriesDataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -37,20 +40,14 @@ export function ConversationsDataTable<TData, TValue>({
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <MessageSquare className="h-5 w-5" />
-          <span className="text-lg font-semibold">Conversations</span>
+          <span className="text-lg font-semibold">Recent Queries</span>
         </div>
         <div>
           <Input
             placeholder="Search..."
-            value={
-              (table
-                .getColumn("firstUserMessage")
-                ?.getFilterValue() as string) ?? ""
-            }
+            value={(table.getColumn("query")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table
-                .getColumn("firstUserMessage")
-                ?.setFilterValue(event.target.value)
+              table.getColumn("query")?.setFilterValue(event.target.value)
             }
             className="h-9 max-w-sm rounded-full"
             autoFocus
@@ -66,6 +63,14 @@ export function ConversationsDataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="cursor-pointer border-none"
+                  onClick={async () => {
+                    const conversation = await getConversation({
+                      domain: baseDocsUrl,
+                      conversationId: (row.original as FernFai.Query)
+                        .conversation_id,
+                    });
+                    console.log(conversation);
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -103,18 +108,13 @@ export function ConversationsDataTable<TData, TValue>({
   );
 }
 
-export const columns: ColumnDef<FernFai.Conversation>[] = [
+export const columns: ColumnDef<FernFai.Query>[] = [
   {
-    id: "firstUserMessage",
-    accessorFn: (conversation) => {
-      const firstUserTurn = conversation.turns.find(
-        (turn) => turn.role.toUpperCase() === "USER"
-      );
-      return firstUserTurn?.text ?? "";
-    },
-    header: "Conversations",
+    id: "query",
+    accessorFn: (query) => query.text,
+    header: "Query",
     cell: ({ row }) => {
-      const text = row.getValue("firstUserMessage") as string;
+      const text = row.getValue("query") as string;
       return (
         <div className="truncate" title={text}>
           {text}

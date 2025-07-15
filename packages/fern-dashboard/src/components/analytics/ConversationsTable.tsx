@@ -2,16 +2,22 @@
 
 import { FernFai } from "@fern-api/fai-sdk";
 
-import { ConversationsDataTable, columns } from "./ConversationsDataTable";
+import { QueriesDataTable, columns } from "./ConversationsDataTable";
 
 export function ConversationsTable({
-  conversations,
+  queries,
+  baseDocsUrl,
 }: {
-  conversations: FernFai.Conversation[];
+  queries: FernFai.Query[];
+  baseDocsUrl: string;
 }) {
   return (
     <div>
-      <ConversationsDataTable columns={columns} data={conversations} />
+      <QueriesDataTable
+        columns={columns}
+        data={queries}
+        baseDocsUrl={baseDocsUrl}
+      />
     </div>
   );
 }
