@@ -18,6 +18,7 @@ import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { PreviewHeader } from "@/components/docs-preview/PreviewHeader";
 import { EditorLinkInterceptor } from "@/components/editor/EditorLinkInterceptor";
+import { ServerSidePostHogOrgNameUpdater } from "@/components/posthog/ServerSidePostHogOrgNameUpdater";
 import { EditorRoutingProvider } from "@/providers/EditorRoutingContext";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { EncodedDocsUrl } from "@/utils/types";
@@ -110,6 +111,7 @@ export default async function VisualEditorPreviewLayout({
                 branch,
               }}
             >
+              <ServerSidePostHogOrgNameUpdater orgName={orgName} />
               <div id="preview-container">
                 <EditorLinkInterceptor />
                 <AbstractDefaultDocs

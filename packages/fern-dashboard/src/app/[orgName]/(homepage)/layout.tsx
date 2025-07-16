@@ -1,5 +1,6 @@
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { ServerSidePostHogOrgNameUpdater } from "@/components/posthog/ServerSidePostHogOrgNameUpdater";
 import { ServerSidePylonSetup } from "@/components/pylon/ServerSidePylonSetup";
 
 import { Auth0OrgName } from "../../services/auth0/types";
@@ -16,6 +17,7 @@ export default async function AuthedLayout({
   return (
     <ProtectedRoute orgName={orgName}>
       <>
+        <ServerSidePostHogOrgNameUpdater orgName={orgName} />
         <ServerSidePylonSetup />
         <AppLayout>{children}</AppLayout>
       </>
