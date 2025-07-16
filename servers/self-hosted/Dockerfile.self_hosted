@@ -65,8 +65,9 @@ EXPOSE 9000 9001
 
 # ----------- Start MeiliSearch setup -----------
 RUN apt-get update && \
-    apt-get install -y curl && \
-    curl -L https://install.meilisearch.com | sh
+    apt-get install -y wget && \
+    wget https://github.com/meilisearch/meilisearch/releases/download/v1.15.2/meilisearch-linux-amd64 -O /usr/local/bin/meilisearch && \
+    chmod +x /usr/local/bin/meilisearch
 
 EXPOSE 7700
 # ----------- End MeiliSearch setup -----------
@@ -103,7 +104,9 @@ RUN mkdir -p /nextapp && \
 RUN apt-get update && apt-get install -y jq
 
 # ----------- Start Buf CLI setup -----------
-RUN wget https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64 -O /usr/local/bin/buf && \
+RUN apt-get update && \
+    apt-get install -y wget && \
+    wget https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64 -O /usr/local/bin/buf && \
     chmod +x /usr/local/bin/buf
 # ----------- End Buf CLI setup -----------
 
