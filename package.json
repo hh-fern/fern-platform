@@ -6,11 +6,12 @@
   "author": "Birch Solutions, Inc.",
   "scripts": {
     "aws:up": "pnpm up -r \"@aws-sdk/*\"",
-    "build": "turbo build",
+    "build": "pnpm -r build",
     "check-docs-release-blockers": "pnpm tsx packages/scripts/src/cli.ts -- fern-scripts check-docs-release-blockers",
     "clean": "turbo clean",
     "codegen": "turbo codegen",
-    "compile": "turbo compile",
+    "compile": "pnpm -r compile",
+    "turboc": "turbo compile",
     "depcheck": "turbo depcheck",
     "docs:build": "turbo docs:build",
     "docs:dev": "turbo docs:dev",
@@ -39,7 +40,9 @@
     "test": "CI=true turbo test",
     "test:update": "CI=true turbo test -- -u",
     "vercel-scripts": "pnpm --filter=@fern-platform/vercel-scripts vercel-scripts",
-    "vercel:up": "pnpm up -r \"@vercel/*\""
+    "vercel:up": "pnpm up -r \"@vercel/*\"",
+    "build-all": "pnpm -r build",
+    "compile-all": "pnpm -r compile"
   },
   "resolutions": {
     "@types/estree": "1.0.6",
