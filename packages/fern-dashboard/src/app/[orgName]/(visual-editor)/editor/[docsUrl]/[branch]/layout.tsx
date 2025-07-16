@@ -1,3 +1,4 @@
+import { ThemeProvider } from "next-themes";
 import { redirect } from "next/navigation";
 import type React from "react";
 
@@ -10,6 +11,7 @@ import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { GithubExtendedAccessProtectedRoute } from "@/components/auth/GithubExtendedAccessProtectedRoute";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { BranchProvider } from "@/providers/BranchContext";
+import { GitPRUrlProvider } from "@/providers/GitPRUrlContext";
 import { MdxStateProvider } from "@/providers/MdxStateContext";
 import { throwDigestibleError } from "@/utils/errors";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
@@ -46,11 +48,7 @@ async function DynamicEditorContent({
     userId: session.user.sub,
   });
 
-  if (
-    sourceRepo.owner == null ||
-    sourceRepo.repo == null ||
-    sourceRepo.githubUrl == null
-  ) {
+  if (sourceRepo.owner == null || sourceRepo.repo == null) {
     throwDigestibleError(
       "We were unable to find the source repo for this domain. Please confirm that you have linked a repo to this domain.",
       "SOURCE_REPO_NOT_FOUND"
@@ -70,16 +68,25 @@ async function DynamicEditorContent({
       owner={sourceRepo.owner}
       repo={sourceRepo.repo}
     >
-      <MdxStateProvider docsUrl={docsUrl}>
-        <BranchProvider branch={branch}>
-          <HeaderToolbar
-            orgName={orgName}
-            session={session}
-            docsUrl={docsUrl}
-          />
-          {children}
-        </BranchProvider>
-      </MdxStateProvider>
+      <ThemeProvider
+        attribute="class"
+        forcedTheme="light"
+        enableSystem={false}
+        disableTransitionOnChange
+      >
+        <MdxStateProvider docsUrl={docsUrl}>
+          <BranchProvider branch={branch}>
+            <GitPRUrlProvider>
+              <HeaderToolbar
+                orgName={orgName}
+                session={session}
+                docsUrl={docsUrl}
+              />
+              {children}
+            </GitPRUrlProvider>
+          </BranchProvider>
+        </MdxStateProvider>
+      </ThemeProvider>
     </GithubExtendedAccessProtectedRoute>
   );
 }

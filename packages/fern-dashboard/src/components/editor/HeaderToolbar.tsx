@@ -1,9 +1,9 @@
 "use client";
 
 import { redirect } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { ArrowLeftIcon, Globe } from "lucide-react";
+import { ArrowLeftIcon, GitBranch, Globe } from "lucide-react";
 
 import { FernTooltipProvider } from "@fern-docs/components";
 import { FernTooltip } from "@fern-docs/components";
@@ -13,6 +13,7 @@ import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { handleCreatePr } from "@/app/services/github/github";
 import { useBranch } from "@/providers/BranchContext";
+import { useGitPrUrl } from "@/providers/GitPRUrlContext";
 import { useMdxState } from "@/providers/MdxStateContext";
 import { useGithubSourceRepo } from "@/state/useGithubSourceRepo";
 import { DocsUrl } from "@/utils/types";
@@ -41,6 +42,8 @@ export function HeaderToolbar({
 }) {
   const { name, picture } = session.user;
   const { changedMdxFiles, mdxSyncedStatus } = useMdxState();
+  // NOTE: useGitPrUrl is not fully in use because the Provider keeps unmounting, but this is in the right direction we want to go in
+  const { gitPrUrl, setPrUrl } = useGitPrUrl();
   const { branch } = useBranch();
   const githubSource = getLoadableValue(useGithubSourceRepo(docsUrl));
 
@@ -49,8 +52,15 @@ export function HeaderToolbar({
     redirect(`/${orgName}/docs/${docsUrl}`);
   }
 
+  useEffect(() => {
+    // NOTE: This is a temporary solution to persist the PR URL across route changes/refreshes.
+    const prUrl = localStorage.getItem(`gitPrUrl-${branch}`);
+    if (prUrl) {
+      setPrUrl(prUrl);
+    }
+  }, [branch, setPrUrl]);
+
   const [isCommitting, setIsCommitting] = useState(false);
-  const [prUrl, setPrUrl] = useState<string | undefined>(undefined);
 
   const handleCommitPress = useCallback(async () => {
     if (githubSource?.owner == null || githubSource.repo == null) {
@@ -88,7 +98,7 @@ export function HeaderToolbar({
         ErrorFullCommitToast();
       }
 
-      if (response.success && !prUrl) {
+      if (response.success && !gitPrUrl) {
         if (githubSource.baseBranch == null) {
           ErrorNoBaseBranchToast();
           return;
@@ -99,7 +109,10 @@ export function HeaderToolbar({
           repo: githubSource.repo,
           baseBranch: githubSource.baseBranch,
         });
-        setPrUrl(newPrUrl);
+        if (newPrUrl) {
+          setPrUrl(newPrUrl);
+          localStorage.setItem(`gitPrUrl-${branch}`, newPrUrl);
+        }
       }
     } catch (error) {
       ErrorFullCommitToast();
@@ -107,7 +120,14 @@ export function HeaderToolbar({
     } finally {
       setIsCommitting(false);
     }
-  }, [githubSource, branch, changedMdxFiles, mdxSyncedStatus, prUrl]);
+  }, [
+    githubSource,
+    branch,
+    changedMdxFiles,
+    mdxSyncedStatus,
+    gitPrUrl,
+    setPrUrl,
+  ]);
 
   const commitDisabledReason = useMemo(() => {
     if (isCommitting) {
@@ -130,7 +150,16 @@ export function HeaderToolbar({
             <ArrowLeftIcon />
           </a>
         </Button>
-        <p className="text-gray-900">{branch}</p>
+        <div className="flex items-center gap-1 rounded-md p-1 px-2 text-gray-900 transition-colors hover:bg-gray-300 hover:transition-none">
+          <a
+            href={`https://github.com/${githubSource?.owner}/${githubSource?.repo}/compare/${githubSource?.baseBranch}...${branch}`}
+            target="_blank"
+            className="flex items-center gap-1"
+          >
+            <GitBranch className="size-4" />
+            <p>{branch}</p>
+          </a>
+        </div>
       </div>
       {/* TODO: Add undo/redo/settings buttons
        <div className="flex items-center gap-2">
@@ -196,15 +225,19 @@ export function HeaderToolbar({
         <div className="flex gap-1">
           <FernTooltipProvider>
             <FernTooltip
-              content={prUrl ? undefined : "Commit changes to view PR"}
+              content={gitPrUrl ? undefined : "Commit changes to view PR"}
               delayDuration={200}
               variant="dashboard"
             >
               {/* Additional span is needed since disabled buttons don't have pointer events */}
               <span className="pointer-events-auto">
-                <Button disabled={!prUrl} variant="ghost" asChild={!!prUrl}>
+                <Button
+                  disabled={!gitPrUrl}
+                  variant="ghost"
+                  asChild={!!gitPrUrl}
+                >
                   <a
-                    href={prUrl}
+                    href={gitPrUrl ?? ""}
                     target="_blank"
                     className="flex items-center gap-2"
                   >

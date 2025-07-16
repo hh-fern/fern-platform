@@ -77,9 +77,7 @@ await client.analytics.getHistogramAnalytics("domain", {
 </dl>
 </details>
 
-## Conversations
-
-<details><summary><code>client.conversations.<a href="/src/api/resources/conversations/client/Client.ts">getConversations</a>(domain, { ...params }) -> FernFai.Conversations</code></summary>
+<details><summary><code>client.analytics.<a href="/src/api/resources/analytics/client/Client.ts">getInsights</a>(domain, { ...params }) -> FernFai.Insights</code></summary>
 <dl>
 <dd>
 
@@ -91,7 +89,7 @@ await client.analytics.getHistogramAnalytics("domain", {
 <dl>
 <dd>
 
-Retrieve all paginated chat conversations
+Retrieve the insights for a given period
 
 </dd>
 </dl>
@@ -107,7 +105,10 @@ Retrieve all paginated chat conversations
 <dd>
 
 ```typescript
-await client.conversations.getConversations("domain");
+await client.analytics.getInsights("domain", {
+    start_date: "2024-01-15T09:30:00Z",
+    end_date: "2024-01-15T09:30:00Z",
+});
 ```
 
 </dd>
@@ -131,7 +132,7 @@ await client.conversations.getConversations("domain");
 <dl>
 <dd>
 
-**request:** `FernFai.GetConversationsRequest`
+**request:** `FernFai.GetInsightsRequest`
 
 </dd>
 </dl>
@@ -139,7 +140,7 @@ await client.conversations.getConversations("domain");
 <dl>
 <dd>
 
-**requestOptions:** `Conversations.RequestOptions`
+**requestOptions:** `Analytics.RequestOptions`
 
 </dd>
 </dl>
@@ -150,7 +151,9 @@ await client.conversations.getConversations("domain");
 </dl>
 </details>
 
-<details><summary><code>client.conversations.<a href="/src/api/resources/conversations/client/Client.ts">getConversationById</a>(conversationId) -> FernFai.Conversation</code></summary>
+## Conversations
+
+<details><summary><code>client.conversations.<a href="/src/api/resources/conversations/client/Client.ts">getConversation</a>(domain, conversationId) -> FernFai.Conversation</code></summary>
 <dl>
 <dd>
 
@@ -178,7 +181,7 @@ Retrieve a complete conversation by conversation id
 <dd>
 
 ```typescript
-await client.conversations.getConversationById("conversation_id");
+await client.conversations.getConversation("domain", "conversation_id");
 ```
 
 </dd>
@@ -190,6 +193,14 @@ await client.conversations.getConversationById("conversation_id");
 
 <dl>
 <dd>
+
+<dl>
+<dd>
+
+**domain:** `string`
+
+</dd>
+</dl>
 
 <dl>
 <dd>
@@ -269,6 +280,77 @@ await client.queries.createQuery({
 <dd>
 
 **request:** `FernFai.CreateQueryRequest`
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `Queries.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.queries.<a href="/src/api/resources/queries/client/Client.ts">getRecentQueries</a>(domain, { ...params }) -> FernFai.QueryPage</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve all paginated recent queries
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.queries.getRecentQueries("domain");
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**domain:** `string` — The domain to retrieve queries for
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `FernFai.GetRecentQueriesRequest`
 
 </dd>
 </dl>

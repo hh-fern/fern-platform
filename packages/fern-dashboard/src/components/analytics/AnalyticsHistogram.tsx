@@ -57,21 +57,27 @@ export function AnalyticsHistogram({
               dataKey="label"
               stroke="#ccc"
               tick={{ fill: "#666" }}
-              tickFormatter={parseLabel}
+              tickFormatter={(value, index) => {
+                if (chartData.length > 13) {
+                  return index % 3 === 0 || index === chartData.length - 1
+                    ? parseLabel(value)
+                    : "";
+                }
+                return parseLabel(value);
+              }}
+              interval={0}
             />
             <Tooltip
               content={
                 <ChartTooltipContent
-                  name={
-                    renderType === "QUESTIONS" ? "Questions" : "Conversations"
-                  }
+                  name={renderType === "QUERIES" ? "Queries" : "Conversations"}
                   hideLabel
                 />
               }
             />
             <Bar
               dataKey="count"
-              name={renderType === "QUESTIONS" ? "Questions" : "Conversations"}
+              name={renderType === "QUERIES" ? "Queries" : "Conversations"}
               fill="url(#barGradient)"
               activeBar={{
                 fill: "url(#barGradientHover)",

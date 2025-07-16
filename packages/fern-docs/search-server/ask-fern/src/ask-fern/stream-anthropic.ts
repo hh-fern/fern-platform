@@ -128,20 +128,29 @@ export async function runRouteForAnthropic({
                 documentIdsToIgnore: documentIdsToIgnore,
               });
               documentIdsToIgnore.push(...response.map((hit) => hit.id));
-              return JSON.stringify(
-                response.map((hit) => {
-                  const { domain, pathname, hash, document } = hit.attributes;
-                  const url = `https://${domain}${pathname}${hash ?? ""}`;
-                  if (document.length > 20000) {
-                    return {
-                      ...hit.attributes,
-                      url,
-                      document: document.slice(0, 20000),
-                    };
-                  }
-                  return { url, ...hit.attributes };
-                })
-              );
+
+              const mappedResponse = response.map((hit) => {
+                const { domain, pathname, hash, document } = hit.attributes;
+                const url = `https://${domain}${pathname}${hash ?? ""}`;
+                if (document.length > 20000) {
+                  return {
+                    ...hit.attributes,
+                    url,
+                    document: document.slice(0, 20000),
+                  };
+                }
+                return { url, ...hit.attributes };
+              });
+
+              const responseURLs = new Set();
+              const dedupedResponse = []; // avoid sending the same document over and over
+              for (const hit of mappedResponse) {
+                if (!responseURLs.has(hit.url)) {
+                  responseURLs.add(hit.url);
+                  dedupedResponse.push(hit);
+                }
+              }
+              return dedupedResponse;
             },
           }),
         },
@@ -173,7 +182,7 @@ export async function runRouteForAnthropic({
           }
           postToSlack(
             "#search-notifs",
-            `:rotating_light: [${domain}] \`Ask AI\` encountered a ${errorKind} for query '${lastUserMessage}': \`${errorString}\``
+            `:rotating_light: [${domain}] [source: ${chatSource}] [conversationId: ${conversationId}] \`Ask AI\` encountered a ${errorKind} for query '${lastUserMessage}': \`${errorString}\``
           );
         },
         onFinish: async (e) => {

@@ -12,7 +12,8 @@ type FloatingMenuAction =
   | "toggleBulletList"
   | "toggleOrderedList"
   | "toggleQuote"
-  | "setLink";
+  | "setLink"
+  | "plainText";
 
 export default function FloatingMenu() {
   const { editor } = useCurrentEditor();
@@ -21,7 +22,23 @@ export default function FloatingMenu() {
     return () => {
       if (!editor) return;
 
+      // Remove the "/" character first
+      const { selection } = editor.state;
+      const { $from } = selection;
+
+      if ($from.parent.textContent.startsWith("/")) {
+        // Delete the "/" character
+        editor
+          .chain()
+          .focus()
+          .deleteRange({ from: $from.start(), to: $from.start() + 1 })
+          .run();
+      }
+
       switch (action) {
+        case "plainText":
+          // Just remove the "/" and stay in text mode
+          break;
         case "toggleHeading1":
           editor.chain().focus().toggleHeading({ level: 1 }).run();
           break;
@@ -40,13 +57,16 @@ export default function FloatingMenu() {
         case "toggleQuote":
           editor.chain().focus().toggleBlockquote().run();
           break;
-        case "setLink":
-          // TODO: This should open an additional popover to edit the link
-          editor
-            .chain()
-            .focus()
-            .setLink({ href: "https://www.google.com" })
-            .run();
+        // TODO: Add link
+        // case "setLink":
+        //   // TODO: This should open an additional popover to edit the link
+        //   editor
+        //     .chain()
+        //     .focus()
+        //     .setLink({ href: "https://www.google.com" })
+        //     .run();
+        //   break;
+        default:
           break;
       }
     };
@@ -60,19 +80,23 @@ export default function FloatingMenu() {
         const { selection } = state;
         const { $from } = selection;
 
-        // Check if we're at the start of an empty paragraph
+        // Check if we're at the start of a paragraph that begins with "/"
         return (
           editor.isFocused &&
           selection.empty &&
           $from.parent.type.name === "paragraph" &&
-          $from.parent.textContent === "" &&
-          $from.parentOffset === 0
+          $from.parent.textContent.startsWith("/") &&
+          $from.parentOffset === $from.parent.textContent.length
         );
       }}
     >
-      <div className="border-1 text-gray-1100 flex min-w-60 flex-col border-gray-500 bg-white p-2 shadow-sm">
+      <div className="border-1 text-gray-1100 rounded-2 flex min-w-60 flex-col border-gray-500 bg-white p-1 pt-2 shadow-sm">
         <FloatingMenuHeading title="Basics" />
-        <FloatingMenuItem title="Text" iconProps={{ variant: "Type" }} />
+        <FloatingMenuItem
+          title="Text"
+          iconProps={{ variant: "Type" }}
+          onClick={menuItemClickHandler("plainText")}
+        />
         <FloatingMenuItem
           title="Heading 1"
           iconProps={{ variant: "Heading1" }}
@@ -103,11 +127,13 @@ export default function FloatingMenu() {
           iconProps={{ variant: "MessageSquareQuote" }}
           onClick={menuItemClickHandler("toggleQuote")}
         />
+        {/* 
+        TODO: Add link
         <FloatingMenuItem
           title="Link"
           iconProps={{ variant: "Link" }}
           onClick={menuItemClickHandler("setLink")}
-        />
+        /> */}
       </div>
     </EditorFloatingMenu>
   );
@@ -121,7 +147,7 @@ declare namespace FloatingMenuHeading {
 
 function FloatingMenuHeading({ title }: FloatingMenuHeading.Props) {
   return (
-    <div className="px-2 pb-2 pt-1 text-sm font-bold uppercase text-gray-800">
+    <div className="px-3 py-1 text-sm font-bold uppercase text-gray-800">
       {title}
     </div>
   );
@@ -144,7 +170,7 @@ function FloatingMenuItem({
 
   return (
     <button
-      className="flex h-8 cursor-pointer items-center gap-2 px-2 hover:bg-gray-300"
+      className="rounded-1 flex h-8 cursor-pointer items-center gap-2 px-3 transition-colors hover:bg-gray-300 hover:transition-none"
       onClick={onClick}
     >
       <div className="flex size-4 items-center justify-center">

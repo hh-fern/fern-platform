@@ -20,15 +20,12 @@ const getLastWeekStart = (): string => {
 const getLastYearStart = (): string => {
   const date = new Date();
   date.setFullYear(date.getFullYear() - 1);
-  date.setMonth(0);
-  date.setDate(1);
   return date.toISOString();
 };
 
 const getLastMonthStart = (): string => {
   const date = new Date();
   date.setMonth(date.getMonth() - 1);
-  date.setDate(1);
   return date.toISOString();
 };
 
@@ -49,7 +46,7 @@ export const getRequestParams = (
       return {
         start_date: getLastMonthStart(),
         end_date: endDate,
-        groupBy: "WEEK",
+        groupBy: "DAY",
       };
 
     case TimeRange.LAST_YEAR:

@@ -1,17 +1,17 @@
 from datetime import datetime
-from datetime import timedelta
 
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from sqlalchemy import and_
-from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.fai.app import fai_app
 from src.fai.db_models.query import Query
 from src.fai.dependencies import get_db
+from src.fai.utils.fetch_grouped_data import fetch_grouped_data
+from src.fai.utils.fill_date_gaps import fill_date_gaps
+from src.fai.utils.get_insights_from_queries import get_insights_from_queries
 from src.settings import LOGGER
 
 
@@ -24,84 +24,53 @@ async def get_histogram_analytics(
     db: AsyncSession = Depends(get_db),
 ) -> JSONResponse:
     try:
-        st = datetime.fromisoformat(start_date)
-        ed = datetime.fromisoformat(end_date)
+        start = datetime.fromisoformat(start_date)
+        end = datetime.fromisoformat(end_date)
 
-        if groupBy not in {"DAY", "WEEK", "MONTH"}:
-            return JSONResponse(status_code=400, content={"detail": "Invalid groupBy. Use DAY, WEEK, or MONTH."})
-
-        date_trunc_format = {
-            "DAY": "day",
-            "WEEK": "week",
-            "MONTH": "month",
-        }[groupBy]
-
-        date_label = func.date_trunc(date_trunc_format, Query.created_at).label("label")
-        conversation_count_label = func.count(func.distinct(Query.conversation_id)).label("conversationCount")
-        query_count_label = func.count(Query.query_id).label("queryCount")
-
-        stmt = (
-            select(date_label, conversation_count_label, query_count_label)
-            .where(
-                and_(
-                    Query.domain == domain,
-                    Query.created_at >= st,
-                    Query.created_at <= ed,
-                )
+        valid_groups = {"DAY": "day", "WEEK": "week", "MONTH": "month"}
+        if groupBy not in valid_groups:
+            return JSONResponse(
+                status_code=400,
+                content={"detail": "Invalid groupBy. Use DAY, WEEK, or MONTH."},
             )
-            .group_by(date_label)
-            .order_by(date_label)
-        )
 
-        result = await db.execute(stmt)
-        rows = result.fetchall()
+        grouped_data = await fetch_grouped_data(db, domain, start, end, valid_groups[groupBy])
 
-        counts_by_label = {
-            row.label.strftime("%Y-%m-%d"): {
-                "conversationCount": row.conversationCount,
-                "queryCount": row.queryCount,
-            }
-            for row in rows
-        }
-
-        data = []
-        current = st
-        if groupBy == "DAY":
-            while current <= ed:
-                label = current.strftime("%Y-%m-%d")
-                count = counts_by_label.get(label, {"conversationCount": 0, "queryCount": 0})
-                data.append(
-                    {"label": label, "conversationCount": count["conversationCount"], "queryCount": count["queryCount"]}
-                )
-                current += timedelta(days=1)
-        else:
-            if groupBy == "WEEK":
-                current = current - timedelta(days=current.weekday())
-                step = timedelta(weeks=1)
-            elif groupBy == "MONTH":
-                current = current.replace(day=1)
-
-            while current <= ed:
-                label = current.strftime("%Y-%m-%d")
-                count = counts_by_label.get(label, {"conversationCount": 0, "queryCount": 0})
-                data.append(
-                    {
-                        "label": label,
-                        "conversationCount": count["conversationCount"],
-                        "queryCount": count["queryCount"],
-                    }
-                )
-                if groupBy == "MONTH":
-                    if current.month == 12:
-                        current = current.replace(year=current.year + 1, month=1, day=1)
-                    else:
-                        current = current.replace(month=current.month + 1, day=1)
-                else:
-                    current += step
+        histogram_analytics = fill_date_gaps(start, end, groupBy, grouped_data)
 
         LOGGER.info(f"Retrieved histogram data for domain: {domain}, groupBy: {groupBy}")
-        return JSONResponse(content=jsonable_encoder({"bars": data}))
+        return JSONResponse(content=jsonable_encoder(histogram_analytics))
 
     except Exception as e:
         LOGGER.exception("Failed to get histogram analytics")
+        return JSONResponse(status_code=500, content={"detail": str(e)})
+
+
+@fai_app.get("/analytics/insights/{domain}")
+async def get_insights_analytics(
+    domain: str,
+    start_date: str,
+    end_date: str,
+    db: AsyncSession = Depends(get_db),
+) -> JSONResponse:
+    try:
+        start = datetime.fromisoformat(start_date)
+        end = datetime.fromisoformat(end_date)
+
+        result = await db.execute(
+            select(Query)
+            .where(Query.domain == domain)
+            .where(Query.role == "USER")
+            .where(Query.created_at >= start)
+            .where(Query.created_at <= end)
+        )
+
+        queries = result.scalars().all()
+        api_queries = [query.to_api() for query in queries]
+        insights = await get_insights_from_queries(api_queries)
+
+        return JSONResponse(content=jsonable_encoder(insights))
+
+    except Exception as e:
+        LOGGER.exception("Failed to get insights analytics")
         return JSONResponse(status_code=500, content={"detail": str(e)})
