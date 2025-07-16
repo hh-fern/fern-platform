@@ -9,7 +9,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "foo:build": "next build",
     "depcheck": "depcheck",
     "dev": "next dev --turbopack",
     "format": "prettier --write --ignore-unknown \"**\"",
