@@ -115,7 +115,7 @@ export async function getOrganization(orgName: Auth0OrgName) {
           name: orgName,
         });
 
-      return organization as Auth0Organization;
+      return organization as unknown as Auth0Organization;
     }
   );
 }
@@ -140,7 +140,7 @@ export async function getMyOrganizations(userId: Auth0UserID) {
       id: userId,
     });
 
-  return organizations as Auth0Organization[];
+  return organizations as unknown as Auth0Organization[];
 }
 
 export async function getOrgMembers(
