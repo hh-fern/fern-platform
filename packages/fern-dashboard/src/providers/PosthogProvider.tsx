@@ -32,17 +32,17 @@ export function PostHogProvider({ session, children }: PostHogProvider.Props) {
       capture_pageview: false, // Disable automatic pageview capture, as we capture manually
       debug: true, // Enable debug mode in development
     });
-    
+
     if (!isPosthogTrackingEnabled) {
       posthog.opt_out_capturing();
       posthog.set_config({ disable_session_recording: true });
     }
-    
+
     posthog.setPersonPropertiesForFlags({
       email: session?.user.email,
     });
   }, [isPosthogTrackingEnabled, session?.user.email]);
-  
+
   return (
     <PHProvider client={posthog}>
       {isPosthogTrackingEnabled && (

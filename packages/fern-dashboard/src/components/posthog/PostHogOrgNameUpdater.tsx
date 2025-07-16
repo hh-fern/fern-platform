@@ -10,7 +10,9 @@ export declare namespace PostHogOrgNameUpdater {
   }
 }
 
-export function PostHogOrgNameUpdater({ orgName }: PostHogOrgNameUpdater.Props) {
+export function PostHogOrgNameUpdater({
+  orgName,
+}: PostHogOrgNameUpdater.Props) {
   const posthog = usePostHog();
 
   useEffect(() => {
@@ -22,4 +24,4 @@ export function PostHogOrgNameUpdater({ orgName }: PostHogOrgNameUpdater.Props) 
   }, [posthog, orgName]);
 
   return null;
-} 
+}
