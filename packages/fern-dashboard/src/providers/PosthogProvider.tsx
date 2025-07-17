@@ -30,7 +30,6 @@ export function PostHogProvider({ session, children }: PostHogProvider.Props) {
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
       api_host: "/ingest",
       capture_pageview: false, // Disable automatic pageview capture, as we capture manually
-      debug: true, // Enable debug mode in development
     });
 
     if (!isPosthogTrackingEnabled) {
