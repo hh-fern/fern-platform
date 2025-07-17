@@ -3,7 +3,10 @@ import { redirect } from "next/navigation";
 import { getCurrentSessionOrThrow } from "@/app/services/auth0/getCurrentSession";
 import { Auth0UserID } from "@/app/services/auth0/types";
 import { AsyncRedisCache } from "@/app/services/redis/AsyncRedisCache";
-import { RedisCacheKey, RedisCacheKeyType } from "@/app/services/redis/cacheKey";
+import {
+  RedisCacheKey,
+  RedisCacheKeyType,
+} from "@/app/services/redis/cacheKey";
 
 import { getServerSidePosthog } from "../getServerSidePosthog";
 import { PosthogFeatureFlag, PosthogFeatureFlags } from "./flags";
@@ -28,9 +31,9 @@ export async function FeatureFlaggedServerSide({
 }: FeatureFlaggedServerSide.Props) {
   const session = await getCurrentSessionOrThrow();
   const isEnabled = await isFeatureFlagEnabledForUser(flag, session.user.sub);
-  
+
   if (flag === PosthogFeatureFlag.ARIEL_ORG_TEST) {
-    console.log("================================================")
+    console.log("================================================");
     console.log("isEnabled", isEnabled);
     console.log("flag", flag);
     console.log("user", session.user.sub);
@@ -63,12 +66,4 @@ export async function getAllFeatureFlags(userId: Auth0UserID) {
   const posthog = getServerSidePosthog();
   const flags = await posthog.getAllFlags(userId);
   return flags as PosthogFeatureFlags;
-}
-
-export async function invalidateFeatureFlagCache(userId: Auth0UserID) {
-  const featureFlags = Object.values(PosthogFeatureFlag);
-  for (const flag of featureFlags) {
-    const cacheKey = RedisCacheKey.featureFlag(flag, userId);
-    await USER_ID_TO_FEATURE_FLAG_CACHE.invalidate(cacheKey);
-  }
 }

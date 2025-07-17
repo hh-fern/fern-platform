@@ -65,7 +65,6 @@ async function DynamicEditorContent({
     );
   }
 
-  // Ensure PostHog profile is updated before rendering content
   await updatePostHogProfile(orgName);
 
   return (

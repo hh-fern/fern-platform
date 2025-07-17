@@ -3,8 +3,13 @@ import {
   GetMembers200ResponseOneOfInner,
 } from "auth0";
 
-import { Auth0OrgID, Auth0OrgName, Auth0Organization, Auth0UserID } from "../auth0/types";
 import { PosthogFeatureFlag } from "../../../components/posthog/feature-flags/flags";
+import {
+  Auth0OrgID,
+  Auth0OrgName,
+  Auth0Organization,
+  Auth0UserID,
+} from "../auth0/types";
 
 export type RedisCacheKey<T extends RedisCacheKeyType> = string & {
   __type: T;
@@ -43,7 +48,9 @@ export const RedisCacheKey = {
       `org-name-to-id-${orgName}`
     ),
   featureFlag: (flag: PosthogFeatureFlag, userId: Auth0UserID) =>
-    cacheKey(RedisCacheKeyType.FEATURE_FLAG_FOR_USER)(`feature-flag-for-user-${flag}-${userId}`),
+    cacheKey(RedisCacheKeyType.FEATURE_FLAG_FOR_USER)(
+      `feature-flag-for-user-${flag}-${userId}`
+    ),
 };
 
 function cacheKey<T extends RedisCacheKeyType>(_type: T) {

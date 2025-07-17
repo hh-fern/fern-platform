@@ -50,7 +50,6 @@ export default async function VisualEditorPreviewLayout({
 }>) {
   const { orgName, docsUrl, branch } = await params;
 
-  // Ensure PostHog profile is updated before rendering content
   await updatePostHogProfile(orgName);
 
   const session = await getCurrentSession();

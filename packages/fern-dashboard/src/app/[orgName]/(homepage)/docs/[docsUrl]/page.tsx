@@ -28,34 +28,36 @@ export default async function Page(props: {
     userId: session.user.sub,
   });
 
-  const testFlag = <FeatureFlaggedServerSide
-    flag={PosthogFeatureFlag.ARIEL_ORG_TEST}
-    redirectWhenDisabled={false}
-  >
-    <div>woohoo the feature is enabled!</div>
-  </FeatureFlaggedServerSide>
+  const testFlag = (
+    <FeatureFlaggedServerSide
+      flag={PosthogFeatureFlag.ARIEL_ORG_TEST}
+      redirectWhenDisabled={false}
+    >
+      <div>woohoo the feature is enabled!</div>
+    </FeatureFlaggedServerSide>
+  );
 
   return (
     <>
-    {testFlag}
-    <FeatureFlaggedServerSide
-      flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
-      redirectWhenDisabled
-    >
-      <DocsSiteOverviewCard
-        docsUrl={docsUrl}
-        githubProtectedArea={
-          <div className="flex w-fit flex-col gap-2">
-            <p>Source</p>
-            <GithubProtectedArea sourceRepo={sourceRepo}>
-              <GithubSource
-                docsUrl={docsUrl}
-                orgName={orgName}
-                session={session}
-              />
-            </GithubProtectedArea>
-          </div>
-        }
+      {testFlag}
+      <FeatureFlaggedServerSide
+        flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
+        redirectWhenDisabled
+      >
+        <DocsSiteOverviewCard
+          docsUrl={docsUrl}
+          githubProtectedArea={
+            <div className="flex w-fit flex-col gap-2">
+              <p>Source</p>
+              <GithubProtectedArea sourceRepo={sourceRepo}>
+                <GithubSource
+                  docsUrl={docsUrl}
+                  orgName={orgName}
+                  session={session}
+                />
+              </GithubProtectedArea>
+            </div>
+          }
         />
       </FeatureFlaggedServerSide>
     </>

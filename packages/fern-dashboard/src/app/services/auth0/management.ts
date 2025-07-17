@@ -72,7 +72,6 @@ const ORGANIZATION_INVITATIONS_CACHE = new AsyncRedisCache(
   { ttlInSeconds: 10 }
 );
 
-
 /**********************
  * cache invalidators *
  **********************/

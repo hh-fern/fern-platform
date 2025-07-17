@@ -14,7 +14,6 @@ export default async function AuthedLayout({
 }>) {
   const { orgName } = await params;
 
-  // Ensure PostHog profile is updated before any content is rendered
   await updatePostHogProfile(orgName);
 
   return (
