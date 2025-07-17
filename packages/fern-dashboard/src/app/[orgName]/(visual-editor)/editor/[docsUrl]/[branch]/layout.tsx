@@ -73,7 +73,6 @@ async function DynamicEditorContent({
       owner={sourceRepo.owner}
       repo={sourceRepo.repo}
     >
-      <>
         <MdxStateProvider docsUrl={docsUrl}>
           <BranchProvider branch={branch}>
             <HeaderToolbar
@@ -84,40 +83,8 @@ async function DynamicEditorContent({
             {children}
           </BranchProvider>
         </MdxStateProvider>
-      </>
     </GithubExtendedAccessProtectedRoute>
   );
 }
 
-export default async function EditorLayout({
-  params,
-  children,
-}: Readonly<{
-  params: Promise<{
-    orgName: Auth0OrgName;
-    docsUrl: EncodedDocsUrl;
-    branch: string;
-  }>;
-  children: React.JSX.Element;
-}>) {
-  const { orgName, docsUrl: encodedDocsUrl, branch } = await params;
-  const docsUrl = parseDocsUrlParam({ docsUrl: encodedDocsUrl });
 
-  const session = await getCurrentSession();
-  if (!session) {
-    redirect("/");
-  }
-
-  return (
-    <EditorShell>
-      <DynamicEditorContent
-        orgName={orgName}
-        docsUrl={docsUrl}
-        branch={branch}
-        session={session}
-      >
-        {children}
-      </DynamicEditorContent>
-    </EditorShell>
-  );
-}
