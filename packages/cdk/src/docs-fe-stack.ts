@@ -78,7 +78,7 @@ async function zipFolder(sourceFolder: string, zipFilePath: string) {
   mkdir(path.dirname(zipFilePath));
 
   if (process.platform === "win32") {
-    replaceExternalSymlinksWithCopies(sourceFolder, true);
+    cleanExternalSymlinks(sourceFolder, true);
   }
 
   return new Promise<void>((resolve, reject) => {
@@ -135,7 +135,7 @@ export function resolveLocalPreviewBundleTarPath(zipFilePath?: string) {
  * Recursively traverses the directory and replaces any symlink that points outside the rootDir
  * with a copy of the file or directory it points to, or deletes the symlink if deleteInsteadOfCopy is true.
  */
-export async function replaceExternalSymlinksWithCopies(
+export async function cleanExternalSymlinks(
     rootDir: string,
     deleteInsteadOfCopy?: boolean
 ): Promise<void> {
