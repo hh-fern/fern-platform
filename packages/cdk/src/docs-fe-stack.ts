@@ -77,45 +77,28 @@ function mkdir(dir: string) {
 async function zipFolder(sourceFolder: string, zipFilePath: string) {
   mkdir(path.dirname(zipFilePath));
 
-  let folderToZip = sourceFolder;
-  let tempDir: string | undefined;
-
   if (process.platform === "win32") {
-    // Create a temp directory
-    const os = await import("os");
-    const tempBase = os.tmpdir();
-    tempDir = fs.mkdtempSync(path.join(tempBase, "fern-docs-bundle-"));
-    // Deep copy the source folder into the temp directory
-    await fs.promises.cp(sourceFolder, tempDir, { recursive: true, dereference: false });
-    // Dereference symlinks in the temp directory
-    dereferenceSymlinks(tempDir);
-    folderToZip = tempDir;
+    replaceExternalSymlinksWithCopies(sourceFolder, true);
   }
 
-  try {
-   await new Promise<void>((resolve, reject) => {
-      const output = fs.createWriteStream(zipFilePath);
-      const archive = archiver("tar", {
-        gzip: true,
-      });
-
-      archive.on("error", (err: unknown) => {
-        reject(err instanceof Error ? err : new Error(String(err)));
-      });
-
-      output.on("close", function () {
-        resolve();
-      });
-
-      archive.pipe(output);
-      archive.directory(folderToZip, false);
-      void archive.finalize();
+  return new Promise<void>((resolve, reject) => {
+    const output = fs.createWriteStream(zipFilePath);
+    const archive = archiver("tar", {
+      gzip: true,
     });
-  } finally {
-    if (tempDir) {
-      await fs.promises.rm(tempDir, { recursive: true, force: true });
-    }
-  }
+
+    archive.on("error", (err: unknown) => {
+      reject(err instanceof Error ? err : new Error(String(err)));
+    });
+
+    output.on("close", function () {
+      resolve();
+    });
+
+    archive.pipe(output);
+    archive.directory(sourceFolder, false);
+    void archive.finalize();
+  });
 }
 
 export async function zipLocalBundle(zipFilePath: string): Promise<void> {
@@ -140,69 +123,70 @@ export async function zipLocalBundle(zipFilePath: string): Promise<void> {
 }
 
 export function resolveLocalPreviewBundleTarPath(zipFilePath?: string) {
-  return (
-    zipFilePath ?? path.resolve(__dirname, "../../fern-docs/bundle/next.tar.gz")
-  );
+  if (!zipFilePath) {
+    return path.resolve(__dirname, "../../fern-docs/bundle/next.tar.gz");;
+  }
+  return path.isAbsolute(zipFilePath)
+    ? zipFilePath
+    : path.resolve(__dirname, zipFilePath);
 }
 
 /**
- * Recursively replaces all symlinks in a directory with deep copies of their targets.
- * @param dir The root directory to process.
+ * Recursively traverses the directory and replaces any symlink that points outside the rootDir
+ * with a copy of the file or directory it points to, or deletes the symlink if deleteInsteadOfCopy is true.
  */
-export function dereferenceSymlinks(dir: string) {
-  if (!path.isAbsolute(dir)) {
-    throw new Error(`Expected absolute path, got: ${dir}`);
-  }
-  for (const entry of fs.readdirSync(dir)) {
-    const entryPath = path.join(dir, entry);
-    const stat = fs.lstatSync(entryPath);
-
-    if (stat.isSymbolicLink()) {
-      const realPath = fs.realpathSync(entryPath);
-      const realStat = fs.statSync(realPath);
-
-      // Remove the symlink
-      fs.unlinkSync(entryPath);
-
-      if (realStat.isDirectory()) {
-        // Recursively copy directory
-        copyDirRecursive(realPath, entryPath);
-        // Now dereference any symlinks in the newly copied directory
-        dereferenceSymlinks(entryPath);
-      } else {
-        // Copy file
-        fs.copyFileSync(realPath, entryPath);
-      }
-    } else if (stat.isDirectory()) {
-      dereferenceSymlinks(entryPath);
+export async function replaceExternalSymlinksWithCopies(
+    rootDir: string,
+    deleteInsteadOfCopy?: boolean
+): Promise<void> {
+    async function processEntry(entryPath: string) {
+        const stat = await fs.promises.lstat(entryPath);
+        if (stat.isSymbolicLink()) {
+            const linkTarget = await fs.promises.readlink(entryPath);
+            // Resolve the absolute path of the symlink target
+            const absTarget = path.resolve(path.dirname(entryPath), linkTarget);
+            const realTarget = await fs.promises.realpath(absTarget);
+            // Check if the real target is outside the rootDir
+            const relative = path.relative(rootDir, realTarget);
+            if (relative.startsWith("..") || path.isAbsolute(relative)) {
+                // Remove the symlink
+                await fs.promises.unlink(entryPath);
+                if (!deleteInsteadOfCopy) {
+                    // Copy the file or directory in its place
+                    const targetStat = await fs.promises.stat(realTarget);
+                    if (targetStat.isDirectory()) {
+                        await copyDir(realTarget, entryPath);
+                    } else {
+                        await fs.promises.copyFile(realTarget, entryPath);
+                    }
+                }
+                // If deleteInsteadOfCopy is true, do nothing else
+            }
+        } else if (stat.isDirectory()) {
+            const entries = await fs.promises.readdir(entryPath);
+            for (const entry of entries) {
+                await processEntry(path.join(entryPath, entry));
+            }
+        }
     }
-    // If it's a file, do nothing
-  }
+    await processEntry(rootDir);
 }
 
-/**
- * Recursively copies a directory.
- * @param src Source directory
- * @param dest Destination directory
- */
-function copyDirRecursive(src: string, dest: string) {
-  if (!path.isAbsolute(src)) {
-    throw new Error(`Expected absolute path, got: ${src}`);
-  }
-  if (!path.isAbsolute(dest)) {
-    throw new Error(`Expected absolute path, got: ${dest}`);
-  }
-  fs.mkdirSync(dest, { recursive: true });
-  for (const entry of fs.readdirSync(src)) {
-    const srcEntry = path.join(src, entry);
-    const destEntry = path.join(dest, entry);
-    const stat = fs.lstatSync(srcEntry);
-
-    if (stat.isDirectory()) {
-      copyDirRecursive(srcEntry, destEntry);
-    } else {
-      fs.copyFileSync(srcEntry, destEntry);
+// Helper to recursively copy a directory
+async function copyDir(src: string, dest: string) {
+    await fs.promises.mkdir(dest, { recursive: true });
+    const entries = await fs.promises.readdir(src, { withFileTypes: true });
+    for (const entry of entries) {
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+        if (entry.isDirectory()) {
+            await copyDir(srcPath, destPath);
+        } else if (entry.isSymbolicLink()) {
+            // Copy the symlink as a symlink (could also resolve/copy target if desired)
+            const linkTarget = await fs.promises.readlink(srcPath);
+            await fs.promises.symlink(linkTarget, destPath);
+        } else {
+            await fs.promises.copyFile(srcPath, destPath);
+        }
     }
-  }
 }
-
