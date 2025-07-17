@@ -18,7 +18,7 @@ import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { PreviewHeader } from "@/components/docs-preview/PreviewHeader";
 import { EditorLinkInterceptor } from "@/components/editor/EditorLinkInterceptor";
-import { ServerSidePostHogOrgNameUpdater } from "@/components/posthog/ServerSidePostHogOrgNameUpdater";
+import { updatePostHogProfile } from "@/components/posthog/ServerSidePostHogOrgNameUpdater";
 import { EditorRoutingProvider } from "@/providers/EditorRoutingContext";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { EncodedDocsUrl } from "@/utils/types";
@@ -49,6 +49,9 @@ export default async function VisualEditorPreviewLayout({
   logo: React.ReactNode;
 }>) {
   const { orgName, docsUrl, branch } = await params;
+
+  // Ensure PostHog profile is updated before rendering content
+  await updatePostHogProfile(orgName);
 
   const session = await getCurrentSession();
   const host = await getHostFromHeaders();
@@ -111,7 +114,6 @@ export default async function VisualEditorPreviewLayout({
                 branch,
               }}
             >
-              <ServerSidePostHogOrgNameUpdater orgName={orgName} />
               <div id="preview-container">
                 <EditorLinkInterceptor />
                 <AbstractDefaultDocs

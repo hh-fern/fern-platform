@@ -28,7 +28,16 @@ export default async function Page(props: {
     userId: session.user.sub,
   });
 
+  const testFlag = <FeatureFlaggedServerSide
+    flag={PosthogFeatureFlag.ARIEL_ORG_TEST}
+    redirectWhenDisabled={false}
+  >
+    <div>woohoo the feature is enabled!</div>
+  </FeatureFlaggedServerSide>
+
   return (
+    <>
+    {testFlag}
     <FeatureFlaggedServerSide
       flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
       redirectWhenDisabled
@@ -47,7 +56,8 @@ export default async function Page(props: {
             </GithubProtectedArea>
           </div>
         }
-      />
-    </FeatureFlaggedServerSide>
+        />
+      </FeatureFlaggedServerSide>
+    </>
   );
 }

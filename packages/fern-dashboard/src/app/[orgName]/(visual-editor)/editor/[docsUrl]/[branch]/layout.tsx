@@ -9,7 +9,7 @@ import {
 import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { GithubExtendedAccessProtectedRoute } from "@/components/auth/GithubExtendedAccessProtectedRoute";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
-import { ServerSidePostHogOrgNameUpdater } from "@/components/posthog/ServerSidePostHogOrgNameUpdater";
+import { updatePostHogProfile } from "@/components/posthog/ServerSidePostHogOrgNameUpdater";
 import { BranchProvider } from "@/providers/BranchContext";
 import { MdxStateProvider } from "@/providers/MdxStateContext";
 import { throwDigestibleError } from "@/utils/errors";
@@ -65,6 +65,9 @@ async function DynamicEditorContent({
     );
   }
 
+  // Ensure PostHog profile is updated before rendering content
+  await updatePostHogProfile(orgName);
+
   return (
     <GithubExtendedAccessProtectedRoute
       orgName={orgName}
@@ -72,7 +75,6 @@ async function DynamicEditorContent({
       repo={sourceRepo.repo}
     >
       <>
-        <ServerSidePostHogOrgNameUpdater orgName={orgName} />
         <MdxStateProvider docsUrl={docsUrl}>
           <BranchProvider branch={branch}>
             <HeaderToolbar

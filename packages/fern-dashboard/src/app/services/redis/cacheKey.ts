@@ -3,7 +3,8 @@ import {
   GetMembers200ResponseOneOfInner,
 } from "auth0";
 
-import { Auth0OrgID, Auth0OrgName, Auth0Organization } from "../auth0/types";
+import { Auth0OrgID, Auth0OrgName, Auth0Organization, Auth0UserID } from "../auth0/types";
+import { PosthogFeatureFlag } from "../../../components/posthog/feature-flags/flags";
 
 export type RedisCacheKey<T extends RedisCacheKeyType> = string & {
   __type: T;
@@ -14,6 +15,7 @@ export const RedisCacheKeyType = {
   ORGANIZATION_MEMBERS: "ORGANIZATION_MEMBERS",
   ORGANIZATION_INVITATIONS: "ORGANIZATION_INVITATIONS",
   ORGANIZATION_NAME_TO_ID: "ORGANIZATION_NAME_TO_ID",
+  FEATURE_FLAG_FOR_USER: "FEATURE_FLAG_FOR_USER",
 } as const;
 
 export type RedisCacheKeyType =
@@ -24,6 +26,7 @@ export type RedisCacheDataTypes = {
   [RedisCacheKeyType.ORGANIZATION_MEMBERS]: GetMembers200ResponseOneOfInner[];
   [RedisCacheKeyType.ORGANIZATION_INVITATIONS]: GetInvitations200ResponseOneOfInner[];
   [RedisCacheKeyType.ORGANIZATION_NAME_TO_ID]: Auth0OrgID;
+  [RedisCacheKeyType.FEATURE_FLAG_FOR_USER]: boolean;
 };
 
 export const RedisCacheKey = {
@@ -39,6 +42,8 @@ export const RedisCacheKey = {
     cacheKey(RedisCacheKeyType.ORGANIZATION_NAME_TO_ID)(
       `org-name-to-id-${orgName}`
     ),
+  featureFlag: (flag: PosthogFeatureFlag, userId: Auth0UserID) =>
+    cacheKey(RedisCacheKeyType.FEATURE_FLAG_FOR_USER)(`feature-flag-for-user-${flag}-${userId}`),
 };
 
 function cacheKey<T extends RedisCacheKeyType>(_type: T) {
