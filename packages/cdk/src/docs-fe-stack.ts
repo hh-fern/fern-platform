@@ -51,28 +51,6 @@ export class DocsFeStack extends Stack {
 
     const local_preview_bundle_dist_tar = resolveLocalPreviewBundleTarPath();
 
-    // if (
-    //   !fs.existsSync(LOCAL_PREVIEW_BUNDLE_OUT_DIR) ||
-    //   !fs.lstatSync(LOCAL_PREVIEW_BUNDLE_OUT_DIR).isDirectory()
-    // ) {
-    //   throw new Error(
-    //     `Local preview bundle not found at ${LOCAL_PREVIEW_BUNDLE_OUT_DIR}`
-    //   );
-    // }
-
-    // // Copy install-esbuild.js into the .next folder
-    // fs.promises
-    //   .copyFile(
-    //     path.resolve(__dirname, "../utilities/install-esbuild.js"),
-    //     path.join(LOCAL_PREVIEW_BUNDLE_OUT_DIR, "install-esbuild.js")
-    //   )
-    //   .then(() => {
-    //     return zipFolder(
-    //       LOCAL_PREVIEW_BUNDLE_OUT_DIR,
-    //       local_preview_bundle_dist_tar
-    //     );
-    //   })
-
     zipLocalBundle(local_preview_bundle_dist_tar)
       .then(() => {
         new BucketDeployment(this, "deploy-local-preview-bundle4", {
@@ -99,24 +77,45 @@ function mkdir(dir: string) {
 async function zipFolder(sourceFolder: string, zipFilePath: string) {
   mkdir(path.dirname(zipFilePath));
 
-  return new Promise<void>((resolve, reject) => {
-    const output = fs.createWriteStream(zipFilePath);
-    const archive = archiver("tar", {
-      gzip: true,
-    });
+  let folderToZip = sourceFolder;
+  let tempDir: string | undefined;
 
-    archive.on("error", (err: unknown) => {
-      reject(err instanceof Error ? err : new Error(String(err)));
-    });
+  if (process.platform === "win32") {
+    // Create a temp directory
+    const os = await import("os");
+    const tempBase = os.tmpdir();
+    tempDir = fs.mkdtempSync(path.join(tempBase, "fern-docs-bundle-"));
+    // Deep copy the source folder into the temp directory
+    await fs.promises.cp(sourceFolder, tempDir, { recursive: true, dereference: false });
+    // Dereference symlinks in the temp directory
+    dereferenceSymlinks(tempDir);
+    folderToZip = tempDir;
+  }
 
-    output.on("close", function () {
-      resolve();
-    });
+  try {
+   await new Promise<void>((resolve, reject) => {
+      const output = fs.createWriteStream(zipFilePath);
+      const archive = archiver("tar", {
+        gzip: true,
+      });
 
-    archive.pipe(output);
-    archive.directory(sourceFolder, false);
-    void archive.finalize();
-  });
+      archive.on("error", (err: unknown) => {
+        reject(err instanceof Error ? err : new Error(String(err)));
+      });
+
+      output.on("close", function () {
+        resolve();
+      });
+
+      archive.pipe(output);
+      archive.directory(folderToZip, false);
+      void archive.finalize();
+    });
+  } finally {
+    if (tempDir) {
+      await fs.promises.rm(tempDir, { recursive: true, force: true });
+    }
+  }
 }
 
 export async function zipLocalBundle(zipFilePath: string): Promise<void> {
@@ -145,3 +144,65 @@ export function resolveLocalPreviewBundleTarPath(zipFilePath?: string) {
     zipFilePath ?? path.resolve(__dirname, "../../fern-docs/bundle/next.tar.gz")
   );
 }
+
+/**
+ * Recursively replaces all symlinks in a directory with deep copies of their targets.
+ * @param dir The root directory to process.
+ */
+export function dereferenceSymlinks(dir: string) {
+  if (!path.isAbsolute(dir)) {
+    throw new Error(`Expected absolute path, got: ${dir}`);
+  }
+  for (const entry of fs.readdirSync(dir)) {
+    const entryPath = path.join(dir, entry);
+    const stat = fs.lstatSync(entryPath);
+
+    if (stat.isSymbolicLink()) {
+      const realPath = fs.realpathSync(entryPath);
+      const realStat = fs.statSync(realPath);
+
+      // Remove the symlink
+      fs.unlinkSync(entryPath);
+
+      if (realStat.isDirectory()) {
+        // Recursively copy directory
+        copyDirRecursive(realPath, entryPath);
+        // Now dereference any symlinks in the newly copied directory
+        dereferenceSymlinks(entryPath);
+      } else {
+        // Copy file
+        fs.copyFileSync(realPath, entryPath);
+      }
+    } else if (stat.isDirectory()) {
+      dereferenceSymlinks(entryPath);
+    }
+    // If it's a file, do nothing
+  }
+}
+
+/**
+ * Recursively copies a directory.
+ * @param src Source directory
+ * @param dest Destination directory
+ */
+function copyDirRecursive(src: string, dest: string) {
+  if (!path.isAbsolute(src)) {
+    throw new Error(`Expected absolute path, got: ${src}`);
+  }
+  if (!path.isAbsolute(dest)) {
+    throw new Error(`Expected absolute path, got: ${dest}`);
+  }
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src)) {
+    const srcEntry = path.join(src, entry);
+    const destEntry = path.join(dest, entry);
+    const stat = fs.lstatSync(srcEntry);
+
+    if (stat.isDirectory()) {
+      copyDirRecursive(srcEntry, destEntry);
+    } else {
+      fs.copyFileSync(srcEntry, destEntry);
+    }
+  }
+}
+
