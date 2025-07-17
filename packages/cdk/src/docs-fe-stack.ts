@@ -77,15 +77,24 @@ function mkdir(dir: string) {
 async function zipFolder(sourceFolder: string, zipFilePath: string) {
   mkdir(path.dirname(zipFilePath));
 
-  if (process.platform === "win32") {
-    cleanExternalSymlinks(sourceFolder, true);
-  }
+  // if (process.platform === "win32") {
+  //   cleanExternalSymlinks(sourceFolder);
+  // }
 
   return new Promise<void>((resolve, reject) => {
     const output = fs.createWriteStream(zipFilePath);
-    const archive = archiver("tar", {
-      gzip: true,
-    });
+    // const archive = archiver("tar", {
+    //   gzip: true,
+    // });
+    const useDereference = process.platform === "win32";
+    if (useDereference) {
+      // eslint-disable-next-line no-console
+      console.debug("[zipFolder] Running in dereference mode for archiver (win32 platform)");
+    }
+    const archive = archiver("tar", useDereference
+      ? { gzip: true, dereference: true } as any
+      : { gzip: true }
+    );
 
     archive.on("error", (err: unknown) => {
       reject(err instanceof Error ? err : new Error(String(err)));
