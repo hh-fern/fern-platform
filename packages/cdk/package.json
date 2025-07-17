@@ -22,7 +22,8 @@
     "deploy:dev2": "cdk deploy local-preview-bundle2-dev2 --require-approval never --progress events",
     "deploy:prod": "cdk deploy local-preview-bundle2-prod --require-approval never --progress events",
     "synth-app:dev2": "cdk synth local-preview-bundle4-dev2",
-    "synth:dev2": "cdk synth local-preview-bundle2-dev2"
+    "synth:dev2": "cdk synth local-preview-bundle2-dev2",
+    "zip:local:bundle": "tsx scripts/zip-local-bundle.ts"
   },
   "dependencies": {
     "@fern-fern/fern-cloud-sdk": "^0.0.305",
