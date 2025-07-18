@@ -23,7 +23,7 @@ echo "PostgreSQL PID: $postgres_pid"
 echo "Creating Postgres database..."
 
 echo "Running database migrations..."
-DATABASE_URL=${DATABASE_URL} prisma migrate deploy --schema /prisma/schema.prisma
+DATABASE_URL=${DATABASE_URL} PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 prisma migrate deploy --schema /prisma/schema.prisma
 # -----------  End Postgres setup  -----------
 
 # -----------  Start MeiliSearch setup  -----------
