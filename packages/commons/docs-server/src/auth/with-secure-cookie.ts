@@ -8,7 +8,7 @@ import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 export function normalizeDomainForCookie(hostname: string): string {
   // leave as-is for localhost or fern-hosted site
   if (hostname === "localhost" || hostname.endsWith("buildwithfern.com")) {
-    return hostname;
+    return ".buildwithfern.com";
   }
 
   // leave as-is for IP addresses
