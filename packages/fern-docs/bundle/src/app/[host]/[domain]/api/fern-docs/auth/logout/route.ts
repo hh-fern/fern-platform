@@ -83,8 +83,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       normalizeDomainForCookie(domain),
     ];
 
-    for (const domain of domainVariations) {
-      const cookieValue = `${cookieName}=; Max-Age=0; Path=/; ${domain ? `Domain=${domain}; ` : ""}SameSite=Lax; HttpOnly; ${req.nextUrl.protocol === "https" ? "Secure; " : ""}Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+    for (const variant of domainVariations) {
+      const cookieValue = `${cookieName}=; Max-Age=0; Path=/; ${variant ? `Domain=${variant}; ` : ""}SameSite=Lax; HttpOnly; ${req.nextUrl.protocol === "https" ? "Secure; " : ""}Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       cookieDeletions.push(cookieValue);
     }
   }
