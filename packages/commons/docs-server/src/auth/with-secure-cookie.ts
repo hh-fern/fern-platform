@@ -3,16 +3,15 @@ import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 /**
  * normalizes a domain for cookie setting, handling various conventions:
  * - dot prefix for cross-subdomain sharing
- * - preserve localhost and fern-hosted sites
  */
 export function normalizeDomainForCookie(hostname: string): string {
-  // leave as-is for localhost or fern-hosted site
-  if (hostname === "localhost" || hostname.endsWith("buildwithfern.com")) {
+  // fern-hosted sites should use fern domain
+  if (hostname.endsWith("buildwithfern.com")) {
     return ".buildwithfern.com";
   }
 
-  // leave as-is for IP addresses
-  if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname)) {
+  // leave as-is for IP addresses or localhost
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname) || hostname === "localhost") {
     return hostname;
   }
 
