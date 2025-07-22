@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { withSecureCookie } from "@fern-api/docs-server/auth/with-secure-cookie";
 import { safeUrl } from "@fern-api/docs-server/safeUrl";
 
 export async function GET(request: NextRequest) {
@@ -16,20 +17,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let response: NextResponse;
+    let response: NextResponse = NextResponse.json({ success: true });
 
     if (redirect && safeUrl(redirect)) {
-      response = NextResponse.redirect(redirect);
-    } else {
-      response = NextResponse.json({ success: true });
+      const url = new URL(redirect);
+      // only allow relative redirects within the same origin
+      if (url.origin === new URL(request.url).origin) {
+        response = NextResponse.redirect(redirect);
+      }
     }
 
-    response.cookies.set(name, payload, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    });
+    response.cookies.set(
+      name,
+      payload,
+      withSecureCookie(request.nextUrl.origin)
+    );
 
     return response;
   } catch (_error) {
