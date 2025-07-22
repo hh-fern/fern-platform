@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { safeUrl } from "@fern-api/docs-server/safeUrl";
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, payload, redirect } = body;
+    const { searchParams } = new URL(request.url);
+    const name = searchParams.get("name");
+    const payload = searchParams.get("payload");
+    const redirect = searchParams.get("redirect");
 
     if (!name || !payload) {
       return NextResponse.json(
-        { error: "Missing required fields: name and payload" },
+        { error: "Missing required query parameters: name and payload" },
         { status: 400 }
       );
     }
@@ -31,9 +33,6 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (_error) {
-    return NextResponse.json(
-      { error: "Invalid JSON payload" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }
