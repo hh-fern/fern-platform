@@ -22,10 +22,7 @@ export async function GET(request: NextRequest) {
     if (redirect) {
       const redirectUrl = safeUrl(redirect);
       if (redirectUrl) {
-        // only allow relative redirects within the same origin
-        if (redirectUrl.origin === new URL(request.url).origin) {
-          response = NextResponse.redirect(redirectUrl.toString());
-        }
+        response = NextResponse.redirect(redirectUrl.toString());
       }
     }
 
