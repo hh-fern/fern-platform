@@ -19,11 +19,13 @@ export async function GET(request: NextRequest) {
 
     let response: NextResponse = NextResponse.json({ success: true });
 
-    if (redirect && safeUrl(redirect)) {
-      const url = new URL(redirect);
-      // only allow relative redirects within the same origin
-      if (url.origin === new URL(request.url).origin) {
-        response = NextResponse.redirect(redirect);
+    if (redirect) {
+      const redirectUrl = safeUrl(redirect);
+      if (redirectUrl) {
+        // only allow relative redirects within the same origin
+        if (redirectUrl.origin === new URL(request.url).origin) {
+          response = NextResponse.redirect(redirectUrl.toString());
+        }
       }
     }
 
