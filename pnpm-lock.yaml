@@ -656,7 +656,7 @@ importers:
         specifier: 5.7.3
         version: 5.7.3
       vite:
-        specifier: ^6.1.4
+        specifier: ^6.1.0
         version: 6.3.5(@types/node@18.19.33)(jiti@2.4.2)(less@4.2.0)(lightningcss@1.29.1)(sass@1.77.0)(stylus@0.62.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.8.0)
       vitest:
         specifier: ^3.0.5
@@ -1791,7 +1791,7 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       vite:
-        specifier: ^6.1.4
+        specifier: ^6.1.0
         version: 6.3.5(@types/node@18.19.33)(jiti@2.4.2)(less@4.2.0)(lightningcss@1.29.1)(sass@1.77.0)(stylus@0.62.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.8.0)
       vitest:
         specifier: ^3.0.5
@@ -29694,11 +29694,11 @@ snapshots:
 
   '@types/postcss-modules-local-by-default@4.0.2':
     dependencies:
-      postcss: 8.5.2
+      postcss: 8.5.6
 
   '@types/postcss-modules-scope@3.0.4':
     dependencies:
-      postcss: 8.5.2
+      postcss: 8.5.6
 
   '@types/prettier@2.6.0': {}
 
@@ -30326,7 +30326,7 @@ snapshots:
       '@vue/shared': 3.5.13
       estree-walker: 2.0.2
       magic-string: 0.30.17
-      postcss: 8.5.2
+      postcss: 8.5.6
       source-map-js: 1.2.1
     optional: true
 
@@ -43969,7 +43969,7 @@ snapshots:
   vite@5.4.14(@types/node@22.15.29)(less@4.2.0)(lightningcss@1.29.1)(sass@1.77.0)(stylus@0.62.0)(terser@5.39.0):
     dependencies:
       esbuild: 0.25.0
-      postcss: 8.5.2
+      postcss: 8.5.6
       rollup: 4.35.0
     optionalDependencies:
       '@types/node': 22.15.29
