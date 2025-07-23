@@ -20,6 +20,7 @@ import {
 import { EndpointResponseSection } from "./EndpointResponseSection";
 import { EndpointSection } from "./EndpointSection";
 import { ResponseSummaryFallback } from "./response-summary-fallback";
+import { EndpointMultipleResponseSection } from "./EndpointMultipleResponseSection";
 
 export interface HoveringProps {
   isHovering: boolean;
@@ -217,31 +218,39 @@ export async function EndpointContentLeft({
       </TypeDefinitionAnchorPart>
       <TypeDefinitionResponse>
         <TypeDefinitionAnchorPart part="response">
-          {endpoint.responses?.[0] != null && (
-            <EndpointSection
-              title="Response"
-              description={
-                <MdxServerComponentProseSuspense
-                  size="sm"
-                  className="text-(color:--grayscale-a11)"
-                  mdx={endpoint.responses[0].description}
-                  fallback={
-                    <ResponseSummaryFallback
-                      response={endpoint.responses[0]}
-                      types={types}
-                    />
-                  }
-                />
-              }
-            >
-              <TypeDefinitionAnchorPart part="body">
-                <EndpointResponseSection
-                  body={endpoint.responses[0].body}
-                  types={types}
-                />
-              </TypeDefinitionAnchorPart>
-            </EndpointSection>
-          )}
+          {endpoint.responses?.[0] != null ? (
+            endpoint.responses.length > 1 ? (
+              <EndpointMultipleResponseSection
+                method={endpoint.method}
+                responses={endpoint.responses}
+                types={types}
+              />
+            ) : (
+              <EndpointSection
+                title="Response"
+                description={
+                  <MdxServerComponentProseSuspense
+                    size="sm"
+                    className="text-(color:--grayscale-a11)"
+                    mdx={endpoint.responses[0].description}
+                    fallback={
+                      <ResponseSummaryFallback
+                        response={endpoint.responses[0]}
+                        types={types}
+                      />
+                    }
+                  />
+                }
+              >
+                <TypeDefinitionAnchorPart part="body">
+                  <EndpointResponseSection
+                    body={endpoint.responses[0].body}
+                    types={types}
+                  />
+                </TypeDefinitionAnchorPart>
+              </EndpointSection>
+            )
+          ) : null}
           {showErrors && endpoint.errors && endpoint.errors.length > 0 && (
             <TypeDefinitionAnchorPart part="error">
               <EndpointSection title="Errors" hideSeparator>
