@@ -212,7 +212,12 @@ export class ApiDefinitionV1ToLatest {
       requestHeaders: this.migrateParameters(v1.headers),
       responseHeaders: undefined,
       requests: [this.migrateHttpRequest(v1.request)].filter(isNonNullish),
-      responses: [this.migrateHttpResponse(v1.response)].filter(isNonNullish),
+      responses:
+        v1.responsesV2 != null
+          ? v1.responsesV2.responses
+              ?.map((response) => this.migrateHttpResponse(response))
+              .filter(isNonNullish)
+          : [this.migrateHttpResponse(v1.response)].filter(isNonNullish),
       errors: this.migrateHttpErrors(v1.errorsV2),
       examples: undefined,
       snippetTemplates: v1.snippetTemplates,
