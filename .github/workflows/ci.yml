@@ -162,8 +162,6 @@ jobs:
         run: pnpm test
         env:
           CI: true
-          DATABASE_URL: postgresql://runner:runner@localhost:5432/fern_dashboard_tes
-          DIRECT_URL: postgresql://runner:runner@localhost:5432/fern_dashboard_tes
 
       - name: Install Docker Compose
         run: |

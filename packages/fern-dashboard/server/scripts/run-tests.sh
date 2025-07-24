@@ -23,8 +23,14 @@ for path in "${POSTGRES_PATHS[@]}"; do
 done
 
 # Set up test database URL with current user
-export DATABASE_URL="postgresql://${USER}@localhost:5432/fern_dashboard_tes"
-export DIRECT_URL="postgresql://${USER}@localhost:5432/fern_dashboard_tes"
+# In CI environment, use the runner credentials
+if [ "$CI" = "true" ]; then
+  export DATABASE_URL="postgresql://runner:runner@localhost:5432/fern_dashboard_tes"
+  export DIRECT_URL="postgresql://runner:runner@localhost:5432/fern_dashboard_tes"
+else
+  export DATABASE_URL="postgresql://${USER}@localhost:5432/fern_dashboard_tes"
+  export DIRECT_URL="postgresql://${USER}@localhost:5432/fern_dashboard_tes"
+fi
 
 # Ensure environment variables are properly set for vitest
 export NODE_ENV=test
