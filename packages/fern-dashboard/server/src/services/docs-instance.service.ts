@@ -18,8 +18,8 @@ export class DocsInstanceService {
     });
   }
 
-  async getDocsInstanceByOrgId(orgId: string): Promise<DocsInstance | null> {
-    return prisma.docsInstance.findUnique({
+  async getDocsInstanceByOrgId(orgId: string): Promise<DocsInstance[]> {
+    return prisma.docsInstance.findMany({
       where: { orgId },
     });
   }

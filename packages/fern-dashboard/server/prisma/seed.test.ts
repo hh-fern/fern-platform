@@ -62,6 +62,8 @@ async function main() {
     update: {},
     create: {
       userId: "fern-test-user-1",
+      email: "user1@fern.dev",
+      githubUsername: "fern-user-1",
       isAdmin: true,
     },
   });
@@ -71,6 +73,7 @@ async function main() {
     update: {},
     create: {
       userId: "fern-test-user-2",
+      email: "user2@fern.dev",
       isAdmin: false,
     },
   });

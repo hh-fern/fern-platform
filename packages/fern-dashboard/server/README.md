@@ -8,12 +8,14 @@ This package contains the server-side code for the Fern Dashboard, including dat
 server/
 ├── prisma/
 │   ├── schema.prisma     # Database schema definition
-│   ├── seed.ts           # Database seeding script
+│   ├── seed.test.ts      # Database seeding script for test data
 │   └── migrations/       # Database migration files
 ├── src/
 │   ├── index.ts          # Main server entry point
 │   ├── database.ts       # Database connection utilities
-│   └── services/         # Database service layers
+│   ├── services/         # Database service layers
+│   ├── examples/         # Database usage examples
+│   └── __tests__/        # Unit tests for database operations
 ├── generated/            # Generated Prisma client (gitignored)
 ├── dist/                 # Compiled TypeScript output
 ...
@@ -53,30 +55,115 @@ server/
    # DATABASE_URL="postgresql://username:password@localhost:5432/fern_dashboard"
    ```
 
-4. **Generate Prisma Client**:
+### Making Changes
+
+1. **Compile Project** (includes Prisma generation + TypeScript compilation):
 
    ```bash
-   pnpm db:generate
+   pnpm compile
    ```
 
-5. **Create Database Tables**:
+2. **Create Database Tables**:
 
    ```bash
    pnpm db:push
    ```
 
-6. **Seed Database with Test Data** (optional):
+## Testing and Seeding
 
-   ```bash
-   # Set up test environment (creates .env.test file)
-   pnpm db:setup:test
+This project includes two different approaches for testing database functionality:
 
-   # Update .env.test with your test database URL
-   # Example: TEST_DATABASE_URL="postgresql://user:password@localhost:5432/fern_dashboard_test"
+### 1. Database Seeding (`prisma/seed.test.ts`)
 
-   # Run test seed (safe for production - uses fern-test prefixes)
-   pnpm db:seed:test
-   ```
+**Purpose**: Creates comprehensive test data with realistic relationships for development and integration testing.
+
+**What it does**:
+
+- Creates users, organizations, docs instances, and feedback with `fern-test` prefixes
+- Establishes relationships between entities (users belong to organizations, docs instances belong to organizations, etc.)
+- Provides a realistic dataset for testing API endpoints and complex queries
+- Safe to run on any database (uses prefixed data)
+
+**When to update**:
+
+- When adding new fields to existing models
+- When adding new models to the schema
+- When you need realistic test data for development
+
+**How to run**:
+
+```bash
+# Set up test environment
+pnpm db:setup:test
+
+# Update .env.test with your test database URL
+# TEST_DATABASE_URL="postgresql://user:password@localhost:5432/fern_dashboard_test"
+
+# Run the seed script
+pnpm db:seed:test
+```
+
+**Example update when adding new fields**:
+
+```typescript
+// In seed.test.ts - when adding email and githubUsername to User model
+const user1 = await prisma.user.upsert({
+  where: { userId: "fern-test-user-1" },
+  update: {},
+  create: {
+    userId: "fern-test-user-1",
+    email: "user1@fern.dev", // New required field
+    githubUsername: "fern-user-1", // New optional field
+    isAdmin: true,
+  },
+});
+```
+
+### 2. Unit Tests (`src/__tests__/database.test.ts`)
+
+**Purpose**: Tests individual database operations and edge cases in isolation.
+
+**What it does**:
+
+- Tests CRUD operations for each service (UserService, OrganizationService, etc.)
+- Verifies error handling and edge cases
+- Ensures data integrity and constraints
+- Runs in isolation with cleanup between tests
+
+**When to update**:
+
+- When adding new service methods
+- When adding new validation logic
+- When you need to test specific edge cases or error conditions
+
+**How to run**:
+
+```bash
+# Run all tests
+pnpm test
+
+# Run only database tests
+pnpm test database.test.ts
+```
+
+**Example update when adding new service methods**:
+
+```typescript
+// In database.test.ts - when adding UserService
+it("should create and retrieve a user", async () => {
+  const testUserId = "test-user-1";
+  const testEmail = "test-user-1@example.com";
+
+  const createdUser = await userService.createUser({
+    userId: testUserId,
+    email: testEmail,
+    githubUsername: "test-github-user",
+    isAdmin: false,
+  });
+  expect(createdUser.userId).toBe(testUserId);
+  expect(createdUser.email).toBe(testEmail);
+});
+```
 
 ## Available Scripts
 
@@ -115,4 +202,7 @@ server/
 1. **Schema Changes**: Edit `prisma/schema.prisma`
 2. **Generate Client**: Run `pnpm db:generate`
 3. **Apply Changes**: Use `pnpm db:push` for development or `pnpm db:migrate` for production
-4. **Update Code**: Use the generated Prisma client in your code
+4. **Compile TypeScript**: Run `pnpm compile` to check for type errors
+5. **Update Seed Data**: Update `prisma/seed.test.ts` with new fields/models
+6. **Update Unit Tests**: Update `src/__tests__/database.test.ts` for new functionality
+7. **Test Changes**: Run `pnpm test` and `pnpm db:seed:test`
