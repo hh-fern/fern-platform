@@ -12,71 +12,33 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
-model DocsWorkspace {
-  id            Int      @id @default(autoincrement())
-  title         String
-  initializedAt DateTime @default(now())
-  auth0OrgId    String
-  gitRepo       GitRepo? @relation("DocsWorkspaceRelation")
-  users         User[]
+model Organization {
+  orgId   String  @unique
+  
 }
 
-model GitRepo {
-  id              Int           @id @default(autoincrement())
-  initializedAt   DateTime      @default(now())
-  docsWorkspace   DocsWorkspace @relation("DocsWorkspaceRelation", fields: [docsWorkspaceId], references: [id])
-  docsWorkspaceId Int           @unique
-  branches        Branch[]
+model DocsInstance {
+  id        String    @unique
+  orgId     String    @unique // foreign key to organization
+  url       String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
 }
 
-model Branch {
-  id        Int      @id @default(autoincrement())
-  title     String
-  creator   User?    @relation(fields: [creatorId], references: [id])
-  creatorId Int?
-  createdAt DateTime @default(now())
-  gitRepo   GitRepo  @relation(fields: [gitRepoId], references: [id])
-  gitRepoId Int
-  updatedAt DateTime @default(now())
-  files     File[]
-}
-
-model User {
-  id         Int             @id @default(autoincrement())
-  name       String?
-  workspaces DocsWorkspace[]
-  branches   Branch[]
-}
-
-model File {
-  id               Int           @id @default(autoincrement())
-  title            String
-  branch           Branch        @relation(fields: [branchId], references: [id])
-  branchId         Int
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @default(now())
-  versions         FileVersion[] @relation("FileVersions")
-  currentVersion   FileVersion?  @relation("CurrentFileVersion", fields: [currentVersionId], references: [id])
-  currentVersionId Int?
-
-  @@unique([currentVersionId])
-  @@index([currentVersionId], name: "current_version_index")
-  @@index([branchId], name: "file_branch_index")
-}
-
-model FileVersion {
-  id            Int       @id @default(autoincrement())
-  file          File      @relation("FileVersions", fields: [fileId], references: [id])
-  fileId        Int
-  content       String
-  versionNumber Int
-  createdAt     DateTime  @default(now())
-  deletedAt     DateTime?
-  currentFile   File?     @relation("CurrentFileVersion")
-
-  @@unique([fileId, versionNumber])
-  @@index([fileId], name: "file_version_index")
+model Feedback {
+  id          Int              @id @default(autoincrement())
+  votedAt     DateTime         @default(now())
+  submittedAt DateTime?
+  pageUrl     String
+  sessionId   String?
+  eventId     String?          @unique
+  location    String?
+  deviceType  String?
+  browser     String?
+  isHelpful   Boolean
+  selection   String?
+  comment     String?
+  email       String?
 }
