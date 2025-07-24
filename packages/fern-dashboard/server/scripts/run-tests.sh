@@ -26,6 +26,9 @@ done
 export DATABASE_URL="postgresql://${USER}@localhost:5432/fern_dashboard_tes"
 export DIRECT_URL="postgresql://${USER}@localhost:5432/fern_dashboard_tes"
 
+# Ensure environment variables are properly set for vitest
+export NODE_ENV=test
+
 echo "📊 Using test database: fern_dashboard_tes"
 echo "👤 Using username: ${USER}"
 
