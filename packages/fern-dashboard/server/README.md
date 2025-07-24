@@ -25,7 +25,7 @@ server/
 
 ### Prerequisites
 
-1. **PostgreSQL**: Install PostgreSQL locally for development
+1. **Docker**: Install Docker and docker-compose for testing
 2. **Vercel Project**: Link your project to Vercel for environment management
 
 ### Initial Setup
@@ -55,8 +55,6 @@ server/
    # DATABASE_URL="postgresql://username:password@localhost:5432/fern_dashboard"
    ```
 
-   **Note**: Test environment variables are automatically configured using the current user's username.
-
 ### Making Changes
 
 1. **Compile Project** (includes Prisma generation + TypeScript compilation):
@@ -84,8 +82,7 @@ pnpm db:test
 
 This command:
 
-- Automatically detects PostgreSQL installation
-- Sets up local PostgreSQL test database using current user
+- Sets up test database environment
 - Pushes schema changes
 - Seeds with test data (prefixed with `fern-test-`)
 - Is completely isolated from production
@@ -113,6 +110,11 @@ Run database tests:
 ```bash
 pnpm test
 ```
+
+### Additional Test Commands
+
+- `pnpm db:seed:test` - Run database seeding test
+- `pnpm db:push:test` - Run database push test
 
 ## Available Scripts
 

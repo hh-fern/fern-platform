@@ -1,0 +1,30 @@
+FROM node:18-alpine
+
+# Install PostgreSQL client and OpenSSL
+RUN apk add --no-cache postgresql-client openssl
+
+# Install Prisma globally (like in self-hosted setup)
+RUN npm install -g prisma
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package.json ./
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Install dependencies
+RUN pnpm install
+
+# Copy source code
+COPY . .
+
+# Set environment variables for testing
+ENV NODE_ENV=test
+ENV DATABASE_URL=postgresql://test:test@postgres:5432/fern_dashboard_tes
+ENV DIRECT_URL=postgresql://test:test@postgres:5432/fern_dashboard_tes
+
+# Default command
+CMD ["pnpm", "test"] 

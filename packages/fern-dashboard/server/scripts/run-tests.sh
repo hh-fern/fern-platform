@@ -1,42 +1,50 @@
 #!/bin/bash
 
-# Script to run tests with proper environment setup
+# Script to run tests with Docker environment
 
 set -e
 
-echo "🧪 Setting up test environment..."
+echo "🧪 Setting up Docker test environment..."
 
-# Detect and add PostgreSQL tools to PATH
-POSTGRES_PATHS=(
-    "/opt/homebrew/opt/postgresql@15/bin"
-    "/usr/local/opt/postgresql@15/bin"
-    "/usr/local/bin"
-    "/opt/homebrew/bin"
-)
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+    echo "❌ Docker is not running. Please start Docker and try again."
+    exit 1
+fi
 
-for path in "${POSTGRES_PATHS[@]}"; do
-    if [ -d "$path" ] && [ -f "$path/psql" ]; then
-        echo "📦 Found PostgreSQL tools at: $path"
-        export PATH="$path:$PATH"
-        break
+# Check if docker-compose is available
+if ! command -v docker-compose > /dev/null 2>&1; then
+    echo "❌ docker-compose is not available. Please install docker-compose and try again."
+    exit 1
+fi
+
+echo "🐳 Starting PostgreSQL container..."
+docker-compose -f docker-compose.test.yml up -d postgres
+
+# Wait for PostgreSQL to be ready
+echo "⏳ Waiting for PostgreSQL to be ready..."
+timeout=60
+counter=0
+while ! docker-compose -f docker-compose.test.yml exec -T postgres pg_isready -U test -d fern_dashboard_tes > /dev/null 2>&1; do
+    sleep 1
+    counter=$((counter + 1))
+    if [ $counter -ge $timeout ]; then
+        echo "❌ PostgreSQL failed to start within $timeout seconds"
+        docker-compose -f docker-compose.test.yml logs postgres
+        exit 1
     fi
 done
 
-# Set up test database URL with current user
-# In CI environment, use the runner credentials
-if [ "$CI" = "true" ]; then
-  export DATABASE_URL="postgresql://runner:runner@localhost:5432/fern_dashboard_tes"
-  export DIRECT_URL="postgresql://runner:runner@localhost:5432/fern_dashboard_tes"
-else
-  export DATABASE_URL="postgresql://${USER}@localhost:5432/fern_dashboard_tes"
-  export DIRECT_URL="postgresql://${USER}@localhost:5432/fern_dashboard_tes"
-fi
+echo "✅ PostgreSQL is ready!"
 
-# Ensure environment variables are properly set for vitest
-export NODE_ENV=test
-
-echo "📊 Using test database: fern_dashboard_tes"
-echo "👤 Using username: ${USER}"
+# Generate Prisma client and run migrations (like self-hosted setup)
+echo "🔧 Generating Prisma client and running migrations..."
+docker-compose -f docker-compose.test.yml run --rm server-test sh -c "pnpm db:generate && pnpm db:migrate:deploy"
 
 echo "🚀 Running tests..."
-vitest --run --passWithNoTests 
+docker-compose -f docker-compose.test.yml run --rm server-test pnpm test
+
+echo "🧹 Cleaning up..."
+docker-compose -f docker-compose.test.yml down
+
+echo "✅ Tests completed!" 

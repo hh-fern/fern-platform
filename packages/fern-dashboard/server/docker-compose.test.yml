@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: fern_dashboard_tes
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d fern_dashboard_tes"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+  server-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://test:test@postgres:5432/fern_dashboard_tes
+      DIRECT_URL: postgresql://test:test@postgres:5432/fern_dashboard_tes
+      NODE_ENV: test
+      PRISMA_ENGINE_PROTOCOL: json-rpc
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - test-network
+
+volumes:
+  postgres_test_data:
+
+networks:
+  test-network:
+    driver: bridge

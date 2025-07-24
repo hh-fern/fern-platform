@@ -1,0 +1,151 @@
+name: CI Docker
+
+on:
+  push:
+    branches:
+      - "**"
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: "buildwithfern"
+  FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+  WORKOS_API_KEY: ${{ secrets.WORKOS_API_KEY }}
+  WORKOS_CLIENT_ID: ${{ secrets.WORKOS_CLIENT_ID }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install
+        uses: ./.github/actions/install
+
+      - name: Compile and build
+        run: pnpm turbo compile codegen build
+        env:
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+          WORKOS_API_KEY: ${{ secrets.WORKOS_API_KEY }}
+          WORKOS_CLIENT_ID: ${{ secrets.WORKOS_CLIENT_ID }}
+
+      - name: Compile Template Resolver
+        run: pnpm --filter=@fern-api/template-resolver compile:cjs
+
+      - name: Check dependencies
+        run: pnpm depcheck
+
+      - name: Check format
+        run: pnpm format:check
+
+  lint:
+    runs-on: CLI
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install
+        uses: ./.github/actions/install
+
+      - name: Lint style
+        run: pnpm lint:style
+
+      - name: eslint
+        run: pnpm lint:eslint
+
+  lint-fai:
+    runs-on: CLI
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install
+        uses: ./.github/actions/install
+
+      - name: Setup poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
+          cd servers/fai
+          poetry install
+
+      - name: Check formatting
+        run: |
+          cd servers/fai
+          poetry run black --check .
+
+      - name: Check imports
+        run: |
+          cd servers/fai
+          poetry run isort --check .
+
+      - name: Type check
+        run: |
+          cd servers/fai
+          poetry run mypy .
+
+  visual-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install
+        uses: ./.github/actions/install
+
+      - name: Build components
+        run: pnpm turbo --filter=@fern-docs/components compile
+
+  fern-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install
+        uses: ./.github/actions/install
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: fernapi
+          password: ${{ secrets.FERN_API_DOCKERHUB_PASSWORD }}
+
+      - name: Codegen
+        run: |
+          pnpm fdr:generate
+          pnpm turbo --filter=@fern-platform/fdr codegen
+
+      - name: Ensure no changes to git-tracked files
+        run: git --no-pager diff --exit-code
+
+  test-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install
+        uses: ./.github/actions/install
+
+      - name: 🧪 Build generator-cli
+        run: pnpm turbo --filter=@fern-api/generator-cli compile
+
+      - name: Run tests with Docker
+        run: |
+          cd packages/fern-dashboard/server
+          chmod +x scripts/*.sh
+          pnpm test
+        env:
+          CI: true
+
+      - name: Run tests against local FDR
+        run: pnpm --filter=@fern-platform/fdr test:local
+        env:
+          CI: true 
