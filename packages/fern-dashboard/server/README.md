@@ -7,7 +7,7 @@ This package contains the server-side code for the Fern Dashboard, including dat
 ```
 server/
 ├── prisma/
-│   ├── schema.prisma      # Database schema definition
+│   ├── schema.prisma     # Database schema definition
 │   ├── seed.ts           # Database seeding script
 │   └── migrations/       # Database migration files
 ├── src/
@@ -16,9 +16,7 @@ server/
 │   └── services/         # Database service layers
 ├── generated/            # Generated Prisma client (gitignored)
 ├── dist/                 # Compiled TypeScript output
-├── package.json          # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-└── README.md            # This file
+...
 ```
 
 ## Database Setup
@@ -37,6 +35,7 @@ server/
    ```
 
 2. **Link to Vercel** (if not already linked):
+   [Instructions here](../README.md)
 
    ```bash
    cd ../../  # Go to fern-dashboard root
@@ -44,6 +43,7 @@ server/
    ```
 
 3. **Configure Environment Variables**:
+   [Instructions here](../README.md)
 
    ```bash
    # Pull environment variables from Vercel

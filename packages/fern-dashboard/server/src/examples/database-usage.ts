@@ -66,7 +66,7 @@ async function directPrismaExample() {
   const helpfulFeedback = await prisma.feedback.findMany({
     where: {
       isHelpful: true,
-      createdAt: {
+      votedAt: {
         gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
       },
     },
