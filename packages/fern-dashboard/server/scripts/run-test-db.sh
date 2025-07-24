@@ -12,25 +12,29 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Check if docker-compose is available
-if ! command -v docker-compose > /dev/null 2>&1; then
-    echo "❌ docker-compose is not available. Please install docker-compose and try again."
+# Detect docker-compose command (V1 or V2)
+if command -v docker-compose > /dev/null 2>&1; then
+    DOCKER_COMPOSE="docker-compose"
+elif docker compose version > /dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+else
+    echo "❌ Neither docker-compose nor docker compose is available. Please install Docker Compose and try again."
     exit 1
 fi
 
 echo "🐳 Starting PostgreSQL container..."
-docker-compose -f docker-compose.test.yml up -d postgres
+$DOCKER_COMPOSE -f docker-compose.test.yml up -d postgres
 
 # Wait for PostgreSQL to be ready
 echo "⏳ Waiting for PostgreSQL to be ready..."
 timeout=60
 counter=0
-while ! docker-compose -f docker-compose.test.yml exec -T postgres pg_isready -U test -d fern_dashboard_tes > /dev/null 2>&1; do
+while ! $DOCKER_COMPOSE -f docker-compose.test.yml exec -T postgres pg_isready -U test -d fern_dashboard_tes > /dev/null 2>&1; do
     sleep 1
     counter=$((counter + 1))
     if [ $counter -ge $timeout ]; then
         echo "❌ PostgreSQL failed to start within $timeout seconds"
-        docker-compose -f docker-compose.test.yml logs postgres
+        $DOCKER_COMPOSE -f docker-compose.test.yml logs postgres
         exit 1
     fi
 done
@@ -39,18 +43,18 @@ echo "✅ PostgreSQL is ready!"
 
 # Generate Prisma client and run migrations (like self-hosted setup)
 echo "🔧 Generating Prisma client and running migrations..."
-docker-compose -f docker-compose.test.yml run --rm server-test sh -c "pnpm db:generate && pnpm db:migrate:deploy"
+$DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test sh -c "pnpm db:generate && pnpm db:migrate:deploy"
 
 # Run the specified command
 if [ $# -eq 0 ]; then
     echo "🌱 Seeding test database..."
-    docker-compose -f docker-compose.test.yml run --rm server-test pnpm ts-node prisma/seed.test.ts
+    $DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test pnpm ts-node prisma/seed.test.ts
 else
     echo "🚀 Running: $@"
-    docker-compose -f docker-compose.test.yml run --rm server-test "$@"
+    $DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test "$@"
 fi
 
 echo "🧹 Cleaning up..."
-docker-compose -f docker-compose.test.yml down
+$DOCKER_COMPOSE -f docker-compose.test.yml down
 
 echo "✅ Test database operation completed!" 
