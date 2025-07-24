@@ -28,6 +28,7 @@
     "db:studio": "prisma studio",
     "db:validate": "prisma validate",
     "dev": "pnpm db:generate && ts-node src/index.ts",
+    "format": "prisma format",
     "start": "node dist/index.js",
     "test": "vitest --run --passWithNoTests"
   },

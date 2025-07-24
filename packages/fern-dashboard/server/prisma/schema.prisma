@@ -15,26 +15,51 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model User {
+  userId    String   @unique
+  createdAt DateTime @default(now())
+  isAdmin   Boolean  @default(true)
+
+  organizations UserOrganization[]
+}
+
+model UserOrganization {
+  userId String
+  orgId  String
+
+  user         User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  organization Organization @relation(fields: [orgId], references: [orgId], onDelete: Cascade)
+
+  @@id([userId, orgId])
+}
+
 model Organization {
-  orgId   String  @unique
-  
+  orgId String @unique
+
+  users UserOrganization[]
+
+  docsInstances DocsInstance[]
 }
 
 model DocsInstance {
   id        String    @unique
-  orgId     String    @unique // foreign key to organization
+  orgId     String // foreign key to organization
   url       String
   createdAt DateTime  @default(now())
   updatedAt DateTime?
+
+  organization Organization @relation(fields: [orgId], references: [orgId], onDelete: Cascade)
+
+  feedback Feedback[]
 }
 
 model Feedback {
-  id          Int              @id @default(autoincrement())
-  votedAt     DateTime         @default(now())
+  id          Int       @id @default(autoincrement())
+  votedAt     DateTime  @default(now())
   submittedAt DateTime?
   pageUrl     String
   sessionId   String?
-  eventId     String?          @unique
+  eventId     String?   @unique
   location    String?
   deviceType  String?
   browser     String?
@@ -42,4 +67,7 @@ model Feedback {
   selection   String?
   comment     String?
   email       String?
+
+  docsInstanceId String?
+  docsInstance   DocsInstance? @relation(fields: [docsInstanceId], references: [id], onDelete: SetNull)
 }
