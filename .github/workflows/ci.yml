@@ -124,6 +124,20 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: runner
+          POSTGRES_DB: fern_dashboard_tes
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v4
         with:
@@ -135,10 +149,21 @@ jobs:
       - name: 🧪 Build generator-cli
         run: pnpm turbo --filter=@fern-api/generator-cli compile
 
+      - name: Setup database
+        run: |
+          cd packages/fern-dashboard/server
+          pnpm db:generate
+          pnpm db:push
+        env:
+          DATABASE_URL: postgresql://runner:runner@localhost:5432/fern_dashboard_tes
+          DIRECT_URL: postgresql://runner:runner@localhost:5432/fern_dashboard_tes
+
       - name: Run tests
         run: pnpm test
         env:
           CI: true
+          DATABASE_URL: postgresql://runner:runner@localhost:5432/fern_dashboard_tes
+          DIRECT_URL: postgresql://runner:runner@localhost:5432/fern_dashboard_tes
 
       - name: Install Docker Compose
         run: |
