@@ -2,12 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "Fern Dashboard Server with Prisma Database Management",
-  "keywords": [
-    "fern",
-    "dashboard",
-    "prisma",
-    "database"
-  ],
+  "keywords": [],
   "license": "ISC",
   "author": "",
   "main": "index.js",
@@ -24,7 +19,8 @@
     "db:migrate:status": "prisma migrate status",
     "db:pull": "prisma db pull",
     "db:push": "prisma db push",
-    "db:seed": "ts-node prisma/seed.ts",
+    "db:seed:test": "ts-node prisma/seed.test.ts",
+    "db:setup:test": "bash scripts/setup-test-db.sh",
     "db:studio": "prisma studio",
     "db:validate": "prisma validate",
     "dev": "pnpm db:generate && ts-node src/index.ts",

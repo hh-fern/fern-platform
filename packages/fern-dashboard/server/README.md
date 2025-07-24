@@ -65,9 +65,17 @@ server/
    pnpm db:push
    ```
 
-6. **Seed Database** (optional):
+6. **Seed Database with Test Data** (optional):
+
    ```bash
-   pnpm db:seed
+   # Set up test environment (creates .env.test file)
+   pnpm db:setup:test
+
+   # Update .env.test with your test database URL
+   # Example: TEST_DATABASE_URL="postgresql://user:password@localhost:5432/fern_dashboard_test"
+
+   # Run test seed (safe for production - uses fern-test prefixes)
+   pnpm db:seed:test
    ```
 
 ## Available Scripts
@@ -81,7 +89,7 @@ server/
 - `pnpm db:migrate:deploy` - Deploy migrations to production
 - `pnpm db:migrate:reset` - Reset database and reapply migrations
 - `pnpm db:migrate:status` - Check migration status
-- `pnpm db:seed` - Seed database with sample data
+- `pnpm db:seed:test` - Seed database with test data (uses TEST_DATABASE_URL if available)
 - `pnpm db:studio` - Open Prisma Studio (database GUI)
 - `pnpm db:validate` - Validate schema
 - `pnpm db:format` - Format schema file

@@ -1,9 +1,20 @@
 import { PrismaClient } from "../generated/prisma";
 
-const prisma = new PrismaClient();
+// Use test database URL if available, otherwise fall back to main database
+const databaseUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
+const _directUrl = process.env.TEST_DIRECT_URL || process.env.DIRECT_URL;
+
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: databaseUrl,
+    },
+  },
+});
 
 async function main() {
-  console.log("Seeding database...");
+  console.log("Seeding test database...");
+  console.log(`Using database URL: ${databaseUrl?.substring(0, 20)}...`);
 
   // Clean up existing fern-test data
   console.log("Cleaning up existing fern-test data...");
@@ -185,7 +196,7 @@ async function main() {
     },
   });
 
-  console.log("Database seeded successfully");
+  console.log("Test database seeded successfully");
   console.log({
     user1,
     user2,

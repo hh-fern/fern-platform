@@ -30,8 +30,22 @@
     "test": {
       "dependsOn": ["compile"]
     },
+    "db:seed:test": {
+      "env": [
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "TEST_DATABASE_URL",
+        "TEST_DIRECT_URL"
+      ]
+    },
     "test-db": {
-      "dependsOn": ["compile"]
+      "dependsOn": ["compile"],
+      "env": [
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "TEST_DATABASE_URL",
+        "TEST_DIRECT_URL"
+      ]
     },
     "test-ete": {
       "dependsOn": ["compile"]
