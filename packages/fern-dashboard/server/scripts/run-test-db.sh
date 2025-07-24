@@ -29,7 +29,7 @@ $DOCKER_COMPOSE -f docker-compose.test.yml up -d postgres
 echo "⏳ Waiting for PostgreSQL to be ready..."
 timeout=60
 counter=0
-while ! $DOCKER_COMPOSE -f docker-compose.test.yml exec -T postgres pg_isready -U test -d fern_dashboard_tes > /dev/null 2>&1; do
+while ! $DOCKER_COMPOSE -f docker-compose.test.yml exec -T postgres pg_isready -U test -d fern_dashboard_tes -h localhost -p 5432 > /dev/null 2>&1; do
     sleep 1
     counter=$((counter + 1))
     if [ $counter -ge $timeout ]; then

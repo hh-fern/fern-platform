@@ -22,6 +22,21 @@ else
     exit 1
 fi
 
+# Debug: Check what's using port 5432
+echo "🔍 Checking what's using port 5432..."
+if command -v netstat > /dev/null 2>&1; then
+    netstat -tlnp | grep :5432 || echo "No process found using port 5432"
+elif command -v ss > /dev/null 2>&1; then
+    ss -tlnp | grep :5432 || echo "No process found using port 5432"
+else
+    echo "netstat/ss not available for port checking"
+fi
+
+# Debug: Check for existing containers
+echo "🐳 Checking for existing PostgreSQL containers..."
+$DOCKER_COMPOSE -f docker-compose.test.yml ps
+docker ps | grep postgres || echo "No PostgreSQL containers found"
+
 echo "🐳 Starting PostgreSQL container..."
 $DOCKER_COMPOSE -f docker-compose.test.yml up -d postgres
 
@@ -29,7 +44,7 @@ $DOCKER_COMPOSE -f docker-compose.test.yml up -d postgres
 echo "⏳ Waiting for PostgreSQL to be ready..."
 timeout=60
 counter=0
-while ! $DOCKER_COMPOSE -f docker-compose.test.yml exec -T postgres pg_isready -U test -d fern_dashboard_tes > /dev/null 2>&1; do
+while ! $DOCKER_COMPOSE -f docker-compose.test.yml exec -T postgres pg_isready -U test -d fern_dashboard_tes -h localhost -p 5432 > /dev/null 2>&1; do
     sleep 1
     counter=$((counter + 1))
     if [ $counter -ge $timeout ]; then
