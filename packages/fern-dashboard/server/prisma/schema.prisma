@@ -16,9 +16,11 @@ datasource db {
 }
 
 model User {
-  userId    String   @id @unique
-  createdAt DateTime @default(now())
-  isAdmin   Boolean  @default(true)
+  userId         String   @id @unique
+  email          String   @unique
+  githubUsername String?  @unique
+  createdAt      DateTime @default(now())
+  isAdmin        Boolean  @default(true)
 
   organizations UserOrganization[]
 }
@@ -43,7 +45,7 @@ model Organization {
 
 model DocsInstance {
   id        String    @id @unique
-  orgId     String 
+  orgId     String
   url       String
   createdAt DateTime  @default(now())
   updatedAt DateTime?
