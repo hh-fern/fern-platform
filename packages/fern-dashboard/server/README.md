@@ -90,6 +90,7 @@ server/
 - `pnpm db:migrate:reset` - Reset database and reapply migrations
 - `pnpm db:migrate:status` - Check migration status
 - `pnpm db:seed:test` - Seed database with test data (uses TEST_DATABASE_URL if available)
+- `pnpm db:setup:test` - Set up test seed environment
 - `pnpm db:studio` - Open Prisma Studio (database GUI)
 - `pnpm db:validate` - Validate schema
 - `pnpm db:format` - Format schema file
