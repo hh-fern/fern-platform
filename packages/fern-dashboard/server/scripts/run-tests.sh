@@ -58,7 +58,7 @@ echo "✅ PostgreSQL is ready!"
 
 # Generate Prisma client and run migrations (like self-hosted setup)
 echo "🔧 Generating Prisma client and running migrations..."
-$DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test sh -c "pnpm db:generate && pnpm db:migrate:deploy"
+$DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test sh -c "pnpm db:generate && pnpm db:migrate:reset --force && pnpm db:migrate:deploy"
 
 echo "🚀 Running tests..."
 $DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test pnpm vitest run
