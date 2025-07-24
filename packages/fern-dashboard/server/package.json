@@ -19,20 +19,23 @@
     "db:migrate:status": "prisma migrate status",
     "db:pull": "prisma db pull",
     "db:push": "prisma db push",
-    "db:seed:test": "ts-node prisma/seed.test.ts",
+    "db:push:test": "./scripts/run-push-test.sh",
+    "db:seed:test": "./scripts/run-seed-test.sh",
     "db:setup:test": "bash scripts/setup-test-db.sh",
     "db:studio": "prisma studio",
+    "db:test": "./scripts/run-test-db.sh",
     "db:validate": "prisma validate",
     "dev": "pnpm db:generate && ts-node src/index.ts",
     "format": "prisma format",
     "start": "node dist/index.js",
-    "test": "vitest --run --passWithNoTests"
+    "test": "./scripts/run-tests.sh"
   },
   "dependencies": {
     "@prisma/client": "5.13.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.28",
+    "dotenv-cli": "^6.0.0",
     "prisma": "5.13.0",
     "ts-node": "^10.9.2",
     "typescript": "5.7.3",

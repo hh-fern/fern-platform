@@ -1,8 +1,12 @@
+import * as dotenv from "dotenv";
+
 import { PrismaClient } from "../generated/prisma";
 
-// Use test database URL if available, otherwise fall back to main database
-const databaseUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
-const _directUrl = process.env.TEST_DIRECT_URL || process.env.DIRECT_URL;
+// Load environment variables from .env.test
+dotenv.config({ path: ".env.test" });
+
+const databaseUrl = process.env.DATABASE_URL;
+const _directUrl = process.env.DIRECT_URL;
 
 const prisma = new PrismaClient({
   datasources: {
