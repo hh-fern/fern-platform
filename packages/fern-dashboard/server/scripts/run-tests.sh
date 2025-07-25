@@ -11,6 +11,18 @@ if [ "$CI" = "true" ]; then
     # In CI, PostgreSQL is already provided as a service
     echo "✅ Using existing PostgreSQL service in CI"
     
+    # Check if environment variables are set
+    if [ -z "$DATABASE_URL" ] || [ -z "$DIRECT_URL" ]; then
+        echo "❌ Error: DATABASE_URL and DIRECT_URL environment variables are required in CI"
+        echo "DATABASE_URL: $DATABASE_URL"
+        echo "DIRECT_URL: $DIRECT_URL"
+        exit 1
+    fi
+    
+    echo "🔧 Environment variables are set correctly"
+    echo "DATABASE_URL: ${DATABASE_URL:0:30}..."
+    echo "DIRECT_URL: ${DIRECT_URL:0:30}..."
+    
     # Generate Prisma client and run migrations
     echo "🔧 Generating Prisma client and running migrations..."
     pnpm db:generate
