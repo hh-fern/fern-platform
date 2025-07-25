@@ -6,8 +6,12 @@ export default defineConfig({
     globals: true,
     env: {
       NODE_ENV: "test",
-      DATABASE_URL: process.env.DATABASE_URL,
-      DIRECT_URL: process.env.DIRECT_URL,
+      DATABASE_URL:
+        process.env.DATABASE_URL ||
+        "postgresql://runner:runner@localhost:5432/fern_dashboard_tes",
+      DIRECT_URL:
+        process.env.DIRECT_URL ||
+        "postgresql://runner:runner@localhost:5432/fern_dashboard_tes",
     },
     setupFiles: [],
     exclude: ["prisma/**/*", "dist/**/*", "generated/**/*"],
