@@ -2,11 +2,20 @@ import * as dotenv from "dotenv";
 
 import { PrismaClient } from "../generated/prisma";
 
-// Load environment variables from .env.test
-dotenv.config({ path: ".env.test" });
+// Load environment variables from .env.test if it exists, otherwise use system env vars
+try {
+  dotenv.config({ path: ".env.test" });
+} catch (_error) {
+  // .env.test file doesn't exist, use system environment variables
+  console.log("No .env.test file found, using system environment variables");
+}
 
 const databaseUrl = process.env.DATABASE_URL;
 const _directUrl = process.env.DIRECT_URL;
+
+if (!databaseUrl) {
+  throw new Error("DATABASE_URL environment variable is required");
+}
 
 const prisma = new PrismaClient({
   datasources: {
