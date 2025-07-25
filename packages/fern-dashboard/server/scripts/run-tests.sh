@@ -16,10 +16,10 @@ if [ "$CI" = "true" ]; then
     export DIRECT_URL="postgresql://runner:runner@localhost:5432/fern_dashboard_tes"
     export CI=true
     
-    # Generate Prisma client and run migrations
-    echo "🔧 Generating Prisma client and running migrations..."
+    # Generate Prisma client and push schema
+    echo "🔧 Generating Prisma client and pushing schema..."
     pnpm db:generate
-    pnpm db:migrate:deploy
+    pnpm db:push
     
     echo "🚀 Running tests..."
     pnpm vitest run
