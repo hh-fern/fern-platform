@@ -1,9 +1,29 @@
 #!/bin/bash
 
-# Script to run tests with Docker environment
+# Script to run tests with Docker environment or CI environment
 
 set -e
 
+# Check if we're running in CI environment
+if [ "$CI" = "true" ]; then
+    echo "🧪 Running tests in CI environment..."
+    
+    # In CI, PostgreSQL is already provided as a service
+    echo "✅ Using existing PostgreSQL service in CI"
+    
+    # Generate Prisma client and run migrations
+    echo "🔧 Generating Prisma client and running migrations..."
+    pnpm db:generate
+    pnpm db:migrate:deploy
+    
+    echo "🚀 Running tests..."
+    pnpm vitest run
+    
+    echo "✅ Tests completed!"
+    exit 0
+fi
+
+# Local development with Docker
 echo "🧪 Setting up Docker test environment..."
 
 # Check if Docker is running
