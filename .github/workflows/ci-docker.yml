@@ -137,6 +137,9 @@ jobs:
       - name: 🧪 Build generator-cli
         run: pnpm turbo --filter=@fern-api/generator-cli compile
 
+      - name: 🧪 Build FDR dependencies
+        run: pnpm turbo compile --filter=@fern-api/fdr-sdk --filter=@fern-api/github --filter=@fern-api/template-resolver --filter=@fern-api/ui-core-utils --filter=@fern-docs/search-ask-fern --filter=@fern-docs/search-keyword --filter=@fern-docs/search-utils
+
       - name: Run tests with Docker
         run: |
           cd packages/fern-dashboard/server
