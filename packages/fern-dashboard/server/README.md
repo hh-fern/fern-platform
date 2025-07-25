@@ -8,7 +8,7 @@ This package contains the server-side code for the Fern Dashboard, including dat
 server/
 ├── prisma/
 │   ├── schema.prisma     # Database schema definition
-│   ├── seed.test.ts      # Database seeding script for test data
+│   ├── seed.ts           # Database seeding script for test data
 │   └── migrations/       # Database migration files
 ├── src/
 │   ├── index.ts          # Main server entry point
@@ -90,7 +90,7 @@ This command:
 **Example update when adding new fields**:
 
 ```typescript
-// In seed.test.ts - when adding email and githubUsername to User model
+// In seed.ts - when adding email and githubUsername to User model
 const user1 = await prisma.user.upsert({
   where: { userId: "fern-test-user-1" },
   update: {},

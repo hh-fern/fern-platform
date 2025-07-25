@@ -42,7 +42,7 @@ echo "🔧 Generating Prisma client and running migrations..."
 docker-compose -f docker-compose.test.yml run --rm server-test sh -c "pnpm db:generate && pnpm db:push"
 
 echo "🌱 Running seed test..."
-docker-compose -f docker-compose.test.yml run --rm server-test pnpm ts-node prisma/seed.test.ts
+docker-compose -f docker-compose.test.yml run --rm server-test pnpm ts-node prisma/seed.ts
 
 echo "🧹 Cleaning up..."
 docker-compose -f docker-compose.test.yml down

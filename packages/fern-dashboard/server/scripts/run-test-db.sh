@@ -48,7 +48,7 @@ $DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test sh -c "pnpm db:g
 # Run the specified command
 if [ $# -eq 0 ]; then
     echo "🌱 Seeding test database..."
-    $DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test pnpm ts-node prisma/seed.test.ts
+    $DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test pnpm ts-node prisma/seed.ts
 else
     echo "🚀 Running: $@"
     $DOCKER_COMPOSE -f docker-compose.test.yml run --rm server-test "$@"
