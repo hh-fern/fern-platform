@@ -12,9 +12,14 @@ async function main() {
     // Keep the process running
     process.on("SIGINT", () => {
       console.log("Shutting down server...");
-      void disconnectDatabase().then(() => {
-        process.exit(0);
-      });
+      void disconnectDatabase()
+        .then(() => {
+          process.exit(0);
+        })
+        .catch((error: unknown) => {
+          console.error("Error during shutdown:", error);
+          process.exit(1);
+        });
     });
   } catch (error) {
     console.error("Failed to start server:", error);
