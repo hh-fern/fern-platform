@@ -123,6 +123,7 @@ const PageEditor = React.forwardRef<PageEditorRef, PageEditor.Props>(
           insertPosition = nextPos;
           return false; // Stop searching
         }
+        return true;
       });
 
       if (insertPosition != null) {
@@ -150,6 +151,7 @@ const PageEditor = React.forwardRef<PageEditorRef, PageEditor.Props>(
           insertPosition = pos;
           return false; // Stop searching
         }
+        return true;
       });
 
       if (insertPosition != null) {
