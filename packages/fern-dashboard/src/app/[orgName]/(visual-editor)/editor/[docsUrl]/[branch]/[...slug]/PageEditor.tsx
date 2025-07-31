@@ -189,19 +189,10 @@ const PageEditor = React.forwardRef<PageEditorRef, PageEditor.Props>(
     function onTiptapEditorUpdate(props: EditorEvents["update"]) {
       const latestTiptapHtml = props.editor.getHTML();
       if (originalTiptapHtml.current && isFirstUpdate.current === false) {
-        console.log("=== TIPTAP UPDATE DEBUG ===");
-        console.log(
-          "Original HTML:",
-          originalTiptapHtml.current.substring(0, 500) + "..."
-        );
-        console.log("Latest HTML:", latestTiptapHtml.substring(0, 500) + "...");
-        console.log("Original elements keys:", Object.keys(originalElements));
-
         const changedNodes = getChangedNodesFromHtml(
           originalTiptapHtml.current,
           latestTiptapHtml
         );
-        console.log("Changed nodes:", changedNodes);
 
         // Always include the current originalElements when staging changes
         // This ensures that custom components maintain their mappings
@@ -210,7 +201,6 @@ const PageEditor = React.forwardRef<PageEditorRef, PageEditor.Props>(
           changedNodes,
           originalElements,
         });
-        console.log("Staged changes with originalElements");
       } else {
         isFirstUpdate.current = false;
       }

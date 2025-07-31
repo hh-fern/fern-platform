@@ -20,7 +20,11 @@ export declare namespace AISidePanel {
     onGenerateContent: (
       prompt: string,
       chatHistory: ChatMessage[]
-    ) => Promise<{ success: boolean; error?: string }>;
+    ) => Promise<{
+      success: boolean;
+      error?: string;
+      note?: string;
+    }>;
     isGenerating?: boolean;
     className?: string;
   }
@@ -153,7 +157,7 @@ export function AISidePanel({
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
             <div>
               <label htmlFor="ai-prompt" className="sr-only">
                 Content generation prompt

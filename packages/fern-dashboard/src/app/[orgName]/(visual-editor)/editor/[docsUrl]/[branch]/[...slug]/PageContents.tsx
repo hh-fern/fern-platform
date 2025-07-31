@@ -80,47 +80,21 @@ export default function PageContents({
           }
         );
 
-        // Debug logging
-        console.log("=== AI CONTENT INSERTION DEBUG ===");
-        console.log("Original HTML:", html);
-        console.log("New originalElements:", newOriginalElements);
-        console.log(
-          "Existing originalElements keys:",
-          Object.keys(originalElements)
-        );
-
-        // Let's try a simpler approach - just proceed normally and see what actually happens
-        const uniqueElements: OriginalElements = {};
-        const updatedHtml = html;
-
-        Object.entries(newOriginalElements).forEach(([hash, element]) => {
-          if (originalElements[hash]) {
-            console.log(`COLLISION DETECTED for hash: ${hash}`);
-            console.log("Existing element:", originalElements[hash]);
-            console.log("New element:", element);
-          }
-          uniqueElements[hash] = element;
-        });
-
-        console.log("Final uniqueElements:", uniqueElements);
-        console.log("Updated HTML:", updatedHtml);
-
-        // Add the elements to the global state (allowing overwrites for now to debug)
-        const newGlobalElements = {
+        // Merge new AI-generated elements with existing ones
+        const mergedElements = {
           ...originalElements,
-          ...uniqueElements,
+          ...newOriginalElements,
         };
 
-        console.log("Setting originalElements to:", newGlobalElements);
-        setOriginalElements(newGlobalElements as WithCode<OriginalElements>);
+        // Update global originalElements state
+        setOriginalElements(mergedElements as WithCode<OriginalElements>);
 
         if (editorRef.current) {
-          console.log("Inserting content into TipTap editor");
-          // Pass the complete merged originalElements to ensure the new elements are included in stageChanges
+          // Pass the complete merged originalElements to ensure new elements are included in stageChanges
           editorRef.current.insertContent(
-            updatedHtml,
+            html,
             response.placement,
-            newGlobalElements
+            mergedElements
           );
         }
       } catch (error) {

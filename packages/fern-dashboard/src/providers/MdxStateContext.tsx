@@ -116,33 +116,15 @@ export function MdxStateProvider({
         if (
           state.changed &&
           state.html &&
-          state.frontmatter
+          state.frontmatter &&
+          state.originalElements
         ) {
-          console.log("=== HTML TO MDX DEBUG ===");
-          console.log("Filename:", filename);
-          console.log("HTML length:", state.html.length);
-          console.log("State has originalElements:", !!state.originalElements);
-          
-          if (state.originalElements) {
-            console.log("Original elements keys:", Object.keys(state.originalElements));
-            console.log("Original elements count:", Object.keys(state.originalElements).length);
-          } else {
-            console.log("WARNING: No originalElements in state!");
-          }
-          
-          // Use empty object as fallback if originalElements is missing
-          const elementsToUse = state.originalElements || {};
-          console.log("Using originalElements with count:", Object.keys(elementsToUse).length);
-          
-          const result = htmlToMdx(
+          acc[filename] = htmlToMdx(
             state.html,
             state.frontmatter,
-            elementsToUse,
+            state.originalElements,
             state.changedNodes
-          );
-          
-          console.log("Generated MDX:", result.mdx.substring(0, 500) + "...");
-          acc[filename] = result.mdx;
+          ).mdx;
         }
         return acc;
       },
@@ -155,10 +137,7 @@ export function MdxStateProvider({
     async (filename: Filename) => {
       // Get content of file to sync
       const content = changedMdxFiles[filename];
-      console.log("=== SYNC CHANGES DEBUG ===");
-      console.log("Filename:", filename);
-      console.log("Content to sync:", content);
-      
+
       // Verify there is content to sync
       if (typeof content !== "undefined") {
         // Clear any existing timeout for this file

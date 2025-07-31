@@ -8,6 +8,8 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+type UserType = "user" | "assistant";
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getCurrentSession();
@@ -144,11 +146,11 @@ Use these components to create rich, interactive documentation!`;
       system: systemPrompt,
       messages: [
         {
-          role: "user",
+          role: "user" as UserType,
           content: "Add a troubleshooting section with common issues",
         },
         {
-          role: "assistant",
+          role: "assistant" as UserType,
           content: JSON.stringify({
             success: true,
             content:
@@ -159,7 +161,7 @@ Use these components to create rich, interactive documentation!`;
         // Add chat history context
         ...(chatHistory && Array.isArray(chatHistory)
           ? chatHistory.slice(-6).map((msg: any) => ({
-              role: msg.role === "user" ? "user" : "assistant",
+              role: (msg.role === "user" ? "user" : "assistant") as UserType,
               content:
                 msg.role === "user"
                   ? msg.content
@@ -167,7 +169,7 @@ Use these components to create rich, interactive documentation!`;
             }))
           : []),
         {
-          role: "user",
+          role: "user" as UserType,
           content: prompt,
         },
       ],
@@ -184,6 +186,7 @@ Use these components to create rich, interactive documentation!`;
     try {
       parsedResponse = JSON.parse(generatedContent.text);
     } catch (error) {
+      console.error("Error parsing JSON response from Anthropic API:", error);
       // Fallback if AI doesn't return valid JSON
       return NextResponse.json({
         success: false,
