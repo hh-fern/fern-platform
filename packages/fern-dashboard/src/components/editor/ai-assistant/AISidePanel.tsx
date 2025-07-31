@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-import { Bot, Send, X } from "lucide-react";
+import { ArrowUp } from "lucide-react";
+
+import { FernLogo } from "@fern-docs/components";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/utils";
@@ -32,13 +34,51 @@ export declare namespace AISidePanel {
 
 export function AISidePanel({
   isOpen,
-  onClose,
   onGenerateContent,
   isGenerating = false,
   className,
 }: AISidePanel.Props) {
   const [prompt, setPrompt] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [showContent, setShowContent] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Handle animation timing
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isOpen) {
+      // Delay showing content until slide-in animation completes (300ms)
+      timer = setTimeout(() => {
+        setShowContent(true);
+      }, 300);
+    } else {
+      // Hide content immediately when closing
+      setShowContent(false);
+    }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [isOpen]);
+
+  // Function to auto-resize textarea
+  const autoResizeTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        Math.min(textareaRef.current.scrollHeight, 120) + "px";
+    }
+  };
+
+  // Handle setting prompt and auto-resize
+  const handleSetPrompt = (text: string) => {
+    setPrompt(text);
+    // Use setTimeout to ensure the DOM is updated before resizing
+    setTimeout(autoResizeTextarea, 0);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +93,20 @@ export function AISidePanel({
     // Add user message to chat history
     const updatedHistory = [...chatHistory, userMessage];
     setChatHistory(updatedHistory);
+    setPrompt("");
+
+    // Add thinking state immediately after user message
+    const thinkingMessage: ChatMessage = {
+      role: "assistant",
+      content: "thinking",
+      timestamp: Date.now(),
+    };
+    setChatHistory((prev) => [...prev, thinkingMessage]);
 
     const result = await onGenerateContent(prompt.trim(), updatedHistory);
+
+    // Remove thinking message and add actual response
+    setChatHistory((prev) => prev.slice(0, -1));
 
     if (result.success) {
       // Add successful assistant response to history
@@ -70,7 +122,6 @@ export function AISidePanel({
           timestamp: Date.now(),
         },
       ]);
-      setPrompt("");
     } else {
       // Add error message to history and keep panel open
       setChatHistory((prev) => [
@@ -81,7 +132,6 @@ export function AISidePanel({
           timestamp: Date.now(),
         },
       ]);
-      // Don't clear the prompt on error so user can try again
     }
   };
 
@@ -90,139 +140,174 @@ export function AISidePanel({
   return (
     <div
       className={cn(
-        "fixed inset-y-0 right-0 z-50 w-96 border-l border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900",
+        "fixed right-0 z-10 w-96 bg-transparent",
         "transform transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "translate-x-full",
         className
       )}
+      style={{
+        top: "calc(var(--header-height) + var(--header-toolbar-height) - 32px)",
+        bottom: 0,
+        right: 0,
+      }}
     >
-      <div className="flex h-full flex-col">
-        <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-800">
-          <div className="flex items-center gap-2">
-            <Bot className="text-primary h-5 w-5" />
-            <h2 className="text-lg font-semibold">AI Content Assistant</h2>
-          </div>
-          <Button
-            variant="ghost"
-            size="iconSm"
-            onClick={onClose}
-            aria-label="Close AI Assistant"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex-1 p-4">
-          <div className="mb-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Describe what content you would like to generate for this page.
-              The AI is aware of your current page content and previous
-              conversation.
-            </p>
-          </div>
-
-          {/* Chat History */}
-          {chatHistory.length > 0 && (
-            <div className="mb-4 max-h-40 overflow-y-auto rounded-md border bg-gray-50 p-3 dark:bg-gray-800">
-              <h4 className="mb-2 text-xs font-medium text-gray-700 dark:text-gray-300">
-                Conversation History
-              </h4>
-              <div className="space-y-2">
-                {chatHistory.map((message, index) => (
-                  <div key={index} className="text-xs">
-                    <span
-                      className={cn(
-                        "font-medium",
-                        message.role === "user" &&
-                          "text-blue-600 dark:text-blue-400",
-                        message.role === "assistant" &&
-                          "text-green-600 dark:text-green-400",
-                        message.role === "error" &&
-                          "text-red-600 dark:text-red-400"
-                      )}
-                    >
-                      {message.role === "user"
-                        ? "You"
-                        : message.role === "error"
-                          ? "Error"
-                          : "AI"}
-                      :
-                    </span>
-                    <span className="ml-2 text-gray-600 dark:text-gray-400">
-                      {message.content}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+      <div className="flex h-full flex-col justify-center">
+        <div
+          className={cn(
+            "transition-opacity duration-300 ease-in-out",
+            showContent ? "opacity-100" : "opacity-0"
           )}
+        >
+          {isOpen && (
+            <>
+              {/* Fixed Header */}
+              <div className="flex flex-shrink-0 items-center justify-center p-4 pt-16">
+                <div className="flex items-end gap-2">
+                  <FernLogo className="mb-1.5 w-24" />
+                  <p className="text-muted-foreground mb-0 mt-0 text-lg">
+                    Writer
+                  </p>
+                </div>
+              </div>
 
-          <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
-            <div>
-              <label htmlFor="ai-prompt" className="sr-only">
-                Content generation prompt
-              </label>
-              <textarea
-                id="ai-prompt"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="e.g., 'Add a getting started section with installation steps' or 'Create an API reference for authentication endpoints'"
-                className={cn(
-                  "min-h-[120px] w-full rounded-md border border-gray-200 p-3 dark:border-gray-700",
-                  "bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100",
-                  "focus:ring-primary focus:border-transparent focus:ring-2",
-                  "resize-none placeholder:text-gray-500 dark:placeholder:text-gray-400"
-                )}
-                disabled={isGenerating}
-              />
-            </div>
+              {/* Scrollable Chat History */}
+              {chatHistory.length !== 0 && (
+                <div className="flex min-h-0 flex-1 flex-col">
+                  <div className="flex-1 space-y-4 overflow-y-auto p-4">
+                    {chatHistory.map((message, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "flex items-start gap-3",
+                          message.role === "user"
+                            ? "flex-row-reverse"
+                            : "flex-row"
+                        )}
+                      >
+                        {/* Avatar */}
+                        {(message.role === "assistant" ||
+                          message.role === "error") && (
+                          <div
+                            className={cn(
+                              "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full",
+                              message.role === "error"
+                                ? "bg-red-500"
+                                : "bg-white"
+                            )}
+                          >
+                            {message.role === "assistant" ? (
+                              <FernLogo className="h-4 w-4 text-white" />
+                            ) : (
+                              <span className="text-sm font-medium text-white">
+                                !
+                              </span>
+                            )}
+                          </div>
+                        )}
 
-            <Button
-              type="submit"
-              disabled={!prompt.trim() || isGenerating}
-              loading={isGenerating}
-              className="w-full"
-            >
-              {isGenerating ? (
-                "Generating content..."
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Generate Content
-                </>
+                        {/* Message Bubble */}
+                        <div
+                          className={cn(
+                            "max-w-[240px] rounded-2xl px-4 py-2 text-sm",
+                            message.role === "user"
+                              ? "text-gray-1100 bg-green-300"
+                              : message.role === "error"
+                                ? "bg-red-500 text-white"
+                                : "border border-gray-200 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                          )}
+                        >
+                          {message.content === "thinking" ? (
+                            <div className="flex items-center gap-2 py-1.5">
+                              <div className="flex space-x-1">
+                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-500 [animation-delay:-0.3s]"></div>
+                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-500 [animation-delay:-0.15s]"></div>
+                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-500"></div>
+                              </div>
+                            </div>
+                          ) : (
+                            message.content
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
-            </Button>
-          </form>
 
-          <div className="mt-6 space-y-2">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              Suggested prompts:
-            </h3>
-            <div className="space-y-1">
-              {[
-                "Add a card group with 3 feature cards",
-                "Create a step-by-step tutorial with numbered steps",
-                "Add a troubleshooting accordion with common issues",
-                "Generate code examples with multiple languages",
-                "Add a getting started section with installation steps",
-                "Create a comparison table of different options",
-              ].map((suggestion) => (
-                <button
-                  key={suggestion}
-                  type="button"
-                  onClick={() => setPrompt(suggestion)}
-                  disabled={isGenerating}
-                  className={cn(
-                    "w-full rounded border border-gray-200 p-2 text-left text-xs dark:border-gray-700",
-                    "transition-colors hover:bg-gray-50 dark:hover:bg-gray-800",
-                    "disabled:cursor-not-allowed disabled:opacity-50"
-                  )}
+              {/* Message Input - Fixed at bottom */}
+              <div className="flex-shrink-0 p-4">
+                <form
+                  onSubmit={(e) => void handleSubmit(e)}
+                  className="flex items-center gap-2"
                 >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
-          </div>
+                  <div className="flex flex-1">
+                    <label htmlFor="ai-prompt" className="sr-only">
+                      Content generation prompt
+                    </label>
+                    <textarea
+                      ref={textareaRef}
+                      id="ai-prompt"
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      placeholder="Ask Fern to write your docs..."
+                      className={cn(
+                        "w-full rounded-2xl border border-gray-400 bg-white p-3",
+                        "focus:ring-primary focus:border-primary focus:outline-none",
+                        "resize-none placeholder:text-gray-700",
+                        "max-h-[120px] min-h-[44px]"
+                      )}
+                      disabled={isGenerating}
+                      rows={1}
+                      style={{ height: "auto" }}
+                      onInput={autoResizeTextarea}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={!prompt.trim() || isGenerating}
+                    loading={isGenerating}
+                    size="icon"
+                    className="h-11 w-11 flex-shrink-0 rounded-full"
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
+                </form>
+
+                {/* Scrollable suggested prompts */}
+                {chatHistory.length === 0 && (
+                  <div className="mt-6 space-y-2">
+                    <h3 className="text-center text-sm font-medium">
+                      Suggested prompts:
+                    </h3>
+                    <div className="flex flex-col gap-1">
+                      {[
+                        "Summarize the content of this page and create an overview section at the top.",
+                        "Add a new section about <topic> to the page.",
+                        "Make the content on this page more concise.",
+                      ].map((suggestion) => (
+                        <Button
+                          key={suggestion}
+                          variant="ghost"
+                          onClick={() => handleSetPrompt(suggestion)}
+                          disabled={isGenerating}
+                          className={cn(
+                            "h-fit w-full text-wrap text-xs",
+                            "transition-colors hover:bg-gray-400/50",
+                            "disabled:cursor-not-allowed disabled:opacity-50"
+                          )}
+                        >
+                          <span className="text-wrap text-xs">
+                            {suggestion}
+                          </span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

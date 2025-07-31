@@ -52,6 +52,12 @@ const PageEditor = React.forwardRef<PageEditorRef, PageEditor.Props>(
         const editor = editorRef.current;
         const htmlBeforeInsertion = editor.getHTML();
 
+        // Debug: Log placement processing
+        console.log("PageEditor insertContent Debug:", {
+          placement,
+          contentPreview: content.substring(0, 100),
+        });
+
         // Parse placement instruction and insert content
         if (placement === "cursor") {
           editor.commands.insertContent(`\n\n${content}`);

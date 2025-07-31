@@ -28,6 +28,19 @@ export function AIAssistant({
 }: AIAssistant.Props) {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
+  // Add/remove CSS class on body to push content when panel is open
+  React.useEffect(() => {
+    if (isPanelOpen) {
+      document.body.classList.add('ai-panel-open');
+    } else {
+      document.body.classList.remove('ai-panel-open');
+    }
+    
+    return () => {
+      document.body.classList.remove('ai-panel-open');
+    };
+  }, [isPanelOpen]);
+
   const { generateContent, isGenerating } = useAIAssistant({
     currentContent: currentHtml,
     pageContext,
@@ -50,7 +63,8 @@ export function AIAssistant({
   return (
     <>
       <FloatingAIButton
-        onClick={() => setIsPanelOpen(true)}
+        onClick={() => setIsPanelOpen(!isPanelOpen)}
+        isOpen={isPanelOpen}
         className={className}
       />
       <AISidePanel

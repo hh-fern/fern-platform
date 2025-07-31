@@ -90,6 +90,12 @@ export default function PageContents({
         setOriginalElements(mergedElements as WithCode<OriginalElements>);
 
         if (editorRef.current) {
+          // Debug: Log the placement value
+          console.log("AI Content Placement Debug:", {
+            placement: response.placement,
+            contentPreview: html.substring(0, 100),
+          });
+          
           // Pass the complete merged originalElements to ensure new elements are included in stageChanges
           editorRef.current.insertContent(
             html,

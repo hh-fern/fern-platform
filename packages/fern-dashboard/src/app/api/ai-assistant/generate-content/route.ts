@@ -60,11 +60,16 @@ ERROR RESPONSE (when you cannot fulfill the request):
 PLACEMENT OPTIONS (only use if you're certain):
 - "cursor" - Insert at current cursor position
 - "end" - Insert at the end of the document  
-- "beginning" - Insert at the beginning of the document
+- "beginning" - Insert at the beginning of the document (use this for "at the top", "at the start", "add to the beginning", etc.)
 - "after:<heading>" - Insert after a specific heading (e.g., "after:## Introduction")
 - "before:<heading>" - Insert before a specific heading
 - "replace:<heading>" - Replace content under a specific heading
 - "append:<heading>" - Append to content under a specific heading
+
+PLACEMENT HINTS:
+- When user says "at the top", "beginning", "start": use "beginning"
+- When user says "at the bottom", "at the end": use "end"
+- When user references a specific section: use "after:<section>" or "before:<section>"
 
 CONTENT RULES:
 1. Generate ONLY the raw markdown content - no explanations or meta-commentary
