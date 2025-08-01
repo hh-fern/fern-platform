@@ -345,7 +345,8 @@ export function DomainConfigurationCard({
     if (isDomainSetupEnabled && customDomains.length > 0) {
       void autoVerifyNewDomains();
     }
-  }, [isDomainSetupEnabled, customDomains.length, autoVerifyNewDomains]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDomainSetupEnabled, customDomains.length]);
 
   // Parse DNS records from instructions
   const getDnsRecords = (domain: string): DNSRecord[] => {
