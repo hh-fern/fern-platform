@@ -121,12 +121,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const bearer_token = data.access_token;
     const refresh_token = data.refresh_token;
     const expires_in = data.expires_in;
+    const roles = data.scope;
 
     const fern_token = await mintJwtToken({
       bearer_token,
       refresh_token,
       issuer,
       expires_in,
+      roles,
     });
 
     const res = redirectLocation
@@ -166,21 +168,34 @@ async function mintJwtToken({
   refresh_token,
   issuer,
   expires_in,
+  roles,
 }: {
   bearer_token: string;
   refresh_token: string;
   issuer: string;
   expires_in: number;
+  roles?: string[];
 }) {
-  return await new SignJWT({
-    fern: {
-      playground: {
-        initial_state: {
-          auth: {
-            bearer_token: bearer_token,
-          },
+  const rolesPayload = roles
+    ? {
+        roles: roles,
+      }
+    : undefined;
+
+  const playgroundPayload = {
+    playground: {
+      initial_state: {
+        auth: {
+          bearer_token: bearer_token,
         },
       },
+    },
+  };
+
+  return await new SignJWT({
+    fern: {
+      ...rolesPayload,
+      ...playgroundPayload,
     },
     refresh_token: refresh_token,
   })
