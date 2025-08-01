@@ -121,7 +121,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const bearer_token = data.access_token;
     const refresh_token = data.refresh_token;
     const expires_in = data.expires_in;
-    const roles = data.scope;
+    const roles = data.scope
+      ? data.scope.split(" ").filter(Boolean)
+      : undefined;
 
     const fern_token = await mintJwtToken({
       bearer_token,
