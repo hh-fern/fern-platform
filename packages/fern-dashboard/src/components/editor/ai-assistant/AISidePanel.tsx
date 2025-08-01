@@ -285,9 +285,9 @@ export function AISidePanel({
                           {message.content === "thinking" ? (
                             <div className="flex items-center gap-2 py-1.5">
                               <div className="flex space-x-1">
-                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-500 [animation-delay:-0.3s]"></div>
-                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-500 [animation-delay:-0.15s]"></div>
-                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-500"></div>
+                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-700 [animation-delay:-0.3s]"></div>
+                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-700 [animation-delay:-0.15s]"></div>
+                                <div className="h-1 w-1 animate-bounce rounded-full bg-gray-700"></div>
                               </div>
                             </div>
                           ) : (

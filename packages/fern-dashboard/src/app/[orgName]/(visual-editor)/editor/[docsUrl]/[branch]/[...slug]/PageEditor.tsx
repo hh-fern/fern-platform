@@ -52,12 +52,6 @@ const PageEditor = React.forwardRef<PageEditorRef, PageEditor.Props>(
         const editor = editorRef.current;
         const htmlBeforeInsertion = editor.getHTML();
 
-        // Debug: Log placement processing
-        console.log("PageEditor insertContent Debug:", {
-          placement,
-          contentPreview: content.substring(0, 100),
-        });
-
         // Parse placement instruction and insert content
         if (placement === "cursor") {
           editor.commands.insertContent(`\n\n${content}`);
@@ -117,23 +111,61 @@ const PageEditor = React.forwardRef<PageEditorRef, PageEditor.Props>(
       content: string
     ) => {
       const doc = editor.state.doc;
-      let insertPosition = null;
+      let targetHeadingPos: number | null = null;
+      let targetHeadingLevel: number | null = null;
+      let sectionEndPos: number | null = null;
 
+      // First pass: find the target heading and its level
       doc.descendants((node, pos) => {
         if (
           node.type.name === "heading" &&
           node.textContent.trim() === targetHeading.replace(/^#+\s*/, "")
         ) {
-          // Find the end of this heading's section
-          const nextPos = pos + node.nodeSize;
-          insertPosition = nextPos;
+          targetHeadingPos = pos;
+          targetHeadingLevel = node.attrs.level;
           return false; // Stop searching
         }
         return true;
       });
 
-      if (insertPosition != null) {
-        editor.commands.insertContentAt(insertPosition, `\n\n${content}`);
+      if (targetHeadingPos != null && targetHeadingLevel != null) {
+        // Second pass: find the end of this section by looking for the next heading
+        // of the same or higher level (lower level number = higher heading)
+        let foundSectionEnd = false;
+        doc.descendants((node, pos) => {
+          // Only look at nodes after our target heading
+          if (targetHeadingPos != null && pos <= targetHeadingPos) {
+            return true;
+          }
+
+          if (
+            node.type.name === "heading" &&
+            targetHeadingLevel != null &&
+            node.attrs.level <= targetHeadingLevel
+          ) {
+            // Found the next heading of same or higher level - this is where our section ends
+            sectionEndPos = pos;
+            foundSectionEnd = true;
+            return false; // Stop searching
+          }
+          return true;
+        });
+
+        // If no next heading found, insert at the end of the document
+        if (!foundSectionEnd) {
+          sectionEndPos = doc.content.size;
+          console.log(
+            "No section end found, inserting at document end:",
+            sectionEndPos
+          );
+        }
+
+        if (sectionEndPos != null) {
+          editor.commands.insertContentAt(sectionEndPos, `\n\n${content}`);
+        } else {
+          // Fallback: insert at end
+          editor.commands.insertContentAt(doc.content.size, `\n\n${content}`);
+        }
       } else {
         // Fallback: insert at end
         editor.commands.insertContentAt(doc.content.size, `\n\n${content}`);

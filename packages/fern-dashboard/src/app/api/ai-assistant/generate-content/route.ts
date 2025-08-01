@@ -77,6 +77,14 @@ PLACEMENT HINTS:
 - When user says "at the bottom", "at the end": use "end"
 - When user references a specific section: use "after:<section>" or "before:<section>"
 
+UNDERSTANDING SECTIONS:
+- A "section" includes the heading AND all content under that heading until the next heading of the same or higher level
+- When user says "below/after a section", place content after the entire section (heading + content), not just after the heading
+- When user says "above/before a section", place content before the section heading
+- Examples:
+  - "put this below the API section" → place after all API section content, before next major section
+  - "add this after the introduction" → place after entire introduction section and its content
+
 CONTENT RULES:
 1. Generate ONLY the raw markdown content - no explanations or meta-commentary
 2. Make content complement existing page structure
@@ -98,7 +106,7 @@ Example success response (normal):
   "success": true,
   "content": "## Installation\\n\\nTo install the package:\\n\\n\`\`\`bash\\nnpm install example\\n\`\`\`",
   "placement": "after:## Overview",
-  "summary": "I added an installation section with the npm command"
+  "summary": "I added an installation section after the entire Overview section"
 }
 
 Example success response (with context note):
