@@ -1,5 +1,6 @@
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DocsSiteLayout } from "@/components/docs-page/DocsSiteLayout";
+import { DomainStatusProvider } from "@/state/useDomainStatus";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import { EncodedDocsUrl } from "@/utils/types";
 
@@ -14,8 +15,10 @@ export default async function Layout({
   const docsUrl = parseDocsUrlParam(_params);
 
   return (
-    <DocsSiteLayout docsUrl={docsUrl} orgName={orgName}>
-      <>{children}</>
-    </DocsSiteLayout>
+    <DomainStatusProvider>
+      <DocsSiteLayout docsUrl={docsUrl} orgName={orgName}>
+        <>{children}</>
+      </DocsSiteLayout>
+    </DomainStatusProvider>
   );
 }
