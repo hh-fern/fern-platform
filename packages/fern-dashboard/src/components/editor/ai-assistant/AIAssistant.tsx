@@ -16,6 +16,8 @@ export declare namespace AIAssistant {
       placement: string;
     }) => void;
     getCurrentContent?: () => string;
+    isOpen?: boolean;
+    onToggle?: () => void;
   }
 }
 
@@ -25,21 +27,27 @@ export function AIAssistant({
   className,
   onContentGenerated,
   getCurrentContent,
+  isOpen,
+  onToggle,
 }: AIAssistant.Props) {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  
+  // Use external state if provided, otherwise use internal state
+  const panelOpen = isOpen !== undefined ? isOpen : isPanelOpen;
+  const togglePanel = onToggle || (() => setIsPanelOpen(!isPanelOpen));
 
   // Add/remove CSS class on body to push content when panel is open
   React.useEffect(() => {
-    if (isPanelOpen) {
-      document.body.classList.add('ai-panel-open');
+    if (panelOpen) {
+      document.body.classList.add("ai-panel-open");
     } else {
-      document.body.classList.remove('ai-panel-open');
+      document.body.classList.remove("ai-panel-open");
     }
-    
+
     return () => {
-      document.body.classList.remove('ai-panel-open');
+      document.body.classList.remove("ai-panel-open");
     };
-  }, [isPanelOpen]);
+  }, [panelOpen]);
 
   const { generateContent, isGenerating } = useAIAssistant({
     currentContent: currentHtml,
@@ -63,13 +71,13 @@ export function AIAssistant({
   return (
     <>
       <FloatingAIButton
-        onClick={() => setIsPanelOpen(!isPanelOpen)}
-        isOpen={isPanelOpen}
+        onClick={togglePanel}
+        isOpen={panelOpen}
         className={className}
       />
       <AISidePanel
-        isOpen={isPanelOpen}
-        onClose={() => setIsPanelOpen(false)}
+        isOpen={panelOpen}
+        onClose={() => panelOpen && togglePanel()}
         onGenerateContent={handleGenerateContent}
         isGenerating={isGenerating}
       />

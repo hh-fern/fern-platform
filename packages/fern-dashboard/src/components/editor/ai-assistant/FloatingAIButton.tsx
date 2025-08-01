@@ -20,9 +20,25 @@ export function FloatingAIButton({
   isOpen = false,
   className,
 }: FloatingAIButton.Props) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  };
+
   return (
     <div
-      className="fixed z-50 transition-all duration-300 ease-in-out"
+      className="pointer-events-auto fixed z-50 transition-all duration-300 ease-in-out"
       style={{
         top: isOpen
           ? "calc(var(--header-toolbar-height) + 18px)"
@@ -31,10 +47,12 @@ export function FloatingAIButton({
       }}
     >
       <Button
-        onClick={onClick}
+        onClick={handleClick}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         size="icon"
         className={cn(
-          "bg-primary hover:bg-primary/90 shadow-background-a9 group relative z-50 h-12 overflow-hidden rounded-full shadow-md transition-all duration-300",
+          "bg-primary hover:bg-primary/90 shadow-background-a9 group pointer-events-auto relative z-[9999] h-12 overflow-hidden rounded-full shadow-md transition-all duration-300",
           isOpen ? "w-12 px-0" : "w-fit px-4",
           className
         )}

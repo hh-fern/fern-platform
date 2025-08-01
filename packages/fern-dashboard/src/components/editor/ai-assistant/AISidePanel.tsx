@@ -135,8 +135,6 @@ export function AISidePanel({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
     <div
       className={cn(
@@ -163,7 +161,7 @@ export function AISidePanel({
               {/* Fixed Header */}
               <div className="flex flex-shrink-0 items-center justify-center p-4 pt-16">
                 <div className="flex items-end gap-2">
-                  <FernLogo className="mb-1.5 w-24" />
+                  <FernLogo className="w-23 mb-1.5" />
                   <p className="text-muted-foreground mb-0 mt-0 text-lg">
                     Writer
                   </p>
@@ -274,7 +272,7 @@ export function AISidePanel({
                   </Button>
                 </form>
 
-                {/* Scrollable suggested prompts */}
+                {/* Suggested prompts */}
                 {chatHistory.length === 0 && (
                   <div className="mt-6 space-y-2">
                     <h3 className="text-center text-sm font-medium">
@@ -284,7 +282,7 @@ export function AISidePanel({
                       {[
                         "Summarize the content of this page and create an overview section at the top.",
                         "Add a new section about <topic> to the page.",
-                        "Make the content on this page more concise.",
+                        "Add a conclusion section to the bottom of the page.",
                       ].map((suggestion) => (
                         <Button
                           key={suggestion}

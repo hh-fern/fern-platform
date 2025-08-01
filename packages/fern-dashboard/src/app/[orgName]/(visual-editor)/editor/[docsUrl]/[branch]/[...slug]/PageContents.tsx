@@ -4,13 +4,13 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { MdxToHtmlResponse, OriginalElements, mdxToHtml } from "@fern-docs/mdx";
 
-import { AIAssistant } from "@/components/editor/ai-assistant";
 import { useMdxState } from "@/providers/MdxStateContext";
 import {
   WithCode,
   useOriginalElements,
 } from "@/providers/OriginalElementsContext";
 
+import { useAIAssistant } from "./AIAssistantProvider";
 import PageEditor, { PageEditorRef } from "./PageEditor";
 import PageSubtitle from "./PageSubtitle";
 import PageTitle from "./PageTitle";
@@ -37,6 +37,7 @@ export default function PageContents({
   const { updateDependencies, changedMdxFiles, syncChanges } = useMdxState();
 
   const { originalElements, setOriginalElements } = useOriginalElements();
+  const { setupAI } = useAIAssistant();
 
   useEffect(() => {
     void bundleOriginalElements(originalElements).then((bundled) => {
@@ -95,7 +96,7 @@ export default function PageContents({
             placement: response.placement,
             contentPreview: html.substring(0, 100),
           });
-          
+
           // Pass the complete merged originalElements to ensure new elements are included in stageChanges
           editorRef.current.insertContent(
             html,
@@ -109,6 +110,33 @@ export default function PageContents({
     },
     [setOriginalElements, originalElements]
   );
+
+  // Helper function to clean HTML for AI processing
+  const getCleanContent = useCallback(() => {
+    if (!editorRef.current) return initialHtml;
+
+    const html = editorRef.current.getHTML();
+
+    // Remove data-hash attributes and other editor-specific attributes
+    const cleanHtml = html
+      .replace(/\s*data-hash="[^"]*"/g, "")
+      .replace(/\s*data-[^=]*="[^"]*"/g, "")
+      .replace(/\s*class="[^"]*"/g, "")
+      .replace(/\s*style="[^"]*"/g, "")
+      .trim();
+
+    return cleanHtml;
+  }, [initialHtml]);
+
+  // Setup AI assistant when component mounts
+  useEffect(() => {
+    setupAI({
+      currentHtml: initialHtml,
+      pageContext: `Documentation page: ${title || "Untitled"}`,
+      onContentGenerated: (response) => void handleContentGenerated(response),
+      getCurrentContent: getCleanContent,
+    });
+  }, [setupAI, initialHtml, title, handleContentGenerated, getCleanContent]);
 
   return (
     <>
@@ -130,12 +158,6 @@ export default function PageContents({
           initialHtml={initialHtml}
         />
       </div>
-      <AIAssistant
-        currentHtml={initialHtml}
-        pageContext={`Documentation page: ${title || "Untitled"}`}
-        onContentGenerated={handleContentGenerated}
-        getCurrentContent={() => editorRef.current?.getHTML() || initialHtml}
-      />
     </>
   );
 }

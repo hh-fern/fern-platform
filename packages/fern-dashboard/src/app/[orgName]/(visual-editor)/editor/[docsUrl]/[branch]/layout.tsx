@@ -17,6 +17,8 @@ import { throwDigestibleError } from "@/utils/errors";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import type { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 
+import { AIAssistantProvider } from "./[...slug]/AIAssistantProvider";
+
 export const experimental_ppr = true;
 
 // Static shell that renders immediately
@@ -83,7 +85,7 @@ async function DynamicEditorContent({
                 session={session}
                 docsUrl={docsUrl}
               />
-              {children}
+              <AIAssistantProvider>{children}</AIAssistantProvider>
             </GitPRUrlProvider>
           </BranchProvider>
         </MdxStateProvider>
