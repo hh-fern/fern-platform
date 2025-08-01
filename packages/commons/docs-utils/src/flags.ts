@@ -33,6 +33,7 @@ export interface EdgeFlags {
   isChangelogRedirects: boolean;
   isPosthogDisabled: boolean;
   isNextMdxRef: boolean;
+  isLlmsTxtDisabled: boolean;
 }
 
 export const DEFAULT_EDGE_FLAGS: EdgeFlags = {
@@ -70,9 +71,18 @@ export const DEFAULT_EDGE_FLAGS: EdgeFlags = {
   isChangelogRedirects: false,
   isPosthogDisabled: false,
   isNextMdxRef: false,
+  isLlmsTxtDisabled: false,
 };
 
 export const DEFAULT_SELF_HOSTED_EDGE_FLAGS: EdgeFlags = {
   ...DEFAULT_EDGE_FLAGS,
   isWhitelabeled: true,
+};
+
+export interface OrgEdgeFlags {
+  bypassExtendedGithubAuth: boolean;
+}
+
+export const DEFAULT_ORG_EDGE_FLAGS: OrgEdgeFlags = {
+  bypassExtendedGithubAuth: false,
 };

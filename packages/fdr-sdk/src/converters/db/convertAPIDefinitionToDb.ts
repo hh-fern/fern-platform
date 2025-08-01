@@ -232,6 +232,14 @@ function transformEndpoint({
       writeShape.request != null
         ? transformHttpRequestToDb({ writeShape: writeShape.request })
         : undefined,
+    requestsV2:
+      writeShape.requestsV2 != null
+        ? {
+            requests: writeShape.requestsV2.requests?.map((request) =>
+              transformHttpRequestToDb({ writeShape: request })
+            ),
+          }
+        : undefined,
     response:
       writeShape.response != null
         ? convertResponseToDb({
@@ -492,7 +500,7 @@ function transformHttpRequestToDb({
       };
     case "bytes":
       return {
-        contentType: "application/octet-stream",
+        contentType: writeShape.type.contentType ?? "application/octet-stream",
         description: writeShape.description,
         type: {
           type: "bytes",

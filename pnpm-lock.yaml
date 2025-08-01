@@ -820,6 +820,9 @@ importers:
       '@fern-docs/components':
         specifier: workspace:*
         version: link:../fern-docs/components
+      '@fern-docs/edge-config':
+        specifier: workspace:*
+        version: link:../fern-docs/edge-config
       '@fern-docs/mdx':
         specifier: workspace:*
         version: link:../fern-docs/mdx
@@ -19007,9 +19010,6 @@ packages:
 
   to-arraybuffer@1.0.1:
     resolution: {integrity: sha512-okFlQcoGTi4LQBG/PgSYblw9VOyptsz2KJZqc6qtgGdes8VktzUQkj4BI2blit072iS8VODNcMA+tvnS9dnuMA==}
-
-  to-buffer@1.1.1:
-    resolution: {integrity: sha512-lx9B5iv7msuFYE3dytT+KE5tap+rNYw+K4jVkb9R/asAb+pbBSM17jtunHplhBe6RRJdZx3Pn2Jph24O32mOVg==}
 
   to-buffer@1.2.1:
     resolution: {integrity: sha512-tB82LpAIWjhLYbqjx3X4zEeHN6M8CiuOEy2JY8SEQVdYRe3CCHOFaqrBW1doLDrfpWhplcW7BL+bO3/6S3pcDQ==}
@@ -42696,7 +42696,7 @@ snapshots:
       end-of-stream: 1.4.4
       fs-constants: 1.0.0
       readable-stream: 2.3.8
-      to-buffer: 1.1.1
+      to-buffer: 1.2.1
       xtend: 4.0.2
 
   tar-stream@2.2.0:
@@ -42891,8 +42891,6 @@ snapshots:
   tmpl@1.0.5: {}
 
   to-arraybuffer@1.0.1: {}
-
-  to-buffer@1.1.1: {}
 
   to-buffer@1.2.1:
     dependencies:

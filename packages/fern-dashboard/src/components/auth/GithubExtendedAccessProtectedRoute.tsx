@@ -7,6 +7,7 @@ import checkGitHubPermissions, {
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import * as auth0Management from "@/app/services/auth0/management";
 import { Auth0OrgName } from "@/app/services/auth0/types";
+import { checkOrgHasFlag } from "@/app/services/edge-config/checkOrgHasFlag";
 
 import { Page404 } from "../Page404";
 import { AuthorizeGithubModal } from "../docs-page/AuthorizeGithubModal";
@@ -41,9 +42,23 @@ export const GithubExtendedAccessProtectedRoute = async ({
     return <Page404 />;
   }
 
+  // Check if the org is enabled for bypassing GitHub authorization
+  const shouldBypassGithubAuth = await checkOrgHasFlag(
+    orgName,
+    "bypassExtendedGithubAuth"
+  );
+
+  if (shouldBypassGithubAuth) {
+    // When bypass is enabled, use the Fern support environment variable
+    // The actual GitHub operations will use FERN_SUPPORT_GITHUB_TOKEN
+    return children;
+  }
+
+  // Original GitHub authorization logic when bypass is not enabled
   if (owner && repo) {
     const writePermission = await checkWritePermissionToRepo(
       session.user.sub,
+      orgName,
       owner,
       repo
     );
