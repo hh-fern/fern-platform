@@ -48,7 +48,7 @@ SUCCESS RESPONSE:
   "success": true,
   "content": "The raw markdown content to insert",
   "placement": "WHERE|HOW to insert the content",
-  "note": "Optional note about the content (e.g., if it seems out of context)"
+  "summary": "REQUIRED: Brief, conversational description of what you did using first person (e.g., 'I added a troubleshooting section with 3 common issues')"
 }
 
 ERROR RESPONSE (when you cannot fulfill the request):
@@ -79,11 +79,19 @@ CONTENT RULES:
 5. If referencing previous conversation, use the chat history context
 6. You can use Fern's custom components (see FERN COMPONENTS section below)
 
+SUMMARY RULES:
+- Always use first person ("I added...", "I created...", "I updated...")
+- Be specific about what was added/changed ("I added 3 API endpoints" vs "I added content")
+- Include context/reasoning when helpful ("I added error handling since you mentioned API reliability")
+- Use conversational language ("As a note..." instead of "Note:")
+- Keep it brief but informative (1-2 sentences max)
+
 Example success response (normal):
 {
   "success": true,
   "content": "## Installation\\n\\nTo install the package:\\n\\n\`\`\`bash\\nnpm install example\\n\`\`\`",
-  "placement": "after:## Overview"
+  "placement": "after:## Overview",
+  "summary": "I added an installation section with the npm command"
 }
 
 Example success response (with context note):
@@ -91,7 +99,7 @@ Example success response (with context note):
   "success": true,
   "content": "Birds are fascinating creatures with diverse species found worldwide. They play important roles in ecosystems as both predators and prey.",
   "placement": "end",
-  "note": "Added bird content as requested, though it may seem out of context for this API documentation."
+  "summary": "I added the bird content you requested. As a note, this may seem out of context for API documentation"
 }
 
 Example error response (only for missing references):
@@ -161,6 +169,7 @@ Use these components to create rich, interactive documentation!`;
             content:
               '## Troubleshooting\n\n<Callout intent="info" title="Quick Help">\nIf you\'re experiencing issues, check the common problems below first.\n</Callout>\n\n<AccordionGroup>\n<Accordion title="Authentication Failed">\nIf you\'re receiving authentication errors, verify that:\n- Your API key is correctly set in the environment variables\n- The API key has the necessary permissions\n- You\'re using the correct base URL\n</Accordion>\n\n<Accordion title="Rate Limiting">\nIf you encounter rate limiting errors:\n- Implement exponential backoff in your requests\n- Check your current usage limits in the dashboard\n- Consider upgrading your plan for higher limits\n</Accordion>\n</AccordionGroup>',
             placement: "end",
+            summary: "I added a troubleshooting section with 2 common issues",
           }),
         },
         // Add chat history context
@@ -170,7 +179,7 @@ Use these components to create rich, interactive documentation!`;
               content:
                 msg.role === "user"
                   ? msg.content
-                  : "✅ Content added successfully",
+                  : msg.content || "✅ Content added successfully",
             }))
           : []),
         {
@@ -212,7 +221,7 @@ Use these components to create rich, interactive documentation!`;
       success: true,
       content: parsedResponse.content || generatedContent.text,
       placement: parsedResponse.placement || "cursor",
-      note: parsedResponse.note,
+      summary: parsedResponse.summary || "Content added successfully",
     });
   } catch (error) {
     console.error("Error generating content:", error);

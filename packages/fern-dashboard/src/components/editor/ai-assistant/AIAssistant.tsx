@@ -62,7 +62,7 @@ export function AIAssistant({
 
     if (result.success && result.content && onContentGenerated) {
       onContentGenerated(result.content);
-      return { success: true, note: result.note };
+      return { success: true, summary: result.summary };
     } else {
       return { success: false, error: result.error };
     }

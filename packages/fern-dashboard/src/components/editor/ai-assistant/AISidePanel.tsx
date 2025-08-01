@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { ArrowUp } from "lucide-react";
 
@@ -25,7 +25,7 @@ export declare namespace AISidePanel {
     ) => Promise<{
       success: boolean;
       error?: string;
-      note?: string;
+      summary?: string;
     }>;
     isGenerating?: boolean;
     className?: string;
@@ -41,7 +41,12 @@ export function AISidePanel({
   const [prompt, setPrompt] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [showContent, setShowContent] = useState(false);
+  const [messageVisibility, setMessageVisibility] = useState<
+    Record<number, "hidden" | "partial" | "visible">
+  >({});
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   // Handle animation timing
   useEffect(() => {
@@ -63,6 +68,71 @@ export function AISidePanel({
       }
     };
   }, [isOpen]);
+
+  // Function to scroll chat to bottom
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  // Function to check message visibility and apply opacity effects
+  const checkMessageVisibility = useCallback(() => {
+    if (!chatContainerRef.current) return;
+
+    const containerRect = chatContainerRef.current.getBoundingClientRect();
+    const containerTop = containerRect.top;
+    const containerBottom = containerRect.bottom;
+    const newVisibility: Record<number, "hidden" | "partial" | "visible"> = {};
+
+    chatHistory.forEach((_, index) => {
+      const messageElement = messageRefs.current[index];
+      if (!messageElement) return;
+
+      const messageRect = messageElement.getBoundingClientRect();
+      const messageTop = messageRect.top;
+      const messageBottom = messageRect.bottom;
+
+      // Check if message is completely visible
+      if (messageTop >= containerTop && messageBottom <= containerBottom) {
+        newVisibility[index] = "visible";
+      }
+      // Check if message is partially visible (overflowing top or bottom)
+      else if (
+        (messageTop < containerTop && messageBottom > containerTop) ||
+        (messageTop < containerBottom && messageBottom > containerBottom)
+      ) {
+        newVisibility[index] = "partial";
+      }
+      // Message is completely hidden
+      else {
+        newVisibility[index] = "hidden";
+      }
+    });
+
+    setMessageVisibility(newVisibility);
+  }, [chatHistory]);
+
+  // Auto-scroll when chat history changes
+  useEffect(() => {
+    // Use setTimeout to ensure DOM is updated before scrolling
+    const timer = setTimeout(() => {
+      scrollToBottom();
+      checkMessageVisibility();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [chatHistory, checkMessageVisibility]);
+
+  // Check message visibility when chat container size changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      checkMessageVisibility();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, showContent, checkMessageVisibility]);
 
   // Function to auto-resize textarea
   const autoResizeTextarea = () => {
@@ -110,9 +180,7 @@ export function AISidePanel({
 
     if (result.success) {
       // Add successful assistant response to history
-      const successMessage = result.note
-        ? `✅ Content added successfully. Note: ${result.note}`
-        : "✅ Content added successfully";
+      const successMessage = result.summary || "✅ Content added successfully";
 
       setChatHistory((prev) => [
         ...prev,
@@ -149,10 +217,10 @@ export function AISidePanel({
         right: 0,
       }}
     >
-      <div className="flex h-full flex-col justify-center">
+      <div className="flex h-full max-h-[calc(100vh-var(--header-toolbar-height))] flex-col justify-center">
         <div
           className={cn(
-            "transition-opacity duration-300 ease-in-out",
+            "flex h-full flex-col justify-center transition-opacity duration-300 ease-in-out",
             showContent ? "opacity-100" : "opacity-0"
           )}
         >
@@ -168,50 +236,43 @@ export function AISidePanel({
                 </div>
               </div>
 
-              {/* Scrollable Chat History */}
+              {/* Scrollable Chat History - Only shows if there is content */}
               {chatHistory.length !== 0 && (
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <div className="flex-1 space-y-4 overflow-y-auto p-4">
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                  <div
+                    ref={chatContainerRef}
+                    className="flex-1 space-y-4 overflow-y-auto p-4"
+                    onScroll={checkMessageVisibility}
+                  >
                     {chatHistory.map((message, index) => (
                       <div
                         key={index}
+                        ref={(el) => {
+                          messageRefs.current[index] = el;
+                        }}
                         className={cn(
-                          "flex items-start gap-3",
+                          "flex items-start gap-3 transition-all duration-300",
                           message.role === "user"
                             ? "flex-row-reverse"
-                            : "flex-row"
+                            : "flex-row",
+                          messageVisibility[index] === "partial" && "opacity-30"
                         )}
                       >
                         {/* Avatar */}
                         {(message.role === "assistant" ||
                           message.role === "error") && (
-                          <div
-                            className={cn(
-                              "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full",
-                              message.role === "error"
-                                ? "bg-red-500"
-                                : "bg-white"
-                            )}
-                          >
-                            {message.role === "assistant" ? (
-                              <FernLogo className="h-4 w-4 text-white" />
-                            ) : (
-                              <span className="text-sm font-medium text-white">
-                                !
-                              </span>
-                            )}
+                          <div className="shadow-accent flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white shadow-md">
+                            <FernLogo className="h-4 w-4" variant="leaf-only" />
                           </div>
                         )}
 
                         {/* Message Bubble */}
                         <div
                           className={cn(
-                            "max-w-[240px] rounded-2xl px-4 py-2 text-sm",
+                            "shadow-accent max-w-[240px] rounded-2xl px-4 py-2 text-sm shadow-md",
                             message.role === "user"
                               ? "text-gray-1100 bg-green-300"
-                              : message.role === "error"
-                                ? "bg-red-500 text-white"
-                                : "border border-gray-200 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                              : "border border-gray-200 bg-white text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                           )}
                         >
                           {message.content === "thinking" ? (
@@ -252,7 +313,7 @@ export function AISidePanel({
                         "w-full rounded-2xl border border-gray-400 bg-white p-3",
                         "focus:ring-primary focus:border-primary focus:outline-none",
                         "resize-none placeholder:text-gray-700",
-                        "max-h-[120px] min-h-[44px]"
+                        "max-h-[200px] min-h-[84px]"
                       )}
                       disabled={isGenerating}
                       rows={1}

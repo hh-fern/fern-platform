@@ -26,7 +26,7 @@ export function useAIAssistant(config: AIAssistantConfig = {}) {
       success: boolean;
       content?: GeneratedContentResponse;
       error?: string;
-      note?: string;
+      summary?: string;
     }> => {
       if (!prompt.trim()) {
         return { success: false, error: "Please enter a prompt" };
@@ -75,7 +75,7 @@ export function useAIAssistant(config: AIAssistantConfig = {}) {
 
         setGeneratedContent(result);
 
-        return { success: true, content: result, note: data.note };
+        return { success: true, content: result, summary: data.summary };
       } catch (error) {
         console.error("Error generating content:", error);
         const errorMessage =
