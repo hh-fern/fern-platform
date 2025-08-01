@@ -31,7 +31,7 @@ export function AIAssistant({
   onToggle,
 }: AIAssistant.Props) {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  
+
   // Use external state if provided, otherwise use internal state
   const panelOpen = isOpen !== undefined ? isOpen : isPanelOpen;
   const togglePanel = onToggle || (() => setIsPanelOpen(!isPanelOpen));

@@ -54,7 +54,8 @@ export function FloatingAIButton({
         className={cn(
           "bg-primary hover:bg-primary/90 shadow-background-a9 group pointer-events-auto relative z-[9999] h-12 overflow-hidden rounded-full shadow-md transition-all duration-300",
           isOpen ? "w-12 px-0" : "w-fit px-4",
-          !isOpen && "after:animate-shine after:absolute after:inset-y-0 after:w-8 after:bg-white/50 after:blur after:content-['']",
+          !isOpen &&
+            "after:animate-shine after:absolute after:inset-y-0 after:w-8 after:bg-white/50 after:blur after:content-['']",
           className
         )}
         aria-label={isOpen ? "Close AI Assistant" : "Open AI Assistant"}

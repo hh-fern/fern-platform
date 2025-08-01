@@ -54,7 +54,10 @@ export declare namespace FernLogo {
 
 export const FernLogo = forwardRef<
   SVGSVGElement,
-  ComponentPropsWithoutRef<"svg"> & { fill?: FernLogoFill; variant?: "default" | "leaf-only" }
+  ComponentPropsWithoutRef<"svg"> & {
+    fill?: FernLogoFill;
+    variant?: "default" | "leaf-only";
+  }
 >(({ fill = FernLogoFill.Default, variant = "default", ...props }, ref) => {
   if (variant === "leaf-only") {
     return (
