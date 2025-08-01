@@ -15,6 +15,8 @@ export interface ChatMessage {
   timestamp: number;
 }
 
+const DEFAULT_TEXTAREA_HEIGHT = "50px";
+
 export declare namespace AISidePanel {
   export interface Props {
     isOpen: boolean;
@@ -165,6 +167,11 @@ export function AISidePanel({
     setChatHistory(updatedHistory);
     setPrompt("");
 
+    // Reset textarea height to original default height
+    if (textareaRef.current) {
+      textareaRef.current.style.height = DEFAULT_TEXTAREA_HEIGHT;
+    }
+
     // Add thinking state immediately after user message
     const thinkingMessage: ChatMessage = {
       role: "assistant",
@@ -313,7 +320,7 @@ export function AISidePanel({
                         "w-full rounded-2xl border border-gray-400 bg-white p-3",
                         "focus:ring-primary focus:border-primary focus:outline-none",
                         "resize-none placeholder:text-gray-700",
-                        "max-h-[200px] min-h-[84px]"
+                        `max-h-[200px] min-h-[${DEFAULT_TEXTAREA_HEIGHT}]`
                       )}
                       disabled={isGenerating}
                       rows={1}
