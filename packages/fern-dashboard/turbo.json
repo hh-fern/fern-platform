@@ -4,7 +4,13 @@
   "globalEnv": [],
   "tasks": {
     "build": {
-      "env": ["NEXT_RUNTIME", "SENTRY_AUTH_TOKEN", "FERN_SUPPORT_GITHUB_TOKEN"]
+      "env": [
+        "NEXT_RUNTIME",
+        "SENTRY_AUTH_TOKEN",
+        "VERCEL_ACCESS_TOKEN",
+        "VERCEL_PROJECT_ID",
+        "VERCEL_TEAM_ID"
+      ]
     },
     "compile": {
       "outputs": ["tsconfig.tsbuildinfo"],
@@ -15,10 +21,16 @@
       "dependsOn": ["compile"],
       "outputs": [".next/**", "!.next/cache/**"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": ["SENTRY_AUTH_TOKEN", "FERN_SUPPORT_GITHUB_TOKEN"]
+      "env": [
+        "SENTRY_AUTH_TOKEN",
+        "VERCEL_ACCESS_TOKEN",
+        "VERCEL_PROJECT_ID",
+        "VERCEL_TEAM_ID"
+      ]
     },
     "dashboard:dev": {
-      "dependsOn": ["^build", "^compile"]
+      "dependsOn": ["^build", "^compile"],
+      "env": ["VERCEL_ACCESS_TOKEN", "VERCEL_PROJECT_ID", "VERCEL_TEAM_ID"]
     },
     "dashboard:start": {
       "dependsOn": ["dashboard:build"]

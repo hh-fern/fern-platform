@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { Vercel } from "@vercel/sdk";
 
 import { getCurrentSessionOrThrow } from "@/app/services/auth0/getCurrentSession";
@@ -13,7 +14,7 @@ export async function DELETE(request: NextRequest) {
 
     const { domain } = await request.json();
 
-    if (!domain || typeof domain !== 'string') {
+    if (!domain || typeof domain !== "string") {
       return NextResponse.json(
         { error: { message: "Domain is required and must be a string" } },
         { status: 400 }
@@ -35,12 +36,11 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
+  } catch (_error: any) {
+    console.error("Error deleting domain:", _error);
 
-  } catch (error: any) {
-    console.error("Error deleting domain:", error);
-    
     // If domain doesn't exist, that's OK - consider it success
-    if (error.status === 404) {
+    if (_error.status === 404) {
       return NextResponse.json({ success: true });
     }
 
@@ -49,4 +49,4 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

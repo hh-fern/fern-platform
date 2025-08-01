@@ -1,19 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
 import { getLoadableValue } from "@fern-ui/loadable";
 
+import { useDomainStatus } from "@/state/useDomainStatus";
 import { useDocsSite } from "@/state/useMyDocsSites";
 import { DocsUrl } from "@/utils/types";
-import { useDomainStatus } from "@/state/useDomainStatus";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 import { cn } from "@/utils/utils";
 
 import Card from "../ui/card";
 import { DocsSiteLink } from "./DocsSiteLink";
+import { DomainConfigurationCard } from "./DomainConfigurationCard";
 import { DocsSiteImage } from "./docs-site-image/DocsSiteImage";
 import { SkeletonDocsSiteImage } from "./docs-site-image/SkeletonDocsSiteImage";
-import { DomainConfigurationCard } from "./DomainConfigurationCard";
 
 export declare namespace DocsSiteOverviewCard {
   export interface Props {
@@ -29,21 +28,26 @@ interface DomainWithStatusProps {
   domainStatuses: Record<string, any>;
 }
 
-function DomainWithStatus({ domain, path, isDomainSetupEnabled, domainStatuses }: DomainWithStatusProps) {
-  const fullDomain = `${domain}${path || ''}`;
-  
+function DomainWithStatus({
+  domain,
+  path,
+  isDomainSetupEnabled,
+  domainStatuses,
+}: DomainWithStatusProps) {
   // For non-enabled orgs or Fern subdomains, just show the regular link
-  if (!isDomainSetupEnabled || domain.includes('buildwithfern.com')) {
-    return <DocsSiteLink docsSiteUrl={{ domain, path: path || '' }} />;
+  if (!isDomainSetupEnabled || domain.includes("buildwithfern.com")) {
+    return <DocsSiteLink docsSiteUrl={{ domain, path: path || "" }} />;
   }
 
   // For custom domains in enabled orgs, show status
   const status = domainStatuses[domain];
   const getStatusDisplay = () => {
     if (!status) return { text: "Configuring...", color: "text-blue-600" };
-    if (status.status === 'ready') return null; // No status shown for ready domains
-    if (status.status === 'error') return { text: "Error", color: "text-red-600" };
-    if (status.status === 'verifying') return { text: "Verifying...", color: "text-blue-600" };
+    if (status.status === "ready") return null; // No status shown for ready domains
+    if (status.status === "error")
+      return { text: "Error", color: "text-red-600" };
+    if (status.status === "verifying")
+      return { text: "Verifying...", color: "text-blue-600" };
     return null;
   };
 
@@ -51,14 +55,21 @@ function DomainWithStatus({ domain, path, isDomainSetupEnabled, domainStatuses }
 
   return (
     <div className="flex items-center gap-2">
-      <DocsSiteLink docsSiteUrl={{ domain, path: path || '' }} />
+      <DocsSiteLink docsSiteUrl={{ domain, path: path || "" }} />
       {statusDisplay && (
-        <span className={cn("text-xs px-2 py-1 rounded-full", statusDisplay.color, 
-          statusDisplay.color === "text-yellow-600" ? "bg-yellow-100 dark:bg-yellow-900/30" :
-          statusDisplay.color === "text-blue-600" ? "bg-blue-100 dark:bg-blue-900/30" :
-          statusDisplay.color === "text-red-600" ? "bg-red-100 dark:bg-red-900/30" :
-          "bg-gray-100 dark:bg-gray-700"
-        )}>
+        <span
+          className={cn(
+            "rounded-full px-2 py-1 text-xs",
+            statusDisplay.color,
+            statusDisplay.color === "text-yellow-600"
+              ? "bg-yellow-100 dark:bg-yellow-900/30"
+              : statusDisplay.color === "text-blue-600"
+                ? "bg-blue-100 dark:bg-blue-900/30"
+                : statusDisplay.color === "text-red-600"
+                  ? "bg-red-100 dark:bg-red-900/30"
+                  : "bg-gray-100 dark:bg-gray-700"
+          )}
+        >
           {statusDisplay.text}
         </span>
       )}

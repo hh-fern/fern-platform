@@ -6,7 +6,7 @@ export interface VercelDomainResponse {
 }
 
 export interface VercelDomainVerification {
-  type: 'TXT' | 'CNAME';
+  type: "TXT" | "CNAME";
   domain: string;
   value: string;
   reason?: string;
@@ -18,7 +18,7 @@ export interface VercelDomainConfig {
 }
 
 export interface DomainStatus {
-  status: 'ready' | 'needs_dns' | 'error';
+  status: "ready" | "needs_dns" | "error";
   message: string;
   instructions?: string[];
 }
@@ -27,4 +27,4 @@ export interface AddDomainResult {
   success: boolean;
   domain?: VercelDomainResponse;
   isNew: boolean;
-} 
+}

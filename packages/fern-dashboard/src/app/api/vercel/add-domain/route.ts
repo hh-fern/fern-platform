@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { Vercel } from "@vercel/sdk";
 
 import { getCurrentSessionOrThrow } from "@/app/services/auth0/getCurrentSession";
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     const { domain } = await request.json();
 
-    if (!domain || typeof domain !== 'string') {
+    if (!domain || typeof domain !== "string") {
       return NextResponse.json(
         { error: { message: "Domain is required and must be a string" } },
         { status: 400 }
@@ -36,16 +37,15 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(result);
+  } catch (_error: any) {
+    console.error("Error adding domain:", _error);
 
-  } catch (error: any) {
-    console.error("Error adding domain:", error);
-
-    if (error.body) {
+    if (_error.body) {
       try {
-        const errorBody = JSON.parse(error.body);
+        const errorBody = JSON.parse(_error.body);
         return NextResponse.json(
           { error: errorBody.error },
-          { status: error.status || 400 }
+          { status: _error.status || 400 }
         );
       } catch {
         return NextResponse.json(
@@ -60,4 +60,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { Vercel } from "@vercel/sdk";
 
 import { getCurrentSessionOrThrow } from "@/app/services/auth0/getCurrentSession";
@@ -15,7 +16,7 @@ async function getDomainConfig(domain: string) {
       teamId: process.env.VERCEL_TEAM_ID,
     });
     return result;
-  } catch (error: any) {
+  } catch (_error: any) {
     return null;
   }
 }
@@ -28,15 +29,15 @@ async function getProjectDomain(domain: string) {
       teamId: process.env.VERCEL_TEAM_ID,
     });
     return result;
-  } catch (error: any) {
+  } catch (_error: any) {
     return null;
   }
 }
 
 async function checkDomainStatus(domain: string): Promise<DomainStatus> {
   const [configResult, projectResult] = await Promise.all([
-    getDomainConfig(domain), 
-    getProjectDomain(domain)
+    getDomainConfig(domain),
+    getProjectDomain(domain),
   ]);
 
   // Log what we got from Vercel for debugging
@@ -44,17 +45,20 @@ async function checkDomainStatus(domain: string): Promise<DomainStatus> {
     hasConfig: !!configResult,
     hasProject: !!projectResult,
     verified: projectResult?.verified,
-    misconfigured: configResult?.misconfigured
+    misconfigured: configResult?.misconfigured,
   });
 
   // If we can't find the domain in the project, it might not be added yet
   // But don't immediately mark as error - could be a temporary API issue
   if (!projectResult) {
     // Try to be more lenient - maybe the domain exists but our API call failed
-    console.warn(`Could not find domain ${domain} in project, but this might be a temporary issue`);
-    return { 
-      status: 'error', 
-      message: 'Domain not found. Please try again or contact support if this persists.' 
+    console.warn(
+      `Could not find domain ${domain} in project, but this might be a temporary issue`
+    );
+    return {
+      status: "error",
+      message:
+        "Domain not found. Please try again or contact support if this persists.",
     };
   }
 
@@ -63,36 +67,49 @@ async function checkDomainStatus(domain: string): Promise<DomainStatus> {
 
   // If domain is verified and not misconfigured, it's ready
   if (verified && !misconfigured) {
-    return { status: 'ready', message: 'Domain is ready to use' };
+    return { status: "ready", message: "Domain is ready to use" };
   }
 
   // If domain is verified but misconfigured, still treat as ready
   // The misconfiguration might be acceptable for our use case
   if (verified) {
-    console.log(`Domain ${domain} is verified but marked as misconfigured - treating as ready`);
-    return { status: 'ready', message: 'Domain is verified and working' };
+    console.log(
+      `Domain ${domain} is verified but marked as misconfigured - treating as ready`
+    );
+    return { status: "ready", message: "Domain is verified and working" };
   }
 
   // Domain needs DNS configuration
   const instructions: string[] = [];
-  
+
   if (!verified && projectResult.verification) {
     for (const record of projectResult.verification) {
-      if (record.type === 'TXT') {
-        instructions.push(`Add TXT record for ${record.domain} with value: ${record.value}`);
+      if (record.type === "TXT") {
+        instructions.push(
+          `Add TXT record for ${record.domain} with value: ${record.value}`
+        );
       }
     }
   }
-  
-  if (misconfigured || (!verified && projectResult.verification?.some((r: any) => r.type === 'CNAME'))) {
-    const subdomain = projectResult.name.replace('.' + projectResult.apexName, '');
-    instructions.push(`Add CNAME record for ${subdomain} with value: cname.vercel-dns.com`);
+
+  if (
+    misconfigured ||
+    (!verified &&
+      projectResult.verification?.some((r: any) => r.type === "CNAME"))
+  ) {
+    const subdomain = projectResult.name.replace(
+      "." + projectResult.apexName,
+      ""
+    );
+    instructions.push(
+      `Add CNAME record for ${subdomain} with value: cname.vercel-dns.com`
+    );
   }
 
-  return { 
-    status: 'needs_dns', 
-    message: 'DNS configuration required',
-    instructions: instructions
+  return {
+    status: "needs_dns",
+    message: "DNS configuration required",
+    instructions: instructions,
   };
 }
 
@@ -101,7 +118,7 @@ export async function GET(request: NextRequest) {
     await getCurrentSessionOrThrow();
 
     const { searchParams } = new URL(request.url);
-    const domain = searchParams.get('domain');
+    const domain = searchParams.get("domain");
 
     if (!domain) {
       return NextResponse.json(
@@ -129,15 +146,17 @@ export async function GET(request: NextRequest) {
     console.log(`Checking domain status for: ${domain}`);
     const status = await checkDomainStatus(domain);
     console.log(`Domain status result for ${domain}:`, status);
-    
-    return NextResponse.json(status);
 
-  } catch (error: any) {
-    console.error("Error checking domain status:", error);
-    
+    return NextResponse.json(status);
+  } catch (_error: any) {
+    console.error("Error checking domain status:", _error);
+
     return NextResponse.json(
-      { error: "Unable to check domain status. Please try again or contact support." },
+      {
+        error:
+          "Unable to check domain status. Please try again or contact support.",
+      },
       { status: 500 }
     );
   }
-} 
+}

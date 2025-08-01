@@ -332,7 +332,8 @@
 
 /* Custom slow pulse animation for domain verification */
 @keyframes slow-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -341,7 +342,8 @@
 }
 
 @keyframes slow-pulse-dark {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
