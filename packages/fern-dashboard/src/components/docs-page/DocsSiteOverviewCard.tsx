@@ -2,11 +2,9 @@
 
 import { getLoadableValue } from "@fern-ui/loadable";
 
-import { useDomainStatus } from "@/state/useDomainStatus";
 import { useDocsSite } from "@/state/useMyDocsSites";
 import { DocsUrl } from "@/utils/types";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
-import { cn } from "@/utils/utils";
 
 import Card from "../ui/card";
 import { DocsSiteLink } from "./DocsSiteLink";
@@ -25,14 +23,12 @@ interface DomainWithStatusProps {
   domain: string;
   path?: string;
   isDomainSetupEnabled: boolean;
-  domainStatuses: Record<string, any>;
 }
 
 function DomainWithStatus({
   domain,
   path,
   isDomainSetupEnabled,
-  domainStatuses,
 }: DomainWithStatusProps) {
   // For non-enabled orgs or Fern subdomains, just show the regular link
   if (!isDomainSetupEnabled || domain.includes("buildwithfern.com")) {
@@ -53,7 +49,6 @@ export function DocsSiteOverviewCard({
   githubProtectedArea,
 }: DocsSiteOverviewCard.Props) {
   const docsSite = getLoadableValue(useDocsSite(docsUrl));
-  const { domainStatuses } = useDomainStatus();
   const orgName = useOrgNameFromPathname();
 
   // TEMPORARY: Only enable for plantman org during testing
@@ -78,7 +73,6 @@ export function DocsSiteOverviewCard({
                     domain={url.domain}
                     path={url.path}
                     isDomainSetupEnabled={isDomainSetupEnabled}
-                    domainStatuses={domainStatuses}
                   />
                 ))}
               </div>
