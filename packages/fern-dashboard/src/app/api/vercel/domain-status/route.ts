@@ -23,8 +23,13 @@ async function getDomainConfig(domain: string) {
 
 async function getProjectDomain(domain: string) {
   try {
+    const projectId = process.env.VERCEL_PROJECT_ID;
+    if (!projectId) {
+      throw new Error("VERCEL_PROJECT_ID not configured");
+    }
+
     const result = await vercel.projects.getProjectDomain({
-      idOrName: process.env.VERCEL_PROJECT_ID || "",
+      idOrName: projectId,
       domain: domain,
       teamId: process.env.VERCEL_TEAM_ID,
     });
@@ -49,16 +54,17 @@ async function checkDomainStatus(domain: string): Promise<DomainStatus> {
   });
 
   // If we can't find the domain in the project, it might not be added yet
-  // But don't immediately mark as error - could be a temporary API issue
+  // For newly added domains, Vercel might need time to process
   if (!projectResult) {
-    // Try to be more lenient - maybe the domain exists but our API call failed
     console.warn(
-      `Could not find domain ${domain} in project, but this might be a temporary issue`
+      `Could not find domain ${domain} in project - might still be processing`
     );
+
+    // Instead of immediately returning error, return a "verifying" status
+    // This gives Vercel more time to process the domain addition
     return {
-      status: "error",
-      message:
-        "Domain not found. Please try again or contact support if this persists.",
+      status: "verifying",
+      message: "Domain is being configured. This may take a few moments...",
     };
   }
 

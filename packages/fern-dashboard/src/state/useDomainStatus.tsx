@@ -136,11 +136,8 @@ export function DomainStatusProvider({ children }: { children: ReactNode }) {
       // If any domain has error status
       if (statuses.some((status) => status === "error")) return "error";
 
-      // Only show verifying if domains are actually being verified AND not already ready
-      const hasActivelyVerifying = customDomains.some((domain) =>
-        verifyingDomains.has(domain) && domainStatuses[domain]?.status !== "ready"
-      );
-      if (hasActivelyVerifying) return "verifying";
+      // Skip verifying status - users don't need to see internal processing
+      // Domains will show as "live" until there's something actionable
 
       // If we haven't initialized from localStorage yet, don't show pending immediately
       if (!isInitialized) return "live";
@@ -148,7 +145,7 @@ export function DomainStatusProvider({ children }: { children: ReactNode }) {
       // Otherwise, pending (some domains need DNS setup)
       return "pending";
     },
-    [domainStatuses, verifyingDomains, isInitialized]
+    [domainStatuses, isInitialized]
   );
 
   return (

@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Check, Copy } from "lucide-react";
-import { toast } from "sonner";
 
 import { getLoadableValue } from "@fern-ui/loadable";
 import { useCopyToClipboard } from "@fern-ui/react-commons";
@@ -35,7 +34,7 @@ interface DNSRecord {
 }
 
 interface DomainStatusResponse {
-  status: "ready" | "needs_dns" | "error";
+  status: "ready" | "needs_dns" | "error" | "verifying";
   message?: string;
   instructions?: string[];
 }
@@ -90,12 +89,13 @@ export function DomainConfigurationCard({
 
       // Show configuration for:
       // 1. Domains that need DNS setup
-      // 2. Domains with errors (so user can retry)  
+      // 2. Domains with errors (so user can retry)
       // 3. Domains without status yet (new domains that need to be configured)
+      // Note: "verifying" status is intentionally hidden - users don't need to see internal processing
       return (
         (status?.status === "needs_dns" && status.instructions) ||
         status?.status === "error" ||
-        (!status) // Show domains without status - auto-verification will handle them silently
+        !status // Show domains without status - auto-verification will handle them silently
       );
     });
   }, [customDomains, domainStatuses]);
@@ -120,20 +120,25 @@ export function DomainConfigurationCard({
               isNew: false,
             };
           }
-          
+
           // Handle other Vercel API quirks that should be treated as success
-          if (result.error?.code === "domain_already_exists" || 
-              result.error?.code === "already_exists" ||
-              result.error?.message?.includes("already exists")) {
+          if (
+            result.error?.code === "domain_already_exists" ||
+            result.error?.code === "already_exists" ||
+            result.error?.message?.includes("already exists")
+          ) {
             return {
               success: true,
               domain: result.error.domain || result,
               isNew: false,
             };
           }
-          
+
           // Only throw for actual failures
-          console.warn(`Vercel API returned error for ${domainName}:`, result.error);
+          console.warn(
+            `Vercel API returned error for ${domainName}:`,
+            result.error
+          );
           throw new Error(result.error?.message || "Failed to add domain");
         }
 
@@ -175,46 +180,39 @@ export function DomainConfigurationCard({
       setVerifyingDomain(domainName, true);
 
       try {
-        // First add domain to Vercel
-        const addResult = await addDomainToVercel(domainName);
+        // Silently add domain to Vercel and verify it was added
+        const _addResult = await addDomainToVercel(domainName);
 
-        if (!addResult.success) {
-          if (!silent) {
-            toast.error(
-              `Failed to configure ${domainName}. Please try again later.`
-            );
-          }
-          setDomainStatus(domainName, {
+        // Wait for Vercel to process the domain (silent - no UI updates)
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+
+        // Check if domain was actually added by verifying it exists in project
+        let status = await checkDomainStatus(domainName);
+
+        // If domain is still being processed, retry once after additional delay
+        if (status.status === "verifying") {
+          console.log(
+            `Domain ${domainName} still processing, retrying in 3 seconds...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          status = await checkDomainStatus(domainName);
+        }
+
+        // If still verifying after retries, it might be a real issue
+        if (status.status === "verifying") {
+          status = {
             status: "error",
-            message: "Failed to add domain to Vercel",
-          });
-          return;
+            message:
+              "Domain verification timed out. Please try again or contact support.",
+          };
         }
 
-        // Wait a moment for the domain to be processed
-        await new Promise((resolve) =>
-          setTimeout(resolve, addResult.isNew ? 3000 : 1000)
-        );
-
-        // Check domain status
-        const status = await checkDomainStatus(domainName);
-        setDomainStatus(domainName, status);
-
-        if (status.status === "ready") {
-          if (!silent) {
-            toast.success(`${domainName} is ready to use!`);
-          }
-        } else if (status.status === "needs_dns" && status.instructions) {
-          if (!silent) {
-            toast.warning(
-              `${domainName} requires DNS configuration. Please add the records shown below.`
-            );
-          }
-        } else if (status.status === "error") {
-          if (!silent) {
-            toast.error(`Error configuring ${domainName}: ${status.message}`);
-          }
+        // Only set status if there's something actionable for the user
+        if (status.status !== "verifying") {
+          setDomainStatus(domainName, status);
         }
+
+        // Status checking complete - no notifications needed
       } catch (_error: any) {
         console.error("Error in handleVerifyDomain:", _error);
 
@@ -227,9 +225,7 @@ export function DomainConfigurationCard({
           return;
         }
 
-        if (!silent) {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
+        // Error logged to console above
         setDomainStatus(domainName, {
           status: "error",
           message: "Network error occurred",
@@ -309,8 +305,6 @@ export function DomainConfigurationCard({
     autoVerifyAttempted,
     domainStatuses,
     handleVerifyDomain,
-    checkDomainStatus,
-    setDomainStatus,
   ]);
 
   // Auto-verify when custom domains are detected (only for enabled orgs)
@@ -357,11 +351,13 @@ export function DomainConfigurationCard({
       const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
       if (existingStatus.timestamp && existingStatus.timestamp > oneDayAgo) {
         // Domain was verified recently and is ready - no need to verify again
-        console.log(`Domain ${domain} is already verified and ready - skipping manual verification`);
+        console.log(
+          `Domain ${domain} is already verified and ready - skipping manual verification`
+        );
         return;
       }
     }
-    
+
     await handleVerifyDomain(domain, false); // false = show notifications
   };
 
@@ -454,9 +450,9 @@ export function DomainConfigurationCard({
         return (
           <div key={domain} className="space-y-6">
             {/* Header */}
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                <div className="mt-1">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex min-w-0 flex-1 items-start gap-4">
+                <div className="mt-1 flex-shrink-0">
                   <Image
                     src="/favicon.ico"
                     alt="Domain"
@@ -465,10 +461,10 @@ export function DomainConfigurationCard({
                     className="opacity-70"
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2">
                     <h3
-                      className="text-lg font-semibold"
+                      className="truncate text-lg font-semibold"
                       style={{ color: "var(--radix-green-11, #008700)" }}
                     >
                       {content.title}
@@ -497,20 +493,22 @@ export function DomainConfigurationCard({
                   )}
                 </div>
               </div>
-              <Button
-                onClick={() =>
-                  content.isSubpath
-                    ? window.open("#", "_blank")
-                    : handleManualVerifyDomain(domain)
-                }
-                disabled={isVerifying}
-                loading={isVerifying}
-                variant="outline"
-                size="sm"
-                className="shrink-0 border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
-              >
-                {isVerifying ? "Verifying..." : content.buttonText}
-              </Button>
+              <div className="flex-shrink-0">
+                <Button
+                  onClick={() =>
+                    content.isSubpath
+                      ? window.open("#", "_blank")
+                      : handleManualVerifyDomain(domain)
+                  }
+                  disabled={isVerifying}
+                  loading={isVerifying}
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+                >
+                  {isVerifying ? "Verifying..." : content.buttonText}
+                </Button>
+              </div>
             </div>
 
             {/* DNS Records Table */}

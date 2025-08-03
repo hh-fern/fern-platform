@@ -18,7 +18,7 @@ export interface VercelDomainConfig {
 }
 
 export interface DomainStatus {
-  status: "ready" | "needs_dns" | "error";
+  status: "ready" | "needs_dns" | "error" | "verifying";
   message: string;
   instructions?: string[];
 }

@@ -35,8 +35,6 @@ function DomainWithStatus({
     return <DocsSiteLink docsSiteUrl={{ domain, path: path || "" }} />;
   }
 
-
-
   return (
     <div className="flex items-center gap-2">
       <DocsSiteLink docsSiteUrl={{ domain, path: path || "" }} />
