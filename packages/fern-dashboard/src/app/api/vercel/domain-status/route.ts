@@ -65,18 +65,22 @@ async function checkDomainStatus(domain: string): Promise<DomainStatus> {
   const verified = projectResult.verified;
   const misconfigured = configResult?.misconfigured || false;
 
-  // If domain is verified and not misconfigured, it's ready
+  // Be more strict about verification - only mark as ready if both verified AND not misconfigured
   if (verified && !misconfigured) {
     return { status: "ready", message: "Domain is ready to use" };
   }
 
-  // If domain is verified but misconfigured, still treat as ready
-  // The misconfiguration might be acceptable for our use case
-  if (verified) {
+  // If verified but misconfigured, still needs DNS setup
+  if (verified && misconfigured) {
     console.log(
-      `Domain ${domain} is verified but marked as misconfigured - treating as ready`
+      `Domain ${domain} is verified but misconfigured - needs DNS configuration`
     );
-    return { status: "ready", message: "Domain is verified and working" };
+    // Don't return ready here, let it fall through to DNS instructions
+  }
+
+  // If not verified, definitely needs DNS setup
+  if (!verified) {
+    console.log(`Domain ${domain} is not verified - needs DNS configuration`);
   }
 
   // Domain needs DNS configuration

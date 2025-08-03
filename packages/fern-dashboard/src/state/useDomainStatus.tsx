@@ -125,27 +125,27 @@ export function DomainStatusProvider({ children }: { children: ReactNode }) {
       );
       if (customDomains.length === 0) return "live"; // Only Fern subdomains = live
 
-      // Check if any domain is being verified
-      const hasVerifying = customDomains.some((domain) =>
-        verifyingDomains.has(domain)
-      );
-      if (hasVerifying) return "verifying";
-
-      // Check domain statuses
+      // Check domain statuses first
       const statuses = customDomains.map(
         (domain) => domainStatuses[domain]?.status
       );
 
+      // If all domains are ready, always show live (ignore verifying state)
+      if (statuses.every((status) => status === "ready")) return "live";
+
       // If any domain has error status
       if (statuses.some((status) => status === "error")) return "error";
 
-      // If all domains are ready
-      if (statuses.every((status) => status === "ready")) return "live";
+      // Only show verifying if domains are actually being verified AND not already ready
+      const hasActivelyVerifying = customDomains.some((domain) =>
+        verifyingDomains.has(domain) && domainStatuses[domain]?.status !== "ready"
+      );
+      if (hasActivelyVerifying) return "verifying";
 
       // If we haven't initialized from localStorage yet, don't show pending immediately
       if (!isInitialized) return "live";
 
-      // Otherwise, pending
+      // Otherwise, pending (some domains need DNS setup)
       return "pending";
     },
     [domainStatuses, verifyingDomains, isInitialized]

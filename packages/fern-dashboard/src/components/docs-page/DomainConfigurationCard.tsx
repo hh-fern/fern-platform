@@ -78,16 +78,24 @@ export function DomainConfigurationCard({
       const domain = urlObj.domain;
       const status = domainStatuses[domain];
 
+      // NEVER show ready domains - they don't need configuration
+      if (status?.status === "ready") {
+        return false;
+      }
+
+      // Show configuration card for subpaths (they need special handling)
+      if (urlObj.path && urlObj.path !== "") {
+        return true;
+      }
+
       // Show configuration for:
       // 1. Domains that need DNS setup
-      // 2. Domains with errors (so user can retry)
-      // 3. Domains without status yet (new domains)
-      // 4. Subpaths that are not verified (show contact support message)
+      // 2. Domains with errors (so user can retry)  
+      // 3. Domains without status yet (new domains that need to be configured)
       return (
         (status?.status === "needs_dns" && status.instructions) ||
         status?.status === "error" ||
-        !status ||
-        (urlObj.path && urlObj.path !== "" && status?.status !== "ready")
+        (!status) // Show domains without status - auto-verification will handle them silently
       );
     });
   }, [customDomains, domainStatuses]);
@@ -104,6 +112,7 @@ export function DomainConfigurationCard({
         const result = await response.json();
 
         if (!response.ok) {
+          // Handle common cases where the domain was actually added successfully
           if (result.error?.code === "domain_already_in_use") {
             return {
               success: true,
@@ -111,6 +120,20 @@ export function DomainConfigurationCard({
               isNew: false,
             };
           }
+          
+          // Handle other Vercel API quirks that should be treated as success
+          if (result.error?.code === "domain_already_exists" || 
+              result.error?.code === "already_exists" ||
+              result.error?.message?.includes("already exists")) {
+            return {
+              success: true,
+              domain: result.error.domain || result,
+              isNew: false,
+            };
+          }
+          
+          // Only throw for actual failures
+          console.warn(`Vercel API returned error for ${domainName}:`, result.error);
           throw new Error(result.error?.message || "Failed to add domain");
         }
 
@@ -222,7 +245,7 @@ export function DomainConfigurationCard({
   const autoVerifyNewDomains = useCallback(async () => {
     if (!isDomainSetupEnabled || !customDomains.length) return;
 
-    // Find domains that need auto-verification
+    // Find domains that need auto-verification - be VERY conservative
     const domainsToVerify = customDomains.filter((urlObj) => {
       const domain = urlObj.domain;
       const existingStatus = domainStatuses[domain];
@@ -232,18 +255,10 @@ export function DomainConfigurationCard({
         return false;
       }
 
-      // For ready/live domains, check much less frequently (every 24 hours)
+      // NEVER auto-verify domains that are already ready - this prevents UI flashing
       if (existingStatus?.status === "ready") {
-        const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
-        if (
-          existingStatus.timestamp &&
-          existingStatus.timestamp > twentyFourHoursAgo
-        ) {
-          setAutoVerifyAttempted((prev) => new Set([...prev, domain]));
-          return false; // Skip - checked recently and was good
-        }
-        // If it's been 24+ hours, include it for a silent health check
-        return true;
+        setAutoVerifyAttempted((prev) => new Set([...prev, domain]));
+        return false; // Skip - already ready, no need to verify
       }
 
       // Skip if domain has DNS instructions (user should handle manually)
@@ -255,7 +270,7 @@ export function DomainConfigurationCard({
         return false;
       }
 
-      // For non-ready domains, check less frequently (every 1 hour)
+      // Skip if domain has been checked recently (within 1 hour) regardless of status
       if (
         existingStatus?.timestamp &&
         Date.now() - existingStatus.timestamp < 60 * 60 * 1000
@@ -264,66 +279,24 @@ export function DomainConfigurationCard({
         return false;
       }
 
-      return true;
+      // Only auto-verify truly new domains (no status at all)
+      return !existingStatus;
     });
 
     if (domainsToVerify.length === 0) return;
 
-    // Silently verify domains without visual spam
-    const readyDomains = domainsToVerify.filter(
-      (d) => domainStatuses[d.domain]?.status === "ready"
+    console.log(
+      `🔍 Auto-verifying ${domainsToVerify.length} new domain(s): ${domainsToVerify.map((d) => d.domain).join(", ")}`
     );
-    const newDomains = domainsToVerify.filter(
-      (d) =>
-        !domainStatuses[d.domain] ||
-        domainStatuses[d.domain]?.status !== "ready"
-    );
-
-    if (readyDomains.length > 0) {
-      console.log(
-        `🔍 Health checking ${readyDomains.length} live domain(s): ${readyDomains.map((d) => d.domain).join(", ")}`
-      );
-    }
-    if (newDomains.length > 0) {
-      console.log(
-        `🔍 Auto-verifying ${newDomains.length} new domain(s): ${newDomains.map((d) => d.domain).join(", ")}`
-      );
-    }
 
     for (const urlObj of domainsToVerify) {
       const domain = urlObj.domain;
-      const wasReady = domainStatuses[domain]?.status === "ready";
 
       // Mark as attempted to prevent repeated auto-verification
       setAutoVerifyAttempted((prev) => new Set([...prev, domain]));
 
-      // For ready domains, do a health check - only update status if there's actually a problem
-      if (wasReady) {
-        try {
-          const status = await checkDomainStatus(domain);
-          if (status.status === "ready") {
-            // Domain is still good, just update timestamp
-            setDomainStatus(domain, { ...status, timestamp: Date.now() });
-          } else {
-            // Domain has an issue, update status to reflect the problem
-            console.log(
-              `⚠️ Live domain ${domain} now has issues: ${status.status}`
-            );
-            setDomainStatus(domain, status);
-          }
-        } catch (_error) {
-          // Health check failed, mark as error
-          console.log(`❌ Health check failed for ${domain}`);
-          setDomainStatus(domain, {
-            status: "error",
-            message: "Domain health check failed",
-            timestamp: Date.now(),
-          });
-        }
-      } else {
-        // New or problematic domain - do full verification
-        await handleVerifyDomain(domain, true); // true = silent mode, no notifications
-      }
+      // Only new domains get here - do full verification
+      await handleVerifyDomain(domain, true); // true = silent mode, no notifications
 
       // Add a small delay between domains to avoid overwhelming the API
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -378,6 +351,17 @@ export function DomainConfigurationCard({
   };
 
   const handleManualVerifyDomain = async (domain: string) => {
+    // Check if domain is already in good shape - if so, skip verification entirely
+    const existingStatus = domainStatuses[domain];
+    if (existingStatus?.status === "ready") {
+      const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+      if (existingStatus.timestamp && existingStatus.timestamp > oneDayAgo) {
+        // Domain was verified recently and is ready - no need to verify again
+        console.log(`Domain ${domain} is already verified and ready - skipping manual verification`);
+        return;
+      }
+    }
+    
     await handleVerifyDomain(domain, false); // false = show notifications
   };
 

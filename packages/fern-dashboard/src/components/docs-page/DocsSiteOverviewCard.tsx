@@ -39,40 +39,11 @@ function DomainWithStatus({
     return <DocsSiteLink docsSiteUrl={{ domain, path: path || "" }} />;
   }
 
-  // For custom domains in enabled orgs, show status
-  const status = domainStatuses[domain];
-  const getStatusDisplay = () => {
-    if (!status) return { text: "Configuring...", color: "text-blue-600" };
-    if (status.status === "ready") return null; // No status shown for ready domains
-    if (status.status === "error")
-      return { text: "Error", color: "text-red-600" };
-    if (status.status === "verifying")
-      return { text: "Verifying...", color: "text-blue-600" };
-    return null;
-  };
 
-  const statusDisplay = getStatusDisplay();
 
   return (
     <div className="flex items-center gap-2">
       <DocsSiteLink docsSiteUrl={{ domain, path: path || "" }} />
-      {statusDisplay && (
-        <span
-          className={cn(
-            "rounded-full px-2 py-1 text-xs",
-            statusDisplay.color,
-            statusDisplay.color === "text-yellow-600"
-              ? "bg-yellow-100 dark:bg-yellow-900/30"
-              : statusDisplay.color === "text-blue-600"
-                ? "bg-blue-100 dark:bg-blue-900/30"
-                : statusDisplay.color === "text-red-600"
-                  ? "bg-red-100 dark:bg-red-900/30"
-                  : "bg-gray-100 dark:bg-gray-700"
-          )}
-        >
-          {statusDisplay.text}
-        </span>
-      )}
     </div>
   );
 }
