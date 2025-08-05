@@ -243,6 +243,7 @@ export class Write {
      *                     editThisPageUrl: undefined
      *                 }
      *             },
+     *             apiSpecs: undefined,
      *             config: {
      *                 title: undefined,
      *                 defaultLanguage: undefined,

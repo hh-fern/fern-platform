@@ -1,4 +1,6 @@
 export * from "./ApiDefinitionId";
+export * from "./ApiSpecs";
+export * from "./ApiSpec";
 export * from "./VersionId";
 export * from "./OrgId";
 export * from "./TokenId";

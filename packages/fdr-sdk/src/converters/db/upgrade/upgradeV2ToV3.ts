@@ -17,6 +17,7 @@ export function upgradeV2ToV3(
       })
     ),
     config: v2.config,
+    apiSpecs: undefined,
     jsFiles: undefined,
   };
 }

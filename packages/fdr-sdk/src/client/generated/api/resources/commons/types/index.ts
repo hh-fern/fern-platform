@@ -1,4 +1,6 @@
 export * from "./ApiDefinitionId.js";
+export * from "./ApiSpecs.js";
+export * from "./ApiSpec.js";
 export * from "./VersionId.js";
 export * from "./OrgId.js";
 export * from "./TokenId.js";

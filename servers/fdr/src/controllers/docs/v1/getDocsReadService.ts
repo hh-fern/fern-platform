@@ -164,6 +164,8 @@ export async function getDocsDefinition({
     filesV2,
     apis: apiDefinitionsById,
     apisV2: apiV2DefinitionsById,
+    apiSpecs:
+      docsDbDefinition.type === "v3" ? docsDbDefinition.apiSpecs : undefined,
     id: docsV2?.docsConfigInstanceId ?? undefined,
   });
 }

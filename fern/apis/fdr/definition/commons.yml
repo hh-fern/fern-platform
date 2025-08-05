@@ -3,6 +3,14 @@
 types:
   ApiDefinitionId: uuid
 
+  ApiSpecs:
+    type: list<ApiSpec>
+
+  ApiSpec:
+    properties:
+      specType: string
+      content: string
+
   VersionId: string
 
   OrgId:

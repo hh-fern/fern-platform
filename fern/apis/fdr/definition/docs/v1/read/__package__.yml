@@ -71,6 +71,7 @@ types:
       apisV2: map<rootCommons.ApiDefinitionId, apiReadLatest.ApiDefinition>
       files: map<rootCommons.FileId, rootCommons.Url>
       filesV2: map<rootCommons.FileId, File>
+      apiSpecs: optional<rootCommons.ApiSpecs>
       jsFiles:
         type: optional<map<string, string>>
         docs: |

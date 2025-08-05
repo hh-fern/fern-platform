@@ -131,6 +131,7 @@ export function convertDocsDefinitionToDb({
     },
     pages: writeShape.pages,
     jsFiles: writeShape.jsFiles,
+    apiSpecs: writeShape.apiSpecs,
   };
 }
 

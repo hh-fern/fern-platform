@@ -8,6 +8,7 @@ export interface DocsDefinition {
     apisV2: Record<FernRegistry.ApiDefinitionId, FernRegistry.api.latest.ApiDefinition>;
     files: Record<FernRegistry.FileId, FernRegistry.Url>;
     filesV2: Record<FernRegistry.FileId, FernRegistry.docs.v1.read.File_>;
+    apiSpecs: FernRegistry.ApiSpecs | undefined;
     /**
      * A map of file names to their contents.
      * The key is the absolute path file name and the value is the file contents.

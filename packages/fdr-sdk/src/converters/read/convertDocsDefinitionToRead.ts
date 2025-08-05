@@ -9,6 +9,7 @@ export function convertDocsDefinitionToRead({
   filesV2,
   apis,
   apisV2,
+  apiSpecs,
   id,
 }: {
   docsDbDefinition: DocsV1Db.DocsDefinitionDb;
@@ -18,6 +19,7 @@ export function convertDocsDefinitionToRead({
     FernRegistry.ApiDefinitionId,
     FernRegistry.api.latest.ApiDefinition
   >;
+  apiSpecs: FernRegistry.ApiSpecs | undefined;
   id: APIV1Db.DocsConfigId | undefined;
 }): DocsV1Read.DocsDefinition {
   return {
@@ -26,6 +28,7 @@ export function convertDocsDefinitionToRead({
     apisV2,
     files: mapValues(filesV2, (fileV2) => fileV2.url),
     filesV2,
+    apiSpecs,
     jsFiles:
       docsDbDefinition.type === "v3" ? docsDbDefinition.jsFiles : undefined,
     id,

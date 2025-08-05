@@ -8,6 +8,7 @@ export class DefinitionObjectFactory {
       apisV2: {},
       files: {},
       filesV2: {},
+      apiSpecs: undefined,
       config: {
         colorsV3: {
           type: "dark",

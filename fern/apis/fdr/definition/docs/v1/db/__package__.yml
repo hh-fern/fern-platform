@@ -40,6 +40,7 @@ types:
       referencedApis: set<rootCommons.ApiDefinitionId>
       files: map<rootCommons.FileId, DbFileInfoV2>
       config: DocsDbConfig
+      apiSpecs: optional<rootCommons.ApiSpecs>
       jsFiles:
         type: optional<map<string, string>>
         docs: |

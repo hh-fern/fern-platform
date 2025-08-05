@@ -14,6 +14,7 @@ import * as FernRegistry from "../../../../../../../../index.js";
  *                     editThisPageUrl: undefined
  *                 }
  *             },
+ *             apiSpecs: undefined,
  *             config: {
  *                 title: undefined,
  *                 defaultLanguage: undefined,

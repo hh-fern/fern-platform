@@ -7,6 +7,7 @@ export interface DocsDefinitionDbV3 {
     referencedApis: FernRegistry.ApiDefinitionId[];
     files: Record<FernRegistry.FileId, FernRegistry.docs.v1.db.DbFileInfoV2>;
     config: FernRegistry.docs.v1.db.DocsDbConfig;
+    apiSpecs: FernRegistry.ApiSpecs | undefined;
     /**
      * A map of file names to their contents.
      * The key is the absolute path file name and the value is the file contents.

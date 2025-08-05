@@ -6,6 +6,7 @@ import * as FernRegistry from "../../../../../../../index.js";
 
 export interface DocsDefinition {
     pages: Record<FernRegistry.PageId, FernRegistry.docs.v1.write.PageContent>;
+    apiSpecs: FernRegistry.ApiSpecs | undefined;
     config: FernRegistry.docs.v1.write.DocsConfig;
     /**
      * A map of file names to their contents.
