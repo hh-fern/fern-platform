@@ -2,6 +2,9 @@ import "server-only";
 
 import React from "react";
 
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
+
 import { FaIcon } from "@fern-docs/components/fa-icon";
 import { getIconUrl, parseSvg } from "@fern-docs/components/util/fa";
 
@@ -44,7 +47,12 @@ async function FaIconServerInternal({
       />
     );
   } catch (error) {
-    console.error(`[fa-icon-server] ${JSON.stringify(error)}`);
+    FernLogger.error(DashboardError.FONTAWESOME_ICON_ERROR, error, {
+      component: "FaIconServer",
+      icon,
+      url,
+      errorMessage: error instanceof Error ? error.message : String(error),
+    });
     return clientIcon;
   }
 }

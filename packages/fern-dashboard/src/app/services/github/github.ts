@@ -1,3 +1,6 @@
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
+
 import { Auth0OrgName } from "../auth0/types";
 import { DashboardApiClient } from "../dashboard-api/client";
 
@@ -35,14 +38,36 @@ export async function handleCreatePr({
         });
       } catch (error) {
         // Silently fail if we can't generate a PR description.
-        console.error("Error generating PR description:", error);
+        FernLogger.error(
+          DashboardError.FAILED_TO_GENERATE_PR_DESCRIPTION,
+          error,
+          {
+            orgName,
+            branch,
+            owner,
+            repo,
+            baseBranch,
+          }
+        );
       }
       return response.prUrl;
     } else {
-      console.error("Failed to create PR:", response.error);
+      FernLogger.error(DashboardError.FAILED_TO_CREATE_PR, response.error, {
+        orgName,
+        owner,
+        repo,
+        branch,
+        baseBranch,
+      });
     }
   } catch (error) {
-    console.error("Error creating PR:", error);
+    FernLogger.error(DashboardError.FAILED_TO_CREATE_PR, error, {
+      orgName,
+      owner,
+      repo,
+      branch,
+      baseBranch,
+    });
   }
   return undefined;
 }

@@ -2,6 +2,8 @@ import { FdrAPI } from "@fern-api/fdr-sdk";
 
 import { getFdrClient } from "@/app/services/fdr/getFdrClient";
 import { getHostnameFromUrl } from "@/utils/getHostnameFromUrl";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 export default async function postDocsGithubSourceHandler({
   url,
@@ -23,9 +25,13 @@ export default async function postDocsGithubSourceHandler({
   });
 
   if (!response.ok) {
-    console.error(
-      "Failed to set docs URL metadata",
-      JSON.stringify(response.error)
+    FernLogger.error(
+      DashboardError.FAILED_TO_SET_GITHUB_SOURCE,
+      response.error,
+      {
+        url,
+        githubUrl,
+      }
     );
     throw new Error("Failed to set docs URL metadata");
   }

@@ -12,6 +12,8 @@ import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 
 import { INVALIDATE_DOCS_QUERY_KEY } from "../docs-page/MaybeInvalidateDocsSiteQuery";
 import { Button } from "../ui/button";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 export declare namespace ArchiveSiteButton {
   export interface Props {
@@ -35,7 +37,10 @@ export function ArchiveSiteButton({ docsUrl }: ArchiveSiteButton.Props) {
       toast.success(<div className="truncate">Archived {docsUrl}</div>);
       router.push(`/${orgName}/docs?${INVALIDATE_DOCS_QUERY_KEY}=true`);
     } catch (e) {
-      console.error(`Failed to archive ${docsUrl}`, e);
+      FernLogger.error(DashboardError.FAILED_TO_ARCHIVE_SITE, e, {
+        docsUrl,
+        orgName
+      });
       toast.error("Failed to archive site");
       setIsArchiving(false);
     }

@@ -9,6 +9,8 @@ import { Auth0Organization } from "@/app/services/auth0/types";
 import { ReactQueryKey, inferQueryData } from "@/state/queryKeys";
 import { getOrgDisplayName } from "@/utils/getOrgDisplayName";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 import { Button } from "../ui/button";
 import {
@@ -60,7 +62,10 @@ export function InviteUserDialogContent({
       return { previousInvitations };
     },
     onError: async (error, _variables, context) => {
-      console.error(`Failed to invite ${email}`, error);
+      FernLogger.error(DashboardError.FAILED_TO_INVITE_USER, error, {
+        email,
+        orgName
+      });
       toast.error(`Failed to invite ${email}`);
       if (context?.previousInvitations != null) {
         queryClient.setQueryData<inferQueryData<typeof queryKey>>(

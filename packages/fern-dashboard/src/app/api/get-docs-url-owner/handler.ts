@@ -1,4 +1,6 @@
 import { Auth0OrgName } from "@/app/services/auth0/types";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 import { getDocsUrlMetadata } from "../utils/getDocsUrlMetadata";
 
@@ -17,9 +19,12 @@ export default async function getDocsUrlOwnerHandler({
       return { orgName: undefined };
     }
 
-    console.error(
-      "Failed to load docs URL metadata",
-      JSON.stringify(docsUrlMetadata.error)
+    FernLogger.error(
+      DashboardError.FAILED_TO_LOAD_DOCS_URL_METADATA,
+      docsUrlMetadata.error,
+      {
+        url,
+      }
     );
     throw new Error("Failed to load docs URL metadata");
   }

@@ -3,6 +3,9 @@ import * as jsxRuntime from "react/jsx-runtime";
 
 import { useMDXComponents } from "@mdx-js/react";
 
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
+
 interface TwoSlashProps {
   content: {
     code: string;
@@ -55,14 +58,25 @@ export const TwoSlash: React.FC<TwoSlashProps> = ({ content }) => {
 
       // Ensure we have a valid React component
       if (typeof Component !== "function") {
-        console.error("Invalid component type:", typeof Component);
+        FernLogger.error(DashboardError.TWOSLASH_COMPONENT_ERROR, null, {
+          component: "TwoSlash",
+          issue: "Invalid component type",
+          componentType: typeof Component,
+          codeLength: content.code.length,
+        });
         throw new Error(`Invalid component type: ${typeof Component}`);
       }
 
       Component.displayName = "TwoSlashComponent";
       return Component;
     } catch (error) {
-      console.error("Failed to evaluate serialized component:", error);
+      FernLogger.error(DashboardError.TWOSLASH_COMPONENT_ERROR, error, {
+        component: "TwoSlash",
+        issue: "Failed to evaluate serialized component",
+        errorMessage: error instanceof Error ? error.message : String(error),
+        codeLength: content.code.length,
+        jsxElementsCount: content.jsxElements.length,
+      });
       const ErrorComponent = () => (
         <div style={{ color: "red", padding: "1rem" }}>
           Error loading component:{" "}

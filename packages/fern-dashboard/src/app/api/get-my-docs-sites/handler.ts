@@ -2,6 +2,8 @@ import { FdrAPI } from "@fern-api/fdr-sdk";
 
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { getFdrClient } from "@/app/services/fdr/getFdrClient";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 export default async function getMyDocsSites({
   orgName,
@@ -16,7 +18,13 @@ export default async function getMyDocsSites({
     orgId: FdrAPI.OrgId(orgName),
   });
   if (!docsSites.ok) {
-    console.error("Failed to load docs sites", JSON.stringify(docsSites.error));
+    FernLogger.error(
+      DashboardError.FAILED_TO_LOAD_DOCS_SITES,
+      docsSites.error,
+      {
+        orgName,
+      }
+    );
     throw new Error("Failed to load docs sites");
   }
 

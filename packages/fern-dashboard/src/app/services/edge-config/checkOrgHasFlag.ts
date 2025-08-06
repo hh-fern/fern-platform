@@ -1,5 +1,7 @@
 import { OrgEdgeFlags } from "@fern-api/docs-utils";
 import { getEdgeFlagsForOrg } from "@fern-docs/edge-config";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 export async function checkOrgHasFlag(
   orgName: string,
@@ -12,7 +14,14 @@ export async function checkOrgHasFlag(
     }
     return flagConfig[flagKey] ?? false;
   } catch (error) {
-    console.error(`Failed to check org flag for ${orgName}:${flagKey}`, error);
+    FernLogger.error(
+      DashboardError.FAILED_TO_CHECK_ORG_FLAG,
+      error,
+      {
+        orgName,
+        flagKey,
+      }
+    );
     return false;
   }
 }

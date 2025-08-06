@@ -13,6 +13,8 @@ import { columns } from "./ConversationColumnDef";
 import { QueriesDataTable } from "./QueriesDataTable";
 import { exportToCSV } from "./utils/export-to-csv";
 import { TimeRange } from "./utils/get-request-params";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 export function QueriesTable({
   queries,
@@ -55,7 +57,10 @@ export function QueriesTable({
         );
       })
       .catch((error) => {
-        console.error("Failed to export CSV:", error);
+        FernLogger.error(DashboardError.FAILED_TO_EXPORT_CSV, error, {
+          docsUrl,
+          timeRange
+        });
       })
       .finally(() => {
         setIsExporting(false);

@@ -3,6 +3,9 @@
 import React, { PropsWithChildren } from "react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
+
 import { RefreshCcw } from "lucide-react";
 
 import {
@@ -21,7 +24,12 @@ export function ErrorBoundaryFallback({
   error: Error & { digest?: string };
   resetErrorBoundary?: () => void;
 }) {
-  console.error(`[error-boundary-fallback] ${JSON.stringify(error)}`);
+  FernLogger.error(DashboardError.ERROR_BOUNDARY_FALLBACK, error, {
+    component: "ErrorBoundaryFallback",
+    errorDigest: error.digest,
+    errorMessage: error.message,
+    errorStack: error.stack,
+  });
   const errorBadge = (
     <SemanticBadge
       variant="subtle"
@@ -60,7 +68,11 @@ export function ErrorBoundary({
     return (
       <ReactErrorBoundary
         onError={(error) => {
-          console.error(`[error-boundary]: ${error.message}`);
+          FernLogger.error(DashboardError.ERROR_BOUNDARY_FALLBACK, error, {
+            component: "ErrorBoundary",
+            errorMessage: error.message,
+            errorStack: error.stack,
+          });
         }}
         fallback={fallback}
       >

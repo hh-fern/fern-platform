@@ -9,6 +9,8 @@ import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { MemberOrInviteeRow } from "./MemberOrInviteeRow";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 export declare namespace InviteeRow {
   export interface Props {
@@ -51,10 +53,10 @@ export function InviteeRow({ invitation }: InviteeRow.Props) {
       return { previousInvitations };
     },
     onError: async (error, _variables, context) => {
-      console.error(
-        `Failed to rescind invitation to ${invitation.inviteeEmail}`,
-        error
-      );
+      FernLogger.error(DashboardError.FAILED_TO_RESEND_INVITATION, error, {
+        inviteeEmail: invitation.inviteeEmail,
+        orgName
+      });
       toast.error(`Failed to rescind invitation to ${invitation.inviteeEmail}`);
       if (context?.previousInvitations != null) {
         queryClient.setQueryData<inferQueryData<typeof queryKey>>(

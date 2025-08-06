@@ -12,6 +12,8 @@ import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { ReactQueryKey } from "@/state/queryKeys";
 import { usePaginatedUserGithubRepos } from "@/state/usePaginatedUserGithubRepos";
 import { DocsUrl } from "@/utils/types";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 import {
   ErrorEditSourceToast,
@@ -119,7 +121,14 @@ export function SetGithubSourcePopover({
         setSearchQuery("");
       } catch (e) {
         ErrorEditSourceToast();
-        console.error(e);
+        FernLogger.error(
+          DashboardError.FAILED_TO_SET_GITHUB_SOURCE,
+          e,
+          {
+            docsUrl,
+            orgName,
+          }
+        );
       } finally {
         setIsSaving(false);
       }

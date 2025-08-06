@@ -4,6 +4,9 @@ import React from "react";
 
 import { template } from "es-toolkit/compat";
 
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
+
 const TemplateCtx = React.createContext<{
   template: Record<string, string>;
   tooltips: Record<string, React.ReactNode>;
@@ -45,7 +48,13 @@ export function applyTemplates(code: string, data?: Record<string, string>) {
   try {
     return template(code, { interpolate: /{{([^}]+)}}/g })(data);
   } catch (error) {
-    console.error(`[templates] ${JSON.stringify(error)}`);
+    FernLogger.error(DashboardError.TEMPLATE_COMPONENT_ERROR, error, {
+      component: "Template",
+      function: "applyTemplates",
+      code: code.slice(0, 100) + (code.length > 100 ? "..." : ""), // First 100 chars for debugging
+      dataKeys: data ? Object.keys(data) : [],
+      errorMessage: error instanceof Error ? error.message : String(error),
+    });
     return code;
   }
 }

@@ -6,6 +6,8 @@ import { ensureUserOwnsUrl } from "../homepage-images/auth";
 import handler from "../homepage-images/generate/handler";
 import { parseAuthHeader } from "../utils/parseAuthHeader";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 export const maxDuration = 60;
 
@@ -19,7 +21,13 @@ export async function POST(req: NextRequest) {
     const parsedAuthHeader = parseAuthHeader(req);
     token = parsedAuthHeader.token;
   } catch (e) {
-    console.error("Failed to parse auth header", e);
+    FernLogger.error(
+      DashboardError.FAILED_TO_PARSE_AUTH_HEADER,
+      e,
+      {
+        hasAuthHeader: req.headers.has("authorization"),
+      }
+    );
     return NextResponse.json({}, { status: 401 });
   }
 

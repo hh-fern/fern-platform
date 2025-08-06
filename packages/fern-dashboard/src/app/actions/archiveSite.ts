@@ -2,6 +2,9 @@
 
 import { FdrAPI } from "@fern-api/fdr-sdk";
 
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
+
 import { getCurrentSessionOrThrow } from "../services/auth0/getCurrentSession";
 import { getFdrClient } from "../services/fdr/getFdrClient";
 
@@ -13,7 +16,10 @@ export async function archiveSite({ url }: { url: string }) {
     isArchived: true,
   });
   if (!response.ok) {
-    console.error("Failed to archive site", JSON.stringify(response.error));
-    throw new Error("Failed to archive site");
+    FernLogger.error(DashboardError.FAILED_TO_ARCHIVE_SITE, {
+      error: response.error,
+      url,
+    });
+    throw new Error(DashboardError.FAILED_TO_ARCHIVE_SITE);
   }
 }

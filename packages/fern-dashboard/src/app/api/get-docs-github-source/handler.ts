@@ -5,6 +5,8 @@ import { fernToken_admin } from "@fern-api/docs-server";
 import { getOctokit } from "@/app/services/auth0/octokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 import { GithubSourceRepo } from "@/app/services/github/types";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 import { getDocsUrlMetadata } from "../utils/getDocsUrlMetadata";
 
@@ -42,9 +44,12 @@ export default async function getDocsGithubSourceHandler({
         throw new Error("DomainNotRegisteredError");
       }
 
-      console.error(
-        "Failed to load docs URL metadata",
-        JSON.stringify(docsUrlMetadata.error)
+      FernLogger.error(
+        DashboardError.FAILED_TO_LOAD_DOCS_URL_METADATA,
+        docsUrlMetadata.error,
+        {
+          url,
+        }
       );
       throw new Error(
         `Unable to find that domain. Please check that the domain "${decodeURIComponent(
@@ -83,7 +88,9 @@ export default async function getDocsGithubSourceHandler({
         baseBranch: response.data.default_branch,
       };
     } catch (error) {
-      console.error("Failed to get repo info", error);
+      FernLogger.error(DashboardError.FAILED_TO_GET_REPO_INFO, error, {
+        url,
+      });
       // Don't cache this failure, so throw to skip cache
       throw new Error("FailedToGetRepoInfo");
     }
@@ -102,7 +109,9 @@ export default async function getDocsGithubSourceHandler({
         )();
     return await result;
   } catch (error) {
-    console.error("[getDocsGithubSourceHandler]", error);
+    FernLogger.error(DashboardError.FAILED_TO_GET_REPO_INFO, error, {
+      url,
+    });
     // On any error, return EMPTY_RESPONSE (but don't cache the error)
     return EMPTY_RESPONSE;
   }

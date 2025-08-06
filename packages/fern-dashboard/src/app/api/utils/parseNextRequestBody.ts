@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { ZodType, z } from "zod";
 
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
+
 import { MaybeErrorResponse } from "./MaybeErrorResponse";
 
 export async function parseNextRequestBody<T extends ZodType>(
@@ -12,7 +15,10 @@ export async function parseNextRequestBody<T extends ZodType>(
   try {
     requestJson = await req.json();
   } catch (e) {
-    console.error("Failed to deserialize request body", e);
+    FernLogger.error(DashboardError.FAILED_TO_DESERIALIZE_REQUEST_BODY, e, {
+      url: req.url,
+      method: req.method,
+    });
     return {
       errorResponse: NextResponse.json(
         { message: "Request is not JSON" },
@@ -30,9 +36,12 @@ export function safeParseJson<T>(
 ): MaybeErrorResponse<T> {
   const request = schema.safeParse(requestJson);
   if (!request.success) {
-    console.error(
-      "Failed to validate request body",
-      JSON.stringify(request.error)
+    FernLogger.error(
+      DashboardError.FAILED_TO_VALIDATE_REQUEST_BODY,
+      request.error,
+      {
+        requestJson: JSON.stringify(requestJson),
+      }
     );
     return {
       errorResponse: NextResponse.json(

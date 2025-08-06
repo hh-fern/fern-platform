@@ -18,6 +18,8 @@ import { useGitPrUrl } from "@/providers/GitPRUrlContext";
 import { useMdxState } from "@/providers/MdxStateContext";
 import { useGithubSourceRepo } from "@/state/useGithubSourceRepo";
 import { DocsUrl } from "@/utils/types";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 import { GithubLogo } from "../auth/GithubLogo";
 import { ProfileImage } from "../layout/ProfileImage";
@@ -120,7 +122,12 @@ export function HeaderToolbar({
       }
     } catch (error) {
       ErrorFullCommitToast();
-      console.error("Error committing changes:", error); // TODO: errors should be logged to Sentry, not to console
+      FernLogger.error(DashboardError.FAILED_TO_COMMIT_CHANGES, error, {
+        orgName,
+        branch,
+        githubSource,
+        changedMdxFilesCount: changedMdxFiles.length
+      });
     } finally {
       setIsCommitting(false);
     }

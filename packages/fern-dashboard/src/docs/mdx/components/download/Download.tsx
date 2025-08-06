@@ -2,6 +2,9 @@ import React, { ComponentProps, PropsWithChildren } from "react";
 
 import { last } from "es-toolkit/array";
 
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
+
 import { FernLink } from "@fern-docs/components/FernLink";
 
 import { Button } from "../button";
@@ -40,7 +43,13 @@ export function Download({
       document.body.removeChild(a);
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error("Error downloading file:", error);
+      FernLogger.error(DashboardError.DOWNLOAD_COMPONENT_ERROR, error, {
+        component: "Download",
+        function: "handleClick",
+        src,
+        filename,
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
       // if we can't download the file, open it in a new tab
       window.open(src, "_blank");
     }
@@ -58,7 +67,13 @@ export function Download({
           try {
             await handleClick(e);
           } catch (e) {
-            console.error("Failed to download:", e);
+            FernLogger.error(DashboardError.DOWNLOAD_COMPONENT_ERROR, e, {
+              component: "Download",
+              function: "cloneElement onClick",
+              src,
+              filename,
+              errorMessage: e instanceof Error ? e.message : String(e),
+            });
           }
         })();
       },
@@ -74,7 +89,13 @@ export function Download({
           try {
             await handleClick(e);
           } catch (e) {
-            console.error("Failed to download:", e);
+            FernLogger.error(DashboardError.DOWNLOAD_COMPONENT_ERROR, e, {
+              component: "Download",
+              function: "cloneElement onClick",
+              src,
+              filename,
+              errorMessage: e instanceof Error ? e.message : String(e),
+            });
           }
         })();
       }}

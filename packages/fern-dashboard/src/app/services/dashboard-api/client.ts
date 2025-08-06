@@ -14,6 +14,8 @@ import { postGitCommit } from "@/app/api/post-git-commit/route";
 import { postCreateBranch } from "@/app/api/post-git-create-branch/route";
 import { postCreatePr } from "@/app/api/post-git-create-pr/route";
 import { preloadEditorData } from "@/app/api/preload-editor-data/route";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 export const DashboardApiClient = {
   getMyDocsSites: (
@@ -88,11 +90,18 @@ async function typedFetch<T>(
   const responseText = await response.text().catch(() => "");
 
   if (!response.ok) {
-    console.error("Request failed", {
-      url,
-      body: JSON.stringify(body),
-      responseText,
-    });
+    FernLogger.error(
+      DashboardError.DASHBOARD_API_REQUEST_FAILED,
+      new Error(`Request failed: ${responseText}`),
+      {
+        url,
+        method,
+        status: response.status,
+        statusText: response.statusText,
+        body: JSON.stringify(body),
+        responseText,
+      }
+    );
     throw new Error("Request failed: " + responseText);
   }
 
@@ -100,10 +109,15 @@ async function typedFetch<T>(
   try {
     json = JSON.parse(responseText);
   } catch (e) {
-    console.error(
-      "Failed to deserialize response",
-      { url, body: JSON.stringify(body), responseText },
-      e
+    FernLogger.error(
+      DashboardError.FAILED_TO_DESERIALIZE_REQUEST_BODY,
+      e,
+      {
+        url,
+        method,
+        body: JSON.stringify(body),
+        responseText,
+      }
     );
     throw new Error("Failed to deserialize response");
   }

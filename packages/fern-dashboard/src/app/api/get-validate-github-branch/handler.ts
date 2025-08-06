@@ -1,5 +1,7 @@
 import { getOctokit } from "@/app/services/auth0/octokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 export type ValidateGithubBranchResponse = {
   exists: boolean;
@@ -55,7 +57,14 @@ export default async function validateGithubBranchHandler({
     }
 
     // For other errors (like permission issues, network problems, etc.)
-    console.error("Failed to check branch existence", error);
+    FernLogger.error(DashboardError.FAILED_TO_CHECK_BRANCH_EXISTENCE, error, {
+      userId,
+      orgName,
+      owner,
+      repo,
+      branchName,
+      errorStatus: error.status,
+    });
     return {
       exists: false,
       error: "Failed to check branch existence",

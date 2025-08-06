@@ -5,6 +5,9 @@ import { User } from "@auth0/nextjs-auth0/types";
 import { FernVenusApi, FernVenusApiClient } from "@fern-api/venus-api-sdk";
 import { APIResponse } from "@fern-api/venus-api-sdk/core";
 
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
+
 import { getCurrentSessionOrThrow } from "../services/auth0/getCurrentSession";
 import { Auth0OrgName, Auth0UserID } from "../services/auth0/types";
 import { getVenusClient } from "../services/venus/getVenusClient";
@@ -56,11 +59,11 @@ async function createPersonalProjectInVenus({
   );
 
   if (!createOrgResponse.ok) {
-    console.error(
-      "Failed to create organization",
-      JSON.stringify(createOrgResponse.error)
+    FernLogger.error(
+      DashboardError.FAILED_TO_CREATE_ORGANIZATION,
+      createOrgResponse.error
     );
-    throw new Error("Failed to create organization");
+    throw new Error(DashboardError.FAILED_TO_CREATE_ORGANIZATION);
   }
 
   return Auth0OrgName(createOrgResponse.body.organizationId);

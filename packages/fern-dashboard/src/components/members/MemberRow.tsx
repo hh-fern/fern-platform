@@ -12,6 +12,8 @@ import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { MemberOrInviteeRow } from "./MemberOrInviteeRow";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 export declare namespace MemberRow {
   export interface Props {
@@ -48,10 +50,11 @@ export function MemberRow({ member, currentUserId }: MemberRow.Props) {
       return { previousMembers };
     },
     onError: async (error, _variables, context) => {
-      console.error(
-        `Failed to remove ${member.name} (${member.email}, ${member.email})`,
-        error
-      );
+      FernLogger.error(DashboardError.FAILED_TO_REMOVE_MEMBER, error, {
+        memberName: member.name,
+        memberEmail: member.email,
+        orgName
+      });
       toast.error(`Failed to remove ${member.name}`);
       if (context?.previousMembers != null) {
         queryClient.setQueryData<inferQueryData<typeof queryKey>>(

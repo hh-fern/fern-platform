@@ -14,6 +14,8 @@ import { AnalyticsPageHeader } from "./AnalyticsPageHeader";
 import { ConversationSidePanel } from "./ConversationSidePanel";
 import { QueriesTable } from "./QueriesTable";
 import { TimeRange } from "./utils/get-request-params";
+import { FernLogger } from "@/utils/logging/logger";
+import { DashboardError } from "@/utils/logging/errors";
 
 export type RenderType = "QUERIES" | "CONVERSATIONS";
 
@@ -67,7 +69,10 @@ export function AnalyticsPageClient({
         });
         setHistogramData(data);
       } catch (error) {
-        console.error("Failed to fetch histogram data:", error);
+        FernLogger.error(DashboardError.FAILED_TO_FETCH_HISTOGRAM_DATA, error, {
+          docsUrl: baseDocsUrl,
+          timeRange: histogramTimeRange
+        });
       }
     }
 
@@ -100,7 +105,11 @@ export function AnalyticsPageClient({
         setQueriesData(response.queries);
         setTotalQueriesPages(Math.ceil(response.total / ITEMS_PER_PAGE));
       } catch (error) {
-        console.error("Failed to fetch queries data:", error);
+        FernLogger.error(DashboardError.FAILED_TO_FETCH_QUERIES_DATA, error, {
+          docsUrl: baseDocsUrl,
+          page: queriesPage,
+          timeRange: queriesTimeRange
+        });
       } finally {
         setIsLoading(false);
       }

@@ -1,7 +1,14 @@
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getOctokit } from "@/app/services/auth0/octokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
-import { GithubCommitableFile } from "@/app/services/github/types";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
+
+export interface GithubCommitableFile {
+  path: string;
+  content: string;
+  mode?: string;
+}
 
 export default async function postGitCommit(
   userId: Auth0UserID,
@@ -96,7 +103,15 @@ export default async function postGitCommit(
       commitSha,
     };
   } catch (error) {
-    console.error("Failed to commit changes", error);
+    FernLogger.error(DashboardError.FAILED_TO_COMMIT_CHANGES, error, {
+      userId,
+      orgName,
+      owner: request.owner,
+      repo: request.repo,
+      branch: request.branch,
+      message: request.message,
+      fileCount: request.files.length,
+    });
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",

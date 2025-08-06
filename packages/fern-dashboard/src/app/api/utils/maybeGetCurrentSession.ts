@@ -5,6 +5,8 @@ import {
   getCurrentSessionOrThrow,
 } from "@/app/services/auth0/getCurrentSession";
 import { Auth0UserID } from "@/app/services/auth0/types";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 import { MaybeErrorResponse } from "./MaybeErrorResponse";
 import { parseAuthHeader } from "./parseAuthHeader";
@@ -33,7 +35,11 @@ export async function maybeGetCurrentSession(
       },
     };
   } catch (e) {
-    console.error("Failed to get session data", e);
+    FernLogger.error(DashboardError.FAILED_TO_GET_SESSION_DATA, e, {
+      url: req.url,
+      method: req.method,
+      hasAuthHeader: req.headers.get("authorization") != null,
+    });
     return {
       errorResponse: NextResponse.json({}, { status: 401 }),
     };

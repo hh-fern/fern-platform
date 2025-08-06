@@ -2,6 +2,8 @@ import { FdrAPI } from "@fern-api/fdr-sdk";
 
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { getFdrClient } from "@/app/services/fdr/getFdrClient";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 export async function getDocsUrlMetadata({
   url,
@@ -27,9 +29,12 @@ export async function getDocsUrlOwner({
   const metadata = await getDocsUrlMetadata({ url, token });
 
   if (!metadata.ok) {
-    console.error(
-      "Failed to load docs URL metadata",
-      JSON.stringify(metadata.error)
+    FernLogger.error(
+      DashboardError.FAILED_TO_LOAD_DOCS_URL_METADATA,
+      metadata.error,
+      {
+        url,
+      }
     );
     throw new Error("Failed to load docs URL metadata");
   }

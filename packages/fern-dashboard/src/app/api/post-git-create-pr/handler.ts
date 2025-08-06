@@ -1,6 +1,8 @@
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getOctokit } from "@/app/services/auth0/octokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 export default async function postCreatePr(
   userId: Auth0UserID,
@@ -51,7 +53,15 @@ export default async function postCreatePr(
       response,
     };
   } catch (error) {
-    console.error("Failed to create pull request", error);
+    FernLogger.error(DashboardError.FAILED_TO_CREATE_PR, error, {
+      userId,
+      orgName,
+      owner: request.owner,
+      repo: request.repo,
+      head: request.head,
+      base: request.base,
+      title: request.title,
+    });
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",

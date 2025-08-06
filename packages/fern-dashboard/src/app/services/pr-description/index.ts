@@ -1,6 +1,9 @@
 import { Anthropic } from "@anthropic-ai/sdk";
 import { Octokit } from "@octokit/core";
 
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
+
 export interface PrDescriptionService {
   generateAndUpdatePrTitle: (params: {
     owner: string;
@@ -83,7 +86,12 @@ export class PrDescriptionServiceImpl implements PrDescriptionService {
         newTitle,
       };
     } catch (error) {
-      console.error("Error in generateAndUpdatePrTitle:", error);
+      FernLogger.error(DashboardError.FAILED_TO_GENERATE_PR_TITLE, error, {
+        owner,
+        repo,
+        branch,
+        baseBranch,
+      });
       return {
         success: false,
         error:
@@ -157,7 +165,16 @@ export class PrDescriptionServiceImpl implements PrDescriptionService {
         newDescription,
       };
     } catch (error) {
-      console.error("Error in generateAndUpdatePrTitleAndDescription:", error);
+      FernLogger.error(
+        DashboardError.FAILED_TO_GENERATE_PR_TITLE_AND_DESCRIPTION,
+        error,
+        {
+          owner,
+          repo,
+          branch,
+          baseBranch,
+        }
+      );
       return {
         success: false,
         error:
@@ -195,7 +212,12 @@ export class PrDescriptionServiceImpl implements PrDescriptionService {
         body: prs[0].body || undefined,
       };
     } catch (error) {
-      console.error("Error getting PR for branch:", error);
+      FernLogger.error(DashboardError.FAILED_TO_GET_PR_INFO, error, {
+        owner,
+        repo,
+        branch,
+        baseBranch,
+      });
       return null;
     }
   }
@@ -219,7 +241,11 @@ export class PrDescriptionServiceImpl implements PrDescriptionService {
       );
       return response.data;
     } catch (error) {
-      console.error("Error getting PR diff:", error);
+      FernLogger.error(DashboardError.FAILED_TO_GET_PR_DIFF, error, {
+        owner,
+        repo,
+        prNumber,
+      });
       return null;
     }
   }
@@ -303,11 +329,27 @@ Please respond in the with the title on one line and the description lines there
 
         return { newTitle, newDescription };
       } catch (parseError) {
-        console.error("Error parsing AI response:", parseError);
+        FernLogger.error(
+          DashboardError.FAILED_TO_PARSE_AI_RESPONSE,
+          parseError,
+          {
+            diffLength: diff.length,
+            currentTitle,
+            currentDescription,
+          }
+        );
         return { newTitle: null, newDescription: null };
       }
     } catch (error) {
-      console.error("Error generating title and description from diff:", error);
+      FernLogger.error(
+        DashboardError.FAILED_TO_GENERATE_TITLE_AND_DESCRIPTION_FROM_DIFF,
+        error,
+        {
+          diffLength: diff.length,
+          currentTitle,
+          currentDescription,
+        }
+      );
       return { newTitle: null, newDescription: null };
     }
   }
@@ -369,7 +411,14 @@ Return only the title, nothing else.`;
 
       return newTitle;
     } catch (error) {
-      console.error("Error generating title from diff:", error);
+      FernLogger.error(
+        DashboardError.FAILED_TO_GENERATE_TITLE_FROM_DIFF,
+        error,
+        {
+          diffLength: diff.length,
+          currentTitle,
+        }
+      );
       return null;
     }
   }
@@ -393,7 +442,17 @@ Return only the title, nothing else.`;
         }
       );
     } catch (error) {
-      console.error("Error updating PR title and description:", error);
+      FernLogger.error(
+        DashboardError.FAILED_TO_UPDATE_PR_TITLE_AND_DESCRIPTION,
+        error,
+        {
+          owner,
+          repo,
+          prNumber,
+          newTitle,
+          newDescriptionLength: newDescription.length,
+        }
+      );
       throw error;
     }
   }
@@ -415,7 +474,12 @@ Return only the title, nothing else.`;
         }
       );
     } catch (error) {
-      console.error("Error updating PR title:", error);
+      FernLogger.error(DashboardError.FAILED_TO_UPDATE_PR_TITLE, error, {
+        owner,
+        repo,
+        prNumber,
+        newTitle,
+      });
       throw error;
     }
   }
