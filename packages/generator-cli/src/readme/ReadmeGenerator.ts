@@ -395,6 +395,12 @@ export class ReadmeGenerator {
           composer: language.publishInfo,
         });
         break;
+      case "rust":
+        this.writeInstallationForCargo({
+          writer,
+          cargo: language.publishInfo,
+        });
+        break;
       default:
         assertNever(language);
     }
@@ -520,6 +526,28 @@ export class ReadmeGenerator {
     writer.writeLine();
   }
 
+  private writeInstallationForCargo({
+    writer,
+    cargo,
+  }: {
+    writer: Writer;
+    cargo: FernGeneratorCli.CargoPublishInfo;
+  }): void {
+    writer.writeLine("Add this to your `Cargo.toml`:");
+    writer.writeLine();
+    writer.writeLine("```toml");
+    writer.writeLine("[dependencies]");
+    writer.writeLine(`${cargo.packageName} = "${cargo.version}"`);
+    writer.writeLine("```");
+    writer.writeLine();
+    writer.writeLine("Or install via cargo:");
+    writer.writeLine();
+    writer.writeLine("```sh");
+    writer.writeLine(`cargo add ${cargo.packageName}`);
+    writer.writeLine("```");
+    writer.writeLine();
+  }
+
   private writeShield({
     writer,
     language,
@@ -602,6 +630,17 @@ export class ReadmeGenerator {
         this.writeShieldForComposer({
           writer,
           composer,
+        });
+        return;
+      }
+      case "rust": {
+        const cargo = language.publishInfo;
+        if (cargo == null) {
+          return;
+        }
+        this.writeShieldForCargo({
+          writer,
+          cargo,
         });
         return;
       }
@@ -700,6 +739,18 @@ export class ReadmeGenerator {
     );
   }
 
+  private writeShieldForCargo({
+    writer,
+    cargo,
+  }: {
+    writer: Writer;
+    cargo: FernGeneratorCli.CargoPublishInfo;
+  }): void {
+    writer.write("[![crates.io shield]");
+    writer.write(`(https://img.shields.io/crates/v/${cargo.packageName})]`);
+    writer.writeLine(`(https://crates.io/crates/${cargo.packageName})`);
+  }
+
   private generateContributing(): Block {
     return new Block({
       id: "CONTRIBUTING",
@@ -752,6 +803,8 @@ function languageToTitle(language: FernGeneratorCli.LanguageInfo): string {
       return "C#";
     case "php":
       return "PHP";
+    case "rust":
+      return "Rust";
     default:
       assertNever(language);
   }
