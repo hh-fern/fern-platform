@@ -16,8 +16,7 @@ export async function archiveSite({ url }: { url: string }) {
     isArchived: true,
   });
   if (!response.ok) {
-    FernLogger.error(DashboardError.FAILED_TO_ARCHIVE_SITE, {
-      error: response.error,
+    FernLogger.error(DashboardError.FAILED_TO_ARCHIVE_SITE, response.error, {
       url,
     });
     throw new Error(DashboardError.FAILED_TO_ARCHIVE_SITE);

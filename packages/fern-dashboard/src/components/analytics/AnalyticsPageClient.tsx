@@ -7,6 +7,8 @@ import { FernFai } from "@fern-api/fai-sdk";
 import { getDomainAnalytics } from "@/app/actions/getAnalytics";
 import { getQueries } from "@/app/actions/getQueries";
 import { useSidepanel } from "@/components/layout/SidepanelContext";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 
 import { AnalyticsHistogram } from "./AnalyticsHistogram";
 import { ITEMS_PER_PAGE } from "./AnalyticsPage";
@@ -14,8 +16,6 @@ import { AnalyticsPageHeader } from "./AnalyticsPageHeader";
 import { ConversationSidePanel } from "./ConversationSidePanel";
 import { QueriesTable } from "./QueriesTable";
 import { TimeRange } from "./utils/get-request-params";
-import { FernLogger } from "@/utils/logging/logger";
-import { DashboardError } from "@/utils/logging/errors";
 
 export type RenderType = "QUERIES" | "CONVERSATIONS";
 
@@ -71,7 +71,7 @@ export function AnalyticsPageClient({
       } catch (error) {
         FernLogger.error(DashboardError.FAILED_TO_FETCH_HISTOGRAM_DATA, error, {
           docsUrl: baseDocsUrl,
-          timeRange: histogramTimeRange
+          timeRange: histogramTimeRange,
         });
       }
     }
@@ -107,8 +107,8 @@ export function AnalyticsPageClient({
       } catch (error) {
         FernLogger.error(DashboardError.FAILED_TO_FETCH_QUERIES_DATA, error, {
           docsUrl: baseDocsUrl,
-          page: queriesPage,
-          timeRange: queriesTimeRange
+          page: currentPage,
+          timeRange: queryTimeRange,
         });
       } finally {
         setIsLoading(false);

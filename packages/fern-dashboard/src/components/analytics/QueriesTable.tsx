@@ -5,6 +5,8 @@ import { useState } from "react";
 import { FernFai } from "@fern-api/fai-sdk";
 
 import { getAllQueries } from "@/app/actions/getAllQueries";
+import { DashboardError } from "@/utils/logging/errors";
+import { FernLogger } from "@/utils/logging/logger";
 import { cn } from "@/utils/utils";
 
 import { Pagination } from "../ui/pagination";
@@ -13,8 +15,6 @@ import { columns } from "./ConversationColumnDef";
 import { QueriesDataTable } from "./QueriesDataTable";
 import { exportToCSV } from "./utils/export-to-csv";
 import { TimeRange } from "./utils/get-request-params";
-import { FernLogger } from "@/utils/logging/logger";
-import { DashboardError } from "@/utils/logging/errors";
 
 export function QueriesTable({
   queries,
@@ -58,8 +58,9 @@ export function QueriesTable({
       })
       .catch((error) => {
         FernLogger.error(DashboardError.FAILED_TO_EXPORT_CSV, error, {
-          docsUrl,
-          timeRange
+          docsUrl: baseDocsUrl,
+          cutoffTime,
+          timeRange: queryTimeRange,
         });
       })
       .finally(() => {
