@@ -537,15 +537,25 @@ export class ReadmeGenerator {
     writer.writeLine();
     writer.writeLine("```toml");
     writer.writeLine("[dependencies]");
-    writer.writeLine(`${cargo.packageName} = "${cargo.version}"`);
+    writer.writeLine(
+      `${this.getCrateNameFromPackageName(cargo.packageName)} = "${cargo.version}"`
+    );
     writer.writeLine("```");
     writer.writeLine();
     writer.writeLine("Or install via cargo:");
     writer.writeLine();
     writer.writeLine("```sh");
-    writer.writeLine(`cargo add ${cargo.packageName}`);
+    writer.writeLine(
+      `cargo add ${this.getCrateNameFromPackageName(cargo.packageName)}`
+    );
     writer.writeLine("```");
     writer.writeLine();
+  }
+
+  private getCrateNameFromPackageName(packageName: string): string {
+    return packageName.includes("/")
+      ? packageName.split("/").pop()!
+      : packageName;
   }
 
   private writeShield({
@@ -747,8 +757,12 @@ export class ReadmeGenerator {
     cargo: FernGeneratorCli.CargoPublishInfo;
   }): void {
     writer.write("[![crates.io shield]");
-    writer.write(`(https://img.shields.io/crates/v/${cargo.packageName})]`);
-    writer.writeLine(`(https://crates.io/crates/${cargo.packageName})`);
+    writer.write(
+      `(https://img.shields.io/crates/v/${this.getCrateNameFromPackageName(cargo.packageName)})]`
+    );
+    writer.writeLine(
+      `(https://crates.io/crates/${this.getCrateNameFromPackageName(cargo.packageName)})`
+    );
   }
 
   private generateContributing(): Block {
