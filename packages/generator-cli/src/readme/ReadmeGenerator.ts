@@ -399,7 +399,7 @@ export class ReadmeGenerator {
         });
         break;
       case "rust":
-        this.writeInstallationForCargo({
+        await this.writeInstallationForCargo({
           writer,
           cargo: language.publishInfo,
         });
@@ -531,30 +531,30 @@ export class ReadmeGenerator {
     await writer.writeLine();
   }
 
-  private writeInstallationForCargo({
+  private async writeInstallationForCargo({
     writer,
     cargo,
   }: {
     writer: Writer;
     cargo: FernGeneratorCli.CargoPublishInfo;
-  }): void {
-    writer.writeLine("Add this to your `Cargo.toml`:");
-    writer.writeLine();
-    writer.writeLine("```toml");
-    writer.writeLine("[dependencies]");
-    writer.writeLine(
+  }): Promise<void> {
+    await writer.writeLine("Add this to your `Cargo.toml`:");
+    await writer.writeLine();
+    await writer.writeLine("```toml");
+    await writer.writeLine("[dependencies]");
+    await writer.writeLine(
       `${this.getCrateNameFromPackageName(cargo.packageName)} = "${cargo.version}"`
     );
-    writer.writeLine("```");
-    writer.writeLine();
-    writer.writeLine("Or install via cargo:");
-    writer.writeLine();
-    writer.writeLine("```sh");
-    writer.writeLine(
+    await writer.writeLine("```");
+    await writer.writeLine();
+    await writer.writeLine("Or install via cargo:");
+    await writer.writeLine();
+    await writer.writeLine("```sh");
+    await writer.writeLine(
       `cargo add ${this.getCrateNameFromPackageName(cargo.packageName)}`
     );
-    writer.writeLine("```");
-    writer.writeLine();
+    await writer.writeLine("```");
+    await writer.writeLine();
   }
 
   private getCrateNameFromPackageName(packageName: string): string {
