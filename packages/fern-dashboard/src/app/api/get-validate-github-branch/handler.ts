@@ -1,5 +1,4 @@
 import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
-import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 
 export type ValidateGithubBranchResponse = {
   exists: boolean;

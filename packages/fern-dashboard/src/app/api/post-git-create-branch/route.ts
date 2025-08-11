@@ -27,12 +27,11 @@ export async function POST(req: NextRequest) {
   if (maybeSessionData.errorResponse != null) {
     return maybeSessionData.errorResponse;
   }
-  const { userId } = maybeSessionData.data;
   const parsedBody = await parseNextRequestBody(req, PostCreateBranchRequest);
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { owner, repo, branch, baseBranch, orgName } = parsedBody.data;
+  const { owner, repo, branch, baseBranch } = parsedBody.data;
 
   return NextResponse.json(
     await handler({ owner, repo, branch, baseBranch })

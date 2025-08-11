@@ -23,7 +23,6 @@ export async function handleCreatePr({
 }): Promise<string | undefined> {
   try {
     const response = await DashboardApiClient.postCreatePr({
-      orgName,
       owner,
       repo,
       head: branch,
@@ -59,13 +58,11 @@ export async function handleCreatePr({
 }
 
 export async function handleGeneratePrDescription({
-  orgName,
   branch,
   owner,
   repo,
   baseBranch,
 }: {
-  orgName: Auth0OrgName;
   branch: string;
   owner: string;
   repo: string;
@@ -76,7 +73,6 @@ export async function handleGeneratePrDescription({
   newTitle?: string;
 }> {
   return await DashboardApiClient.generatePrDescription({
-    orgName,
     owner,
     repo,
     branch,

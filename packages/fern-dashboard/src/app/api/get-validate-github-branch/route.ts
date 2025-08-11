@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
   if (maybeSessionData.errorResponse != null) {
     return maybeSessionData.errorResponse;
   }
-  const { userId } = maybeSessionData.data;
 
   const parsedBody = await parseNextRequestBody(
     req,
@@ -35,7 +34,7 @@ export async function POST(req: NextRequest) {
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { owner, repo, branchName, orgName } = parsedBody.data;
+  const { owner, repo, branchName } = parsedBody.data;
 
   const response = await handler({ owner, repo, branchName });
 

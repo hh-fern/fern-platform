@@ -1,6 +1,3 @@
-import fs from "fs";
-import path from "path";
-
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/core";
 
@@ -27,7 +24,7 @@ export async function getFernBotOctokitForRepo(
     throw new Error("FERN_BOT_PRIVATE_KEY environment variable is missing");
   }
 
-  let installationId = await getFernBotInstallationId(owner, repo);
+  const installationId = await getFernBotInstallationId(owner, repo);
   if (!installationId) {
     throw new Error(
       `No fern-bot installation found for repo ${owner}/${repo}. Please ensure the app is installed on this repository.`
@@ -65,7 +62,7 @@ export async function getFernBotInstallationId(owner: string, repo: string) {
     throw new Error("FERN_BOT_PRIVATE_KEY environment variable is missing");
   }
 
-  let privateKey = formatPrivateKey(privateKeyEnv);
+  const privateKey = formatPrivateKey(privateKeyEnv);
 
   const appOctokit = new Octokit({
     authStrategy: createAppAuth,

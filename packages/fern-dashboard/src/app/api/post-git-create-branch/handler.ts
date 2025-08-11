@@ -1,6 +1,5 @@
 import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 
 export default async function postCreateBranch(
   request: {
