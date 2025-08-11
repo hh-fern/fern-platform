@@ -357,3 +357,37 @@ it("preview domain truncation - errors out because too long", async () => {
   // this should not work beceause org id is too long
   expect(startDocsPreviewResponse.ok).toBe(false);
 });
+
+it("docs register V2 with dynamic ir", async () => {
+  const fdr = getClient({ authed: true, url: inject("url") });
+  // register docs
+  const startDocsRegisterResponse = getAPIResponse(
+    await fdr.docs.v2.write.startDocsRegister({
+      orgId: FdrAPI.OrgId("acme"),
+      apiId: FdrAPI.ApiId("api"),
+      domain: "https://acme.docs.buildwithfern.com",
+      customDomains: ["https://docs.useacme.com/docs"],
+      filepaths: [
+        DocsV1Write.FilePath("logo.png"),
+        DocsV1Write.FilePath("guides/guide.mdx"),
+        DocsV1Write.FilePath("fonts/Syne.woff2"),
+      ],
+      dynamicIr: [
+        {
+          language: "typescript",
+          dynamicIr: {
+            foo: "bar",
+          },
+        },
+        {
+          language: "python",
+          dynamicIr: {
+            foo: "bar",
+          },
+        },
+      ],
+    })
+  );
+  console.log("uploadUrls:", startDocsRegisterResponse.uploadUrls);
+  expect(Object.keys(startDocsRegisterResponse.uploadUrls)).toHaveLength(5);
+});

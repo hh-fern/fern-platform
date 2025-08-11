@@ -30,6 +30,9 @@ service:
               type: list<v1DocsWrite.FilePath>
               docs: Relative filepath from docs folder.
             images: optional<list<ImageFilePath>>
+            dynamicIr: 
+              type: optional<list<DynamicIr>>
+              docs: A list of Dynamic IR JSON objects to upload
       response: v1DocsWrite.StartDocsRegisterResponse
       errors:
         - rootCommons.UnauthorizedError
@@ -120,6 +123,12 @@ service:
         - rootCommons.UnauthorizedError 
 
 types:
+  DynamicIr:
+    properties:
+      language: string
+      dynamicIr: unknown
+    docs: A language-specific Dynamic IR JSON object to upload
+
   ImageFilePath:
     properties:
       filePath: v1DocsWrite.FilePath

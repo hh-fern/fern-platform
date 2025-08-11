@@ -9,6 +9,10 @@ import {
   convertDocsDefinitionToDb,
 } from "@fern-api/fdr-sdk";
 import { isNonNullish } from "@fern-api/ui-core-utils";
+import {
+  FilePath,
+  FileS3UploadUrl,
+} from "@fern-fern/fdr-cjs-sdk/api/resources/docs/resources/v1/resources/write";
 
 import { DocsV2WriteService } from "../../../api";
 import {
@@ -138,13 +142,23 @@ export function getDocsWriteV2Service(app: FdrApplication): DocsV2WriteService {
       }
 
       const docsRegistrationId = DocsV1Write.DocsRegistrationId(uuidv4());
-      const s3FileInfos =
-        await app.services.s3.getPresignedDocsAssetsUploadUrls({
-          domain: req.body.domain,
-          filepaths: req.body.filepaths,
-          images: req.body.images ?? [],
-          isPrivate: req.body.authConfig?.type === "private",
-        });
+      let s3FileInfos = await app.services.s3.getPresignedDocsAssetsUploadUrls({
+        domain: req.body.domain,
+        filepaths: req.body.filepaths,
+        images: req.body.images ?? [],
+        isPrivate: req.body.authConfig?.type === "private",
+      });
+
+      if (req.body.dynamicIr) {
+        const dynamicIrS3Files =
+          await app.services.s3.getPresignedDynamicIrUploadUrls({
+            domain: req.body.domain,
+            dynamicIrs: req.body.dynamicIr,
+            isPrivate: req.body.authConfig?.type === "private",
+          });
+
+        s3FileInfos = { ...s3FileInfos, ...dynamicIrS3Files };
+      }
 
       await app.services.slack.notifyGeneratedDocs({
         orgId: req.body.orgId,

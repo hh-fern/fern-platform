@@ -13,7 +13,8 @@ import * as FernRegistry from "../../../../../../../../index.js";
  *         orgId: FernRegistry.OrgId("orgId"),
  *         apiId: FernRegistry.ApiId("apiId"),
  *         filepaths: [FernRegistry.docs.v1.write.FilePath("filepaths"), FernRegistry.docs.v1.write.FilePath("filepaths")],
- *         images: undefined
+ *         images: undefined,
+ *         dynamicIr: undefined
  *     }
  */
 export interface StartDocsRegisterRequestV2 {
@@ -26,4 +27,6 @@ export interface StartDocsRegisterRequestV2 {
     /** Relative filepath from docs folder. */
     filepaths: FernRegistry.docs.v1.write.FilePath[];
     images?: FernRegistry.docs.v2.write.ImageFilePath[];
+    /** A list of Dynamic IR JSON objects to upload */
+    dynamicIr?: FernRegistry.docs.v2.write.DynamicIr[];
 }

@@ -18,6 +18,8 @@ import { getS3KeyForV1DocsDefinition } from "@fern-api/fdr-sdk/docs";
 
 import { Cache } from "../../Cache";
 import { FernRegistry } from "../../api/generated";
+import { FilePath } from "../../api/generated/api/resources/docs/resources/v1/resources/write";
+import { DynamicIr } from "../../api/generated/api/resources/docs/resources/v2/resources/write";
 import type { FdrApplication, FdrConfig } from "../../app";
 
 const ONE_WEEK_IN_SECONDS = 604800;
@@ -57,6 +59,16 @@ export interface S3Service {
     domain: string;
     filepaths: DocsV1Write.FilePath[];
     images: DocsV2Write.ImageFilePath[];
+    isPrivate: boolean;
+  }): Promise<Record<DocsV1Write.FilePath, S3DocsFileInfo>>;
+
+  getPresignedDynamicIrUploadUrls({
+    domain,
+    dynamicIrs,
+    isPrivate,
+  }: {
+    domain: string;
+    dynamicIrs: DynamicIr[];
     isPrivate: boolean;
   }): Promise<Record<DocsV1Write.FilePath, S3DocsFileInfo>>;
 
@@ -141,6 +153,32 @@ export class S3ServiceImpl implements S3Service {
         secretAccessKey: config.awsSecretKey,
       },
     });
+  }
+  async getPresignedDynamicIrUploadUrls({
+    domain,
+    dynamicIrs,
+  }: {
+    domain: string;
+    dynamicIrs: DynamicIr[];
+    isPrivate: boolean;
+  }): Promise<Record<DocsV1Write.FilePath, S3DocsFileInfo>> {
+    const result: Record<DocsV1Write.FilePath, S3DocsFileInfo> = {};
+    for (const dynamicIr of dynamicIrs) {
+      const filepath = `v1/dynamic-ir/${dynamicIr.language}.json` as FilePath;
+      const { url, key } = await this.createPresignedDynamicIrUploadUrl({
+        domain,
+        filepath,
+      });
+      result[filepath] = {
+        presignedUrl: {
+          fileId: APIV1Write.FileId(uuidv4()),
+          uploadUrl: url,
+        },
+        key,
+        imageMetadata: undefined,
+      };
+    }
+    return result;
   }
 
   async writeLoadDocsForUrlResponse({
@@ -253,6 +291,28 @@ export class S3ServiceImpl implements S3Service {
       };
     }
     return result;
+  }
+
+  async createPresignedDynamicIrUploadUrl({
+    domain,
+    filepath,
+  }: {
+    domain: string;
+    filepath: DocsV1Write.FilePath;
+  }): Promise<{ url: string; key: string }> {
+    const key = this.constructS3DocsKeyWithoutTime({ domain, filepath });
+    const bucketName = this.config.dbDocsDefinitionS3.bucketName;
+    const input: PutObjectCommandInput = {
+      Bucket: bucketName,
+      Key: key,
+    };
+    const command = new PutObjectCommand(input);
+    return {
+      url: await getSignedUrl(this.dbDocsDefinitionS3, command, {
+        expiresIn: 3600,
+      }),
+      key,
+    };
   }
 
   async createPresignedDocsAssetsUploadUrlWithClient({

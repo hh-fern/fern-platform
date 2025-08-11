@@ -42,7 +42,8 @@ export class Write {
      *         orgId: FernRegistry.OrgId("orgId"),
      *         apiId: FernRegistry.ApiId("apiId"),
      *         filepaths: [FernRegistry.docs.v1.write.FilePath("filepaths"), FernRegistry.docs.v1.write.FilePath("filepaths")],
-     *         images: undefined
+     *         images: undefined,
+     *         dynamicIr: undefined
      *     })
      */
     public startDocsRegister(

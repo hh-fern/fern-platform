@@ -1,3 +1,4 @@
+export * from "./DynamicIr.js";
 export * from "./ImageFilePath.js";
 export * from "./StartDocsPreviewRegisterResponse.js";
 export * from "./InvalidDomainErrorBody.js";

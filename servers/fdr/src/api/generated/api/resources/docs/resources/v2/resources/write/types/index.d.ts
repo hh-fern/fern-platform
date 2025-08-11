@@ -1,3 +1,4 @@
+export * from "./DynamicIr";
 export * from "./ImageFilePath";
 export * from "./StartDocsPreviewRegisterResponse";
 export * from "./InvalidDomainErrorBody";

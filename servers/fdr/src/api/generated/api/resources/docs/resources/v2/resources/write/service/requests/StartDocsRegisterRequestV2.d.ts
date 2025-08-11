@@ -10,4 +10,5 @@ export interface StartDocsRegisterRequestV2 {
     apiId: FernRegistry.ApiId;
     filepaths: FernRegistry.docs.v1.write.FilePath[];
     images?: FernRegistry.docs.v2.write.ImageFilePath[];
+    dynamicIr?: FernRegistry.docs.v2.write.DynamicIr[];
 }
