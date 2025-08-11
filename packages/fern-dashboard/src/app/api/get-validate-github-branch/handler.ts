@@ -1,4 +1,4 @@
-import { getOctokit } from "@/app/services/auth0/octokit";
+import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 
 export type ValidateGithubBranchResponse = {
@@ -10,8 +10,6 @@ export default async function validateGithubBranchHandler({
   owner,
   repo,
   branchName,
-  userId,
-  orgName,
 }: {
   owner: string;
   repo: string;
@@ -19,7 +17,7 @@ export default async function validateGithubBranchHandler({
   userId: Auth0UserID;
   orgName: Auth0OrgName;
 }): Promise<ValidateGithubBranchResponse> {
-  const octokit = await getOctokit(userId, orgName);
+  const octokit = await getFernBotOctokitForRepo(owner, repo);
   if (octokit == null) {
     return {
       exists: false,

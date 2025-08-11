@@ -357,7 +357,6 @@ export function HeaderToolbar({
       ];
 
       const response = await DashboardApiClient.postGitCommit({
-        orgName,
         owner: githubSource.owner,
         repo: githubSource.repo,
         branch,

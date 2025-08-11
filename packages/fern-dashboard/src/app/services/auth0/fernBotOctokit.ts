@@ -1,41 +1,114 @@
+import fs from "fs";
+import path from "path";
+
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/core";
 
 /**
- * TODO
  * Gets Octokit for a specific repo where fern-bot is installed. This should then
  * deprecate the use of the `octokit.ts` file.
  *
  * @param owner - The owner of the repository
  * @param repo - The name of the repository
  * @returns The Octokit instance for the fern-bot installation
+ * @throws Error if no fern-bot is installed on that repo
+ * @throws Error if FERN_BOT_APP_ID or FERN_BOT_PRIVATE_KEY are not defined or defined incorrectly
  */
-export async function getFernBotOctokitForRepo(owner: string, repo: string) {
+export async function getFernBotOctokitForRepo(
+  owner: string,
+  repo: string) {
+  const appId = process.env.FERN_BOT_APP_ID;
+  const privateKeyFilename = process.env.FERN_BOT_PRIVATE_KEY;
+
+  if (!appId) {
+    throw new Error("FERN_BOT_APP_ID environment variable is missing");
+  }
+  if (!privateKeyFilename) {
+    throw new Error("FERN_BOT_PRIVATE_KEY environment variable is missing");
+  }
+
+  let installationId = getFernBotInstallationId(owner, repo);
+  if (!installationId) {
+    throw new Error(
+      `No fern-bot installation found for repo ${owner}/${repo}. Please ensure the app is installed on this repository.`
+    );
+  }
+
+  // installation-specific Octokit
+  return new Octokit({
+    authStrategy: createAppAuth,
+    auth: {
+      appId: process.env.FERN_BOT_APP_ID,
+      privateKey: getFernBotPrivateKey(privateKeyFilename),
+      installationId: installationId,
+    },
+  });
+}
+
+/**
+ * Gets the installation id for the fern-bot for a given owner and repo
+ * or returns undefined if it does not exist.
+ *
+ * @param owner - The owner of the repository
+ * @param repo - The name of the repository
+ * @returns string installation id, or undefined if no such id exists
+ * @throws Error if FERN_BOT_APP_ID or FERN_BOT_PRIVATE_KEY are not defined or defined incorrectly
+ */
+export async function getFernBotInstallationId(owner: string, repo: string) {
+  const appId = process.env.FERN_BOT_APP_ID;
+  const privateKeyFilename = process.env.FERN_BOT_PRIVATE_KEY;
+
+  if (!appId) {
+    throw new Error("FERN_BOT_APP_ID environment variable is missing");
+  }
+  if (!privateKeyFilename) {
+    throw new Error("FERN_BOT_PRIVATE_KEY environment variable is missing");
+  }
+
+  let privateKey = getFernBotPrivateKey(privateKeyFilename);
+
   const appOctokit = new Octokit({
     authStrategy: createAppAuth,
     auth: {
-      appId: process.env.FERN_BOT_APP_ID,
-      privateKey: process.env.FERN_BOT_PRIVATE_KEY,
+      appId,
+      privateKey,
     },
   });
-  // Get installation ID for the repo
-  const { data: installation } = await appOctokit.request(
-    "GET /repos/{owner}/{repo}/installation",
-    {
-      owner,
-      repo,
+
+  let installation;
+  try {
+    const response = await appOctokit.request(
+      "GET /repos/{owner}/{repo}/installation",
+      {
+        owner,
+        repo,
+      }
+    );
+    installation = response.data;
+  } catch (error: any) {
+    if (error.status === 404) {
+      // fern-bot is not yet installed on that repo
+      return undefined;
+    } else {
+      return undefined;
     }
-  );
+  }
 
-  // Create installation-specific Octokit
-  const fernBotOctokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: process.env.FERN_BOT_APP_ID,
-      privateKey: process.env.FERN_BOT_PRIVATE_KEY,
-      installationId: installation.id,
-    },
-  });
+  return installation.id
+}
 
-  return fernBotOctokit;
+function getFernBotPrivateKey(pemFilePath: string) {
+  // Ensure the private key .pem file exists in the `packages/fern-dashboard/` directory from the root
+  const privateKeyPath = path.join(process.cwd(), pemFilePath);
+  if (!fs.existsSync(privateKeyPath)) {
+    throw new Error(`Private key file not found at path: ${privateKeyPath}`);
+  }
+  let privateKey: string;
+  try {
+    privateKey = fs.readFileSync(privateKeyPath, "utf8");
+  } catch (err) {
+    throw new Error(`Failed to read private key file at path: ${privateKeyPath}`);
+  }
+
+  return privateKey;
 }

@@ -6,7 +6,6 @@ import { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";
-import { orgNameValidator } from "../utils/validators";
 import handler from "./handler";
 
 export declare namespace postGitCommit {
@@ -40,22 +39,21 @@ export const PostGitCommitRequest = z.object({
       }),
     ])
   ),
-  orgName: orgNameValidator,
 });
 
 export async function POST(req: NextRequest) {
+  // TODO: can we remove this now
   const maybeSessionData = await maybeGetCurrentSession(req);
   if (maybeSessionData.errorResponse != null) {
     return maybeSessionData.errorResponse;
   }
-  const { userId } = maybeSessionData.data;
   const parsedBody = await parseNextRequestBody(req, PostGitCommitRequest);
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { owner, repo, branch, message, files, orgName } = parsedBody.data;
+  const { owner, repo, branch, message, files } = parsedBody.data;
 
   return NextResponse.json(
-    await handler(userId, orgName, { owner, repo, branch, message, files })
+    await handler({ owner, repo, branch, message, files })
   );
 }

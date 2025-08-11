@@ -1,5 +1,5 @@
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import { getOctokit } from "@/app/services/auth0/octokit";
+import { getUserOctokit } from "@/app/services/auth0/octokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 import { GithubRepo } from "@/app/services/github/types";
 
@@ -22,7 +22,7 @@ export default async function getUserGithubRepos(
     return { repos: [], hasMore: false };
   }
 
-  const octokit = await getOctokit(userId, orgName);
+  const octokit = await getUserOctokit(userId, orgName);
 
   if (octokit == null) {
     return { repos: [], hasMore: false };

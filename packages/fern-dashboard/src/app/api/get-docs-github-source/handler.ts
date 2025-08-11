@@ -2,11 +2,12 @@ import { unstable_cache } from "next/cache";
 
 import { fernToken_admin } from "@fern-api/docs-server";
 
-import { getOctokit } from "@/app/services/auth0/octokit";
+import { getUserOctokit } from "@/app/services/auth0/octokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 import { GithubSourceRepo } from "@/app/services/github/types";
 
 import { getDocsUrlMetadata } from "../utils/getDocsUrlMetadata";
+import { getFernBotInstallationId } from "@/app/services/auth0/fernBotOctokit";
 
 const EMPTY_RESPONSE: GithubSourceRepo = {
   githubUrl: undefined,
@@ -14,6 +15,7 @@ const EMPTY_RESPONSE: GithubSourceRepo = {
   owner: undefined,
   repo: undefined,
   baseBranch: undefined,
+  fernBotHasInstallationId: undefined,
 };
 
 export default async function getDocsGithubSourceHandler({
@@ -58,7 +60,7 @@ export default async function getDocsGithubSourceHandler({
       throw new Error("NoGitUrl");
     }
 
-    const octokit = await getOctokit(userId, orgName);
+    const octokit = await getUserOctokit(userId, orgName);
     if (octokit == null) {
       // Don't cache this failure, so throw to skip cache
       throw new Error("NoOctokit");
@@ -75,12 +77,16 @@ export default async function getDocsGithubSourceHandler({
         owner,
         repo,
       });
+      // check if fern-bot is installed on this app
+      let fernBotHasInstallationId = !!getFernBotInstallationId(owner, repo);
+
       return {
         githubUrl: docsUrlMetadata.body.gitUrl,
         repoName: response.data.full_name,
         owner: response.data.owner.name ?? owner,
         repo: response.data.name ?? repo,
         baseBranch: response.data.default_branch,
+        fernBotHasInstallationId,
       };
     } catch (error) {
       console.error("Failed to get repo info", error);

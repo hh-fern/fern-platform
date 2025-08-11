@@ -102,11 +102,13 @@ export function GithubSource({
               docsUrl={docsUrl}
               session={session}
               sourceRepo={githubSource}
-              disabled={writePermission === false}
+              disabled={writePermission === false || !githubSource.fernBotHasInstallationId}
               disabledReason={
                 writePermission === false
                   ? "You don't have write access to this repo"
-                  : undefined
+                  : !githubSource.fernBotHasInstallationId
+                    ? "fern-bot is not installed on this repository"
+                    : undefined
               }
             />
           )}

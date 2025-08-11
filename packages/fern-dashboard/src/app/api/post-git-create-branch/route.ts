@@ -35,6 +35,6 @@ export async function POST(req: NextRequest) {
   const { owner, repo, branch, baseBranch, orgName } = parsedBody.data;
 
   return NextResponse.json(
-    await handler(userId, orgName, { owner, repo, branch, baseBranch })
+    await handler({ owner, repo, branch, baseBranch })
   );
 }
