@@ -18,12 +18,12 @@ export async function getFernBotOctokitForRepo(
   owner: string,
   repo: string) {
   const appId = process.env.FERN_BOT_APP_ID;
-  const privateKeyFilename = process.env.FERN_BOT_PRIVATE_KEY;
+  const privateKey = process.env.FERN_BOT_PRIVATE_KEY;
 
   if (!appId) {
     throw new Error("FERN_BOT_APP_ID environment variable is missing");
   }
-  if (!privateKeyFilename) {
+  if (!privateKey) {
     throw new Error("FERN_BOT_PRIVATE_KEY environment variable is missing");
   }
 
@@ -39,7 +39,7 @@ export async function getFernBotOctokitForRepo(
     authStrategy: createAppAuth,
     auth: {
       appId: process.env.FERN_BOT_APP_ID,
-      privateKey: getFernBotPrivateKey(privateKeyFilename),
+      privateKey: formatPrivateKey(privateKey),
       installationId: installationId,
     },
   });
@@ -56,16 +56,16 @@ export async function getFernBotOctokitForRepo(
  */
 export async function getFernBotInstallationId(owner: string, repo: string) {
   const appId = process.env.FERN_BOT_APP_ID;
-  const privateKeyFilename = process.env.FERN_BOT_PRIVATE_KEY;
+  const privateKeyEnv = process.env.FERN_BOT_PRIVATE_KEY;
 
   if (!appId) {
     throw new Error("FERN_BOT_APP_ID environment variable is missing");
   }
-  if (!privateKeyFilename) {
+  if (!privateKeyEnv) {
     throw new Error("FERN_BOT_PRIVATE_KEY environment variable is missing");
   }
 
-  let privateKey = getFernBotPrivateKey(privateKeyFilename);
+  let privateKey = formatPrivateKey(privateKeyEnv);
 
   const appOctokit = new Octokit({
     authStrategy: createAppAuth,
@@ -97,18 +97,13 @@ export async function getFernBotInstallationId(owner: string, repo: string) {
   return installation.id
 }
 
-function getFernBotPrivateKey(pemFilePath: string) {
-  // Ensure the private key .pem file exists in the `packages/fern-dashboard/` directory from the root
-  const privateKeyPath = path.join(process.cwd(), pemFilePath);
-  if (!fs.existsSync(privateKeyPath)) {
-    throw new Error(`Private key file not found at path: ${privateKeyPath}`);
-  }
-  let privateKey: string;
-  try {
-    privateKey = fs.readFileSync(privateKeyPath, "utf8");
-  } catch (err) {
-    throw new Error(`Failed to read private key file at path: ${privateKeyPath}`);
-  }
+function formatPrivateKey(privateKey: string) {
+  // Convert any escaped newlines to actual newlines
+  const formattedPrivateKey = privateKey
+  .replace(/\\n/g, '\n')
+  .replace(/-----BEGIN PRIVATE KEY-----/, '-----BEGIN PRIVATE KEY-----\n')
+  .replace(/-----END PRIVATE KEY-----/, '\n-----END PRIVATE KEY-----')
+  .trim();
 
-  return privateKey;
+  return formattedPrivateKey;
 }
