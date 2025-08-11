@@ -11,9 +11,7 @@ import { Octokit } from "@octokit/core";
  * @throws Error if no fern-bot is installed on that repo
  * @throws Error if FERN_BOT_APP_ID or FERN_BOT_PRIVATE_KEY are not defined or defined incorrectly
  */
-export async function getFernBotOctokitForRepo(
-  owner: string,
-  repo: string) {
+export async function getFernBotOctokitForRepo(owner: string, repo: string) {
   const appId = process.env.FERN_BOT_APP_ID;
   const privateKey = process.env.FERN_BOT_PRIVATE_KEY;
 
@@ -91,16 +89,16 @@ export async function getFernBotInstallationId(owner: string, repo: string) {
     }
   }
 
-  return installation.id
+  return installation.id;
 }
 
 function formatPrivateKey(privateKey: string) {
   // Convert any escaped newlines to actual newlines
   const formattedPrivateKey = privateKey
-  .replace(/\\n/g, '\n')
-  .replace(/-----BEGIN PRIVATE KEY-----/, '-----BEGIN PRIVATE KEY-----\n')
-  .replace(/-----END PRIVATE KEY-----/, '\n-----END PRIVATE KEY-----')
-  .trim();
+    .replace(/\\n/g, "\n")
+    .replace(/-----BEGIN PRIVATE KEY-----/, "-----BEGIN PRIVATE KEY-----\n")
+    .replace(/-----END PRIVATE KEY-----/, "\n-----END PRIVATE KEY-----")
+    .trim();
 
   return formattedPrivateKey;
 }

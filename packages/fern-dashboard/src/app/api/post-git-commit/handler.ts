@@ -2,15 +2,13 @@ import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { GithubCommitableFile } from "@/app/services/github/types";
 
-export default async function postGitCommit(
-  request: {
-    owner: string;
-    repo: string;
-    branch: string;
-    message: string;
-    files: GithubCommitableFile[];
-  }
-): Promise<{
+export default async function postGitCommit(request: {
+  owner: string;
+  repo: string;
+  branch: string;
+  message: string;
+  files: GithubCommitableFile[];
+}): Promise<{
   success: boolean;
   error?: string;
   commitSha?: string;
@@ -20,10 +18,7 @@ export default async function postGitCommit(
     return { success: false, error: "No session found" };
   }
 
-  const octokit = await getFernBotOctokitForRepo(
-    request.owner,
-    request.repo,
-  );
+  const octokit = await getFernBotOctokitForRepo(request.owner, request.repo);
 
   if (octokit == null) {
     return { success: false, error: "Failed to get GitHub client" };

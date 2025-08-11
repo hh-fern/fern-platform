@@ -1,14 +1,12 @@
 import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 
-export default async function postCreateBranch(
-  request: {
-    owner: string;
-    repo: string;
-    branch: string;
-    baseBranch: string;
-  }
-): Promise<{
+export default async function postCreateBranch(request: {
+  owner: string;
+  repo: string;
+  branch: string;
+  baseBranch: string;
+}): Promise<{
   success: boolean;
   error?: string;
   baseSha?: string;

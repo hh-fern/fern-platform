@@ -102,7 +102,10 @@ export function GithubSource({
               docsUrl={docsUrl}
               session={session}
               sourceRepo={githubSource}
-              disabled={writePermission === false || !githubSource.fernBotHasInstallationId}
+              disabled={
+                writePermission === false ||
+                !githubSource.fernBotHasInstallationId
+              }
               disabledReason={
                 writePermission === false
                   ? "You don't have write access to this repo"

@@ -2,12 +2,12 @@ import { unstable_cache } from "next/cache";
 
 import { fernToken_admin } from "@fern-api/docs-server";
 
+import { getFernBotInstallationId } from "@/app/services/auth0/fernBotOctokit";
 import { getUserOctokit } from "@/app/services/auth0/octokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 import { GithubSourceRepo } from "@/app/services/github/types";
 
 import { getDocsUrlMetadata } from "../utils/getDocsUrlMetadata";
-import { getFernBotInstallationId } from "@/app/services/auth0/fernBotOctokit";
 
 const EMPTY_RESPONSE: GithubSourceRepo = {
   githubUrl: undefined,
@@ -78,7 +78,10 @@ export default async function getDocsGithubSourceHandler({
         repo,
       });
       // check if fern-bot is installed on this app
-      const fernBotHasInstallationId = !!(await getFernBotInstallationId(owner, repo));
+      const fernBotHasInstallationId = !!(await getFernBotInstallationId(
+        owner,
+        repo
+      ));
 
       return {
         githubUrl: docsUrlMetadata.body.gitUrl,

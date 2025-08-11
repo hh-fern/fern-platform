@@ -4,9 +4,9 @@ import { z } from "zod";
 
 import { ResolvedReturnType } from "@/utils/types";
 
+import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";
 import handler from "./handler";
-import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 
 export declare namespace generatePrDescription {
   export type Request = z.infer<typeof GeneratePrDescriptionRequest>;
@@ -35,7 +35,5 @@ export async function POST(req: NextRequest) {
   }
   const { owner, repo, branch, baseBranch } = parsedBody.data;
 
-  return NextResponse.json(
-    await handler({ owner, repo, branch, baseBranch })
-  );
+  return NextResponse.json(await handler({ owner, repo, branch, baseBranch }));
 }

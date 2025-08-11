@@ -33,8 +33,7 @@ export async function POST(req: NextRequest) {
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { owner, repo, head, base, title, body, draft } =
-    parsedBody.data;
+  const { owner, repo, head, base, title, body, draft } = parsedBody.data;
 
   return NextResponse.json(
     await handler({

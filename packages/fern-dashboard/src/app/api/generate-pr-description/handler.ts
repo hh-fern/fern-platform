@@ -2,14 +2,12 @@ import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { createPrDescriptionService } from "@/app/services/pr-description";
 
-export default async function generatePrDescription(
-  request: {
-    owner: string;
-    repo: string;
-    branch: string;
-    baseBranch?: string;
-  }
-): Promise<{
+export default async function generatePrDescription(request: {
+  owner: string;
+  repo: string;
+  branch: string;
+  baseBranch?: string;
+}): Promise<{
   success: boolean;
   error?: string;
   newTitle?: string;
