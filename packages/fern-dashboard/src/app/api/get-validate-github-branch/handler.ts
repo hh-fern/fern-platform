@@ -14,8 +14,6 @@ export default async function validateGithubBranchHandler({
   owner: string;
   repo: string;
   branchName: string;
-  userId: Auth0UserID;
-  orgName: Auth0OrgName;
 }): Promise<ValidateGithubBranchResponse> {
   const octokit = await getFernBotOctokitForRepo(owner, repo);
   if (octokit == null) {

@@ -78,7 +78,7 @@ export default async function getDocsGithubSourceHandler({
         repo,
       });
       // check if fern-bot is installed on this app
-      let fernBotHasInstallationId = !!getFernBotInstallationId(owner, repo);
+      let fernBotHasInstallationId = !!(await getFernBotInstallationId(owner, repo));
 
       return {
         githubUrl: docsUrlMetadata.body.gitUrl,

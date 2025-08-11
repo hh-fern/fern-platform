@@ -27,7 +27,7 @@ export async function getFernBotOctokitForRepo(
     throw new Error("FERN_BOT_PRIVATE_KEY environment variable is missing");
   }
 
-  let installationId = getFernBotInstallationId(owner, repo);
+  let installationId = await getFernBotInstallationId(owner, repo);
   if (!installationId) {
     throw new Error(
       `No fern-bot installation found for repo ${owner}/${repo}. Please ensure the app is installed on this repository.`
