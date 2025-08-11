@@ -75,6 +75,7 @@ async function DynamicEditorContent({
       orgName={orgName}
       owner={sourceRepo.owner}
       repo={sourceRepo.repo}
+      fernBotInstalled={sourceRepo.fernBotHasInstallationId}
     >
       <ThemeProvider
         attribute="class"

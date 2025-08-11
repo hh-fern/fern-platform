@@ -2,8 +2,10 @@ import { unstable_cache } from "next/cache";
 
 import { fernToken_admin } from "@fern-api/docs-server";
 
-import { getFernBotInstallationId } from "@/app/services/auth0/fernBotOctokit";
-import { getUserOctokit } from "@/app/services/auth0/octokit";
+import {
+  getFernBotInstallationId,
+  getFernBotOctokitForRepo,
+} from "@/app/services/auth0/fernBotOctokit";
 import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 import { GithubSourceRepo } from "@/app/services/github/types";
 
@@ -22,7 +24,6 @@ export default async function getDocsGithubSourceHandler({
   url,
   token,
   userId,
-  orgName,
   skipCache = false,
 }: {
   url: string;
@@ -60,16 +61,16 @@ export default async function getDocsGithubSourceHandler({
       throw new Error("NoGitUrl");
     }
 
-    const octokit = await getUserOctokit(userId, orgName);
-    if (octokit == null) {
-      // Don't cache this failure, so throw to skip cache
-      throw new Error("NoOctokit");
-    }
-
     const [owner, repo] = docsUrlMetadata.body.gitUrl.split("/").slice(-2);
     if (owner == null || repo == null) {
       // Don't cache this failure, so throw to skip cache
       throw new Error("InvalidGitUrl");
+    }
+
+    const octokit = await getFernBotOctokitForRepo(owner, repo);
+    if (octokit == null) {
+      // Don't cache this failure, so throw to skip cache
+      throw new Error("NoOctokit");
     }
 
     try {

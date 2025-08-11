@@ -18,6 +18,7 @@ export declare namespace GithubExtendedAccessProtectedRoute {
     owner: string | undefined;
     repo: string | undefined;
     children: React.JSX.Element;
+    fernBotInstalled: boolean | undefined;
   }
 }
 
@@ -26,6 +27,7 @@ export const GithubExtendedAccessProtectedRoute = async ({
   owner,
   repo,
   children,
+  fernBotInstalled,
 }: GithubExtendedAccessProtectedRoute.Props) => {
   const session = await getCurrentSession();
 
@@ -48,7 +50,7 @@ export const GithubExtendedAccessProtectedRoute = async ({
     "bypassExtendedGithubAuth"
   );
 
-  if (shouldBypassGithubAuth) {
+  if (shouldBypassGithubAuth || fernBotInstalled) {
     // When bypass is enabled, use the Fern support environment variable
     // The actual GitHub operations will use FERN_SUPPORT_GITHUB_TOKEN
     return children;

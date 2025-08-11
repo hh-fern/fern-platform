@@ -35,7 +35,7 @@ export async function GithubProtectedArea({
   // fern-support with additional permissions.
   // TODO: We should still check for write permissions for fern-suppport, but we should
   // surface a different error message to the user.
-  if (bypassExtendedGithubAuth) {
+  if (bypassExtendedGithubAuth || sourceRepo?.fernBotHasInstallationId) {
     return (
       <GithubPermissionsProvider writePermission={true}>
         {children}
