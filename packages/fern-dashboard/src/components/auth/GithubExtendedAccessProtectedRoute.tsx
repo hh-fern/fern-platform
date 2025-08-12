@@ -1,22 +1,17 @@
 import { redirect } from "next/navigation";
 import React from "react";
 
-import checkGitHubPermissions, {
-  checkWritePermissionToRepo,
-} from "@/app/api/github-permissions/handler";
+import { checkWritePermissionToRepo } from "@/app/api/github-permissions/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import * as auth0Management from "@/app/services/auth0/management";
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import { checkOrgHasFlag } from "@/app/services/edge-config/checkOrgHasFlag";
 
 import { Page404 } from "../Page404";
-import { AuthorizeGithubModal } from "../docs-page/AuthorizeGithubModal";
 
 export declare namespace GithubExtendedAccessProtectedRoute {
   export interface Props {
     orgName: Auth0OrgName;
-    owner: string | undefined;
-    repo: string | undefined;
+    githubUrl: string;
     children: React.JSX.Element;
     fernBotInstalled: boolean | undefined;
   }
@@ -24,8 +19,7 @@ export declare namespace GithubExtendedAccessProtectedRoute {
 
 export const GithubExtendedAccessProtectedRoute = async ({
   orgName,
-  owner,
-  repo,
+  githubUrl,
   children,
   fernBotInstalled,
 }: GithubExtendedAccessProtectedRoute.Props) => {
@@ -44,41 +38,27 @@ export const GithubExtendedAccessProtectedRoute = async ({
     return <Page404 />;
   }
 
-  // Check if the org is enabled for bypassing GitHub authorization
-  const shouldBypassGithubAuth = await checkOrgHasFlag(
-    orgName,
-    "bypassExtendedGithubAuth"
-  );
-
-  if (shouldBypassGithubAuth || fernBotInstalled) {
-    // When bypass is enabled, use the Fern support environment variable
-    // The actual GitHub operations will use FERN_SUPPORT_GITHUB_TOKEN
-    return children;
+  if (!githubUrl) {
+    return <div>No github url provided.</div>;
   }
 
-  // Original GitHub authorization logic when bypass is not enabled
-  if (owner && repo) {
-    const writePermission = await checkWritePermissionToRepo(
-      session.user.sub,
-      orgName,
-      owner,
-      repo
-    );
-    if (!writePermission) {
-      return (
-        <AuthorizeGithubModal
-          open
-          persistent
-          hideTrigger
-          customMessage="You don't have write permission to this repo. Please obtain write permission and re-authorize to continue."
-        />
-      );
+  if (githubUrl) {
+    if (!fernBotInstalled) {
+      return <div>Fern bot is not installed on this repo.</div>;
     }
-  }
+    try {
+      const writePermission = await checkWritePermissionToRepo(
+        session.user.sub,
+        githubUrl
+      );
 
-  const { hasRepoAccess } = await checkGitHubPermissions(session.user.sub);
-  if (!hasRepoAccess) {
-    return <AuthorizeGithubModal open persistent hideTrigger />;
+      if (!writePermission) {
+        return <div>You don&apos;t have write permission to this repo.</div>;
+      }
+    } catch (error) {
+      console.error(error);
+      return <div>Error checking write permission.</div>;
+    }
   }
 
   return children;

@@ -6,7 +6,8 @@ interface DigestibleError extends Error {
 export type ERROR_DIGEST_KEYS =
   | "BRANCH_NOT_FOUND"
   | "BASE_BRANCH_NOT_SET"
-  | "SOURCE_REPO_NOT_FOUND";
+  | "SOURCE_REPO_NOT_FOUND"
+  | "SOURCE_REPO_NOT_VALID";
 
 export const ERROR_DIGEST_MESSAGES: Record<ERROR_DIGEST_KEYS, string> = {
   BRANCH_NOT_FOUND:
@@ -14,7 +15,9 @@ export const ERROR_DIGEST_MESSAGES: Record<ERROR_DIGEST_KEYS, string> = {
   BASE_BRANCH_NOT_SET:
     "Looks like your source repo is not configured correctly. Please set a base branch on your Github repo.",
   SOURCE_REPO_NOT_FOUND:
-    "We were unable to find the source repo for this domain. Please confirm that you have linked a repo to this domain.",
+    "We were unable to find a source repo for this domain. Please confirm that you have linked a GitHub repo to this domain.",
+  SOURCE_REPO_NOT_VALID:
+    "We were unable to validate the source repo for this domain. Please confirm that you have linked a valid GitHub repo to this domain.",
 };
 
 export const throwDigestibleError = (

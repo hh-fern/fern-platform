@@ -79,3 +79,13 @@ export async function handleGeneratePrDescription({
     baseBranch,
   });
 }
+
+export function getOwnerAndRepoFromGithubUrl(githubUrl: string) {
+  const [owner, repo] = githubUrl.split("/").slice(-2);
+  return { owner, repo };
+}
+
+export function getRepoDisplayNameFromUrl(githubUrl: string) {
+  const { owner, repo } = getOwnerAndRepoFromGithubUrl(githubUrl);
+  return `${owner}/${repo}`;
+}

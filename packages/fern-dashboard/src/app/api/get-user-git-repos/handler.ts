@@ -1,6 +1,6 @@
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getUserOctokit } from "@/app/services/auth0/octokit";
-import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
+import { Auth0UserID } from "@/app/services/auth0/types";
 import { GithubRepo } from "@/app/services/github/types";
 
 export interface PaginatedGithubReposResponse {
@@ -13,7 +13,6 @@ const MAX_REPOS_TO_FETCH = 100; // GitHub API max fetchable at once is 100
 
 export default async function getUserGithubRepos(
   userId: Auth0UserID,
-  orgName: Auth0OrgName,
   page: number = 1
 ): Promise<PaginatedGithubReposResponse> {
   const session = await getCurrentSession();
@@ -22,7 +21,7 @@ export default async function getUserGithubRepos(
     return { repos: [], hasMore: false };
   }
 
-  const octokit = await getUserOctokit(userId, orgName);
+  const octokit = await getUserOctokit(userId);
 
   if (octokit == null) {
     return { repos: [], hasMore: false };

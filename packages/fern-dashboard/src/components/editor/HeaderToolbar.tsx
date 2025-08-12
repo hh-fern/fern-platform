@@ -1,6 +1,5 @@
 "use client";
 
-import { redirect } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -233,10 +232,12 @@ export function HeaderToolbar({
   orgName,
   session,
   docsUrl,
+  githubUrl,
 }: {
   orgName: Auth0OrgName;
   session: Auth0SessionData;
   docsUrl: DocsUrl;
+  githubUrl: string;
 }) {
   const { name, picture } = session.user;
   const { changedMdxFiles, mdxSyncedStatus } = useMdxState();
@@ -244,12 +245,8 @@ export function HeaderToolbar({
   const { gitPrUrl, setPrUrl, prTitle, refetchPrData } = useGitPrInfo();
   const { branch } = useBranch();
   const { editor } = useEditor();
-  const githubSource = getLoadableValue(useGithubSourceRepo(docsUrl, orgName));
 
-  // If the github source is not found, redirect to the docs page.
-  if (!!githubSource && githubSource.githubUrl == null) {
-    redirect(`/${orgName}/docs/${docsUrl}`);
-  }
+  const githubSource = getLoadableValue(useGithubSourceRepo(githubUrl));
 
   useEffect(() => {
     // NOTE: This is a temporary solution to persist the PR URL across route changes/refreshes.

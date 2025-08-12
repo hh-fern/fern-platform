@@ -1,15 +1,10 @@
 import { unstable_cache } from "next/cache";
 
-import { fernToken_admin } from "@fern-api/docs-server";
-
 import {
   getFernBotInstallationId,
   getFernBotOctokitForRepo,
 } from "@/app/services/auth0/fernBotOctokit";
-import { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 import { GithubSourceRepo } from "@/app/services/github/types";
-
-import { getDocsUrlMetadata } from "../utils/getDocsUrlMetadata";
 
 const EMPTY_RESPONSE: GithubSourceRepo = {
   githubUrl: undefined,
@@ -20,51 +15,25 @@ const EMPTY_RESPONSE: GithubSourceRepo = {
   fernBotHasInstallationId: undefined,
 };
 
-export default async function getDocsGithubSourceHandler({
-  url,
-  token,
+export default async function getGithubSourceMetadataHandler({
+  githubUrl,
   userId,
   skipCache = false,
 }: {
-  url: string;
-  token: string;
-  userId: Auth0UserID;
-  orgName: Auth0OrgName;
+  githubUrl: string;
+  userId: string;
   skipCache?: boolean;
 }): Promise<GithubSourceRepo> {
-  async function getDocsGithubSource() {
-    const docsUrlMetadata = await getDocsUrlMetadata({
-      url: decodeURIComponent(url),
-      token: fernToken_admin() ?? token,
-    });
-    if (!docsUrlMetadata.ok) {
-      // the docs url is user-supplied (parsed from the page url) so it's ok if it
-      // doesn't exist
-      if (docsUrlMetadata.error.error === "DomainNotRegisteredError") {
-        // Don't cache this failure, so throw to skip cache
-        throw new Error("DomainNotRegisteredError");
-      }
-
-      console.error(
-        "Failed to load docs URL metadata",
-        JSON.stringify(docsUrlMetadata.error)
-      );
-      throw new Error(
-        `Unable to find that domain. Please check that the domain "${decodeURIComponent(
-          url
-        )}" is correct.`
-      );
+  async function getGithubSourceMetadata() {
+    if (githubUrl == null) {
+      throw new Error("NoGithubUrl");
     }
 
-    if (docsUrlMetadata.body.gitUrl == null) {
-      // Don't cache this failure, so throw to skip cache
-      throw new Error("NoGitUrl");
-    }
+    const [owner, repo] = githubUrl.split("/").slice(-2);
 
-    const [owner, repo] = docsUrlMetadata.body.gitUrl.split("/").slice(-2);
     if (owner == null || repo == null) {
       // Don't cache this failure, so throw to skip cache
-      throw new Error("InvalidGitUrl");
+      throw new Error("NoOwnerOrRepo");
     }
 
     const octokit = await getFernBotOctokitForRepo(owner, repo);
@@ -85,7 +54,7 @@ export default async function getDocsGithubSourceHandler({
       ));
 
       return {
-        githubUrl: docsUrlMetadata.body.gitUrl,
+        githubUrl,
         repoName: response.data.full_name,
         owner: response.data.owner.name ?? owner,
         repo: response.data.name ?? repo,
@@ -101,13 +70,13 @@ export default async function getDocsGithubSourceHandler({
   try {
     // Only cache successful responses; do not cache failures
     const result = skipCache
-      ? getDocsGithubSource()
+      ? getGithubSourceMetadata()
       : unstable_cache(
-          getDocsGithubSource,
-          [`github-source-${url}-${userId}`],
+          getGithubSourceMetadata,
+          [`github-source-${githubUrl}-${userId}`],
           {
             revalidate: 300, // 5 minutes
-            tags: [`github-source-${url}`],
+            tags: [`github-source-${githubUrl}`],
           }
         )();
     return await result;

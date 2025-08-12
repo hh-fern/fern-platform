@@ -5,7 +5,8 @@ import type React from "react";
 import { ClientPageManager } from "@fern-docs/components/sidebar/nodes/ClientPageManager";
 import { SidebarClientNavigationProvider } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 
-import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
+import getDocsGithubUrl from "@/app/api/get-docs-github-url/handler";
+import getGithubSourceMetadata from "@/app/api/get-github-source-metadata/handler";
 import {
   Auth0SessionData,
   getCurrentSession,
@@ -49,17 +50,25 @@ async function DynamicEditorContent({
   session: Auth0SessionData;
   children: React.JSX.Element;
 }) {
-  const sourceRepo = await getDocsGithubSourceHandler({
+  const githubUrl = await getDocsGithubUrl({
     url: docsUrl,
     token: session.accessToken,
+  });
+  if (githubUrl == null) {
+    throwDigestibleError(
+      "We were unable to find the source repo for this domain. Please confirm that you have linked a repo to this domain.",
+      "SOURCE_REPO_NOT_FOUND"
+    );
+  }
+  const sourceRepo = await getGithubSourceMetadata({
+    githubUrl,
     userId: session.user.sub,
-    orgName,
   });
 
   if (sourceRepo.owner == null || sourceRepo.repo == null) {
     throwDigestibleError(
-      "We were unable to find the source repo for this domain. Please confirm that you have linked a repo to this domain.",
-      "SOURCE_REPO_NOT_FOUND"
+      "We were unable to validate the source repo for this domain. Please confirm that you have linked a valid repo to this domain.",
+      "SOURCE_REPO_NOT_VALID"
     );
   }
 
@@ -73,8 +82,7 @@ async function DynamicEditorContent({
   return (
     <GithubExtendedAccessProtectedRoute
       orgName={orgName}
-      owner={sourceRepo.owner}
-      repo={sourceRepo.repo}
+      githubUrl={githubUrl}
       fernBotInstalled={sourceRepo.fernBotHasInstallationId}
     >
       <ThemeProvider
@@ -106,6 +114,7 @@ async function DynamicEditorContent({
                           orgName={orgName}
                           session={session}
                           docsUrl={docsUrl}
+                          githubUrl={githubUrl}
                         />
                         {children}
                       </GitPRProvider>

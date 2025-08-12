@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
+import getDocsGithubUrlHandler from "@/app/api/get-docs-github-url/handler";
 import getMyDocsSitesHandler from "@/app/api/get-my-docs-sites/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
@@ -44,12 +44,16 @@ export default async function Page(props: {
     redirect(`/${orgName}/docs`);
   }
 
-  const sourceRepo = await getDocsGithubSourceHandler({
-    orgName,
-    url: encodedDocsUrl,
-    token: session.accessToken,
-    userId: session.user.sub,
-  });
+  let githubUrl = undefined;
+
+  try {
+    githubUrl = await getDocsGithubUrlHandler({
+      url: encodedDocsUrl,
+      token: session.accessToken,
+    });
+  } catch (error) {
+    console.error(error);
+  }
 
   return (
     <FeatureFlaggedServerSide
@@ -62,11 +66,12 @@ export default async function Page(props: {
         githubProtectedArea={
           <div className="flex w-fit flex-col gap-2">
             <p>Source</p>
-            <GithubProtectedArea sourceRepo={sourceRepo} orgName={orgName}>
+            <GithubProtectedArea githubUrl={githubUrl}>
               <GithubSource
                 docsUrl={docsUrl}
                 orgName={orgName}
                 session={session}
+                githubUrl={githubUrl}
               />
             </GithubProtectedArea>
           </div>

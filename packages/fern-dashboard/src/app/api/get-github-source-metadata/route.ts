@@ -6,18 +6,16 @@ import { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";
-import { orgNameValidator } from "../utils/validators";
 import handler from "./handler";
 
-export declare namespace getDocsGithubSource {
-  export type Request = z.infer<typeof GetDocsGithubSourceRequest>;
+export declare namespace getGithubSourceMetadata {
+  export type Request = z.infer<typeof GetGithubSourceMetadataRequest>;
   export type Response = ResolvedReturnType<typeof handler>;
 }
 
-const GetDocsGithubSourceRequest = z.object({
-  url: z.string(),
+const GetGithubSourceMetadataRequest = z.object({
   skipCache: z.boolean().optional(),
-  orgName: orgNameValidator,
+  githubUrl: z.string(),
 });
 
 export async function POST(req: NextRequest) {
@@ -25,29 +23,18 @@ export async function POST(req: NextRequest) {
   if (maybeSessionData.errorResponse != null) {
     return maybeSessionData.errorResponse;
   }
-  const { token, userId } = maybeSessionData.data;
+  const { userId } = maybeSessionData.data;
 
   const parsedBody = await parseNextRequestBody(
     req,
-    GetDocsGithubSourceRequest
+    GetGithubSourceMetadataRequest
   );
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { url, skipCache, orgName } = parsedBody.data;
+  const { githubUrl, skipCache } = parsedBody.data;
 
-  const response = await handler({ token, url, userId, orgName, skipCache });
-
-  // TODO: we should check if the user has access to the github repo
-  // if (response.url != null) {
-  //   const doesUserHaveAccessToUrl = await auth0Management.doesUserBelongsToOrg(
-  //     userId,
-  //     response.url
-  //   );
-  //   if (!doesUserBelongToOrg) {
-  //     response = { url: undefined };
-  //   }
-  // }
+  const response = await handler({ userId, githubUrl, skipCache });
 
   return NextResponse.json(response);
 }

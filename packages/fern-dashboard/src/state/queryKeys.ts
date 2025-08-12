@@ -1,5 +1,5 @@
-import { getDocsGithubSource } from "@/app/api/get-docs-github-source/route";
 import { getDocsUrlOwner } from "@/app/api/get-docs-url-owner/route";
+import { getGithubSourceMetadata } from "@/app/api/get-github-source-metadata/route";
 import { getMyDocsSites } from "@/app/api/get-my-docs-sites/route";
 import { getMyOrganizations } from "@/app/api/get-my-organizations/route";
 import { getOrgMembers } from "@/app/api/get-org-members/route";
@@ -47,8 +47,8 @@ export const ReactQueryKey = {
       orgName,
       page?.toString() ?? ""
     ),
-  githubSourceRepo: (docsUrl: DocsUrl) =>
-    queryKey<getDocsGithubSource.Response>("github-source-repo", docsUrl),
+  githubSourceRepo: (githubUrl: string) =>
+    queryKey<getGithubSourceMetadata.Response>("github-source-repo", githubUrl),
 } as const;
 
 function queryKey<T>(...key: string[]) {
