@@ -45,6 +45,13 @@ types:
     properties:
       apiDefinitionId: rootCommons.ApiDefinitionId
       sources: optional<map<SourceId, SourceUpload>>
+      dynamicIrs: optional<map<string, DynamicIrUpload>>
+
+  DynamicIrUpload:
+    properties:
+      uploadUrl:
+        docs: The presigned URL to upload the dynamic IR to.
+        type: string
 
   ApiDefinition:
     properties:
