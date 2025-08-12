@@ -29,7 +29,8 @@ export default async function generatePrDescription(request: {
 
   const prDescriptionService = createPrDescriptionService(
     octokit,
-    anthropicApiKey
+    anthropicApiKey,
+    { name: session.user.name, email: session.user.email }
   );
 
   return await prDescriptionService.generateAndUpdatePrTitleAndDescription(
