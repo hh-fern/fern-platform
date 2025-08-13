@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
+import { validateApiGithubAccess } from "@/app/services/dal/github";
 import { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";
+import { orgNameValidator } from "../utils/validators";
 import handler from "./handler";
 
 export declare namespace postCreatePr {
@@ -21,10 +23,11 @@ export const PostCreatePrRequest = z.object({
   title: z.string(),
   body: z.string().optional(),
   draft: z.boolean().optional(),
+  orgName: orgNameValidator,
+  githubUrl: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
-  // TODO: can we remove this now
   const maybeSessionData = await maybeGetCurrentSession(req);
   if (maybeSessionData.errorResponse != null) {
     return maybeSessionData.errorResponse;
@@ -33,7 +36,19 @@ export async function POST(req: NextRequest) {
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { owner, repo, head, base, title, body, draft } = parsedBody.data;
+  const { owner, repo, head, base, title, body, draft, orgName, githubUrl } =
+    parsedBody.data;
+
+  const validationError = await validateApiGithubAccess({
+    orgName,
+    owner,
+    repo,
+    githubUrl,
+    userId: maybeSessionData.data.userId,
+  });
+  if (validationError) {
+    return validationError;
+  }
 
   return NextResponse.json(
     await handler({

@@ -6,8 +6,10 @@ import { NodeId, getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 import { mdxToHtml } from "@fern-docs/mdx";
 
+import getDocsGithubUrl from "@/app/api/get-docs-github-url/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
+import { validateGithubAccess } from "@/app/services/dal/github";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
@@ -36,6 +38,18 @@ export default async function Page({
   }
 
   const { orgName, docsUrl, branch, slug: slugArray } = await params;
+
+  const githubUrl = await getDocsGithubUrl({
+    url: docsUrl,
+    token: session.accessToken,
+  });
+
+  await validateGithubAccess({
+    orgName,
+    githubUrl,
+    userId: session.user.sub,
+  });
+
   const resolvedSearchParams = await searchParams;
   const host = await getHostFromHeaders();
   const slugAlias = slugArray.join("/");

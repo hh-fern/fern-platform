@@ -63,15 +63,11 @@ async function DynamicEditorContent({
       userId: session.user.sub,
     });
   } catch (_error) {
-    // Silently fail, as the route guard will handle the error
+    // Silently fail, as the route guard will gracefully handle the error
   }
 
   return (
-    <GithubExtendedAccessProtectedRoute
-      orgName={orgName}
-      githubUrl={githubUrl}
-      sourceRepo={sourceRepo}
-    >
+    <GithubExtendedAccessProtectedRoute orgName={orgName} githubUrl={githubUrl}>
       <>
         {sourceRepo && githubUrl && (
           <ThemeProvider

@@ -358,6 +358,7 @@ export function HeaderToolbar({
         branch,
         message: DEFAULT_COMMIT_MESSAGE,
         files: gitFiles,
+        orgName,
       });
       if (response.success) {
         SuccessfulCommitToast();
@@ -404,6 +405,7 @@ export function HeaderToolbar({
           baseBranch: githubSource.baseBranch,
           title: prTitle,
           onAiGenerationComplete: refetchPrData,
+          orgName,
         });
         if (newPrUrl) {
           setPrUrl(newPrUrl);
@@ -426,6 +428,7 @@ export function HeaderToolbar({
     setPrUrl,
     prTitle,
     refetchPrData,
+    orgName,
   ]);
 
   const commitDisabledReason = useMemo(() => {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
+import { validateApiGithubAccess } from "@/app/services/dal/github";
 import { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
@@ -21,6 +22,7 @@ export const UpdatePrTitleRequest = z.object({
   title: z.string(),
   baseBranch: z.string().optional(),
   orgName: orgNameValidator,
+  githubUrl: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -33,7 +35,19 @@ export async function POST(req: NextRequest) {
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { owner, repo, branch, title, baseBranch, orgName } = parsedBody.data;
+  const { owner, repo, branch, title, baseBranch, orgName, githubUrl } =
+    parsedBody.data;
+
+  const validationError = await validateApiGithubAccess({
+    orgName,
+    owner,
+    repo,
+    githubUrl,
+    userId,
+  });
+  if (validationError) {
+    return validationError;
+  }
 
   return NextResponse.json(
     await handler(userId, orgName, {

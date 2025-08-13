@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
+import { validateGithubAccess } from "@/app/services/dal/github";
 import { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
@@ -17,9 +18,10 @@ export declare namespace getPrForBranch {
 export const GetPrForBranchRequest = z.object({
   owner: z.string(),
   repo: z.string(),
+  githubUrl: z.string().optional(),
   branch: z.string(),
-  baseBranch: z.string().optional(),
   orgName: orgNameValidator,
+  baseBranch: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,16 +29,24 @@ export async function POST(req: NextRequest) {
   if (maybeSessionData.errorResponse != null) {
     return maybeSessionData.errorResponse;
   }
-  const { userId } = maybeSessionData.data;
 
   const parsedBody = await parseNextRequestBody(req, GetPrForBranchRequest);
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { owner, repo, branch, baseBranch, orgName } = parsedBody.data;
+  const { owner, repo, branch, baseBranch, orgName, githubUrl } =
+    parsedBody.data;
+
+  await validateGithubAccess({
+    orgName,
+    owner,
+    repo,
+    githubUrl,
+    userId: maybeSessionData.data.userId,
+  });
 
   return NextResponse.json(
-    await handler(userId, orgName, {
+    await handler({
       owner,
       repo,
       branch,

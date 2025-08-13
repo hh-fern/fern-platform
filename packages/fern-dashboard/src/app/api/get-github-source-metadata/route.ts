@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
+import { validateApiGithubAccess } from "@/app/services/dal/github";
 import { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";
+import { orgNameValidator } from "../utils/validators";
 import handler from "./handler";
 
 export declare namespace getGithubSourceMetadata {
@@ -16,6 +18,9 @@ export declare namespace getGithubSourceMetadata {
 const GetGithubSourceMetadataRequest = z.object({
   skipCache: z.boolean().optional(),
   githubUrl: z.string(),
+  orgName: orgNameValidator.optional(),
+  owner: z.string().optional(),
+  repo: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -32,7 +37,21 @@ export async function POST(req: NextRequest) {
   if (parsedBody.errorResponse != null) {
     return parsedBody.errorResponse;
   }
-  const { githubUrl, skipCache } = parsedBody.data;
+  const { githubUrl, skipCache, orgName, owner, repo } = parsedBody.data;
+
+  // Validate GitHub access if we have the required context
+  if (orgName) {
+    const validationError = await validateApiGithubAccess({
+      orgName,
+      owner,
+      repo,
+      githubUrl,
+      userId,
+    });
+    if (validationError) {
+      return validationError;
+    }
+  }
 
   const response = await handler({ userId, githubUrl, skipCache });
 

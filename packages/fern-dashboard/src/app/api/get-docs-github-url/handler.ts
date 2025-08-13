@@ -2,7 +2,7 @@ import { fernToken_admin } from "@fern-api/docs-server";
 
 import { getDocsUrlMetadata } from "../utils/getDocsUrlMetadata";
 
-export default async function getDocsGithubUrlHandler({
+export default async function getDocsGithubUrl({
   url,
   token,
 }: {

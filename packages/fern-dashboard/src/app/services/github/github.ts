@@ -1,3 +1,4 @@
+import { Auth0OrgName } from "../auth0/types";
 import { DashboardApiClient } from "../dashboard-api/client";
 
 export const DEFAULT_PR_TITLE = "Visual Editor: Update";
@@ -10,12 +11,14 @@ export async function handleCreatePr({
   baseBranch,
   title,
   onAiGenerationComplete,
+  orgName,
 }: {
   branch: string;
   owner: string;
   repo: string;
   baseBranch: string;
   title?: string;
+  orgName: Auth0OrgName;
   onAiGenerationComplete?: () => void;
 }): Promise<string | undefined> {
   try {
@@ -25,6 +28,7 @@ export async function handleCreatePr({
       head: branch,
       base: baseBranch,
       title: title || DEFAULT_PR_TITLE,
+      orgName,
     });
     if (response.success) {
       try {
@@ -34,6 +38,7 @@ export async function handleCreatePr({
           owner,
           repo,
           baseBranch,
+          orgName,
         }).then((result) => {
           if (result.success && onAiGenerationComplete) {
             onAiGenerationComplete();
@@ -58,11 +63,13 @@ export async function handleGeneratePrDescription({
   owner,
   repo,
   baseBranch,
+  orgName,
 }: {
   branch: string;
   owner: string;
   repo: string;
   baseBranch: string;
+  orgName: Auth0OrgName;
 }): Promise<{
   success: boolean;
   error?: string;
@@ -73,6 +80,7 @@ export async function handleGeneratePrDescription({
     repo,
     branch,
     baseBranch,
+    orgName,
   });
 }
 
