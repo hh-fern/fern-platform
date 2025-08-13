@@ -56,6 +56,11 @@ export default async function VisualEditorPreviewLayout({
   const session = await getCurrentSession();
   const host = await getHostFromHeaders();
 
+  // Early return if no session
+  if (!session) {
+    throw new Error("No session found");
+  }
+
   // Get the source repository information for this docs URL
   const sourceRepo = await getDocsGithubSourceHandler({
     url: docsUrl,

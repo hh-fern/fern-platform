@@ -109,7 +109,6 @@ export default async function Page({
 
   const filename = page?.filename;
   const mdx = page?.markdown;
-  const cssConfig = page?.css; // Extract CSS configuration
 
   const { html, frontmatter, originalElements, originalFrontmatter } = mdx
     ? mdxToHtml(mdx, {
@@ -147,7 +146,6 @@ export default async function Page({
           initialFrontmatter={frontmatter}
           initialOriginalElements={originalElements}
           initialOriginalFrontmatter={originalFrontmatter}
-          cssConfig={cssConfig}
         />
       </div>
     </AbstractLayoutEvaluatorContent>
