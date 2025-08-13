@@ -72,11 +72,13 @@ export default async function VisualEditorPreviewLayout({
     session?.user.sub && orgName
       ? new GitHubLoader(session.user.sub, orgName)
       : undefined,
-    {
-      owner: sourceRepo.owner,
-      repo: sourceRepo.repo,
-      baseBranch: sourceRepo.baseBranch,
-    }
+    sourceRepo.owner && sourceRepo.repo && sourceRepo.baseBranch
+      ? {
+          owner: sourceRepo.owner,
+          repo: sourceRepo.repo,
+          baseBranch: sourceRepo.baseBranch,
+        }
+      : undefined
   );
 
   const [colors, layout, fonts, config, root, unsafe_fullRoot] =
@@ -250,4 +252,3 @@ export default async function VisualEditorPreviewLayout({
     </div>
   );
 }
-
