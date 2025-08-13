@@ -28,35 +28,7 @@ export class GitHubLoader implements GitLoader {
     repo: string,
     ref: string = "main"
   ): Promise<string | null> {
-    try {
-      const octokit = await this.getOctokit();
-      if (!octokit) {
-        console.error("Failed to get Octokit instance");
-        return null;
-      }
-
-      const response = await octokit.request(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner,
-          repo,
-          path: "fern/docs.yml",
-          ref,
-        }
-      );
-
-      if ("content" in response.data) {
-        const content = Buffer.from(response.data.content, "base64").toString(
-          "utf8"
-        );
-        return content;
-      }
-
-      return null;
-    } catch (error) {
-      console.error(`Failed to fetch docs.yml from ${owner}/${repo}:`, error);
-      return null;
-    }
+    return this.getFile(owner, repo, "fern/docs.yml", ref);
   }
 
   async updateDocsYml(
@@ -109,4 +81,45 @@ export class GitHubLoader implements GitLoader {
       return false;
     }
   }
+
+  async getFile(
+    owner: string,
+    repo: string,
+    path: string,
+    ref: string = "main"
+  ): Promise<string | null> {
+    try {
+      const octokit = await this.getOctokit();
+      if (!octokit) {
+        console.error("Failed to get Octokit instance");
+        return null;
+      }
+
+      const response = await octokit.request(
+        "GET /repos/{owner}/{repo}/contents/{path}",
+        {
+          owner,
+          repo,
+          path,
+          ref,
+        }
+      );
+
+      if ("content" in response.data) {
+        const content = Buffer.from(response.data.content, "base64").toString(
+          "utf8"
+        );
+        return content;
+      }
+
+      return null;
+    } catch (error) {
+      console.error(
+        `Failed to fetch file ${path} from ${owner}/${repo}:`,
+        error
+      );
+      return null;
+    }
+  }
 }
+

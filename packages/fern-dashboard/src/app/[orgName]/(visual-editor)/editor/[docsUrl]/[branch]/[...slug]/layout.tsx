@@ -14,6 +14,7 @@ import AbstractDefaultDocs from "@fern-docs/components/theming/AbstractDefaultDo
 import { GlobalStyles } from "@fern-docs/components/theming/global-styles";
 import { DesktopSearchButton } from "@fern-docs/search-ui/components/desktop/desktop-search-button";
 
+import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { GitHubLoader } from "@/app/services/github/github-loader";
@@ -55,14 +56,27 @@ export default async function VisualEditorPreviewLayout({
   const session = await getCurrentSession();
   const host = await getHostFromHeaders();
 
-  // TODO: createEditableDocsLoader should be called here once, and data passed to child pages (@...) rather than called in those places as well
+  // Get the source repository information for this docs URL
+  const sourceRepo = await getDocsGithubSourceHandler({
+    url: docsUrl,
+    token: session.accessToken,
+    userId: session.user.sub,
+    orgName,
+  });
+
+  // Create the editable docs loader with the sourceRepo information
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
     session?.accessToken,
     session?.user.sub && orgName
       ? new GitHubLoader(session.user.sub, orgName)
-      : undefined
+      : undefined,
+    {
+      owner: sourceRepo.owner,
+      repo: sourceRepo.repo,
+      baseBranch: sourceRepo.baseBranch,
+    }
   );
 
   const [colors, layout, fonts, config, root, unsafe_fullRoot] =
@@ -236,3 +250,4 @@ export default async function VisualEditorPreviewLayout({
     </div>
   );
 }
+

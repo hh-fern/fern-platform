@@ -6,6 +6,7 @@ import { NodeId, getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 import { mdxToHtml } from "@fern-docs/mdx";
 
+import getDocsGithubSourceHandler from "@/app/api/get-docs-github-source/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { GitHubLoader } from "@/app/services/github/github-loader";
@@ -40,22 +41,36 @@ export default async function Page({
   const host = await getHostFromHeaders();
   const slugAlias = slugArray.join("/");
 
+  // Get the source repository information for this docs URL
+  const sourceRepo = await getDocsGithubSourceHandler({
+    url: docsUrl,
+    token: session.accessToken,
+    userId: session.user.sub,
+    orgName,
+  });
+
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
     session?.accessToken,
     session?.user.sub && orgName
       ? new GitHubLoader(session.user.sub, orgName)
+      : undefined,
+    sourceRepo.owner && sourceRepo.repo && sourceRepo.baseBranch
+      ? {
+          owner: sourceRepo.owner,
+          repo: sourceRepo.repo,
+          baseBranch: sourceRepo.baseBranch,
+        }
       : undefined
   );
+
   const root = await loader.getRoot();
 
   const slug = slugAlias === ROOT_SLUG_ALIAS ? root.slug : slugAlias;
   const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));
-
   // Check if client-node-id is passed as search param
   const clientNodeId = resolvedSearchParams["client-node-id"];
-
   // If the page is not found and client-node-id is not passed, redirect to appropriate page
   // For client pages, we allow not-found nodes as long as clientNodeId is provided
   if (foundNode.type !== "found" && !clientNodeId) {
@@ -94,13 +109,14 @@ export default async function Page({
 
   const filename = page?.filename;
   const mdx = page?.markdown;
+  const cssConfig = page?.css; // Extract CSS configuration
+
   const { html, frontmatter, originalElements, originalFrontmatter } = mdx
     ? mdxToHtml(mdx, {
         treatAsCustomElement: ["code"],
         treatAsUnsupported: ["math"],
       })
     : {};
-
   return (
     // TODO: Currently, we are force-hiding the table of contents is within Visual Editor.
     // This is a temporary solution, as I anticipate we will want the TOC to be dynamic based
@@ -131,8 +147,10 @@ export default async function Page({
           initialFrontmatter={frontmatter}
           initialOriginalElements={originalElements}
           initialOriginalFrontmatter={originalFrontmatter}
+          cssConfig={cssConfig}
         />
       </div>
     </AbstractLayoutEvaluatorContent>
   );
 }
+

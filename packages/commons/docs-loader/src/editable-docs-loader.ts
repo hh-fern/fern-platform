@@ -19,14 +19,17 @@ class EditableDocsLoader implements DocsLoader {
   private readOnlyDocsLoader: DocsLoader;
   domain: string;
   fern_token: string | undefined;
+  private sourceRepo?: { owner: string; repo: string; baseBranch?: string };
 
   constructor(
     docsLoader: DocsLoader,
-    private gitLoader?: GitLoader
+    private gitLoader?: GitLoader,
+    sourceRepo?: { owner: string; repo: string; baseBranch?: string }
   ) {
     this.readOnlyDocsLoader = docsLoader;
     this.domain = docsLoader.domain;
     this.fern_token = docsLoader.fern_token;
+    this.sourceRepo = sourceRepo;
   }
 
   getDocsYml = (owner: string, repo: string, ref?: string) =>
@@ -69,7 +72,41 @@ class EditableDocsLoader implements DocsLoader {
     Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">
   > => this.readOnlyDocsLoader.getConfig();
 
-  getPage = (pageId: string) => this.readOnlyDocsLoader.getPage(pageId);
+  getPage = async (pageId: string) => {
+    // Only attempt GitHub loading if sourceRepo is available
+    if (!this.sourceRepo || !this.gitLoader) {
+      return await this.readOnlyDocsLoader.getPage(pageId);
+    }
+
+    // Use sourceRepo values directly
+    const { owner, repo, baseBranch } = this.sourceRepo;
+    if (owner && repo) {
+      // Build the GitHub path: fern/pageId since docs are stored in a subdirectory
+      const githubPath = `fern/${pageId}`;
+
+      try {
+        const markdownContent = await this.gitLoader.getFile(
+          owner,
+          repo,
+          githubPath,
+          baseBranch
+        );
+
+        if (markdownContent) {
+          return {
+            filename: githubPath,
+            markdown: markdownContent,
+            editThisPageUrl: `https://github.com/${owner}/${repo}/edit/${baseBranch}/${githubPath}`,
+          };
+        }
+      } catch (error) {
+        console.warn(`Failed to load ${githubPath} from GitHub:`, error);
+      }
+    }
+
+    // Fallback to FDR backend
+    return await this.readOnlyDocsLoader.getPage(pageId);
+  };
 
   getColors = () => this.readOnlyDocsLoader.getColors();
 
@@ -96,6 +133,12 @@ export interface GitLoader {
     content: string,
     ref?: string
   ): Promise<boolean>;
+  getFile(
+    owner: string,
+    repo: string,
+    path: string,
+    ref?: string
+  ): Promise<string | null>;
 }
 
 export const createEditableDocsLoader = cache(
@@ -104,6 +147,7 @@ export const createEditableDocsLoader = cache(
     encodedDocsUrl: string,
     fern_token?: string,
     gitLoader?: GitLoader,
+    sourceRepo?: { owner: string; repo: string; baseBranch?: string },
     forceRevalidate?: boolean
   ) => {
     // TODO: derive the domain from the workspace
@@ -116,10 +160,10 @@ export const createEditableDocsLoader = cache(
         kvTtl: 5 * 60, // 5 minutes
         cacheKeySuffix: "editable",
         forceRevalidate,
-      },
-      true // Skip auth
+      }
     );
 
-    return new EditableDocsLoader(docsLoader, gitLoader);
+    return new EditableDocsLoader(docsLoader, gitLoader, sourceRepo);
   }
 );
+
