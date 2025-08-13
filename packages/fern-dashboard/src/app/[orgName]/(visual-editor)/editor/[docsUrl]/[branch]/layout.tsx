@@ -12,6 +12,7 @@ import {
   getCurrentSession,
 } from "@/app/services/auth0/getCurrentSession";
 import type { Auth0OrgName } from "@/app/services/auth0/types";
+import { GithubSourceRepo } from "@/app/services/github/types";
 import { GithubExtendedAccessProtectedRoute } from "@/components/auth/GithubExtendedAccessProtectedRoute";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { BranchProvider } from "@/providers/BranchContext";
@@ -21,7 +22,6 @@ import { EditorProvider } from "@/providers/EditorContext";
 import { GitHubRepoProvider } from "@/providers/GitHubRepoContext";
 import { GitPRProvider } from "@/providers/GitPRContext";
 import { MdxStateProvider } from "@/providers/MdxStateContext";
-import { throwDigestibleError } from "@/utils/errors";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import type { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 
@@ -50,82 +50,73 @@ async function DynamicEditorContent({
   session: Auth0SessionData;
   children: React.JSX.Element;
 }) {
-  const githubUrl = await getDocsGithubUrl({
-    url: docsUrl,
-    token: session.accessToken,
-  });
-  if (githubUrl == null) {
-    throwDigestibleError(
-      "We were unable to find the source repo for this domain. Please confirm that you have linked a repo to this domain.",
-      "SOURCE_REPO_NOT_FOUND"
-    );
-  }
-  const sourceRepo = await getGithubSourceMetadata({
-    githubUrl,
-    userId: session.user.sub,
-  });
+  let githubUrl: string | undefined = undefined;
+  let sourceRepo: GithubSourceRepo | undefined;
 
-  if (sourceRepo.owner == null || sourceRepo.repo == null) {
-    throwDigestibleError(
-      "We were unable to validate the source repo for this domain. Please confirm that you have linked a valid repo to this domain.",
-      "SOURCE_REPO_NOT_VALID"
-    );
-  }
-
-  if (sourceRepo.baseBranch == null) {
-    throwDigestibleError(
-      "Looks like your source repo is not configured correctly. Please set a base branch on your Github repo.",
-      "BASE_BRANCH_NOT_SET"
-    );
+  try {
+    githubUrl = await getDocsGithubUrl({
+      url: docsUrl,
+      token: session.accessToken,
+    });
+    sourceRepo = await getGithubSourceMetadata({
+      githubUrl,
+      userId: session.user.sub,
+    });
+  } catch (_error) {
+    // Silently fail, as the route guard will handle the error
   }
 
   return (
     <GithubExtendedAccessProtectedRoute
       orgName={orgName}
       githubUrl={githubUrl}
-      fernBotInstalled={sourceRepo.fernBotHasInstallationId}
+      sourceRepo={sourceRepo}
     >
-      <ThemeProvider
-        attribute="class"
-        forcedTheme="light"
-        enableSystem={false}
-        disableTransitionOnChange
-      >
-        <GitHubRepoProvider
-          owner={sourceRepo.owner ?? ""}
-          repo={sourceRepo.repo ?? ""}
-          branch={branch}
-        >
-          <SidebarClientNavigationProvider branchName={branch}>
-            <ClientPageManager branchName={branch} />
-            <DevModeProvider>
-              <MdxStateProvider docsUrl={docsUrl}>
-                <CurrentPageProvider>
-                  <BranchProvider branch={branch}>
-                    <EditorProvider>
-                      <GitPRProvider
-                        owner={sourceRepo.owner}
-                        repo={sourceRepo.repo}
-                        baseBranch={sourceRepo.baseBranch}
-                        branch={branch}
-                        orgName={orgName}
-                      >
-                        <HeaderToolbar
-                          orgName={orgName}
-                          session={session}
-                          docsUrl={docsUrl}
-                          githubUrl={githubUrl}
-                        />
-                        {children}
-                      </GitPRProvider>
-                    </EditorProvider>
-                  </BranchProvider>
-                </CurrentPageProvider>
-              </MdxStateProvider>
-            </DevModeProvider>
-          </SidebarClientNavigationProvider>
-        </GitHubRepoProvider>
-      </ThemeProvider>
+      <>
+        {sourceRepo && githubUrl && (
+          <ThemeProvider
+            attribute="class"
+            forcedTheme="light"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <GitHubRepoProvider
+              owner={sourceRepo.owner ?? ""}
+              repo={sourceRepo.repo ?? ""}
+              branch={branch}
+            >
+              <SidebarClientNavigationProvider branchName={branch}>
+                <ClientPageManager branchName={branch} />
+                <DevModeProvider>
+                  <MdxStateProvider docsUrl={docsUrl}>
+                    <CurrentPageProvider>
+                      <BranchProvider branch={branch}>
+                        <EditorProvider>
+                          <GitPRProvider
+                            owner={sourceRepo.owner}
+                            repo={sourceRepo.repo}
+                            baseBranch={sourceRepo.baseBranch}
+                            branch={branch}
+                            orgName={orgName}
+                          >
+                            <HeaderToolbar
+                              orgName={orgName}
+                              session={session}
+                              docsUrl={docsUrl}
+                              githubUrl={githubUrl}
+                            />
+                            {children}
+                          </GitPRProvider>
+                        </EditorProvider>
+                      </BranchProvider>
+                    </CurrentPageProvider>
+                  </MdxStateProvider>
+                </DevModeProvider>
+              </SidebarClientNavigationProvider>
+            </GitHubRepoProvider>
+          </ThemeProvider>
+        )}
+      </>
     </GithubExtendedAccessProtectedRoute>
   );
 }

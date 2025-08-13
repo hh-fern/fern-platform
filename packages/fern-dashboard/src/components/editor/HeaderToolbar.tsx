@@ -241,7 +241,6 @@ export function HeaderToolbar({
 }) {
   const { name, picture } = session.user;
   const { changedMdxFiles, mdxSyncedStatus } = useMdxState();
-  // NOTE: useGitPrUrl is not fully in use because the Provider keeps unmounting, but this is in the right direction we want to go in
   const { gitPrUrl, setPrUrl, prTitle, refetchPrData } = useGitPrInfo();
   const { branch } = useBranch();
   const { editor } = useEditor();
@@ -399,7 +398,6 @@ export function HeaderToolbar({
           return;
         }
         const newPrUrl = await handleCreatePr({
-          orgName,
           branch,
           owner: githubSource.owner,
           repo: githubSource.repo,
@@ -420,7 +418,6 @@ export function HeaderToolbar({
       setIsCommitting(false);
     }
   }, [
-    orgName,
     githubSource,
     branch,
     changedMdxFiles,

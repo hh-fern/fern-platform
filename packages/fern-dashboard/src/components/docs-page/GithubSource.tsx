@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import { Cog, Lock } from "lucide-react";
+import { Cog, Loader2, Lock } from "lucide-react";
 
 import { FernTooltip, FernTooltipProvider } from "@fern-docs/components";
 import { getLoadableValue } from "@fern-ui/loadable";
@@ -72,25 +72,20 @@ export function GithubSource({
                 <SetGithubSourcePopover
                   docsUrl={docsUrl}
                   setIsSaving={setIsSaving}
-                  orgName={orgName}
                 >
                   <Button
-                    size="iconSm"
+                    size={isSaving ? "sm" : "iconSm"}
                     variant="ghost"
                     disabled={isSaving}
                     className="size-4 p-0"
                   >
-                    <Cog />
+                    {isSaving ? <Loader2 className="animate-spin" /> : <Cog />}
                   </Button>
                 </SetGithubSourcePopover>
               )}
             </>
           ) : (
-            <SetGithubSourcePopover
-              docsUrl={docsUrl}
-              setIsSaving={setIsSaving}
-              orgName={orgName}
-            >
+            <SetGithubSourcePopover docsUrl={docsUrl} setIsSaving={setIsSaving}>
               <Button size="sm" className="w-fit" disabled={isSaving}>
                 <GithubLogo />
                 {isSaving ? "Saving..." : "Connect Repo"}
