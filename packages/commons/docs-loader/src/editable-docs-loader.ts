@@ -19,12 +19,12 @@ class EditableDocsLoader implements DocsLoader {
   private readOnlyDocsLoader: DocsLoader;
   domain: string;
   fern_token: string | undefined;
-  private sourceRepo?: { owner: string; repo: string; baseBranch?: string };
+  private sourceRepo?: GitSourceRepo;
 
   constructor(
     docsLoader: DocsLoader,
     private gitLoader?: GitLoader,
-    sourceRepo?: { owner: string; repo: string; baseBranch?: string }
+    sourceRepo?: GitSourceRepo
   ) {
     this.readOnlyDocsLoader = docsLoader;
     this.domain = docsLoader.domain;
@@ -122,6 +122,12 @@ class EditableDocsLoader implements DocsLoader {
   getBaseUrl = () => this.readOnlyDocsLoader.getBaseUrl();
 }
 
+interface GitSourceRepo {
+  owner: string;
+  repo: string;
+  baseBranch?: string;
+}
+
 /**
  * The GitLoader is used to get and update docs.yml from a remote git repository.
  */
@@ -147,7 +153,7 @@ export const createEditableDocsLoader = cache(
     encodedDocsUrl: string,
     fern_token?: string,
     gitLoader?: GitLoader,
-    sourceRepo?: { owner: string; repo: string; baseBranch?: string },
+    sourceRepo?: GitSourceRepo,
     forceRevalidate?: boolean
   ) => {
     // TODO: derive the domain from the workspace

@@ -21,7 +21,8 @@ export default async function preloadEditorData(request: {
       request.docsUrl,
       session.accessToken,
       undefined, // No GitHubLoader for preload since we don't have orgName context
-      undefined // No source repo info for preload
+      undefined, // No source repo info for preload
+      true // force revalidate when preloading
     );
 
     // Preload root and config in parallel

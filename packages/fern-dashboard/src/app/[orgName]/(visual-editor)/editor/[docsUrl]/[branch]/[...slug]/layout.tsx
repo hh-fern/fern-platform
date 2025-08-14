@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import React from "react";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
@@ -51,15 +52,14 @@ export default async function VisualEditorPreviewLayout({
   logo: React.ReactNode;
   devPanel: React.ReactNode;
 }>) {
-  const { orgName, docsUrl, branch } = await params;
-
   const session = await getCurrentSession();
-  const host = await getHostFromHeaders();
 
-  // Early return if no session
-  if (!session) {
-    throw new Error("No session found");
+  if (session == null) {
+    redirect("/");
   }
+
+  const { orgName, docsUrl, branch } = await params;
+  const host = await getHostFromHeaders();
 
   // Get the source repository information for this docs URL
   const sourceRepo = await getDocsGithubSourceHandler({
@@ -69,7 +69,7 @@ export default async function VisualEditorPreviewLayout({
     orgName,
   });
 
-  // Create the editable docs loader with the sourceRepo information
+  // TODO: createEditableDocsLoader should be called here once, and data passed to child pages (@...) rather than called in those places as well
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
