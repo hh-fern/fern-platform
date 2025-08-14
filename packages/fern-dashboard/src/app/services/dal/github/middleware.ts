@@ -41,7 +41,7 @@ export function withGithubAuth<TAdditionalContext = {}>(
       const { userId } = sessionResult.data;
 
       // Step 2: Derive the repo identifier
-      const data = parsedBody ?? await req.json();
+      const data = parsedBody ?? (await req.json());
       const identifierResult = await deriveRepoIdentifier(data);
 
       if (!identifierResult.success) {

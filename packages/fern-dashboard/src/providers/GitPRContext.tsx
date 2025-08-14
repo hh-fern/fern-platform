@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 
-import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 
 export const GitPRContext = createContext<{
@@ -39,14 +38,12 @@ export function GitPRProvider({
   owner,
   repo,
   branch,
-  orgName,
   baseBranch,
 }: {
   children: ReactNode;
   owner?: string;
   repo?: string;
   branch: string;
-  orgName: Auth0OrgName;
   baseBranch?: string;
 }) {
   const [gitPrUrl, setGitPrUrl] = useState<string | undefined>(undefined);
@@ -82,7 +79,7 @@ export function GitPRProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [owner, repo, branch, orgName, baseBranch]);
+  }, [owner, repo, branch, baseBranch]);
 
   // Fetch PR information when component mounts or dependencies change
   useEffect(() => {

@@ -27,7 +27,10 @@ export interface ValidatedRequest<TSchema extends z.ZodSchema>
 
 export function withZodValidation<TSchema extends z.ZodSchema>(
   schema: TSchema,
-  handler: (req: ValidatedRequest<TSchema>, parsedBody: z.infer<TSchema>) => Promise<NextResponse>
+  handler: (
+    req: ValidatedRequest<TSchema>,
+    parsedBody: z.infer<TSchema>
+  ) => Promise<NextResponse>
 ) {
   return async (req: NextRequest): Promise<NextResponse> => {
     try {

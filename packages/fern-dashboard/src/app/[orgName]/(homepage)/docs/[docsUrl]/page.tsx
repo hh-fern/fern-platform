@@ -8,6 +8,7 @@ import getMyDocsSitesHandler from "@/app/api/get-my-docs-sites/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { validateGithubRepoAccess } from "@/app/services/dal/github/validators";
+import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
 import {
   GithubAuthState,
@@ -22,13 +23,20 @@ import { EncodedDocsUrl } from "@/utils/types";
 export default async function Page(props: {
   params: Promise<{ orgName: Auth0OrgName; docsUrl: EncodedDocsUrl }>;
 }) {
-  const { orgName, docsUrl: encodedDocsUrl } = await props.params;
-  const docsUrl = parseDocsUrlParam({ docsUrl: encodedDocsUrl });
+  // Validate session
   const session = await getCurrentSession();
-
-  if (!session) {
+  if (session == null) {
     redirect("/");
   }
+
+  const { orgName, docsUrl: encodedDocsUrl } = await props.params;
+
+  // Validate organization access
+  await assertUserHasOrganizationAccess({
+    userId: session.user.sub,
+    orgName,
+  });
+  const docsUrl = parseDocsUrlParam({ docsUrl: encodedDocsUrl });
 
   // Validate that the docsUrl belongs to this organization so that we avoid errors in the page
   try {

@@ -4,6 +4,7 @@ import {
   getFernBotInstallationId,
   getFernBotOctokitForRepo,
 } from "@/app/services/auth0/fernBotOctokit";
+import { getOwnerAndRepoFromGithubUrl } from "@/app/services/github/github";
 import { GithubSourceRepo } from "@/app/services/github/types";
 
 const EMPTY_RESPONSE: GithubSourceRepo = {
@@ -29,7 +30,7 @@ export default async function getGithubSourceMetadataHandler({
       throw new Error("NoGithubUrl");
     }
 
-    const [owner, repo] = githubUrl.split("/").slice(-2);
+    const { owner, repo } = getOwnerAndRepoFromGithubUrl(githubUrl);
 
     if (owner == null || repo == null) {
       // Don't cache this failure, so throw to skip cache

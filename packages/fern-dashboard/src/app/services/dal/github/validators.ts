@@ -116,11 +116,10 @@ export async function assertGithubAccess(
   identifier: RepoIdentifier
 ): Promise<void> {
   const validation = await validateGithubRepoAccess(userId, identifier);
-
-  if (!validation.repoExists) {
+  if (!validation.hasFernBotInstalled) {
     throw throwDigestibleError(
-      new Error("GitHub repository not found or not accessible"),
-      "REPO_NOT_FOUND"
+      new Error("Fern bot is not installed on this repo"),
+      "FERN_BOT_NOT_INSTALLED"
     );
   }
 
@@ -131,10 +130,10 @@ export async function assertGithubAccess(
     );
   }
 
-  if (!validation.hasFernBotInstalled) {
+  if (!validation.repoExists) {
     throw throwDigestibleError(
-      new Error("Fern bot is not installed on this repo"),
-      "FERN_BOT_NOT_INSTALLED"
+      new Error("GitHub repository not found or not accessible"),
+      "REPO_NOT_FOUND"
     );
   }
 }
