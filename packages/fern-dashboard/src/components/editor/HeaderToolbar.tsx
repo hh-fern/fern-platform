@@ -405,7 +405,6 @@ export function HeaderToolbar({
           baseBranch: githubSource.baseBranch,
           title: prTitle,
           onAiGenerationComplete: refetchPrData,
-          orgName,
         });
         if (newPrUrl) {
           setPrUrl(newPrUrl);
@@ -428,7 +427,6 @@ export function HeaderToolbar({
     setPrUrl,
     prTitle,
     refetchPrData,
-    orgName,
   ]);
 
   const commitDisabledReason = useMemo(() => {
@@ -485,7 +483,6 @@ export function HeaderToolbar({
           </a>
         </Button>
         <PRTitleEditor
-          orgName={orgName}
           owner={githubSource?.owner}
           repo={githubSource?.repo}
           baseBranch={githubSource?.baseBranch}

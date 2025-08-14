@@ -1,3 +1,5 @@
+import "server-only";
+
 import { notFound, redirect } from "next/navigation";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
@@ -9,7 +11,8 @@ import { mdxToHtml } from "@fern-docs/mdx";
 import getDocsGithubUrl from "@/app/api/get-docs-github-url/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import { validateGithubAccess } from "@/app/services/dal/github";
+import { assertGithubAccessByUrl } from "@/app/services/dal/github/validators";
+import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
@@ -39,16 +42,17 @@ export default async function Page({
 
   const { orgName, docsUrl, branch, slug: slugArray } = await params;
 
+  await assertUserHasOrganizationAccess({
+    userId: session.user.sub,
+    orgName,
+  });
+
   const githubUrl = await getDocsGithubUrl({
     url: docsUrl,
     token: session.accessToken,
   });
 
-  await validateGithubAccess({
-    orgName,
-    githubUrl,
-    userId: session.user.sub,
-  });
+  await assertGithubAccessByUrl(session.user.sub, githubUrl);
 
   const resolvedSearchParams = await searchParams;
   const host = await getHostFromHeaders();

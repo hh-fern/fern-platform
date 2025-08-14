@@ -1,12 +1,18 @@
+import "server-only";
+
 import { redirect } from "next/navigation";
 
 import getDocsGithubUrlHandler from "@/app/api/get-docs-github-url/handler";
+import getGithubSourceMetadataHandler from "@/app/api/get-github-source-metadata/handler";
 import getMyDocsSitesHandler from "@/app/api/get-my-docs-sites/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
+import { validateGithubRepoAccess } from "@/app/services/dal/github/validators";
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
-import { GithubProtectedArea } from "@/components/docs-page/GithubProtectedArea";
-import { GithubSource } from "@/components/docs-page/GithubSource";
+import {
+  GithubAuthState,
+  GithubSource,
+} from "@/components/docs-page/GithubSource";
 import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
 import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
@@ -45,12 +51,59 @@ export default async function Page(props: {
   }
 
   let githubUrl = undefined;
+  let githubAuthState: GithubAuthState = {
+    repoExists: false,
+    hasWriteAccess: false,
+    hasFernBotInstalled: false,
+    sourceRepo: undefined,
+    isLoading: false,
+  };
 
   try {
     githubUrl = await getDocsGithubUrlHandler({
       url: encodedDocsUrl,
       token: session.accessToken,
     });
+
+    // If we have a GitHub URL, validate the auth state
+    if (githubUrl) {
+      try {
+        const validation = await validateGithubRepoAccess(session.user.sub, {
+          type: "url",
+          githubUrl,
+        });
+
+        let sourceRepo = undefined;
+
+        // If user has all required access, fetch the source repo metadata
+        if (
+          validation.repoExists &&
+          validation.hasWriteAccess &&
+          validation.hasFernBotInstalled
+        ) {
+          try {
+            sourceRepo = await getGithubSourceMetadataHandler({
+              githubUrl,
+              userId: session.user.sub,
+              skipCache: false,
+            });
+          } catch (error) {
+            console.error("Failed to fetch source repo metadata:", error);
+          }
+        }
+
+        githubAuthState = {
+          repoExists: validation.repoExists,
+          hasWriteAccess: validation.hasWriteAccess,
+          hasFernBotInstalled: validation.hasFernBotInstalled,
+          sourceRepo,
+          isLoading: false,
+        };
+      } catch (error) {
+        console.error("Failed to validate GitHub access:", error);
+        // Keep default false state
+      }
+    }
   } catch (error) {
     console.error(error);
   }
@@ -66,14 +119,13 @@ export default async function Page(props: {
         githubProtectedArea={
           <div className="flex w-fit flex-col gap-2">
             <p>Source</p>
-            <GithubProtectedArea githubUrl={githubUrl}>
-              <GithubSource
-                docsUrl={docsUrl}
-                orgName={orgName}
-                session={session}
-                githubUrl={githubUrl}
-              />
-            </GithubProtectedArea>
+            <GithubSource
+              docsUrl={docsUrl}
+              orgName={orgName}
+              session={session}
+              githubUrl={githubUrl}
+              authState={githubAuthState}
+            />
           </div>
         }
       />

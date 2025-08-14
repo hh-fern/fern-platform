@@ -7,9 +7,7 @@ import { getMyOrganizations } from "@/app/api/get-my-organizations/route";
 import { getOrgInvitations } from "@/app/api/get-org-invitations/route";
 import { getOrgMembers } from "@/app/api/get-org-members/route";
 import { getPrForBranch } from "@/app/api/get-pr-for-branch/route";
-import { getUserGithubRepos } from "@/app/api/get-user-git-repos/route";
 import { validateGithubBranch } from "@/app/api/get-validate-github-branch/route";
-import { getGitHubPermissions } from "@/app/api/github-permissions/route";
 import { getHomepageImageUrl } from "@/app/api/homepage-images/get/route";
 import { postDocsGithubSource } from "@/app/api/post-docs-github-source/route";
 import { postGitCommit } from "@/app/api/post-git-commit/route";
@@ -38,13 +36,6 @@ export const DashboardApiClient = {
     ),
   getDocsUrlOwner: (request: getDocsUrlOwner.Request) =>
     typedFetch<getDocsUrlOwner.Response>("/api/get-docs-url-owner", request),
-  getUserGithubRepos: (request?: getUserGithubRepos.Request) =>
-    typedFetch<getUserGithubRepos.Response>("/api/get-user-git-repos", request),
-  getGitHubPermissions: (request: getGitHubPermissions.Request) =>
-    typedFetch<getGitHubPermissions.Response>(
-      "/api/github-permissions",
-      request
-    ),
   postCreateBranch: (request: postCreateBranch.Request) =>
     typedFetch<postCreateBranch.Response>(
       "/api/post-git-create-branch",
@@ -84,6 +75,18 @@ export const DashboardApiClient = {
     typedFetch<updatePrTitle.Response>("/api/update-pr-title", request),
 };
 
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly statusText: string,
+    public readonly body: string,
+    message?: string
+  ) {
+    super(message || `Request failed: ${status} ${statusText}`);
+    this.name = "ApiError";
+  }
+}
+
 async function typedFetch<T>(
   url: string,
   body?: unknown,
@@ -100,9 +103,17 @@ async function typedFetch<T>(
     console.error("Request failed", {
       url,
       body: JSON.stringify(body),
+      status: response.status,
+      statusText: response.statusText,
       responseText,
     });
-    throw new Error("Request failed: " + responseText);
+
+    throw new ApiError(
+      response.status,
+      response.statusText,
+      responseText,
+      `Request failed: ${response.status} ${response.statusText}`
+    );
   }
 
   let json: unknown;

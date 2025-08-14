@@ -1,3 +1,5 @@
+import "server-only";
+
 import { ThemeProvider } from "next-themes";
 import { redirect } from "next/navigation";
 import type React from "react";
@@ -67,7 +69,7 @@ async function DynamicEditorContent({
   }
 
   return (
-    <GithubExtendedAccessProtectedRoute orgName={orgName} githubUrl={githubUrl}>
+    <GithubExtendedAccessProtectedRoute githubUrl={githubUrl}>
       <>
         {sourceRepo && githubUrl && (
           <ThemeProvider

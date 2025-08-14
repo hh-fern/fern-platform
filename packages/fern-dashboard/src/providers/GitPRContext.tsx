@@ -65,7 +65,6 @@ export function GitPRProvider({
         owner,
         repo,
         branch,
-        orgName,
         baseBranch,
       });
 

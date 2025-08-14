@@ -71,7 +71,7 @@ export function GoToEditorButton({
         docsUrl,
       });
       router.prefetch(editorSlug);
-      preload(editorSlug, { as: "document", crossOrigin: "anonymous" });
+      preload(editorSlug, { as: "fetch", crossOrigin: "anonymous" });
     }
   }, [docsUrl, disabled, router, editorSlug]);
 
@@ -88,7 +88,6 @@ export function GoToEditorButton({
     // Very important - the branch creation needs to be finished before navigation
     // TODO: Move the branch creation logic into the editor page
     DashboardApiClient.postCreateBranch({
-      orgName,
       owner: sourceRepo.owner,
       repo: sourceRepo.repo,
       branch: newBranchName,
@@ -106,7 +105,7 @@ export function GoToEditorButton({
       .catch(() => {
         ErrorCreateBranchToast();
       });
-  }, [sourceRepo, newBranchName, editorSlug, orgName]);
+  }, [sourceRepo, newBranchName, editorSlug]);
 
   return (
     <div className="flex w-fit flex-row items-center gap-2">

@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 
 import { GitPullRequest, Loader2 } from "lucide-react";
 
-import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { Input } from "@/components/ui/input";
 import { useGitPrInfo } from "@/providers/GitPRContext";
@@ -12,7 +11,6 @@ import { useGitPrInfo } from "@/providers/GitPRContext";
 import { ErrorUpdatePrTitleToast } from "./EditorToasts";
 
 interface PRTitleEditorProps {
-  orgName: Auth0OrgName;
   owner: string | undefined;
   repo: string | undefined;
   branch: string | null;
@@ -21,7 +19,6 @@ interface PRTitleEditorProps {
 }
 
 export function PRTitleEditor({
-  orgName,
   owner,
   repo,
   branch,
@@ -59,7 +56,6 @@ export function PRTitleEditor({
           repo,
           branch,
           title: trimmedTitle,
-          orgName,
           baseBranch,
         });
 
@@ -79,7 +75,6 @@ export function PRTitleEditor({
       owner,
       repo,
       branch,
-      orgName,
       serverTitle,
       gitPrUrl,
       setLocalTitle,

@@ -1,57 +1,57 @@
 "use client";
 
-import { useEffect } from "react";
 import { useState } from "react";
 
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { Cog, Loader2, Lock } from "lucide-react";
 
 import { FernTooltip, FernTooltipProvider } from "@fern-docs/components";
-import { getLoadableValue } from "@fern-ui/loadable";
 
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { getRepoDisplayNameFromUrl } from "@/app/services/github/github";
-import { useGithubSourceRepo } from "@/state/useGithubSourceRepo";
+import { GithubSourceRepo } from "@/app/services/github/types";
 import { DocsUrl } from "@/utils/types";
 
 import { GithubLogo } from "../auth/GithubLogo";
 import { Button } from "../ui/button";
-import { useGithubPermissions } from "./GithubPermissionsContext";
 import { GoToEditorButton } from "./GoToEditorButton";
 import { SetGithubSourcePopover } from "./SetGithubSource";
+
+export interface GithubAuthState {
+  repoExists: boolean;
+  hasWriteAccess: boolean;
+  hasFernBotInstalled: boolean;
+  sourceRepo?: GithubSourceRepo;
+  isLoading?: boolean;
+}
 
 export function GithubSource({
   docsUrl,
   orgName,
   session,
   githubUrl,
+  authState,
 }: {
   docsUrl: DocsUrl;
   orgName: Auth0OrgName;
   session: Auth0SessionData;
   githubUrl?: string;
+  authState: GithubAuthState;
 }) {
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const { writePermission } = useGithubPermissions();
-
-  const githubSource = getLoadableValue(useGithubSourceRepo(githubUrl));
-
-  useEffect(() => {
-    if (!githubSource) {
-      setIsLoading(true);
-    } else {
-      setIsLoading(false);
-    }
-  }, [githubSource]);
-
   const [isDomainHovered, setIsDomainHovered] = useState(false);
 
+  const {
+    repoExists,
+    hasWriteAccess,
+    hasFernBotInstalled,
+    sourceRepo,
+    isLoading = false,
+  } = authState;
+
   const disabled =
-    isLoading ||
-    (githubSource && !githubSource.fernBotHasInstallationId) ||
-    !writePermission;
+    isLoading || !repoExists || !hasWriteAccess || !hasFernBotInstalled;
 
   return (
     <>
@@ -100,18 +100,18 @@ export function GithubSource({
           orgName={orgName}
           docsUrl={docsUrl}
           session={session}
-          sourceRepo={githubSource}
+          sourceRepo={sourceRepo}
           isValidatingSource={isLoading}
           disabled={disabled}
         />
-        {/* Handle displaying reason for disabling GoToEditor button */}
 
+        {/* Handle displaying reason for disabling GoToEditor button */}
         {!isLoading && disabled && (
           <>
-            {githubSource && !githubSource.fernBotHasInstallationId ? (
+            {!hasFernBotInstalled ? (
               <FernTooltipProvider>
                 <FernTooltip
-                  content="fern-bot is not installed on this repository"
+                  content="The Fern Github app is not installed on this repository."
                   variant="dashboard"
                   delayDuration={0}
                   side="bottom"
@@ -120,7 +120,19 @@ export function GithubSource({
                   <ExclamationCircleIcon className="size-6 text-red-600" />
                 </FernTooltip>
               </FernTooltipProvider>
-            ) : !writePermission ? (
+            ) : !repoExists ? (
+              <FernTooltipProvider>
+                <FernTooltip
+                  content="Unable to find this repository."
+                  variant="dashboard"
+                  delayDuration={0}
+                  side="bottom"
+                  className="bg-gray-1200 rounded-md text-white"
+                >
+                  <ExclamationCircleIcon className="size-6 text-red-600" />
+                </FernTooltip>
+              </FernTooltipProvider>
+            ) : !hasWriteAccess ? (
               <FernTooltipProvider>
                 <FernTooltip
                   content="You do not have write permission to this repository."

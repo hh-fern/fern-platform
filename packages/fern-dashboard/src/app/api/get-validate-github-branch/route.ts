@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
-import { validateApiGithubAccess } from "@/app/services/dal/github";
+import { withGithubAuth } from "@/app/services/dal/github/middleware";
+import {
+  type GithubAuthContext,
+  GithubIdentificationScheme,
+} from "@/app/services/dal/github/types";
+import { withZodValidation } from "@/app/services/dal/zod/middleware";
 import { ResolvedReturnType } from "@/utils/types";
 
-import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
-import { parseNextRequestBody } from "../utils/parseNextRequestBody";
-import { orgNameValidator } from "../utils/validators";
 import handler from "./handler";
 
 export declare namespace validateGithubBranch {
@@ -15,41 +17,25 @@ export declare namespace validateGithubBranch {
   export type Response = ResolvedReturnType<typeof handler>;
 }
 
-const ValidateGithubBranchRequest = z.object({
-  owner: z.string(),
-  repo: z.string(),
-  branchName: z.string(),
-  orgName: orgNameValidator,
-  githubUrl: z.string().optional(),
-});
+const ValidateGithubBranchRequest = GithubIdentificationScheme.and(
+  z.object({
+    branchName: z.string(),
+  })
+);
 
-export async function POST(req: NextRequest) {
-  const maybeSessionData = await maybeGetCurrentSession(req);
-  if (maybeSessionData.errorResponse != null) {
-    return maybeSessionData.errorResponse;
-  }
+export const POST = withZodValidation(
+  ValidateGithubBranchRequest,
+  async (
+    req: NextRequest,
+    validatedBody: z.infer<typeof ValidateGithubBranchRequest>
+  ) =>
+    withGithubAuth(
+      async (_req: NextRequest, { repoData }: GithubAuthContext) => {
+        const { branchName } = validatedBody;
+        const { owner, repo } = repoData;
 
-  const parsedBody = await parseNextRequestBody(
-    req,
-    ValidateGithubBranchRequest
-  );
-  if (parsedBody.errorResponse != null) {
-    return parsedBody.errorResponse;
-  }
-  const { owner, repo, branchName, orgName, githubUrl } = parsedBody.data;
-
-  const validationError = await validateApiGithubAccess({
-    orgName,
-    owner,
-    repo,
-    githubUrl,
-    userId: maybeSessionData.data.userId,
-  });
-  if (validationError) {
-    return validationError;
-  }
-
-  const response = await handler({ owner, repo, branchName });
-
-  return NextResponse.json(response);
-}
+        const response = await handler({ owner, repo, branchName });
+        return NextResponse.json(response);
+      }
+    )(req, validatedBody)
+);
