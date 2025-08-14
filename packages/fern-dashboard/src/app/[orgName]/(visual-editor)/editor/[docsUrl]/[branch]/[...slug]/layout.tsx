@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import React from "react";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
@@ -14,8 +15,11 @@ import AbstractDefaultDocs from "@fern-docs/components/theming/AbstractDefaultDo
 import { GlobalStyles } from "@fern-docs/components/theming/global-styles";
 import { DesktopSearchButton } from "@fern-docs/search-ui/components/desktop/desktop-search-button";
 
+import getDocsGithubUrl from "@/app/api/get-docs-github-url/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
+import { assertGithubAccessByUrl } from "@/app/services/dal/github/validators";
+import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { PreviewHeader } from "@/components/docs-preview/PreviewHeader";
 import { EditorLinkInterceptor } from "@/components/editor/EditorLinkInterceptor";
@@ -52,17 +56,32 @@ export default async function VisualEditorPreviewLayout({
 }>) {
   const { orgName, docsUrl, branch } = await params;
 
+  // Validate session
   const session = await getCurrentSession();
   const host = await getHostFromHeaders();
+  if (session == null) {
+    redirect("/");
+  }
+
+  // Validate organization access
+  await assertUserHasOrganizationAccess({
+    userId: session.user.sub,
+    orgName,
+  });
+
+  // Validate GitHub access
+  const githubUrl = await getDocsGithubUrl({
+    url: docsUrl,
+    token: session.accessToken,
+  });
+  await assertGithubAccessByUrl(session.user.sub, githubUrl);
 
   // TODO: createEditableDocsLoader should be called here once, and data passed to child pages (@...) rather than called in those places as well
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
-    session?.accessToken,
-    session?.user.sub && orgName
-      ? new GitHubLoader(session.user.sub, orgName)
-      : undefined
+    session.accessToken,
+    new GitHubLoader(githubUrl)
   );
 
   const [colors, layout, fonts, config, root, unsafe_fullRoot] =

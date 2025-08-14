@@ -34,24 +34,24 @@ export default async function Page({
   }>;
   searchParams: Promise<Record<string, string>>;
 }) {
+  // Validate session
   const session = await getCurrentSession();
-
   if (session == null) {
     redirect("/");
   }
-
   const { orgName, docsUrl, branch, slug: slugArray } = await params;
 
+  // Validate organization access
   await assertUserHasOrganizationAccess({
     userId: session.user.sub,
     orgName,
   });
 
+  // Validate GitHub access
   const githubUrl = await getDocsGithubUrl({
     url: docsUrl,
     token: session.accessToken,
   });
-
   await assertGithubAccessByUrl(session.user.sub, githubUrl);
 
   const resolvedSearchParams = await searchParams;
@@ -61,10 +61,8 @@ export default async function Page({
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
-    session?.accessToken,
-    session?.user.sub && orgName
-      ? new GitHubLoader(session.user.sub, orgName)
-      : undefined
+    session.accessToken,
+    new GitHubLoader(githubUrl)
   );
   const root = await loader.getRoot();
 
