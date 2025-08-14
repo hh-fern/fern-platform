@@ -15,16 +15,10 @@ export async function assertUserHasOrganizationAccess({
   userId: Auth0UserID;
   orgName: Auth0OrgName;
 }) {
-  // Check if user belongs to organization
-  const isUserInOrgFromUrl = await auth0Management.doesUserBelongsToOrg(
-    userId,
-    orgName
-  );
-
-  if (!isUserInOrgFromUrl) {
-    throw throwDigestibleError(
-      new Error(`User does not have access to the ${orgName} organization.`),
-      "USER_NOT_IN_ORG"
-    );
+  try {
+    // Check if user belongs to organization
+    await auth0Management.ensureUserBelongsToOrg(userId, orgName);
+  } catch (error) {
+    throw throwDigestibleError(error as Error, "USER_NOT_IN_ORG");
   }
 }
