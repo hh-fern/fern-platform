@@ -9,13 +9,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { ArrowLeftIcon, Globe } from "lucide-react";
 
-import {
-  ClientPageStorage,
-  DocsYmlStorage,
-  PageStorage,
-  getPageFilename,
-  pageDataToMdx,
-} from "@fern-docs/components";
+import { ClientPageStorage } from "@fern-docs/components/sidebar/nodes/clientPageStorage";
+import { DocsYmlStorage } from "@fern-docs/components/sidebar/nodes/docsYmlStorage";
+import { PageStorage } from "@fern-docs/components/sidebar/nodes/pageStorage";
+import { getPageFilename, pageDataToMdx } from "@fern-docs/components/sidebar/nodes/mdxUtils";
 import { getLoadableValue } from "@fern-ui/loadable";
 
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
@@ -52,16 +49,21 @@ import { PRTitleEditor } from "./PRTitleEditor";
 /**
  * Collects all changes from various sources into a single record
  * @param changedMdxFiles - Files changed in MDX state
+ * @param deletedMdxFiles - Files deleted in MDX state
  * @param branch - Current branch name
- * @returns Record of all changes keyed by filename
+ * @returns Object with changes and deletions
  */
 function collectAllChanges(
   changedMdxFiles: Record<string, string>,
+  deletedMdxFiles: Set<string>,
   branch: string | null
-): Record<string, string> {
+): { changes: Record<string, string>; deletions: string[] } {
   const allChanges: Record<string, string> = { ...changedMdxFiles };
+  const allDeletions: string[] = [...deletedMdxFiles];
 
-  if (!branch) return allChanges;
+  if (!branch) {
+    return { changes: allChanges, deletions: allDeletions };
+  }
 
   // Add client pages from localStorage
   const clientPages = ClientPageStorage.loadClientPages(branch);
@@ -95,29 +97,36 @@ function collectAllChanges(
     }
   }
 
-  return allChanges;
+  return { changes: allChanges, deletions: allDeletions };
 }
 
 /**
- * Generates a hash from file content with consistent key ordering
- * @param content - Record of file content keyed by filename
- * @returns Hash string representing the content
+ * Generates a hash from file changes and deletions with consistent key ordering
+ * @param changes - Record of file content keyed by filename
+ * @param deletions - Array of deleted filenames
+ * @returns Hash string representing the content and deletions
  */
-function generateSimpleHash(content: Record<string, string>): string {
-  // Create a simple hash from the changes with consistent key ordering
-  const sortedKeys = Object.keys(content).sort();
+function generateSimpleHash(
+  changes: Record<string, string>,
+  deletions: string[]
+): string {
+  // Create a simple hash from the changes and deletions with consistent key ordering
+  const sortedKeys = Object.keys(changes).sort();
   const sortedChanges: Record<string, string> = {};
   sortedKeys.forEach((key) => {
-    const value = content[key];
+    const value = changes[key];
     if (value !== undefined) {
       sortedChanges[key] = value;
     }
   });
 
-  const changeString = JSON.stringify(sortedChanges);
+  const sortedDeletions = [...deletions].sort();
+  const combinedData = { changes: sortedChanges, deletions: sortedDeletions };
+  const dataString = JSON.stringify(combinedData);
+
   let hash = 0;
-  for (let i = 0; i < changeString.length; i++) {
-    const char = changeString.charCodeAt(i);
+  for (let i = 0; i < dataString.length; i++) {
+    const char = dataString.charCodeAt(i);
     hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32bit integer
   }
@@ -134,7 +143,7 @@ export function HeaderToolbar({
   docsUrl: DocsUrl;
 }) {
   const { name, picture } = session.user;
-  const { changedMdxFiles, mdxSyncedStatus } = useMdxState();
+  const { changedMdxFiles, deletedMdxFiles, mdxSyncedStatus } = useMdxState();
   // NOTE: useGitPrUrl is not fully in use because the Provider keeps unmounting, but this is in the right direction we want to go in
   const { gitPrUrl, setPrUrl, prTitle, refetchPrData } = useGitPrInfo();
   const { branch } = useBranch();
@@ -179,8 +188,15 @@ export function HeaderToolbar({
     if (!branch) return;
 
     // Use the same logic as collectAllChanges to get the complete picture of changes
-    const allCurrentChanges = collectAllChanges(changedMdxFiles, branch);
-    const currentHash = generateSimpleHash(allCurrentChanges);
+    const allCurrentData = collectAllChanges(
+      changedMdxFiles,
+      deletedMdxFiles,
+      branch
+    );
+    const currentHash = generateSimpleHash(
+      allCurrentData.changes,
+      allCurrentData.deletions
+    );
     const lastCommittedHash = localStorage.getItem(
       `lastCommittedHash-${branch}`
     );
@@ -198,7 +214,7 @@ export function HeaderToolbar({
     } else {
       setChangesCommitted(false);
     }
-  }, [changedMdxFiles, branch, mdxSyncedStatus]); // Added mdxSyncedStatus to ensure we wait for data to load
+  }, [changedMdxFiles, deletedMdxFiles, branch, mdxSyncedStatus]); // Added mdxSyncedStatus to ensure we wait for data to load
 
   const handleCommitPress = useCallback(async () => {
     if (githubSource?.owner == null || githubSource.repo == null) {
@@ -211,9 +227,13 @@ export function HeaderToolbar({
     }
 
     // Collect all files to commit using the utility function
-    const allFilesToCommit = collectAllChanges(changedMdxFiles, branch);
+    const allData = collectAllChanges(changedMdxFiles, deletedMdxFiles, branch);
+    const { changes: allFilesToCommit, deletions: allFilesToDelete } = allData;
 
-    if (Object.keys(allFilesToCommit).length === 0) {
+    if (
+      Object.keys(allFilesToCommit).length === 0 &&
+      allFilesToDelete.length === 0
+    ) {
       WarningNoChangesToast();
       return;
     }
@@ -230,25 +250,42 @@ export function HeaderToolbar({
     }
     setIsCommitting(true);
     try {
+      // Prepare files for commit (changes and deletions)
+      const filesToCommit = [
+        // File changes/additions
+        ...Object.entries(allFilesToCommit).map(([filePath, content]) => ({
+          path: `fern/${filePath}`,
+          content,
+          mode: "100644" as const,
+        })),
+        // File deletions - need to check if the API supports null content for deletions
+        // If not, we may need to handle deletions differently
+        ...allFilesToDelete.map((filePath) => ({
+          path: `fern/${filePath}`,
+          content: "", // Empty string instead of null - the API might need to be updated to support deletions
+          mode: "100644" as const,
+          // TODO: Add a deletion flag or handle deletions through a different API endpoint
+        })),
+      ];
+
       const response = await DashboardApiClient.postGitCommit({
         orgName,
         owner: githubSource.owner,
         repo: githubSource.repo,
         branch,
         message: DEFAULT_COMMIT_MESSAGE,
-        files: Object.entries(allFilesToCommit).map(([filePath, content]) => ({
-          path: `fern/${filePath}`,
-          content,
-          mode: "100644",
-        })),
+        files: filesToCommit,
       });
       if (response.success) {
         SuccessfulCommitToast();
         setChangesCommitted(true);
 
-        // Store the hash of ALL committed changes (same as what we actually committed)
+        // Store the hash of ALL committed changes and deletions (same as what we actually committed)
         // Use the exact same content that was committed to generate the hash
-        const committedHash = generateSimpleHash(allFilesToCommit);
+        const committedHash = generateSimpleHash(
+          allFilesToCommit,
+          allFilesToDelete
+        );
         localStorage.setItem(`lastCommittedHash-${branch}`, committedHash);
 
         // Clear docs.yml updates from localStorage since they've been committed
@@ -290,6 +327,7 @@ export function HeaderToolbar({
     githubSource,
     branch,
     changedMdxFiles,
+    deletedMdxFiles,
     mdxSyncedStatus,
     gitPrUrl,
     setPrUrl,
@@ -302,8 +340,9 @@ export function HeaderToolbar({
       return "Disabled while committing";
     }
 
-    // Check if there are any changes to commit (current changes + localStorage)
-    let hasAnyChanges = Object.keys(changedMdxFiles)?.length > 0;
+    // Check if there are any changes to commit (current changes + deletions + localStorage)
+    let hasAnyChanges =
+      Object.keys(changedMdxFiles)?.length > 0 || deletedMdxFiles.size > 0;
 
     if (!hasAnyChanges && branch) {
       // Check localStorage for client pages
@@ -341,6 +380,7 @@ export function HeaderToolbar({
   }, [
     isCommitting,
     changedMdxFiles,
+    deletedMdxFiles,
     mdxSyncedStatus,
     branch,
     changesCommitted,

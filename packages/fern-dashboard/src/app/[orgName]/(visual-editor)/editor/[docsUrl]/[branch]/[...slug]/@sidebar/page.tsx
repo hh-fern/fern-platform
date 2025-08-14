@@ -7,7 +7,6 @@ import { FernNavigation } from "@fern-api/fdr-sdk";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
 import { SidebarTabsRootServer } from "@fern-docs/components/sidebar/SidebarTabsRootServer";
-import { SidebarRootNode } from "@fern-docs/components/sidebar/nodes/SidebarRootNode";
 import { HiddenSidebar } from "@fern-docs/components/theming/HiddenSidebar";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
@@ -17,6 +16,7 @@ import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { EncodedDocsUrl } from "@/utils/types";
 
 import { CreateClientPage } from "./CreateClientPage";
+import { SidebarWithDelete } from "./SidebarWithDelete";
 
 export default async function SidebarPage({
   params,
@@ -71,7 +71,7 @@ export default async function SidebarPage({
               <Icon variant="Plus" /> Create new page
             </Button>
           </CreateClientPage>
-          <SidebarRootNode
+          <SidebarWithDelete
             root={found.sidebar}
             visibleNodeIds={visibleNodeIds}
             loader={loader}

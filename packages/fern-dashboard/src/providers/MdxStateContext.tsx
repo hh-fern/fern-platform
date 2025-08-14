@@ -46,21 +46,25 @@ interface MdxDependencies {
 
 export const MdxStateContext = createContext<{
   changedMdxFiles: Record<Filename, Markdown>;
+  deletedMdxFiles: Set<Filename>;
   allMdxFiles: Record<Filename, Markdown>;
   frontmatterData: Record<Filename, MdxToHtmlResponse["frontmatter"]>;
   mdxSyncedStatus: Record<Filename, SyncedStatus>;
   mdxDepsStore: Record<Filename, MdxDependencies>;
   updateDependencies: (filename: Filename, state: MdxDependencies) => void;
   stageChanges: (filename: Filename, state: MdxDependencies) => void;
+  stageDeletion: (filename: Filename) => void;
   syncChanges: (filename: Filename) => Promise<void>;
 }>({
   changedMdxFiles: {},
+  deletedMdxFiles: new Set(),
   allMdxFiles: {},
   frontmatterData: {},
   mdxSyncedStatus: {},
   mdxDepsStore: {},
   updateDependencies: () => undefined,
   stageChanges: () => undefined,
+  stageDeletion: () => undefined,
   syncChanges: () => Promise.resolve(),
 });
 
@@ -78,6 +82,10 @@ export function MdxStateProvider({
   const [mdxSyncedStatus, setMdxSyncedStatus] = useState<
     Record<Filename, SyncedStatus>
   >({});
+
+  const [deletedMdxFiles, setDeletedMdxFiles] = useState<Set<Filename>>(
+    new Set()
+  );
 
   const initialFrontmatter = useRef<
     Record<string, MdxToHtmlResponse["frontmatter"]>
@@ -149,6 +157,21 @@ export function MdxStateProvider({
     },
     [updateDependencies]
   );
+
+  // Stage a file for deletion
+  const stageDeletion = useCallback((filename: Filename) => {
+    setDeletedMdxFiles((prev) => new Set(prev).add(filename));
+    // Remove from mdxDepsStore since it's being deleted
+    setMdxDepsStore((prev) => {
+      const { [filename]: removed, ...rest } = prev;
+      return rest;
+    });
+    // Mark as staged
+    setMdxSyncedStatus((prev) => ({
+      ...prev,
+      [filename]: "STAGED",
+    }));
+  }, []);
 
   // Build a map of changed files (changed flag is true) and their contents
   const changedMdxFiles = useMemo(() => {
@@ -270,12 +293,14 @@ export function MdxStateProvider({
     <MdxStateContext.Provider
       value={{
         changedMdxFiles,
+        deletedMdxFiles,
         allMdxFiles,
         frontmatterData,
         mdxSyncedStatus,
         mdxDepsStore,
         updateDependencies,
         stageChanges,
+        stageDeletion,
         syncChanges,
       }}
     >

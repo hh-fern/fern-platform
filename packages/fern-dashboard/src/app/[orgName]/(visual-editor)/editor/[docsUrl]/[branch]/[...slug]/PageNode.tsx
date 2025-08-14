@@ -5,7 +5,8 @@ import { useMemo } from "react";
 
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { ClientPageStorage, PageStorage } from "@fern-docs/components";
+import { ClientPageStorage } from "@fern-docs/components/sidebar/nodes/clientPageStorage";
+import { PageStorage } from "@fern-docs/components/sidebar/nodes/pageStorage";
 import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 import { MdxToHtmlResponse, mdxToHtml } from "@fern-docs/mdx";

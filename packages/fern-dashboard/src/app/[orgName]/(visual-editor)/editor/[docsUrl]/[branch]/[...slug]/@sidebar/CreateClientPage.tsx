@@ -4,7 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { type DocsYmlPageEntry, DocsYmlStorage } from "@fern-docs/components";
+import { type DocsYmlPageEntry } from "@fern-docs/components/sidebar/nodes/docsYmlTypes";
+import { DocsYmlStorage } from "@fern-docs/components/sidebar/nodes/docsYmlStorage";
 import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 import { mdxToHtml } from "@fern-docs/mdx";
 

@@ -7,7 +7,7 @@ import { UnreachableCaseError } from "ts-essentials";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
 import { processIcon } from "../../processIcon";
-import { SidebarClientPageNode } from "./SidebarClientPageNode";
+import { SidebarClientPageNodeWithDelete } from "./SidebarClientPageNodeWithDelete";
 
 interface SidebarClientNavigationChildProps {
   node: FernNavigation.NavigationChild;
@@ -22,7 +22,7 @@ export function SidebarClientNavigationChild({
   switch (node.type) {
     case "page":
       return (
-        <SidebarClientPageNode
+        <SidebarClientPageNodeWithDelete
           className="cursor-pointer"
           node={node}
           depth={depth}

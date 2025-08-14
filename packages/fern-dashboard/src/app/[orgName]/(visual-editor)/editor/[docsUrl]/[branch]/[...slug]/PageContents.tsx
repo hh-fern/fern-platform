@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { usePageSync } from "@fern-docs/components";
+import { usePageSync } from "@fern-docs/components/sidebar/nodes/usePageSync";
 import { MdxToHtmlResponse } from "@fern-docs/mdx";
 
 import { useCurrentPage } from "@/providers/CurrentPageContext";
