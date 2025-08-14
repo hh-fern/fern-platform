@@ -67,7 +67,7 @@ function collectAllChanges(
   const clientPages = ClientPageStorage.loadClientPages(branch);
   Object.entries(clientPages).forEach(([_clientNodeId, clientPageData]) => {
     if (clientPageData.pageData && clientPageData.fullSlug?.trim()) {
-      const filename = getPageFilename(clientPageData.fullSlug);
+      const filename = `fern/${getPageFilename(clientPageData.fullSlug)}`;
       if (!allChanges[filename]) {
         allChanges[filename] = pageDataToMdx(clientPageData.pageData);
       }
@@ -78,8 +78,10 @@ function collectAllChanges(
   const serverPages = PageStorage.loadPages(branch);
   Object.entries(serverPages).forEach(([filename, pageData]) => {
     if (pageData.pageType === "server" && filename?.trim()) {
-      if (!allChanges[filename]) {
-        allChanges[filename] = pageDataToMdx(pageData);
+      // Ensure server pages also have fern/ prefix if they don't already
+      const normalizedFilename = filename.startsWith("fern/") ? filename : `fern/${filename}`;
+      if (!allChanges[normalizedFilename]) {
+        allChanges[normalizedFilename] = pageDataToMdx(pageData);
       }
     }
   });
@@ -91,7 +93,7 @@ function collectAllChanges(
       addPageToDocsYml
     );
     if (finalDocsYmlContent) {
-      allChanges["docs.yml"] = finalDocsYmlContent;
+      allChanges["fern/docs.yml"] = finalDocsYmlContent;
     }
   }
 
@@ -237,7 +239,7 @@ export function HeaderToolbar({
         branch,
         message: DEFAULT_COMMIT_MESSAGE,
         files: Object.entries(allFilesToCommit).map(([filePath, content]) => ({
-          path: `fern/${filePath}`,
+          path: filePath,
           content,
           mode: "100644",
         })),
@@ -252,7 +254,7 @@ export function HeaderToolbar({
         localStorage.setItem(`lastCommittedHash-${branch}`, committedHash);
 
         // Clear docs.yml updates from localStorage since they've been committed
-        if (allFilesToCommit["docs.yml"]) {
+        if (allFilesToCommit["fern/docs.yml"]) {
           DocsYmlStorage.clearAllUpdates(branch);
         }
       } else {

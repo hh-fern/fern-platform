@@ -35,15 +35,6 @@ class EditableDocsLoader implements DocsLoader {
   getDocsYml = (owner: string, repo: string, ref?: string) =>
     this.gitLoader?.getDocsYml(owner, repo, ref) ?? Promise.resolve(null);
 
-  updateDocsYml = (
-    owner: string,
-    repo: string,
-    content: string,
-    ref?: string
-  ) =>
-    this.gitLoader?.updateDocsYml(owner, repo, content, ref) ??
-    Promise.resolve(false);
-
   getAuthConfig = () => this.readOnlyDocsLoader.getAuthConfig();
 
   getMetadata = () => this.readOnlyDocsLoader.getMetadata();
@@ -133,12 +124,6 @@ interface GitSourceRepo {
  */
 export interface GitLoader {
   getDocsYml(owner: string, repo: string, ref?: string): Promise<string | null>;
-  updateDocsYml(
-    owner: string,
-    repo: string,
-    content: string,
-    ref?: string
-  ): Promise<boolean>;
   getFile(
     owner: string,
     repo: string,

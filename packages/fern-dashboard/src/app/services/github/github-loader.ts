@@ -31,57 +31,6 @@ export class GitHubLoader implements GitLoader {
     return this.getFile(owner, repo, "fern/docs.yml", ref);
   }
 
-  async updateDocsYml(
-    owner: string,
-    repo: string,
-    content: string,
-    ref: string = "main"
-  ): Promise<boolean> {
-    try {
-      const octokit = await this.getOctokit();
-      if (!octokit) {
-        console.error("GitHubLoader: Failed to get Octokit instance");
-        return false;
-      }
-
-      const fullPath = "fern/docs.yml";
-
-      // Get the current file to obtain its SHA
-      const currentFile = await octokit.request(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          owner,
-          repo,
-          path: fullPath,
-          ref,
-        }
-      );
-
-      if (!("sha" in currentFile.data)) {
-        throw new Error("docs.yml file not found or invalid response");
-      }
-
-      // Update the file
-      await octokit.request("PUT /repos/{owner}/{repo}/contents/{path}", {
-        owner,
-        repo,
-        path: fullPath,
-        message: "Update docs.yml - add new page via visual editor",
-        content: Buffer.from(content, "utf8").toString("base64"),
-        sha: currentFile.data.sha,
-        branch: ref,
-      });
-
-      return true;
-    } catch (error) {
-      console.error(
-        `GitHubLoader: Failed to update docs.yml in ${owner}/${repo}:`,
-        error
-      );
-      return false;
-    }
-  }
-
   async getFile(
     owner: string,
     repo: string,

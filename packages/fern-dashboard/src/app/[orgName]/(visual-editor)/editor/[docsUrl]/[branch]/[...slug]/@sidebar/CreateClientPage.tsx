@@ -198,7 +198,7 @@ export function CreateClientPage({ children, root }: CreateClientPageProps) {
         : slug;
 
       // Stage the changes
-      stageChanges(`${fullSlug}.mdx`, {
+      stageChanges(`fern/${fullSlug}.mdx`, {
         html,
         frontmatter,
         originalElements,
@@ -245,7 +245,7 @@ export function CreateClientPage({ children, root }: CreateClientPageProps) {
 
       // Create a client node for the new page
       const nodeId = `client-${crypto.randomUUID()}` as FernNavigation.NodeId;
-      const pageId = `${fullSlug}.mdx` as FernNavigation.PageId;
+      const pageId = `fern/${fullSlug}.mdx` as FernNavigation.PageId;
       const nodeSlug = slug as FernNavigation.Slug;
 
       const clientNode: FernNavigation.PageNode = {
