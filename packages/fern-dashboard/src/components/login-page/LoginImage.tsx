@@ -5,8 +5,8 @@ import Image from "next/image";
 
 import { useIsFirstClientSideRender } from "@/utils/useIsFirstClientSideRender";
 
-import loginPreviewDark from "../../../public/login-preview-dark.avif";
-import loginPreviewLight from "../../../public/login-preview-light.avif";
+import loginPreviewLight from "../../../public/login-image-light.png";
+import loginPreviewDark from "../../../public/login-page-light.png";
 
 export function LoginImage() {
   const { resolvedTheme = "light" } = useTheme();
@@ -18,10 +18,10 @@ export function LoginImage() {
   }
 
   return (
-    <div className="perspective-normal absolute bottom-24 left-0 right-16 top-6 flex justify-center">
+    <div className="perspective-normal absolute bottom-24 left-0 right-16 top-6 m-auto flex w-[754px] justify-center">
       <Image
         src={resolvedTheme === "light" ? loginPreviewLight : loginPreviewDark}
-        className="object-fit rotate-y-[-10deg] w-auto min-w-0 object-contain"
+        className="object-fit w-auto min-w-0 object-contain"
         alt="preview of fern docs"
         priority
       />

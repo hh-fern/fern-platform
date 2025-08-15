@@ -38,7 +38,7 @@ export const NavbarItem = ({
   const isClickable = !isSelected;
 
   const className = cn(
-    "flex flex-1 flex-col items-center gap-2 py-2 text-sm transition md:flex-row",
+    "group flex flex-1 flex-col items-center gap-2 py-2 text-sm transition md:flex-row",
     isSelected ? "text-primary" : "text-gray-900",
     isClickable && "hover:text-gray-1200"
   );
