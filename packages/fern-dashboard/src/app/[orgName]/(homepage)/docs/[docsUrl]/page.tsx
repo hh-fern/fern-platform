@@ -2,11 +2,11 @@ import "server-only";
 
 import { redirect } from "next/navigation";
 
-import getDocsGithubUrlHandler from "@/app/api/get-docs-github-url/handler";
 import getGithubSourceMetadataHandler from "@/app/api/get-github-source-metadata/handler";
 import getMyDocsSitesHandler from "@/app/api/get-my-docs-sites/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
+import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
 import { validateGithubRepoAccess } from "@/app/services/dal/github/validators";
 import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
@@ -68,10 +68,12 @@ export default async function Page(props: {
   };
 
   try {
-    githubUrl = await getDocsGithubUrlHandler({
+    const urlResult = await getDocsGithubUrl({
       url: encodedDocsUrl,
       token: session.accessToken,
     });
+
+    githubUrl = urlResult.success ? urlResult.githubUrl : undefined;
 
     // If we have a GitHub URL, validate the auth state
     if (githubUrl) {

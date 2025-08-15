@@ -1,6 +1,8 @@
+import "server-only";
+
 import { fernToken_admin } from "@fern-api/docs-server";
 
-import { getDocsUrlMetadata } from "../utils/getDocsUrlMetadata";
+import { getDocsUrlMetadata } from "@/app/api/utils/getDocsUrlMetadata";
 
 export default async function getDocsGithubUrl({
   url,
@@ -8,7 +10,9 @@ export default async function getDocsGithubUrl({
 }: {
   url: string;
   token: string;
-}): Promise<string> {
+}): Promise<
+  { success: true; githubUrl: string } | { success: false; error: string }
+> {
   const docsUrlMetadata = await getDocsUrlMetadata({
     url: decodeURIComponent(url),
     token: fernToken_admin() ?? token,
@@ -18,30 +22,31 @@ export default async function getDocsGithubUrl({
     // doesn't exist
     if (docsUrlMetadata.error.error === "DomainNotRegisteredError") {
       // Don't cache this failure, so throw to skip cache
-      throw new Error("DomainNotRegisteredError");
+      return { success: false, error: "DomainNotRegisteredError" };
     }
 
     console.error(
       "Failed to load docs URL metadata",
       JSON.stringify(docsUrlMetadata.error)
     );
-    throw new Error(
-      `Unable to find that domain. Please check that the domain "${decodeURIComponent(
+    return {
+      success: false,
+      error: `Unable to find that domain. Please check that the domain "${decodeURIComponent(
         url
-      )}" is correct.`
-    );
+      )}" is correct.`,
+    };
   }
 
   if (docsUrlMetadata.body.gitUrl == null) {
     // Don't cache this failure, so throw to skip cache
-    throw new Error("NoGitUrl");
+    return { success: false, error: "NoGitUrl" };
   }
 
   const [owner, repo] = docsUrlMetadata.body.gitUrl.split("/").slice(-2);
   if (owner == null || repo == null) {
     // Don't cache this failure, so throw to skip cache
-    throw new Error("InvalidGitUrl");
+    return { success: false, error: "InvalidGitUrl" };
   }
 
-  return docsUrlMetadata.body.gitUrl;
+  return { success: true, githubUrl: docsUrlMetadata.body.gitUrl };
 }

@@ -1,5 +1,4 @@
 import { generatePrDescription } from "@/app/api/generate-pr-description/route";
-import { getDocsGithubUrl } from "@/app/api/get-docs-github-url/route";
 import { getDocsUrlOwner } from "@/app/api/get-docs-url-owner/route";
 import { getGithubSourceMetadata } from "@/app/api/get-github-source-metadata/route";
 import { getMyDocsSites } from "@/app/api/get-my-docs-sites/route";
@@ -55,8 +54,6 @@ export const DashboardApiClient = {
       "/api/get-github-source-metadata",
       request
     ),
-  getDocsGithubUrl: (request: getDocsGithubUrl.Request) =>
-    typedFetch<getDocsGithubUrl.Response>("/api/get-docs-github-url", request),
   postDocsGithubSource: (request: postDocsGithubSource.Request) =>
     typedFetch<postDocsGithubSource.Response>(
       "/api/post-docs-github-source",

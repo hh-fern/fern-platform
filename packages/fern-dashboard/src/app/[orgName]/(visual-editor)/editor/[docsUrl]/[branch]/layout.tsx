@@ -7,10 +7,10 @@ import type React from "react";
 import { ClientPageManager } from "@fern-docs/components/sidebar/nodes/ClientPageManager";
 import { SidebarClientNavigationProvider } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 
-import getDocsGithubUrl from "@/app/api/get-docs-github-url/handler";
 import getGithubSourceMetadata from "@/app/api/get-github-source-metadata/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import type { Auth0OrgName } from "@/app/services/auth0/types";
+import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
 import { assertGithubAccessByUrl } from "@/app/services/dal/github/validators";
 import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
@@ -57,10 +57,14 @@ export default async function EditorLayout({
     orgName,
   });
 
-  const githubUrl = await getDocsGithubUrl({
+  const urlResult = await getDocsGithubUrl({
     url: docsUrl,
     token: session.accessToken,
   });
+  if (!urlResult.success) {
+    redirect(`/${orgName}/docs`);
+  }
+  const { githubUrl } = urlResult;
 
   await assertGithubAccessByUrl(session.user.sub, githubUrl);
 

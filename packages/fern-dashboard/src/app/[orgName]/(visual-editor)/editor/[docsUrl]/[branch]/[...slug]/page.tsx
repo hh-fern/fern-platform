@@ -8,9 +8,9 @@ import { NodeId, getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 import { mdxToHtml } from "@fern-docs/mdx";
 
-import getDocsGithubUrl from "@/app/api/get-docs-github-url/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
+import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
 import { assertGithubAccessByUrl } from "@/app/services/dal/github/validators";
 import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
 import { GitHubLoader } from "@/app/services/github/github-loader";
@@ -48,10 +48,14 @@ export default async function Page({
   });
 
   // Validate GitHub access
-  const githubUrl = await getDocsGithubUrl({
+  const urlResult = await getDocsGithubUrl({
     url: docsUrl,
     token: session.accessToken,
   });
+  if (!urlResult.success) {
+    redirect(`/${orgName}/docs`);
+  }
+  const githubUrl = urlResult.githubUrl;
   await assertGithubAccessByUrl(session.user.sub, githubUrl);
 
   const resolvedSearchParams = await searchParams;
