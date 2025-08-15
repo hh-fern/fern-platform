@@ -75,6 +75,8 @@ jobs:
       - name: Publish CJS SDK
         env:
           NPM_TOKEN: ${{ secrets.FERN_NPM_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
           git_version="$(scripts/fdr-version.sh)"
           fern generate --api fdr --group fdr-cjs-sdk --version ${git_version} --log-level debug
+          fern generate --api fdr --group python-sdk --version ${git_version} --log-level debug

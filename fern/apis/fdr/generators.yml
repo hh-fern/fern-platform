@@ -46,6 +46,17 @@ groups:
             devDependencies: 
               "typescript": "~5.7.2"
 
+  python-sdk:
+    generators:
+      - name: fernapi/fern-python-sdk
+        version: 4.25.9
+        output:
+          location: pypi
+          package-name: "fdr-sdk-py"
+          token: ${PYPI_TOKEN}
+        github:
+          repository: fern-api/fdr-python-sdk
+
   generators-sdk:
     audiences:
       - generators
@@ -62,33 +73,6 @@ groups:
           outputSourceFiles: true
           neverThrowErrors: true
           timeoutInSeconds: infinity
-
-  internal-snippets-sdks:
-    audiences:
-      - snippets
-    generators:
-      # Internal, unadulterated for the use of the APIs
-      - name: fernapi/fern-python-sdk
-        version: 1.4.0
-        output:
-          location: pypi
-          url: pypi.buildwithfern.com
-          package-name: "fern-fern-fdr-sdk"
-        config:
-          package_name: "fdr"
-          pydantic_config:
-            include_union_utils: true
-          client:
-            class_name: FdrClient
-      - name: fernapi/fern-typescript-node-sdk
-        version: 0.12.8-rc0
-        output:
-          location: npm
-          url: npm.buildwithfern.com
-          package-name: "@fern-fern/snippet-sdk"
-        config:
-          namespaceExport: FdrSnippetTemplate
-          includeUtilsOnUnionMembers: true
 
   external-sdk:
     audiences:
