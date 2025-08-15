@@ -35,7 +35,7 @@ export async function Header({ session }: Header.Props) {
       </div>
       <div className="flex shrink-0 gap-2">
         <div className="hidden items-center md:flex">
-          <SupportButton className="mr-2" />
+          <SupportButton />
           <HeaderLinkButton
             text="Docs"
             href="https://buildwithfern.com/learn"
@@ -59,7 +59,7 @@ export async function Header({ session }: Header.Props) {
               </div>
               <div className="flex flex-col md:hidden">
                 <SupportButton
-                  className="justify-start text-left"
+                  className="justify-start !px-0 text-left"
                   buttonProps={{ variant: "ghost" }}
                   icon={
                     <MessageCircleQuestion className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
