@@ -9,7 +9,6 @@ import { Auth0OrgName } from "@/app/services/auth0/types";
 
 import { PosthogFeatureFlag } from "../posthog/feature-flags/flags";
 import { FeatureFlaggedServerSide } from "../posthog/feature-flags/server-side";
-import { ThemeToggle } from "../theme/ThemeToggle";
 import { DocsNavbarItems } from "./DocsNavbarItems";
 import { ICON_SIZE, NavbarItem } from "./NavbarItem";
 import { NavbarSectionTitle } from "./NavbarSectionTitle";
@@ -22,8 +21,8 @@ export declare namespace Navbar {
 
 export function Navbar({ orgName }: Navbar.Props) {
   return (
-    <div className="lg:w-74 flex flex-col justify-between md:w-64 md:py-6 md:pl-4 md:transition-[width]">
-      <div className="flex overflow-y-auto md:flex-col md:pb-4">
+    <div className="flex h-full w-fit max-w-full flex-col justify-between rounded-2xl border border-[var(--border)] bg-[var(--sidebar)] md:w-6 md:w-[var(--sidebar-width)] md:border-0 md:py-6 md:pl-4 md:transition-[width]">
+      <div className="flex gap-8 overflow-y-auto px-8 md:flex-col md:gap-0 md:px-0 md:pb-4">
         <FeatureFlaggedServerSide
           flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
           orgName={orgName}
@@ -67,10 +66,9 @@ export function Navbar({ orgName }: Navbar.Props) {
           />
         </FeatureFlaggedServerSide>
       </div>
-      <div className="hidden flex-col md:flex">
-        <div className="mb-4 mr-4 h-px bg-gray-500" />
+      {/* <div className="hidden flex-col md:flex">
         <ThemeToggle />
-      </div>
+      </div> */}
     </div>
   );
 }

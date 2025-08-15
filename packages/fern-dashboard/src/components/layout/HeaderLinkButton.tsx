@@ -4,13 +4,21 @@ export declare namespace HeaderLinkButton {
   export interface Props {
     text: string;
     href: string;
+    icon?: React.ReactNode;
+    className?: string;
   }
 }
 
-export function HeaderLinkButton({ text, href }: HeaderLinkButton.Props) {
+export function HeaderLinkButton({
+  text,
+  href,
+  icon,
+  className,
+}: HeaderLinkButton.Props) {
   return (
-    <Button size="sm" variant="ghost" asChild>
+    <Button size="sm" variant="ghost" asChild className={className}>
       <a href={href} target="_blank">
+        {icon}
         {text}
       </a>
     </Button>

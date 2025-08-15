@@ -1,4 +1,5 @@
 import { PopoverArrow } from "@radix-ui/react-popover";
+import { Book, MessageCircleQuestion, RotateCcw } from "lucide-react";
 
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import {
@@ -9,6 +10,7 @@ import {
 
 import { LogoutButton } from "../auth/LogoutButton";
 import { OrgSwitcher } from "../auth/OrgSwitcher";
+import { ThemeToggle } from "../theme/ThemeToggle";
 import { ThemedFernLogo } from "../theme/ThemedFernLogo";
 import { HeaderLinkButton } from "./HeaderLinkButton";
 import { MaybeDocsHeaderItems } from "./MaybeDocsHeaderItems";
@@ -31,9 +33,9 @@ export async function Header({ session }: Header.Props) {
         <OrgSwitcher />
         <MaybeDocsHeaderItems />
       </div>
-      <div className="flex shrink-0 gap-4">
-        <div className="hidden items-center gap-2 md:flex">
-          <SupportButton className="mr-4" />
+      <div className="flex shrink-0 gap-2">
+        <div className="hidden items-center md:flex">
+          <SupportButton className="mr-2" />
           <HeaderLinkButton
             text="Docs"
             href="https://buildwithfern.com/learn"
@@ -42,6 +44,7 @@ export async function Header({ session }: Header.Props) {
             text="Changelog"
             href="https://buildwithfern.com/learn/docs/getting-started/changelog"
           />
+          <ThemeToggle />
         </div>
         <Popover>
           <PopoverTrigger className="cursor-pointer">
@@ -50,9 +53,31 @@ export async function Header({ session }: Header.Props) {
           <PopoverContent collisionPadding={8}>
             <PopoverArrow className="fill-popover" />
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col text-xs text-gray-900">
-                <div>{name}</div>
-                <div>{email}</div>
+              <div className="flex flex-col">
+                <div className="text-gray-1200 text-sm">{name}</div>
+                <div className="text-xs text-gray-800">{email}</div>
+              </div>
+              <div className="flex flex-col md:hidden">
+                <SupportButton
+                  className="justify-start text-left"
+                  buttonProps={{ variant: "ghost" }}
+                  icon={
+                    <MessageCircleQuestion className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  }
+                />
+                <HeaderLinkButton
+                  text="Docs"
+                  className="justify-start !px-0 text-left"
+                  href="https://buildwithfern.com/learn"
+                  icon={<Book className="h-4 w-4" />}
+                />
+                <HeaderLinkButton
+                  text="Changelog"
+                  className="justify-start !px-0 text-left"
+                  href="https://buildwithfern.com/learn/docs/getting-started/changelog"
+                  icon={<RotateCcw className="h-4 w-4" />}
+                />
+                <ThemeToggle />
               </div>
               <LogoutButton />
             </div>

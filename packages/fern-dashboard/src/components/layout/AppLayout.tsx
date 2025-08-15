@@ -23,9 +23,9 @@ export async function AppLayout({
     <div className="flex min-w-0 flex-1 flex-col">
       <Header session={session} />
       <div className="flex min-h-0 flex-1 flex-col md:flex-row-reverse">
-        <div className="relative flex flex-1 gap-4 overflow-hidden">
+        <div className="relative flex flex-1 overflow-hidden md:pr-2">
           <div className="flex min-w-0 flex-1">
-            <div className="border-border flex flex-1 justify-center overflow-y-auto border-x border-t bg-white px-6 pt-8 md:rounded-t-2xl lg:px-12 lg:pt-12 dark:bg-black">
+            <div className="flex flex-1 justify-center overflow-y-auto bg-[var(--gray-100)] px-6 pt-8 md:rounded-t-2xl lg:px-12 lg:pt-12">
               <div className="flex min-w-0 max-w-[1200px] flex-1 flex-col">
                 <div className="flex flex-1">{children}</div>
                 <div className="py-12">
@@ -38,7 +38,9 @@ export async function AppLayout({
             {sidepanel}
           </div>
         </div>
-        <Navbar orgName={orgName} />
+        <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-2 pb-2 md:relative md:w-fit">
+          <Navbar orgName={orgName} />
+        </div>
       </div>
     </div>
   );
