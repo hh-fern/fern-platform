@@ -54,6 +54,9 @@ groups:
           location: pypi
           package-name: "fdr-sdk-py"
           token: ${PYPI_TOKEN}
+        config:
+          pydantic_config:
+            include_union_utils: true
         github:
           repository: fern-api/fdr-python-sdk
 
