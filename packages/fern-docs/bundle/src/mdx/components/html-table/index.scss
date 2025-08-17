@@ -48,6 +48,44 @@
     }
   }
 
+  .fern-table.sticky-header {
+    @apply sticky border-separate border-spacing-0;
+
+    thead {
+      @apply sticky;
+      @apply rounded-t-3/2 bg-(color:--grayscale-2) ring;
+      top: calc(
+        var(--header-height, var(--spacing-header-height-real)) + 0.12em
+      );
+      --tw-ring-color: var(--border, var(--grayscale-5));
+
+      &::after {
+        @apply pointer-events-none absolute inset-0 content-[''];
+      }
+
+      tr {
+        @apply rounded-t-3/2;
+
+        th {
+          @apply bg-transparent;
+          border-bottom: 0;
+        }
+
+        th:first-of-type {
+          @apply rounded-tl-3/2;
+        }
+
+        th:last-of-type {
+          @apply rounded-tr-3/2;
+        }
+      }
+    }
+
+    tbody {
+      @apply rounded-b-3/2 ring-border-default ring;
+    }
+  }
+
   .fern-table-root.fullscreen {
     @apply bg-background-translucent rounded-2 text-base shadow-2xl;
 

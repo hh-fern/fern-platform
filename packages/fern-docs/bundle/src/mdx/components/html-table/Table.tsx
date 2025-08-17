@@ -17,11 +17,13 @@ export function Table({ className, ...rest }: ComponentProps<"table">) {
       <Tooltip.TooltipProvider delayDuration={300}>
         <Tooltip.Root>
           <Tooltip.Trigger asChild>
-            <div className="fern-table-root not-prose">
-              <FernScrollArea>
-                <table {...rest} className={cn("fern-table", className)} />
-              </FernScrollArea>
-            </div>
+            <table
+              {...rest}
+              className={cn(
+                "fern-table sticky-header not-prose text-sm",
+                className
+              )}
+            />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content
