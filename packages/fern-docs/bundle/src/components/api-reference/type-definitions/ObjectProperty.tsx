@@ -5,8 +5,6 @@ import { compact } from "es-toolkit/array";
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { AvailabilityBadge } from "@fern-docs/components/badges";
 
-import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
-
 import {
   PropertyContainer,
   TypeDefinitionAnchor,
@@ -21,6 +19,9 @@ import {
   TypeReferenceDefinitions,
 } from "./TypeReferenceDefinitions";
 import { TypeShorthand } from "./TypeShorthand";
+import { Prose } from "@fern-docs/components/mdx/prose";
+import { Markdown } from "@/mdx/components/Markdown";
+import { mdxToHtml } from "@fern-docs/mdx";
 
 export const ObjectProperty = React.memo(function ObjectProperty({
   property,
@@ -112,11 +113,9 @@ export const PropertyRenderer = React.memo(function PropertyRenderer({
         )}
       </TypeDefinitionAnchor>
 
-      <MdxServerComponentProseSuspense
-        mdx={description}
-        size="sm"
-        className="text-(color:--grayscale-a11)"
-      />
+      {description && <Prose size="sm" className="text-(color:--grayscale-a11)">
+        <div dangerouslySetInnerHTML={{ __html: mdxToHtml(description).html }} />
+      </Prose>}
 
       <TypeDefinitionCollapsible>{children}</TypeDefinitionCollapsible>
     </PropertyContainer>
