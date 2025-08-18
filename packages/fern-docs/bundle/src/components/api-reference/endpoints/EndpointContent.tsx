@@ -84,7 +84,7 @@ export async function EndpointContent({
             </TypeDefinitionSlotsServer>
           </TypeDefinitionRoot>
         }
-        // footer={<FooterLayout bottomNavigation={bottomNavigation} />}
+        footer={<FooterLayout bottomNavigation={bottomNavigation} />}
       >
         <PlaygroundKeyboardTrigger />
         <MdxServerComponentProseSuspense mdx={endpoint.description} />

@@ -85,6 +85,16 @@ export const PropertyWithShape = React.memo(function PropertyWithShape({
   );
 });
 
+function wrappedMdxToHtml(mdx: string): { error: boolean, html: string | undefined } {
+  try {
+    const result = mdxToHtml(mdx)
+    return { error: false, html: result.html }
+  } catch (e) {
+    console.log("[wrappedMdxToHtml] mdxToHtml failed. Falling back to unparsed mdx.", mdx, e)
+    return { error: true, html: undefined }
+  }
+}
+
 export const PropertyRenderer = React.memo(function PropertyRenderer({
   icon,
   name,
@@ -100,6 +110,7 @@ export const PropertyRenderer = React.memo(function PropertyRenderer({
   availability: ApiDefinition.Availability | null | undefined;
   children?: React.ReactNode;
 }) {
+  const { error, html } = wrappedMdxToHtml(description || "")
   const child = (
     <PropertyContainer>
       <TypeDefinitionAnchor sideOffset={6}>
@@ -114,7 +125,8 @@ export const PropertyRenderer = React.memo(function PropertyRenderer({
       </TypeDefinitionAnchor>
 
       {description && <Prose size="sm" className="text-(color:--grayscale-a11)">
-        <div dangerouslySetInnerHTML={{ __html: mdxToHtml(description).html }} />
+        {error ? <p>${description}</p> : 
+        <div dangerouslySetInnerHTML={{ __html: html! }} />}
       </Prose>}
 
       <TypeDefinitionCollapsible>{children}</TypeDefinitionCollapsible>
