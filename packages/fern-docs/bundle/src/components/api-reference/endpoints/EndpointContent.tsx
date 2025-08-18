@@ -75,16 +75,17 @@ export async function EndpointContent({
         }
         reference={
           <TypeDefinitionRoot types={types} slug={node.slug}>
-            <TypeDefinitionSlotsServer types={types}>
+            {/* <TypeDefinitionSlotsServer types={types}>
               <EndpointContentLeft
                 context={context}
                 showAuth={showAuth}
                 showErrors={showErrors}
               />
-            </TypeDefinitionSlotsServer>
+            </TypeDefinitionSlotsServer> */}
+            this is empty
           </TypeDefinitionRoot>
         }
-        footer={<FooterLayout bottomNavigation={bottomNavigation} />}
+        // footer={<FooterLayout bottomNavigation={bottomNavigation} />}
       >
         <PlaygroundKeyboardTrigger />
         <MdxServerComponentProseSuspense mdx={endpoint.description} />

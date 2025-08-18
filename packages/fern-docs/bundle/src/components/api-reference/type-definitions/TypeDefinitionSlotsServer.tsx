@@ -6,6 +6,7 @@ import {
   PropertyLocation,
   TypeReferenceDefinitions,
 } from "./TypeReferenceDefinitions";
+import { useMemo } from "react";
 
 export function TypeDefinitionSlotsServer({
   types,
@@ -14,8 +15,9 @@ export function TypeDefinitionSlotsServer({
   types: Record<string, TypeDefinition>;
   children: React.ReactNode;
 }) {
+  const slots = useMemo(() => createTypeDefinitionSlots(types), [types])
   return (
-    <TypeDefinitionSlotsProvider slots={createTypeDefinitionSlots(types)}>
+    <TypeDefinitionSlotsProvider slots={slots}>
       {children}
     </TypeDefinitionSlotsProvider>
   );

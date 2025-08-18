@@ -22,6 +22,7 @@ import {
 import { EndpointResponseSection } from "./EndpointResponseSection";
 import { EndpointSection } from "./EndpointSection";
 import { ResponseSummaryFallback } from "./response-summary-fallback";
+import { useMemo } from "react";
 
 export interface HoveringProps {
   isHovering: boolean;
@@ -123,151 +124,157 @@ export async function EndpointContentLeft({
     ...(endpoint.requestHeaders ?? []),
   ];
 
-  return (
-    <>
-      <TypeDefinitionAnchorPart part="request">
-        {endpoint.pathParameters && endpoint.pathParameters.length > 0 && (
-          <TypeDefinitionAnchorPart part="path">
-            <EndpointSection title="Path parameters">
-              <WithSeparator>
-                {endpoint.pathParameters.map((parameter) => (
-                  <TypeDefinitionAnchorPart
-                    key={parameter.key}
-                    part={parameter.key}
-                  >
-                    <ObjectProperty property={parameter} types={types} />
-                  </TypeDefinitionAnchorPart>
-                ))}
-              </WithSeparator>
-            </EndpointSection>
-          </TypeDefinitionAnchorPart>
-        )}
-        {headers.length > 0 && (
-          <TypeDefinitionAnchorPart part="header">
-            <EndpointSection title="Headers">
-              <WithSeparator>
-                {headers.map((parameter) => {
-                  // let isAuth = false;
-                  if (
-                    (auth?.type === "header" &&
-                      parameter.key === auth?.headerWireValue) ||
-                    parameter.key === "Authorization"
-                  ) {
-                    // isAuth = true;
-                  }
+  const data = useMemo(() => {
+    return JSON.stringify(endpoint)
+  }, [endpoint])
 
-                  // {isAuth && (
-                  //   <div className="absolute right-0 top-3">
-                  //     <div className="bg-(color:--red-a3) flex h-5 items-center rounded-3 px-2">
-                  //       <span className="text-(color:--red-a11) text-xs">Auth</span>
-                  //     </div>
-                  //   </div>
-                  // )}
+  return data
 
-                  return (
-                    <TypeDefinitionAnchorPart
-                      key={parameter.key}
-                      part={parameter.key}
-                    >
-                      <ObjectProperty property={parameter} types={types} />
-                    </TypeDefinitionAnchorPart>
-                  );
-                })}
-              </WithSeparator>
-            </EndpointSection>
-          </TypeDefinitionAnchorPart>
-        )}
-        {endpoint.queryParameters && endpoint.queryParameters.length > 0 && (
-          <TypeDefinitionAnchorPart part="query">
-            <EndpointSection title="Query parameters">
-              <WithSeparator>
-                {endpoint.queryParameters.map((parameter) => (
-                  <TypeDefinitionAnchorPart
-                    key={parameter.key}
-                    part={parameter.key}
-                  >
-                    <ObjectProperty property={parameter} types={types} />
-                  </TypeDefinitionAnchorPart>
-                ))}
-              </WithSeparator>
-            </EndpointSection>
-          </TypeDefinitionAnchorPart>
-        )}
-        {endpoint.requests?.[0] != null ? (
-          endpoint.requests.length > 1 ? (
-            <EndpointMultipleRequestSection
-              requests={endpoint.requests}
-              types={types}
-            />
-          ) : (
-            <EndpointSection
-              title="Request"
-              description={
-                <MdxServerComponentProseSuspense
-                  size="sm"
-                  className="text-(color:--grayscale-a11)"
-                  mdx={endpoint.requests[0].description}
-                  fallback={createEndpointRequestDescriptionFallback(
-                    endpoint.requests[0],
-                    types
-                  )}
-                />
-              }
-            >
-              <TypeDefinitionAnchorPart part="body">
-                <EndpointRequestSection
-                  request={endpoint.requests[0]}
-                  types={types}
-                />
-              </TypeDefinitionAnchorPart>
-            </EndpointSection>
-          )
-        ) : null}
-      </TypeDefinitionAnchorPart>
-      <TypeDefinitionResponse>
-        <TypeDefinitionAnchorPart part="response">
-          {endpoint.responses?.[0] != null ? (
-            endpoint.responses.length > 1 ? (
-              <EndpointMultipleResponseSection
-                method={endpoint.method}
-                responses={endpoint.responses}
-                types={types}
-              />
-            ) : (
-              <EndpointSection
-                title="Response"
-                description={
-                  <MdxServerComponentProseSuspense
-                    size="sm"
-                    className="text-(color:--grayscale-a11)"
-                    mdx={endpoint.responses[0].description}
-                    fallback={
-                      <ResponseSummaryFallback
-                        response={endpoint.responses[0]}
-                        types={types}
-                      />
-                    }
-                  />
-                }
-              >
-                <TypeDefinitionAnchorPart part="body">
-                  <EndpointResponseSection
-                    body={endpoint.responses[0].body}
-                    types={types}
-                  />
-                </TypeDefinitionAnchorPart>
-              </EndpointSection>
-            )
-          ) : null}
-          {showErrors && endpoint.errors && endpoint.errors.length > 0 && (
-            <TypeDefinitionAnchorPart part="error">
-              <EndpointSection title="Errors" hideSeparator>
-                <EndpointErrorGroup errors={endpoint.errors} types={types} />
-              </EndpointSection>
-            </TypeDefinitionAnchorPart>
-          )}
-        </TypeDefinitionAnchorPart>
-      </TypeDefinitionResponse>
-    </>
-  );
+  // return (
+  //   <>
+  //     <TypeDefinitionAnchorPart part="request">
+  //       {endpoint.pathParameters && endpoint.pathParameters.length > 0 && (
+  //         <TypeDefinitionAnchorPart part="path">
+  //           <EndpointSection title="Path parameters">
+  //             <WithSeparator>
+  //               {endpoint.pathParameters.map((parameter) => (
+  //                 <TypeDefinitionAnchorPart
+  //                   key={parameter.key}
+  //                   part={parameter.key}
+  //                 >
+  //                   <ObjectProperty property={parameter} types={types} />
+  //                 </TypeDefinitionAnchorPart>
+  //               ))}
+  //             </WithSeparator>
+  //           </EndpointSection>
+  //         </TypeDefinitionAnchorPart>
+  //       )}
+  //       {headers.length > 0 && (
+  //         <TypeDefinitionAnchorPart part="header">
+  //           <EndpointSection title="Headers">
+  //             <WithSeparator>
+  //               {headers.map((parameter) => {
+  //                 // let isAuth = false;
+  //                 if (
+  //                   (auth?.type === "header" &&
+  //                     parameter.key === auth?.headerWireValue) ||
+  //                   parameter.key === "Authorization"
+  //                 ) {
+  //                   // isAuth = true;
+  //                 }
+
+  //                 // {isAuth && (
+  //                 //   <div className="absolute right-0 top-3">
+  //                 //     <div className="bg-(color:--red-a3) flex h-5 items-center rounded-3 px-2">
+  //                 //       <span className="text-(color:--red-a11) text-xs">Auth</span>
+  //                 //     </div>
+  //                 //   </div>
+  //                 // )}
+
+  //                 return (
+  //                   <TypeDefinitionAnchorPart
+  //                     key={parameter.key}
+  //                     part={parameter.key}
+  //                   >
+  //                     <ObjectProperty property={parameter} types={types} />
+  //                   </TypeDefinitionAnchorPart>
+  //                 );
+  //               })}
+  //             </WithSeparator>
+  //           </EndpointSection>
+  //         </TypeDefinitionAnchorPart>
+  //       )}
+  //       {endpoint.queryParameters && endpoint.queryParameters.length > 0 && (
+  //         <TypeDefinitionAnchorPart part="query">
+  //           <EndpointSection title="Query parameters">
+  //             <WithSeparator>
+  //               {endpoint.queryParameters.map((parameter) => (
+  //                 <TypeDefinitionAnchorPart
+  //                   key={parameter.key}
+  //                   part={parameter.key}
+  //                 >
+  //                   <ObjectProperty property={parameter} types={types} />
+  //                 </TypeDefinitionAnchorPart>
+  //               ))}
+  //             </WithSeparator>
+  //           </EndpointSection>
+  //         </TypeDefinitionAnchorPart>
+  //       )}
+  //       {endpoint.requests?.[0] != null ? (
+  //         endpoint.requests.length > 1 ? (
+  //           <EndpointMultipleRequestSection
+  //             requests={endpoint.requests}
+  //             types={types}
+  //           />
+  //         ) : (
+  //           <EndpointSection
+  //             title="Request"
+  //             description={
+  //               <MdxServerComponentProseSuspense
+  //                 size="sm"
+  //                 className="text-(color:--grayscale-a11)"
+  //                 mdx={endpoint.requests[0].description}
+  //                 fallback={createEndpointRequestDescriptionFallback(
+  //                   endpoint.requests[0],
+  //                   types
+  //                 )}
+  //               />
+  //             }
+  //           >
+  //             <TypeDefinitionAnchorPart part="body">
+  //               <EndpointRequestSection
+  //                 request={endpoint.requests[0]}
+  //                 types={types}
+  //               />
+  //             </TypeDefinitionAnchorPart>
+  //           </EndpointSection>
+  //         )
+  //       ) : null}
+  //     </TypeDefinitionAnchorPart>
+  //     <TypeDefinitionResponse>
+  //       <TypeDefinitionAnchorPart part="response">
+  //         {endpoint.responses?.[0] != null ? (
+  //           endpoint.responses.length > 1 ? (
+  //             <EndpointMultipleResponseSection
+  //               method={endpoint.method}
+  //               responses={endpoint.responses}
+  //               types={types}
+  //             />
+  //           ) : (
+  //             <EndpointSection
+  //               title="Response"
+  //               description={
+  //                 <MdxServerComponentProseSuspense
+  //                   size="sm"
+  //                   className="text-(color:--grayscale-a11)"
+  //                   mdx={endpoint.responses[0].description}
+  //                   fallback={
+  //                     <ResponseSummaryFallback
+  //                       response={endpoint.responses[0]}
+  //                       types={types}
+  //                     />
+  //                   }
+  //                 />
+  //               }
+  //             >
+  //               <TypeDefinitionAnchorPart part="body">
+  //                 <EndpointResponseSection
+  //                   body={endpoint.responses[0].body}
+  //                   types={types}
+  //                 />
+  //               </TypeDefinitionAnchorPart>
+  //             </EndpointSection>
+  //           )
+  //         ) : null}
+  //         {showErrors && endpoint.errors && endpoint.errors.length > 0 && (
+  //           <TypeDefinitionAnchorPart part="error">
+  //             <EndpointSection title="Errors" hideSeparator>
+  //               <EndpointErrorGroup errors={endpoint.errors} types={types} />
+  //             </EndpointSection>
+  //           </TypeDefinitionAnchorPart>
+  //         )}
+  //       </TypeDefinitionAnchorPart>
+  //     </TypeDefinitionResponse>
+  //   </>
+  // );
 }
