@@ -7,8 +7,6 @@ import { AvailabilityBadge } from "@fern-docs/components/badges";
 import { Prose } from "@fern-docs/components/mdx/prose";
 import { mdxToHtml } from "@fern-docs/mdx";
 
-import { Markdown } from "@/mdx/components/Markdown";
-
 import {
   PropertyContainer,
   TypeDefinitionAnchor,
@@ -86,20 +84,21 @@ export const PropertyWithShape = React.memo(function PropertyWithShape({
   );
 });
 
-function wrappedMdxToHtml(mdx: string): {
-  error: boolean;
-  html: string | undefined;
-} {
+type MdxHtmlResult =
+  | { success: true; html: string }
+  | { success: false; error: unknown; mdx: string };
+
+function wrappedMdxToHtml(mdx: string): MdxHtmlResult {
   try {
     const result = mdxToHtml(mdx);
-    return { error: false, html: result.html };
+    return { success: true, html: result.html };
   } catch (e) {
     console.log(
       "[wrappedMdxToHtml] mdxToHtml failed. Falling back to unparsed mdx.",
       mdx,
       e
     );
-    return { error: true, html: undefined };
+    return { success: false, error: e, mdx };
   }
 }
 
@@ -118,7 +117,8 @@ export const PropertyRenderer = React.memo(function PropertyRenderer({
   availability: ApiDefinition.Availability | null | undefined;
   children?: React.ReactNode;
 }) {
-  const { error, html } = wrappedMdxToHtml(description || "");
+  const htmlResult =
+    description != null ? wrappedMdxToHtml(description) : undefined;
   const child = (
     <PropertyContainer>
       <TypeDefinitionAnchor sideOffset={6}>
@@ -132,12 +132,12 @@ export const PropertyRenderer = React.memo(function PropertyRenderer({
         )}
       </TypeDefinitionAnchor>
 
-      {description && (
+      {htmlResult && (
         <Prose size="sm" className="text-(color:--grayscale-a11)">
-          {error ? (
-            <p>${description}</p>
+          {htmlResult.success ? (
+            <div dangerouslySetInnerHTML={{ __html: htmlResult.html }} />
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: html! }} />
+            <p>${htmlResult.mdx}</p>
           )}
         </Prose>
       )}

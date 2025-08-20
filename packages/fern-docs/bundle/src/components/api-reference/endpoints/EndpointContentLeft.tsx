@@ -1,7 +1,5 @@
 import "server-only";
 
-import { useMemo } from "react";
-
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
