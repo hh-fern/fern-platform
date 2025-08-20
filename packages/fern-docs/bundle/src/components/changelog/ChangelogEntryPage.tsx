@@ -33,7 +33,11 @@ export default function ChangelogEntryPage({
   children: React.ReactNode;
 }): ReactElement<any> {
   return (
-    <AsideAwareDiv className="fern-layout-changelog" isFullPage={true}>
+    <AsideAwareDiv
+      blame="changelog-entry-page"
+      className="fern-layout-changelog"
+      isFullPage={true}
+    >
       <SetLayout value="page" />
       <article className="fern-layout-page">
         <HideBuiltWithFern>

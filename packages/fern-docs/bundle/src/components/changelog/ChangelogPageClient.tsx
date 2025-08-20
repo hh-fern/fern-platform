@@ -147,7 +147,11 @@ export default function ChangelogPageClient({
         hideTableOfContents={true}
       />
       {/* TODO(cd): treat as a guide for now, update for large-screen changelog */}
-      <AsideAwareDiv className="fern-layout-changelog" isFullPage={isFullPage}>
+      <AsideAwareDiv
+        blame="changelog-page"
+        className="fern-layout-changelog"
+        isFullPage={isFullPage}
+      >
         <article className="max-w-full">
           <SetLayout value="guide" />
           <HideBuiltWithFern>

@@ -41,6 +41,7 @@ export default async function SidebarPage({
 
   const found = FernNavigation.utils.findNode(root, slugjoin(slug));
   if (found.type !== "found") {
+    console.log("[dynamic-sidebar] not found");
     return null;
   }
 
@@ -58,6 +59,8 @@ export default async function SidebarPage({
     authState.authed ? (authState.user.roles ?? []) : []
   );
 
+  const hideSidebar = isSingleOverviewPage && !isSidebarFixed;
+
   return (
     <>
       {tabs && tabs.length > 0 && (
@@ -65,8 +68,8 @@ export default async function SidebarPage({
           <SidebarTabsList tabs={tabs} />
         </SidebarTabsRootServer>
       )}
-      {isSingleOverviewPage && !isSidebarFixed ? (
-        <HiddenSidebar />
+      {hideSidebar ? (
+        <HiddenSidebar blame="dynamic-sidebar" />
       ) : (
         <SidebarRootNode
           root={found.sidebar}

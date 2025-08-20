@@ -9,7 +9,7 @@ import ReturnHomeButton from "./ReturnHomeButton";
 export default async function NotFoundContent() {
   return (
     <>
-      <HiddenSidebar />
+      <HiddenSidebar blame="not-found" />
       <div className="flex h-[calc(100svh-var(--header-height)-6rem)] w-screen flex-col items-center justify-center gap-6">
         <GradientExclamation />
         <div className="flex flex-col text-center">

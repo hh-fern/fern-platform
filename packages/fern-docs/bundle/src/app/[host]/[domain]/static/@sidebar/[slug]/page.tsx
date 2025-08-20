@@ -11,7 +11,7 @@ import { slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
 import { SidebarTabsRootServer } from "@fern-docs/components/sidebar/SidebarTabsRootServer";
 import { SidebarRootNode } from "@fern-docs/components/sidebar/nodes/SidebarRootNode";
-import { HiddenSidebar } from "@fern-docs/components/theming/HiddenSidebar";
+import { HiddenSidebar } from "@fern-docs/components/state/layout";
 
 export default async function SidebarPage({
   params,
@@ -35,6 +35,7 @@ export default async function SidebarPage({
 
   const found = FernNavigation.utils.findNode(root, slugjoin(slug));
   if (found.type !== "found") {
+    console.log("[static-sidebar] not found");
     return null;
   }
 
@@ -52,6 +53,8 @@ export default async function SidebarPage({
     authState.authed ? (authState.user.roles ?? []) : []
   );
 
+  const hideSidebar = isSingleOverviewPage && !isSidebarFixed;
+
   return (
     <>
       {tabs && tabs.length > 0 && (
@@ -59,8 +62,8 @@ export default async function SidebarPage({
           <SidebarTabsList tabs={tabs} />
         </SidebarTabsRootServer>
       )}
-      {isSingleOverviewPage && !isSidebarFixed ? (
-        <HiddenSidebar />
+      {hideSidebar ? (
+        <HiddenSidebar blame="static-sidebar" />
       ) : (
         <SidebarRootNode
           root={found.sidebar}

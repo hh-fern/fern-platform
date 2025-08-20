@@ -20,7 +20,8 @@ export function useLayout() {
   return useAtomValue(layoutAtom);
 }
 
-export function HiddenSidebar() {
+export function HiddenSidebar({ blame }: { blame?: string }) {
+  console.log("[hidden-sidebar] blaming:", blame);
   return (
     <style jsx global>{`
       #fern-toc,

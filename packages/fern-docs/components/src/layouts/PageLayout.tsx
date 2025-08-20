@@ -14,7 +14,7 @@ export function PageLayout({ header, children, footer }: PageLayoutProps) {
   return (
     <article className="fern-layout-page">
       <SetLayout value="page" />
-      <HiddenSidebar />
+      <HiddenSidebar blame="page-layout" />
       {header}
       <Prose className="prose-h1:mt-[1.5em] first:prose-h1:mt-0 max-w-full">
         {children}

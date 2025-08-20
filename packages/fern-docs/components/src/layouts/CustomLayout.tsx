@@ -10,7 +10,7 @@ export function CustomLayout({ children, footer }: CustomLayoutProps) {
   return (
     <div className="width-before-scroll-bar w-screen">
       <SetLayout value="custom" />
-      <HiddenSidebar />
+      <HiddenSidebar blame="custom-layout" />
       {children}
       {footer}
     </div>
