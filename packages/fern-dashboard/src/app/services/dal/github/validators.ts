@@ -1,7 +1,5 @@
 import "server-only";
 
-import { cache } from "react";
-
 import { Auth0UserID } from "@/app/services/auth0/types";
 import { checkUserHasWritePermissionToRepo } from "@/app/services/dal/github/checkWritePermissionToRepo";
 import { throwDigestibleError } from "@/utils/errors";
@@ -37,74 +35,72 @@ function deriveGithubUrl(identifier: RepoIdentifier): string {
   return `https://github.com/${identifier.owner}/${identifier.repo}`;
 }
 
-export const validateGithubRepoAccess = cache(
-  async (
-    userId: Auth0UserID,
-    identifier: RepoIdentifier
-  ): Promise<GithubRepoValidation> => {
-    const cacheKey = getCacheKey(userId, identifier);
-    const cached = githubValidationCache.get(cacheKey);
+export const validateGithubRepoAccess = async (
+  userId: Auth0UserID,
+  identifier: RepoIdentifier
+): Promise<GithubRepoValidation> => {
+  const cacheKey = getCacheKey(userId, identifier);
+  const cached = githubValidationCache.get(cacheKey);
 
-    // Return cached result if still fresh
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      return cached.data;
+  // Return cached result if still fresh
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+
+  const githubUrl = deriveGithubUrl(identifier);
+
+  // Initialize validation result
+  const validation: GithubRepoValidation = {
+    hasWriteAccess: false,
+    hasFernBotInstalled: false,
+    repoExists: false,
+  };
+
+  try {
+    // Check both user permissions and Fern bot access in parallel
+    const [hasWriteAccess, hasFernBotInstalled] = await Promise.allSettled([
+      checkUserHasWritePermissionToRepo(userId, githubUrl),
+      checkFernHasAccessToRepo(githubUrl),
+    ]);
+
+    // Process write permission result
+    if (hasWriteAccess.status === "fulfilled" && hasWriteAccess.value) {
+      validation.hasWriteAccess = true;
+      validation.repoExists = true; // If we have write access, repo exists
     }
 
-    const githubUrl = deriveGithubUrl(identifier);
+    // Process Fern bot access result
+    if (
+      hasFernBotInstalled.status === "fulfilled" &&
+      hasFernBotInstalled.value
+    ) {
+      validation.hasFernBotInstalled = true;
+      validation.repoExists = true; // If Fern bot has access, repo exists
+    }
 
-    // Initialize validation result
-    const validation: GithubRepoValidation = {
+    // Cache the validation result
+    githubValidationCache.set(cacheKey, {
+      data: validation,
+      timestamp: Date.now(),
+    });
+
+    return validation;
+  } catch (_error) {
+    // In case of unexpected errors, cache negative result for shorter duration
+    const failedValidation: GithubRepoValidation = {
       hasWriteAccess: false,
       hasFernBotInstalled: false,
       repoExists: false,
     };
 
-    try {
-      // Check both user permissions and Fern bot access in parallel
-      const [hasWriteAccess, hasFernBotInstalled] = await Promise.allSettled([
-        checkUserHasWritePermissionToRepo(userId, githubUrl),
-        checkFernHasAccessToRepo(githubUrl),
-      ]);
+    githubValidationCache.set(cacheKey, {
+      data: failedValidation,
+      timestamp: Date.now() - CACHE_DURATION / 2, // Shorter cache for failures
+    });
 
-      // Process write permission result
-      if (hasWriteAccess.status === "fulfilled" && hasWriteAccess.value) {
-        validation.hasWriteAccess = true;
-        validation.repoExists = true; // If we have write access, repo exists
-      }
-
-      // Process Fern bot access result
-      if (
-        hasFernBotInstalled.status === "fulfilled" &&
-        hasFernBotInstalled.value
-      ) {
-        validation.hasFernBotInstalled = true;
-        validation.repoExists = true; // If Fern bot has access, repo exists
-      }
-
-      // Cache the validation result
-      githubValidationCache.set(cacheKey, {
-        data: validation,
-        timestamp: Date.now(),
-      });
-
-      return validation;
-    } catch (_error) {
-      // In case of unexpected errors, cache negative result for shorter duration
-      const failedValidation: GithubRepoValidation = {
-        hasWriteAccess: false,
-        hasFernBotInstalled: false,
-        repoExists: false,
-      };
-
-      githubValidationCache.set(cacheKey, {
-        data: failedValidation,
-        timestamp: Date.now() - CACHE_DURATION / 2, // Shorter cache for failures
-      });
-
-      return failedValidation;
-    }
+    return failedValidation;
   }
-);
+};
 
 /**
  * Asserts that the user has required GitHub access for components.
