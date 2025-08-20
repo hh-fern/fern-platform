@@ -1,18 +1,14 @@
 import "server-only";
 
 import { ThemeProvider } from "next-themes";
-import { redirect } from "next/navigation";
 import type React from "react";
 
 import { ClientPageManager } from "@fern-docs/components/sidebar/nodes/ClientPageManager";
 import { SidebarClientNavigationProvider } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 
 import getGithubSourceMetadata from "@/app/api/get-github-source-metadata/handler";
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import type { Auth0OrgName } from "@/app/services/auth0/types";
-import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
-import { assertGithubAccessByUrl } from "@/app/services/dal/github/validators";
-import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
+import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { BranchProvider } from "@/providers/BranchContext";
 import { CurrentPageProvider } from "@/providers/CurrentPageContext";
@@ -48,25 +44,10 @@ export default async function EditorLayout({
   const { orgName, docsUrl: encodedDocsUrl, branch } = await params;
   const docsUrl = parseDocsUrlParam({ docsUrl: encodedDocsUrl });
 
-  const session = await getCurrentSession();
-  if (!session) {
-    redirect("/");
-  }
-  await assertUserHasOrganizationAccess({
-    userId: session.user.sub,
+  const { githubUrl, session } = await assertAuthAndFetchGithubUrl({
     orgName,
+    docsUrl,
   });
-
-  const urlResult = await getDocsGithubUrl({
-    url: docsUrl,
-    token: session.accessToken,
-  });
-  if (!urlResult.success) {
-    redirect(`/${orgName}/docs`);
-  }
-  const { githubUrl } = urlResult;
-
-  await assertGithubAccessByUrl(session.user.sub, githubUrl);
 
   const sourceRepo = await getGithubSourceMetadata({
     githubUrl,

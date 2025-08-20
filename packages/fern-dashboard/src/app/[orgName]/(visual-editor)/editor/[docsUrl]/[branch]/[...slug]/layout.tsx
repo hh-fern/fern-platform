@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import React from "react";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
@@ -15,16 +14,14 @@ import AbstractDefaultDocs from "@fern-docs/components/theming/AbstractDefaultDo
 import { GlobalStyles } from "@fern-docs/components/theming/global-styles";
 import { DesktopSearchButton } from "@fern-docs/search-ui/components/desktop/desktop-search-button";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
-import { assertGithubAccessByUrl } from "@/app/services/dal/github/validators";
-import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
+import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { PreviewHeader } from "@/components/docs-preview/PreviewHeader";
 import { EditorLinkInterceptor } from "@/components/editor/EditorLinkInterceptor";
 import { EditorRoutingProvider } from "@/providers/EditorRoutingContext";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
+import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import { EncodedDocsUrl } from "@/utils/types";
 
 import "./index.css";
@@ -56,30 +53,11 @@ export default async function VisualEditorPreviewLayout({
 }>) {
   const { orgName, docsUrl, branch } = await params;
 
-  // Validate session
-  const session = await getCurrentSession();
-  const host = await getHostFromHeaders();
-  if (session == null) {
-    redirect("/");
-  }
-
-  // Validate organization access
-  await assertUserHasOrganizationAccess({
-    userId: session.user.sub,
+  const { githubUrl, session } = await assertAuthAndFetchGithubUrl({
     orgName,
+    docsUrl: parseDocsUrlParam({ docsUrl }),
   });
-
-  // Validate GitHub access
-  const urlResult = await getDocsGithubUrl({
-    url: docsUrl,
-    token: session.accessToken,
-  });
-  if (!urlResult.success) {
-    redirect(`/${orgName}/docs`);
-  }
-
-  const { githubUrl } = urlResult;
-  await assertGithubAccessByUrl(session.user.sub, githubUrl);
+  const host = await getHostFromHeaders();
 
   // TODO: createEditableDocsLoader should be called here once, and data passed to child pages (@...) rather than called in those places as well
   const loader = await createEditableDocsLoader(

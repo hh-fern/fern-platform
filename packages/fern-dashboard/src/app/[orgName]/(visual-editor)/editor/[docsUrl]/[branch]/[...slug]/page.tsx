@@ -8,14 +8,12 @@ import { NodeId, getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 import { mdxToHtml } from "@fern-docs/mdx";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
-import { assertGithubAccessByUrl } from "@/app/services/dal/github/validators";
-import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
+import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
+import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import { EncodedDocsUrl } from "@/utils/types";
 
 import PageNode from "./PageNode";
@@ -34,29 +32,12 @@ export default async function Page({
   }>;
   searchParams: Promise<Record<string, string>>;
 }) {
-  // Validate session
-  const session = await getCurrentSession();
-  if (session == null) {
-    redirect("/");
-  }
   const { orgName, docsUrl, branch, slug: slugArray } = await params;
 
-  // Validate organization access
-  await assertUserHasOrganizationAccess({
-    userId: session.user.sub,
+  const { githubUrl, session } = await assertAuthAndFetchGithubUrl({
     orgName,
+    docsUrl: parseDocsUrlParam({ docsUrl }),
   });
-
-  // Validate GitHub access
-  const urlResult = await getDocsGithubUrl({
-    url: docsUrl,
-    token: session.accessToken,
-  });
-  if (!urlResult.success) {
-    redirect(`/${orgName}/docs`);
-  }
-  const githubUrl = urlResult.githubUrl;
-  await assertGithubAccessByUrl(session.user.sub, githubUrl);
 
   const resolvedSearchParams = await searchParams;
   const host = await getHostFromHeaders();
