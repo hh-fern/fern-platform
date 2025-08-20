@@ -4,6 +4,10 @@ import { compact } from "es-toolkit/array";
 
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { AvailabilityBadge } from "@fern-docs/components/badges";
+import { Prose } from "@fern-docs/components/mdx/prose";
+import { mdxToHtml } from "@fern-docs/mdx";
+
+import { Markdown } from "@/mdx/components/Markdown";
 
 import {
   PropertyContainer,
@@ -19,9 +23,6 @@ import {
   TypeReferenceDefinitions,
 } from "./TypeReferenceDefinitions";
 import { TypeShorthand } from "./TypeShorthand";
-import { Prose } from "@fern-docs/components/mdx/prose";
-import { Markdown } from "@/mdx/components/Markdown";
-import { mdxToHtml } from "@fern-docs/mdx";
 
 export const ObjectProperty = React.memo(function ObjectProperty({
   property,
@@ -85,13 +86,20 @@ export const PropertyWithShape = React.memo(function PropertyWithShape({
   );
 });
 
-function wrappedMdxToHtml(mdx: string): { error: boolean, html: string | undefined } {
+function wrappedMdxToHtml(mdx: string): {
+  error: boolean;
+  html: string | undefined;
+} {
   try {
-    const result = mdxToHtml(mdx)
-    return { error: false, html: result.html }
+    const result = mdxToHtml(mdx);
+    return { error: false, html: result.html };
   } catch (e) {
-    console.log("[wrappedMdxToHtml] mdxToHtml failed. Falling back to unparsed mdx.", mdx, e)
-    return { error: true, html: undefined }
+    console.log(
+      "[wrappedMdxToHtml] mdxToHtml failed. Falling back to unparsed mdx.",
+      mdx,
+      e
+    );
+    return { error: true, html: undefined };
   }
 }
 
@@ -110,7 +118,7 @@ export const PropertyRenderer = React.memo(function PropertyRenderer({
   availability: ApiDefinition.Availability | null | undefined;
   children?: React.ReactNode;
 }) {
-  const { error, html } = wrappedMdxToHtml(description || "")
+  const { error, html } = wrappedMdxToHtml(description || "");
   const child = (
     <PropertyContainer>
       <TypeDefinitionAnchor sideOffset={6}>
@@ -124,10 +132,15 @@ export const PropertyRenderer = React.memo(function PropertyRenderer({
         )}
       </TypeDefinitionAnchor>
 
-      {description && <Prose size="sm" className="text-(color:--grayscale-a11)">
-        {error ? <p>${description}</p> : 
-        <div dangerouslySetInnerHTML={{ __html: html! }} />}
-      </Prose>}
+      {description && (
+        <Prose size="sm" className="text-(color:--grayscale-a11)">
+          {error ? (
+            <p>${description}</p>
+          ) : (
+            <div dangerouslySetInnerHTML={{ __html: html! }} />
+          )}
+        </Prose>
+      )}
 
       <TypeDefinitionCollapsible>{children}</TypeDefinitionCollapsible>
     </PropertyContainer>

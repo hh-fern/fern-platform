@@ -1,5 +1,7 @@
 import "server-only";
 
+import { useMemo } from "react";
+
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
@@ -22,7 +24,6 @@ import {
 import { EndpointResponseSection } from "./EndpointResponseSection";
 import { EndpointSection } from "./EndpointSection";
 import { ResponseSummaryFallback } from "./response-summary-fallback";
-import { useMemo } from "react";
 
 export interface HoveringProps {
   isHovering: boolean;

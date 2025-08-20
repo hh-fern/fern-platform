@@ -1,10 +1,14 @@
 "use client";
 
 import React from "react";
+
 import { TypeDefinition } from "@fern-api/fdr-sdk/api-definition";
 
 import { getTypeIdWithLocation } from "./TypeDefinitionSlotsServer";
-import { PropertyLocation, TypeReferenceDefinitions } from "./TypeReferenceDefinitions";
+import {
+  PropertyLocation,
+  TypeReferenceDefinitions,
+} from "./TypeReferenceDefinitions";
 
 const TypeDefinitionSlots = React.createContext<
   (id: string) => React.ReactNode | undefined
@@ -75,23 +79,23 @@ function getTypeDefinitionElement(
 ): React.ReactNode | undefined {
   // Check if the id has location suffix
   const locationMatch = id.match(/^(.+)_location:(request|response)$/);
-  
+
   if (locationMatch) {
     const baseId = locationMatch[1];
     const location = locationMatch[2];
     if (!baseId || !location) return undefined;
-    
+
     const type = types[baseId];
     if (!type) return undefined;
-    
+
     const variants = createPropertyAccessTypeVariants(type, types);
     return location === "request" ? variants.request : variants.response;
   }
-  
+
   // No location suffix, return default variant
   const type = types[id];
   if (!type) return undefined;
-  
+
   const variants = createPropertyAccessTypeVariants(type, types);
   return variants.default;
 }
