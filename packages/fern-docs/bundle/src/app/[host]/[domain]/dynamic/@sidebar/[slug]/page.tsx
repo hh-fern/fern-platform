@@ -43,6 +43,8 @@ export default async function SidebarPage({
   if (found.type !== "found") {
     console.log("[dynamic-sidebar] not found");
     console.log("[dynamic-sidebar] full root:", root);
+    console.log("[dynamic-sidebar] metadata:", await loader.getMetadata());
+
     if (root.child.type === "productgroup") {
       console.log(
         "[dynamic-sidebar] root.child productgroup.length:",
@@ -51,8 +53,6 @@ export default async function SidebarPage({
     } else {
       console.log("[dynamic-sidebar] root.child.type:", root.child.type);
     }
-
-    console.log("[dynamic-sidebar] metadata:", await loader.getMetadata());
 
     return null;
   }
