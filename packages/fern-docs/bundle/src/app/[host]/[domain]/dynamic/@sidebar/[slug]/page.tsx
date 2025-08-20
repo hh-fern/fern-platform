@@ -42,6 +42,17 @@ export default async function SidebarPage({
   const found = FernNavigation.utils.findNode(root, slugjoin(slug));
   if (found.type !== "found") {
     console.log("[dynamic-sidebar] not found");
+    if (root.child.type === "productgroup") {
+      console.log(
+        "[dynamic-sidebar] root.child productgroup.length:",
+        root.child.children.length
+      );
+    } else {
+      console.log("[dynamic-sidebar] root.child.type:", root.child.type);
+    }
+
+    console.log("[dynamic-sidebar] metadata:", await loader.getMetadata());
+
     return null;
   }
 
@@ -60,6 +71,20 @@ export default async function SidebarPage({
   );
 
   const hideSidebar = isSingleOverviewPage && !isSidebarFixed;
+
+  if (hideSidebar) {
+    console.log("[dynamic-sidebar] hideSidebar:", hideSidebar);
+    console.log(
+      "[dynamic-sidebar] isSingleOverviewPage:",
+      isSingleOverviewPage
+    );
+    console.log("[dynamic-sidebar] isSidebarFixed:", isSidebarFixed);
+    console.log(
+      "[dynamic-sidebar] found.currentProduct:",
+      found.currentProduct
+    );
+    console.log("[dynamic-sidebar] config.layout:", config.layout);
+  }
 
   return (
     <>
