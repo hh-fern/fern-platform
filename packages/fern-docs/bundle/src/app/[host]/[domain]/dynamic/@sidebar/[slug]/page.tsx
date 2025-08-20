@@ -42,6 +42,7 @@ export default async function SidebarPage({
   const found = FernNavigation.utils.findNode(root, slugjoin(slug));
   if (found.type !== "found") {
     console.log("[dynamic-sidebar] not found");
+    console.log("[dynamic-sidebar] full root:", root);
     if (root.child.type === "productgroup") {
       console.log(
         "[dynamic-sidebar] root.child productgroup.length:",
