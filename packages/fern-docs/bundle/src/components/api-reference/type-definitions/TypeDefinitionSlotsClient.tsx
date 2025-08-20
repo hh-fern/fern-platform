@@ -4,7 +4,6 @@ import React from "react";
 
 import { TypeDefinition } from "@fern-api/fdr-sdk/api-definition";
 
-import { getTypeIdWithLocation } from "./TypeDefinitionSlotsServer";
 import {
   PropertyLocation,
   TypeReferenceDefinitions,
@@ -73,29 +72,48 @@ function createPropertyAccessTypeVariants(
   };
 }
 
+function parseTypeIdWithLocation(id: string): {
+  baseId: string;
+  location: PropertyLocation | undefined;
+} {
+  const locationSuffix = "_location:";
+  const locationIndex = id.lastIndexOf(locationSuffix);
+
+  if (locationIndex === -1) {
+    return { baseId: id, location: undefined };
+  }
+
+  const baseId = id.substring(0, locationIndex);
+  const locationPart = id.substring(locationIndex + locationSuffix.length);
+
+  if (locationPart === "request" || locationPart === "response") {
+    return { baseId, location: locationPart };
+  }
+
+  // If location part is not valid, treat the whole thing as baseId
+  return { baseId: id, location: undefined };
+}
+
 function getTypeDefinitionElement(
   id: string,
   types: Record<string, TypeDefinition>
 ): React.ReactNode | undefined {
-  // Check if the id has location suffix
-  const locationMatch = id.match(/^(.+)_location:(request|response)$/);
+  const { baseId, location } = parseTypeIdWithLocation(id);
 
-  if (locationMatch) {
-    const baseId = locationMatch[1];
-    const location = locationMatch[2];
-    if (!baseId || !location) return undefined;
-
-    const type = types[baseId];
-    if (!type) return undefined;
-
-    const variants = createPropertyAccessTypeVariants(type, types);
-    return location === "request" ? variants.request : variants.response;
-  }
-
-  // No location suffix, return default variant
-  const type = types[id];
+  const type = types[baseId];
   if (!type) return undefined;
 
   const variants = createPropertyAccessTypeVariants(type, types);
-  return variants.default;
+
+  if (location === "request") {
+    return variants.request;
+  } else if (location === "response") {
+    return variants.response;
+  } else {
+    return variants.default;
+  }
+}
+
+function getTypeIdWithLocation(id: string, location: PropertyLocation) {
+  return `${id}_location:${location}`;
 }
