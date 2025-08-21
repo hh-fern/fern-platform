@@ -77,24 +77,11 @@ function mkdir(dir: string) {
 async function zipFolder(sourceFolder: string, zipFilePath: string) {
   mkdir(path.dirname(zipFilePath));
 
-  // if (process.platform === "win32") {
-  //   cleanExternalSymlinks(sourceFolder);
-  // }
-
   return new Promise<void>((resolve, reject) => {
     const output = fs.createWriteStream(zipFilePath);
     const archive = archiver("tar", {
       gzip: true,
     });
-    // const useDereference = process.platform === "win32";
-    // if (useDereference) {
-    //   // eslint-disable-next-line no-console
-    //   console.debug("[zipFolder] Running in dereference mode for archiver (win32 platform)");
-    // }
-    // const archive = archiver("tar", useDereference
-    //   ? { gzip: true, dereference: true } as any
-    //   : { gzip: true }
-    // );
 
     archive.on("error", (err: unknown) => {
       reject(err instanceof Error ? err : new Error(String(err)));
@@ -138,64 +125,4 @@ export function resolveLocalPreviewBundleTarPath(zipFilePath?: string) {
   return path.isAbsolute(zipFilePath)
     ? zipFilePath
     : path.resolve(__dirname, zipFilePath);
-}
-
-/**
- * Recursively traverses the directory and replaces any symlink that points outside the rootDir
- * with a copy of the file or directory it points to, or deletes the symlink if deleteInsteadOfCopy is true.
- */
-export async function cleanExternalSymlinks(
-    rootDir: string,
-    deleteInsteadOfCopy?: boolean
-): Promise<void> {
-    async function processEntry(entryPath: string) {
-        const stat = await fs.promises.lstat(entryPath);
-        if (stat.isSymbolicLink()) {
-            const linkTarget = await fs.promises.readlink(entryPath);
-            // Resolve the absolute path of the symlink target
-            const absTarget = path.resolve(path.dirname(entryPath), linkTarget);
-            const realTarget = await fs.promises.realpath(absTarget);
-            // Check if the real target is outside the rootDir
-            const relative = path.relative(rootDir, realTarget);
-            if (relative.startsWith("..") || path.isAbsolute(relative)) {
-                // Remove the symlink
-                await fs.promises.unlink(entryPath);
-                if (!deleteInsteadOfCopy) {
-                    // Copy the file or directory in its place
-                    const targetStat = await fs.promises.stat(realTarget);
-                    if (targetStat.isDirectory()) {
-                        await copyDir(realTarget, entryPath);
-                    } else {
-                        await fs.promises.copyFile(realTarget, entryPath);
-                    }
-                }
-                // If deleteInsteadOfCopy is true, do nothing else
-            }
-        } else if (stat.isDirectory()) {
-            const entries = await fs.promises.readdir(entryPath);
-            for (const entry of entries) {
-                await processEntry(path.join(entryPath, entry));
-            }
-        }
-    }
-    await processEntry(rootDir);
-}
-
-// Helper to recursively copy a directory
-async function copyDir(src: string, dest: string) {
-    await fs.promises.mkdir(dest, { recursive: true });
-    const entries = await fs.promises.readdir(src, { withFileTypes: true });
-    for (const entry of entries) {
-        const srcPath = path.join(src, entry.name);
-        const destPath = path.join(dest, entry.name);
-        if (entry.isDirectory()) {
-            await copyDir(srcPath, destPath);
-        } else if (entry.isSymbolicLink()) {
-            // Copy the symlink as a symlink (could also resolve/copy target if desired)
-            const linkTarget = await fs.promises.readlink(srcPath);
-            await fs.promises.symlink(linkTarget, destPath);
-        } else {
-            await fs.promises.copyFile(srcPath, destPath);
-        }
-    }
 }
