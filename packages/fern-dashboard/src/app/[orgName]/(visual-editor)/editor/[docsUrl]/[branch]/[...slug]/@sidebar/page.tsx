@@ -14,6 +14,8 @@ import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { EncodedDocsUrl } from "@/utils/types";
 
+import { CreatePageButton } from "./CreatePageButton";
+
 export default async function SidebarPage({
   params,
 }: {
@@ -32,7 +34,14 @@ export default async function SidebarPage({
     loader.getRoot(),
   ]);
 
-  const found = FernNavigation.utils.findNode(root, slugjoin(slug));
+  let found = FernNavigation.utils.findNode(root, slugjoin(slug));
+  if (found.type !== "found") {
+    // For client pages that don't exist in server navigation, use the redirect
+    // which points to the root node of the active product/version
+    if (found.redirect) {
+      found = FernNavigation.utils.findNode(root, found.redirect);
+    }
+  }
   if (found.type !== "found") {
     return null;
   }
@@ -54,11 +63,23 @@ export default async function SidebarPage({
       {isSingleOverviewPage && !isSidebarFixed ? (
         <HiddenSidebar />
       ) : (
-        <SidebarRootNode
-          root={found.sidebar}
-          visibleNodeIds={visibleNodeIds}
-          loader={loader}
-        />
+        <>
+          <CreatePageButton
+            root={found.sidebar}
+            navigationContext={{
+              currentProduct: found.currentProduct,
+              currentVersion: found.currentVersion,
+              currentTab: found.currentTab,
+              isCurrentVersionDefault: found.isCurrentVersionDefault,
+              isCurrentProductDefault: found.isCurrentProductDefault,
+            }}
+          />
+          <SidebarRootNode
+            root={found.sidebar}
+            visibleNodeIds={visibleNodeIds}
+            loader={loader}
+          />
+        </>
       )}
     </>
   );

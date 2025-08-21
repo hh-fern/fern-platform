@@ -13,6 +13,8 @@ import {
 } from "../type-definitions/TypeDefinitionContext";
 import { WithSeparator } from "../type-definitions/TypeDefinitionDetails";
 import { EndpointErrorGroup } from "./EndpointErrorGroup";
+import { EndpointMultipleRequestSection } from "./EndpointMultipleRequestSection";
+import { EndpointMultipleResponseSection } from "./EndpointMultipleResponseSection";
 import {
   EndpointRequestSection,
   createEndpointRequestDescriptionFallback,
@@ -191,57 +193,72 @@ export async function EndpointContentLeft({
             </EndpointSection>
           </TypeDefinitionAnchorPart>
         )}
-        {endpoint.requests?.[0] != null && (
-          <EndpointSection
-            title="Request"
-            description={
-              <MdxServerComponentProseSuspense
-                size="sm"
-                className="text-(color:--grayscale-a11)"
-                mdx={endpoint.requests[0].description}
-                fallback={createEndpointRequestDescriptionFallback(
-                  endpoint.requests[0],
-                  types
-                )}
-              />
-            }
-          >
-            <TypeDefinitionAnchorPart part="body">
-              <EndpointRequestSection
-                request={endpoint.requests[0]}
-                types={types}
-              />
-            </TypeDefinitionAnchorPart>
-          </EndpointSection>
-        )}
-      </TypeDefinitionAnchorPart>
-      <TypeDefinitionResponse>
-        <TypeDefinitionAnchorPart part="response">
-          {endpoint.responses?.[0] != null && (
+        {endpoint.requests?.[0] != null ? (
+          endpoint.requests.length > 1 ? (
+            <EndpointMultipleRequestSection
+              requests={endpoint.requests}
+              types={types}
+            />
+          ) : (
             <EndpointSection
-              title="Response"
+              title="Request"
               description={
                 <MdxServerComponentProseSuspense
                   size="sm"
                   className="text-(color:--grayscale-a11)"
-                  mdx={endpoint.responses[0].description}
-                  fallback={
-                    <ResponseSummaryFallback
-                      response={endpoint.responses[0]}
-                      types={types}
-                    />
-                  }
+                  mdx={endpoint.requests[0].description}
+                  fallback={createEndpointRequestDescriptionFallback(
+                    endpoint.requests[0],
+                    types
+                  )}
                 />
               }
             >
               <TypeDefinitionAnchorPart part="body">
-                <EndpointResponseSection
-                  body={endpoint.responses[0].body}
+                <EndpointRequestSection
+                  request={endpoint.requests[0]}
                   types={types}
                 />
               </TypeDefinitionAnchorPart>
             </EndpointSection>
-          )}
+          )
+        ) : null}
+      </TypeDefinitionAnchorPart>
+      <TypeDefinitionResponse>
+        <TypeDefinitionAnchorPart part="response">
+          {endpoint.responses?.[0] != null ? (
+            endpoint.responses.length > 1 ? (
+              <EndpointMultipleResponseSection
+                method={endpoint.method}
+                responses={endpoint.responses}
+                types={types}
+              />
+            ) : (
+              <EndpointSection
+                title="Response"
+                description={
+                  <MdxServerComponentProseSuspense
+                    size="sm"
+                    className="text-(color:--grayscale-a11)"
+                    mdx={endpoint.responses[0].description}
+                    fallback={
+                      <ResponseSummaryFallback
+                        response={endpoint.responses[0]}
+                        types={types}
+                      />
+                    }
+                  />
+                }
+              >
+                <TypeDefinitionAnchorPart part="body">
+                  <EndpointResponseSection
+                    body={endpoint.responses[0].body}
+                    types={types}
+                  />
+                </TypeDefinitionAnchorPart>
+              </EndpointSection>
+            )
+          ) : null}
           {showErrors && endpoint.errors && endpoint.errors.length > 0 && (
             <TypeDefinitionAnchorPart part="error">
               <EndpointSection title="Errors" hideSeparator>

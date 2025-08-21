@@ -1,5 +1,6 @@
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import {
+  RoleId,
   isProductGroupNode,
   isProductNode,
   isTabbedNode,
@@ -84,7 +85,7 @@ export const getFallbackVersion = (
   return null;
 };
 
-export const getHeaderTabs = (
+const getTabsInternal = (
   foundNode: FernNavigation.utils.Node,
   root: FernNavigation.RootNode,
   slug: string
@@ -125,4 +126,82 @@ export const getHeaderTabs = (
     }
   }
   return null;
+};
+
+export const getTabs = (
+  foundNode: FernNavigation.utils.Node,
+  root: FernNavigation.RootNode,
+  slug: string,
+  showHiddenNodes: boolean,
+  roles: string[]
+): FernNavigation.TabChild[] | null => {
+  const tabs = getTabsInternal(foundNode, root, slug);
+
+  if (showHiddenNodes) {
+    return tabs;
+  }
+
+  return (
+    tabs?.filter((tab) => {
+      if (tab.type !== "tab" && tab.type !== "changelog") {
+        return true; // link type
+      }
+
+      if (tab.authed) {
+        return false;
+      }
+
+      if (
+        !tab.viewers ||
+        tab.viewers.length === 0 ||
+        tab.viewers.includes(RoleId("everyone"))
+      ) {
+        return true;
+      }
+
+      return tab.viewers.some((viewerRole: RoleId) =>
+        roles.includes(viewerRole as string)
+      );
+    }) ?? null
+  );
+};
+
+export const getProducts = (
+  root: FernNavigation.RootNode,
+  showHiddenNodes: boolean,
+  roles: string[]
+): FernNavigation.ProductNode[] | null => {
+  if (root.child.type !== "productgroup") {
+    return null;
+  }
+
+  const products = root.child.children;
+
+  if (showHiddenNodes) {
+    return products;
+  }
+
+  return (
+    products?.filter((product) => {
+      if (product.type !== "product") {
+        return true;
+      }
+
+      if (product.authed) {
+        return false;
+      }
+
+      if (
+        !product.viewers ||
+        product.viewers.length === 0 ||
+        product.viewers.includes(RoleId("everyone"))
+      ) {
+        return true;
+      }
+
+      return product.viewers.some((viewerRole: RoleId) =>
+        roles.includes(viewerRole as string)
+      );
+    }) ?? null
+  );
 };

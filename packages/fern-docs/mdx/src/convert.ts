@@ -14,16 +14,17 @@ import {
   frontmatterFromMarkdown,
   frontmatterToMarkdown,
 } from "mdast-util-frontmatter";
+import { mathFromMarkdown, mathToMarkdown } from "mdast-util-math";
 import { mdxFromMarkdown, mdxToMarkdown } from "mdast-util-mdx";
 import {
   Handler as ToHastHandler,
-  Handlers as ToHastHandlers,
   State as ToHastState,
   toHast,
   defaultHandlers as toHastDefaultHandlers,
 } from "mdast-util-to-hast";
 import { toMarkdown } from "mdast-util-to-markdown";
 import { frontmatter as fm } from "micromark-extension-frontmatter";
+import { math } from "micromark-extension-math";
 import { mdxjs } from "micromark-extension-mdxjs";
 
 // Options for how yaml is written to the frontmatter
@@ -39,12 +40,49 @@ type ToHastDefaultHandlersType = keyof typeof toHastDefaultHandlers;
 // Hast nodes that have default handlers
 type ToMdastDefaultHandlersType = keyof typeof toMdastDefaultHandlers;
 
-// All mdast node types that toHast can handle
-// Note: toHast does NOT support toml by default
-type AllElementsType = keyof ToHastHandlers;
+// All mdast node types that toHast can handle (keyof Handlers from mdast-util-to-hast)
+// Notes:
+// - toHast does NOT support toml by default
+// - We must be explicit about the keys here due to an issue with TypeScript inferring the correct types
+type AllElementsType =
+  | "blockquote"
+  | "break"
+  | "code"
+  | "definition"
+  | "delete"
+  | "emphasis"
+  | "footnoteDefinition"
+  | "footnoteReference"
+  | "heading"
+  | "html"
+  | "image"
+  | "imageReference"
+  | "inlineCode"
+  | "link"
+  | "linkReference"
+  | "list"
+  | "listItem"
+  | "paragraph"
+  | "root"
+  | "strong"
+  | "table"
+  | "tableCell"
+  | "tableRow"
+  | "text"
+  | "thematicBreak"
+  | "yaml"
+  | "mdxJsxFlowElement"
+  | "mdxJsxTextElement"
+  | "mdxFlowExpression"
+  | "mdxTextExpression"
+  | "mdxjsEsm"
+  | "math"
+  | "inlineMath";
 
 // Nodes we should not treat as custom elements
-// Note: since toHast does not support math or inlineMath nodes by default, we treat them as custom elements
+// Notes:
+// - Since toHast does not support math or inlineMath nodes by default, we treat them as custom elements
+// - We also treat html nodes as custom elements, since when we encounter them they are usually customer-provided components
 type BaseElementsType = Exclude<
   AllElementsType,
   | "mdxJsxFlowElement"
@@ -54,6 +92,7 @@ type BaseElementsType = Exclude<
   | "mdxjsEsm"
   | "math"
   | "inlineMath"
+  | "html"
 >;
 
 // Non-custom nodes that can be hashed
@@ -94,6 +133,7 @@ export interface MdxToHtmlResponse {
   html: string;
   frontmatter: Frontmatter;
   originalElements: OriginalElements;
+  originalFrontmatter?: string;
 }
 
 interface MdxToHtmlOptions {
@@ -101,6 +141,11 @@ interface MdxToHtmlOptions {
    * Whether to treat an mdast node type as a custom element for now e.g. avoid lossiness in code block "meta" props
    */
   treatAsCustomElement?: BaseElementsType[];
+  /**
+   * Whether to treat an mdast node type as unsupported for now
+   * Note: we will intentionally throw an error if we encounter an unsupported node type
+   */
+  treatAsUnsupported?: AllElementsType[];
 }
 
 // Convert mdx to html, frontmatter, and original elements
@@ -108,19 +153,25 @@ export function mdxToHtml(
   rootContent: string,
   options?: MdxToHtmlOptions
 ): MdxToHtmlResponse {
-  const { treatAsCustomElement = [] } = options ?? {};
+  const { treatAsCustomElement = [], treatAsUnsupported = [] } = options ?? {};
 
   // Get mdast from root mdx content
   const mdast = fromMarkdown(rootContent, {
-    extensions: [mdxjs(), fm(["yaml"])],
-    mdastExtensions: [mdxFromMarkdown(), frontmatterFromMarkdown(["yaml"])],
+    extensions: [mdxjs(), fm(["yaml"]), math()],
+    mdastExtensions: [
+      mdxFromMarkdown(),
+      frontmatterFromMarkdown(["yaml"]),
+      mathFromMarkdown(),
+    ],
   });
 
   // Get frontmatter from mdast (expects only one frontmatter node)
   const frontmatterNode = mdast.children.find((node) => node.type === "yaml");
+  const originalFrontmatter = frontmatterNode?.value;
 
   // Parse frontmatter from yaml
-  const parsedFrontmatter = frontmatterNode && yaml.load(frontmatterNode.value);
+  const parsedFrontmatter =
+    originalFrontmatter && yaml.load(originalFrontmatter);
   const frontmatter = isValidFrontmatter(parsedFrontmatter)
     ? parsedFrontmatter
     : {};
@@ -137,6 +188,9 @@ export function mdxToHtml(
   ) {
     const { type, name } = getNodeInfo(node);
     const nodeType = type as BaseElementsType;
+    if (treatAsUnsupported.includes(nodeType)) {
+      throw new Error(`Unsupported node type: ${nodeType}`);
+    }
     if (!isHashableBaseElementsType(nodeType)) {
       // Early return if the node is not hashable
       return getToHastDefaultHandler(nodeType)(state, node, parents);
@@ -158,6 +212,9 @@ export function mdxToHtml(
   function customElementHandler(_: ToHastState, node: any, __?: MdastParents) {
     const { type, name } = getNodeInfo(node);
     const nodeType = type as CustomElementsType;
+    if (treatAsUnsupported.includes(nodeType)) {
+      throw new Error(`Unsupported node type: ${nodeType}`);
+    }
     const { hash, content } = getNodeContent(node, rootContent);
     originalElements[hash] = { content, type, name };
     return mdxCustomElementNode(hash, content, nodeType, name);
@@ -202,6 +259,7 @@ export function mdxToHtml(
         mdxjsEsm: customElementHandler,
         math: customElementHandler,
         inlineMath: customElementHandler,
+        html: customElementHandler,
         ...Object.fromEntries(
           treatAsCustomElement.map((type) => [type, customElementHandler])
         ),
@@ -212,7 +270,7 @@ export function mdxToHtml(
   // Get html from hast
   const html = toHtml(hast);
 
-  return { html, frontmatter, originalElements };
+  return { html, frontmatter, originalFrontmatter, originalElements };
 }
 
 // Response from htmlToMdx
@@ -226,7 +284,9 @@ export function htmlToMdx(
   html: string,
   frontmatter: Frontmatter,
   originalElements: OriginalElements,
-  changedNodes?: ChangedNodes
+  originalFrontmatter?: string,
+  changedNodes?: ChangedNodes,
+  changedFrontmatter?: boolean
 ): HtmlToMdxResponse {
   // Get hast from html
   const hast = fromHtml(html);
@@ -236,14 +296,15 @@ export function htmlToMdx(
     if (
       element.properties?.dataHash &&
       typeof element.properties.dataHash === "string" &&
-      !changedNodes?.[element.properties.dataHash]
+      typeof originalElements[element.properties.dataHash] !== "undefined" &&
+      changedNodes?.[element.properties.dataHash] === false
     ) {
       // Use hash as placeholder, which will be replaced with actual content
       const placeholder = getCustomElementPlaceholder(
         String(element.properties.dataHash)
       );
 
-      return { type: "text", value: placeholder + "\n\n" } as any;
+      return { type: "html", value: placeholder } as any;
     }
     return getToMdastDefaultHandler(element.tagName as any)(state, element);
   };
@@ -255,21 +316,148 @@ export function htmlToMdx(
       String(element.properties.dataHash)
     );
 
-    return { type: "text", value: placeholder + "\n\n" } as any;
+    return { type: "html", value: placeholder } as any;
   };
 
   // Get mdast from hast (and handle custom elements)
   // TODO: fix types
   const mdast = toMdast(hast, {
     handlers: {
-      // TODO: add full set of base elements
-      p: baseElementHandler,
+      // All HTML tags that have MDX representations
+      // Headings
       h1: baseElementHandler,
       h2: baseElementHandler,
       h3: baseElementHandler,
       h4: baseElementHandler,
       h5: baseElementHandler,
       h6: baseElementHandler,
+
+      // Text formatting
+      p: baseElementHandler,
+      strong: baseElementHandler,
+      b: baseElementHandler,
+      em: baseElementHandler,
+      i: baseElementHandler,
+      del: baseElementHandler,
+      s: baseElementHandler,
+      strike: baseElementHandler,
+      u: baseElementHandler,
+      mark: baseElementHandler,
+      ins: baseElementHandler,
+      small: baseElementHandler,
+      big: baseElementHandler,
+      blink: baseElementHandler,
+      nobr: baseElementHandler,
+      span: baseElementHandler,
+      font: baseElementHandler,
+
+      // Code and inline code
+      code: baseElementHandler,
+      tt: baseElementHandler,
+      kbd: baseElementHandler,
+      samp: baseElementHandler,
+      var: baseElementHandler,
+      pre: baseElementHandler,
+      plaintext: baseElementHandler,
+      listing: baseElementHandler,
+      xmp: baseElementHandler,
+
+      // Links and references
+      a: baseElementHandler,
+      q: baseElementHandler,
+      cite: baseElementHandler,
+      dfn: baseElementHandler,
+      abbr: baseElementHandler,
+      acronym: baseElementHandler,
+
+      // Lists
+      ul: baseElementHandler,
+      ol: baseElementHandler,
+      dir: baseElementHandler,
+      li: baseElementHandler,
+      dl: baseElementHandler,
+      dt: baseElementHandler,
+      dd: baseElementHandler,
+
+      // Tables
+      table: baseElementHandler,
+      tr: baseElementHandler,
+      td: baseElementHandler,
+      th: baseElementHandler,
+
+      // Block elements
+      blockquote: baseElementHandler,
+      hr: baseElementHandler,
+      br: baseElementHandler,
+      wbr: baseElementHandler,
+
+      // Media
+      img: baseElementHandler,
+      image: baseElementHandler,
+      iframe: baseElementHandler,
+      audio: baseElementHandler,
+      video: baseElementHandler,
+
+      // Forms and inputs
+      input: baseElementHandler,
+      textarea: baseElementHandler,
+      select: baseElementHandler,
+      button: baseElementHandler,
+      label: baseElementHandler,
+      fieldset: baseElementHandler,
+      legend: baseElementHandler,
+      form: baseElementHandler,
+
+      // Layout and structure
+      div: baseElementHandler,
+      section: baseElementHandler,
+      article: baseElementHandler,
+      aside: baseElementHandler,
+      header: baseElementHandler,
+      footer: baseElementHandler,
+      nav: baseElementHandler,
+      main: baseElementHandler,
+      body: baseElementHandler,
+      html: baseElementHandler,
+      address: baseElementHandler,
+      center: baseElementHandler,
+      hgroup: baseElementHandler,
+      multicol: baseElementHandler,
+      picture: baseElementHandler,
+      figure: baseElementHandler,
+      figcaption: baseElementHandler,
+
+      // Other elements
+      details: baseElementHandler,
+      summary: baseElementHandler,
+      data: baseElementHandler,
+      time: baseElementHandler,
+      bdi: baseElementHandler,
+      bdo: baseElementHandler,
+      canvas: baseElementHandler,
+      map: baseElementHandler,
+      object: baseElementHandler,
+      param: baseElementHandler,
+      embed: baseElementHandler,
+      marquee: baseElementHandler,
+      meter: baseElementHandler,
+      progress: baseElementHandler,
+      output: baseElementHandler,
+      slot: baseElementHandler,
+      noscript: baseElementHandler,
+      ruby: baseElementHandler,
+      rb: baseElementHandler,
+      rbc: baseElementHandler,
+      rp: baseElementHandler,
+      rt: baseElementHandler,
+      rtc: baseElementHandler,
+      sup: baseElementHandler,
+      sub: baseElementHandler,
+      tbody: baseElementHandler,
+      thead: baseElementHandler,
+      tfoot: baseElementHandler,
+
+      // Custom elements
       ["custom-element"]: customElementHandler,
     } as any,
     newlines: true,
@@ -277,12 +465,21 @@ export function htmlToMdx(
 
   // Get mdx from mdast
   const mdx = toMarkdown(mdast, {
-    extensions: [mdxToMarkdown(), frontmatterToMarkdown(["yaml"])],
+    extensions: [
+      mdxToMarkdown(),
+      frontmatterToMarkdown(["yaml"]),
+      mathToMarkdown({ singleDollarTextMath: false }),
+    ],
+    // TODO: float configurations up to make them more discoverable
+    // Use hyphen instead of asterisk for unordered lists
+    bullet: "-",
   });
 
   // Reinject frontmatter if it exists
   let finalMdx = mdx;
-  if (frontmatter && Object.keys(frontmatter).length > 0) {
+  if (changedFrontmatter === false && originalFrontmatter) {
+    finalMdx = `---\n${originalFrontmatter}---\n\n${mdx}`;
+  } else if (frontmatter && Object.keys(frontmatter).length > 0) {
     const frontmatterYaml = yaml.dump(frontmatter, FRONTMATTER_YAML_OPTIONS);
     finalMdx = `---\n${frontmatterYaml}---\n\n${mdx}`;
   }
@@ -291,7 +488,18 @@ export function htmlToMdx(
   Object.entries(originalElements).forEach(([hash, customElement]) => {
     const placeholder = getCustomElementPlaceholder(hash);
     const content = customElement.content;
-    finalMdx = finalMdx.replace(placeholder, content);
+
+    // Escape dollar signs in content to prevent them from being treated as replacement references
+    // In JavaScript string replacement, $ has special meaning:
+    // - $& inserts the matched substring
+    // - $` inserts the portion of the string that precedes the matched substring
+    // - $' inserts the portion of the string that follows the matched substring
+    // - $n inserts the nth parenthesized submatch string
+    // By doubling the $ ($$), we insert a literal $ character
+    const escapedContent = content.replace(/\$/g, "$$$$");
+
+    // Replace placeholder with escaped content, using replaceAll for cases where there are repeats
+    finalMdx = finalMdx.replaceAll(placeholder, escapedContent);
   });
 
   return { mdx: finalMdx };
@@ -301,11 +509,14 @@ export function htmlToMdx(
 function isValidFrontmatter(
   frontmatter: unknown
 ): frontmatter is Record<string, unknown> {
-  return (
+  const isValid =
     !!frontmatter &&
     typeof frontmatter === "object" &&
-    !Array.isArray(frontmatter)
-  );
+    !Array.isArray(frontmatter);
+  if (!isValid) {
+    console.warn("Invalid or missing frontmatter", frontmatter);
+  }
+  return isValid;
 }
 
 // Get node info in a type-safe way
@@ -449,7 +660,7 @@ function mdxBaseElementNode(
     case "object": {
       if (Array.isArray(defaultNode)) {
         // Expects defaultNode: ElementContent[]
-        return defaultNode.map(() => null);
+        return defaultNode;
       } else if (defaultNode.type === "element") {
         // Expects defaultNode: Element
         // Note: we add a data-hash property to the element for the client's reference

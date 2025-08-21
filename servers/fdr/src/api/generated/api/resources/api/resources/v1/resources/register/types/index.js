@@ -1,4 +1,6 @@
+export * from "./DynamicIr";
 export * from "./RegisterApiDefinitionResponse";
+export * from "./DynamicIrUpload";
 export * from "./ApiDefinition";
 export * from "./ApiNavigationConfigRoot";
 export * from "./ApiNavigationConfigItem";

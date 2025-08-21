@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import urlJoin from "url-join";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
-import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import {
   HEADER_HOST,
   HEADER_X_FERN_HOST,
@@ -16,7 +15,7 @@ import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
 export const runtime = "edge";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  if (isLocal() || isSelfHosted()) {
+  if (isLocal()) {
     return {
       rules: {
         userAgent: "*",
@@ -28,6 +27,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const headersList = await headers();
   const domain =
     headersList.get(HEADER_X_FERN_HOST) ?? headersList.get(HEADER_HOST);
+
   if (!domain) {
     return {
       rules: {

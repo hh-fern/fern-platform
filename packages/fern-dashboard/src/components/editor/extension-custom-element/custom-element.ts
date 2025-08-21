@@ -25,15 +25,13 @@ export interface CustomElementOptions {
 export const CustomElement = Node.create<CustomElementOptions>({
   name: TAG,
 
-  priority: 1000,
-
   group: "block",
 
   content: "text*",
 
   atom: true,
 
-  draggable: false,
+  draggable: true,
 
   selectable: false,
 
@@ -90,26 +88,82 @@ export const CustomElement = Node.create<CustomElementOptions>({
         key: new PluginKey(TAG),
         /**
          * This plugin is used to prevent the custom element node from being replaced (deleted).
+         * However, it allows setContent operations (full document replacements) to proceed.
          * @see https://github.com/ueberdosis/tiptap/issues/181#issuecomment-1213455982
          */
         filterTransaction(transaction, state) {
-          let result = true; // true for keep, false for stop transaction
-          const replaceSteps: number[] = [];
-          transaction.steps.forEach((step, index) => {
+          // Allow transactions that replace the entire document (setContent operations)
+          if (
+            transaction.steps.length === 1 &&
+            transaction.steps[0] instanceof ReplaceStep
+          ) {
+            const step = transaction.steps[0] as ReplaceStep;
+            // If the step replaces from position 0 to the end of the document, it's likely a setContent
+            if (step.from === 0 && step.to === state.doc.content.size) {
+              return true;
+            }
+          }
+
+          // Check if any step involves a custom element
+          let hasCustomElement = false;
+          transaction.steps.forEach((step) => {
             if (step instanceof ReplaceStep) {
-              replaceSteps.push(index);
+              state.doc.nodesBetween(step.from, step.to, (node) => {
+                if (node.type.name === TAG) {
+                  hasCustomElement = true;
+                }
+              });
             }
           });
 
-          replaceSteps.forEach((index) => {
-            const step = transaction.steps[index] as ReplaceStep;
-            const oldStart = step.from;
-            const oldEnd = step.to;
-            state.doc.nodesBetween(oldStart, oldEnd, (node) => {
-              if (node.type.name === TAG) {
-                result = false;
+          // If no custom elements are involved, allow the transaction
+          if (!hasCustomElement) {
+            return true;
+          }
+
+          // Check if this is a drag operation (remove + insert pattern)
+          const replaceSteps = transaction.steps.filter(
+            (step) => step instanceof ReplaceStep
+          ) as ReplaceStep[];
+
+          if (replaceSteps.length === 2) {
+            const [removeStep, insertStep] = replaceSteps;
+
+            // Check if this looks like a drag operation:
+            // - One step removes content (slice size 0, from !== to)
+            // - Another step inserts content (slice size > 0, from === to)
+            const hasRemovalStep =
+              removeStep?.slice?.content?.size === 0 &&
+              removeStep?.from !== removeStep?.to;
+            const hasInsertionStep =
+              !!insertStep?.slice?.content?.size &&
+              insertStep?.from === insertStep?.to;
+
+            if (hasRemovalStep && hasInsertionStep) {
+              return true;
+            }
+          }
+
+          // For other transactions involving custom elements, only block pure deletions
+          // (where content is removed without any corresponding insertion)
+          let result = true;
+          const hasInsertion = replaceSteps.some(
+            (step) => step.slice.content.size > 0
+          );
+
+          transaction.steps.forEach((step) => {
+            if (step instanceof ReplaceStep) {
+              const isDeletion =
+                step.slice.content.size === 0 && step.from !== step.to;
+              if (isDeletion && !hasInsertion) {
+                // This is a pure deletion with no insertion - block it if it affects custom elements
+                state.doc.nodesBetween(step.from, step.to, (node) => {
+                  if (node.type.name === TAG) {
+                    result = false;
+                  }
+                });
               }
-            });
+            }
           });
           return result;
         },

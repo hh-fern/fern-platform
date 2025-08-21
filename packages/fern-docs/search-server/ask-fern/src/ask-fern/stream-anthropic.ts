@@ -10,7 +10,6 @@ import {
   convertToModelMessages,
   createUIMessageStream,
   createUIMessageStreamResponse,
-  embed,
   stepCountIs,
   streamText,
   tool,
@@ -19,19 +18,19 @@ import z from "zod";
 
 import { postToSlack, track } from "@fern-api/docs-server";
 import {
+  fernToken_admin,
   getFaiOrigin,
-  turbopufferApiKey,
 } from "@fern-api/docs-server/env-variables";
 import { FernFaiClient } from "@fern-api/fai-sdk";
+import { FacetFilter } from "@fern-docs/search-keyword";
 
 import {
+  TurbopufferRecord,
   convertTpufRecordsToDocuments,
   createChatSystemPrompt,
-  queryTurbopuffer,
 } from "../index";
-
-export const maxDuration = 60;
-export const revalidate = 0;
+import { runQueryTurbopuffer } from "./run-query-turbopuffer";
+import { MAX_QUERY_ATTEMPTS, TOP_K } from "./stream-constants";
 
 export async function runRouteForAnthropic({
   domain,
@@ -40,6 +39,7 @@ export async function runRouteForAnthropic({
   conversationId,
   lastUserMessage,
   messages,
+  filters,
   embeddingModel,
   turbopufferNamespace,
   languageModel,
@@ -50,6 +50,7 @@ export async function runRouteForAnthropic({
   conversationId: string;
   lastUserMessage: string;
   messages: UIMessage[];
+  filters: FacetFilter[];
   embeddingModel: EmbeddingModel<string>;
   turbopufferNamespace: string;
   languageModel: LanguageModel;
@@ -74,16 +75,29 @@ export async function runRouteForAnthropic({
 
   const start = Date.now();
 
-  const searchResults = await runQueryTurbopuffer(lastUserMessage, {
+  const searchResultURLs = new Set<string>();
+  const searchResults: TurbopufferRecord[] = [];
+  const turbopufferResults = await runQueryTurbopuffer(lastUserMessage, {
     embeddingModel,
     namespace: turbopufferNamespace,
     topK: 3,
+    filters,
   });
+  for (const result of turbopufferResults) {
+    if (result.attributes.url) {
+      if (!searchResultURLs.has(result.attributes.url)) {
+        searchResultURLs.add(result.attributes.url);
+        searchResults.push(result);
+      }
+    } else {
+      searchResults.push(result);
+    }
+  }
 
   const searchResultSources = searchResults.map((hit) => {
     return {
       title: hit.attributes.title,
-      url: `https://${hit.attributes.domain}${hit.attributes.pathname}${hit.attributes.hash ?? ""}`,
+      url: hit.attributes.url,
     };
   });
 
@@ -97,6 +111,9 @@ export async function runRouteForAnthropic({
   });
 
   const documentIdsToIgnore: string[] = [];
+  const urlsToIgnore: string[] = searchResultSources.map(
+    (source) => source.url
+  );
   let timeToFirstToken: number | undefined = undefined;
   let responseText = "";
 
@@ -121,36 +138,44 @@ export async function runRouteForAnthropic({
               query: z.string(),
             }),
             async execute({ query }) {
-              const response = await runQueryTurbopuffer(query, {
-                embeddingModel,
-                namespace: turbopufferNamespace,
-                topK: 5,
-                documentIdsToIgnore: documentIdsToIgnore,
-              });
-              documentIdsToIgnore.push(...response.map((hit) => hit.id));
-
-              const mappedResponse = response.map((hit) => {
-                const { domain, pathname, hash, document } = hit.attributes;
-                const url = `https://${domain}${pathname}${hash ?? ""}`;
-                if (document.length > 20000) {
-                  return {
-                    ...hit.attributes,
-                    url,
-                    document: document.slice(0, 20000),
-                  };
+              const response = [];
+              for (let i = 0; i < MAX_QUERY_ATTEMPTS; i++) {
+                const result = await runQueryTurbopuffer(query, {
+                  embeddingModel,
+                  namespace: turbopufferNamespace,
+                  topK: TOP_K,
+                  documentIdsToIgnore: documentIdsToIgnore,
+                  urlsToIgnore: urlsToIgnore,
+                  filters,
+                });
+                for (const hit of result) {
+                  const url = hit.attributes.url;
+                  documentIdsToIgnore.push(hit.id);
+                  if (url != null && !urlsToIgnore.includes(url)) {
+                    urlsToIgnore.push(url);
+                    if (hit.attributes.document.length > 20000) {
+                      response.push({
+                        ...hit.attributes,
+                        document: hit.attributes.document.slice(0, 20000),
+                        url,
+                      });
+                    } else {
+                      response.push({
+                        ...hit.attributes,
+                        document: hit.attributes.document,
+                        url,
+                      });
+                    }
+                    if (response.length >= TOP_K) {
+                      return response;
+                    }
+                  }
                 }
-                return { url, ...hit.attributes };
-              });
-
-              const responseURLs = new Set();
-              const dedupedResponse = []; // avoid sending the same document over and over
-              for (const hit of mappedResponse) {
-                if (!responseURLs.has(hit.url)) {
-                  responseURLs.add(hit.url);
-                  dedupedResponse.push(hit);
+                if (response.length >= TOP_K) {
+                  return response;
                 }
               }
-              return dedupedResponse;
+              return response;
             },
           }),
         },
@@ -190,18 +215,22 @@ export async function runRouteForAnthropic({
           const queryId = crypto.randomUUID();
           const faiClient = new FernFaiClient({
             baseUrl: getFaiOrigin(),
-            token: () => "",
+            token: fernToken_admin(),
           });
-          await faiClient.queries.createQuery({
-            query_id: queryId,
-            conversation_id: conversationId,
-            domain,
-            text: responseText,
-            role: "ASSISTANT",
-            source: chatSource.toUpperCase(),
-            created_at: new Date(end).toISOString(),
-            time_to_first_token: timeToFirstToken,
-          });
+          try {
+            await faiClient.queries.createQuery({
+              query_id: queryId,
+              conversation_id: conversationId,
+              domain,
+              text: responseText,
+              role: "ASSISTANT",
+              source: chatSource.toUpperCase(),
+              created_at: new Date(end).toISOString(),
+              time_to_first_token: timeToFirstToken,
+            });
+          } catch (error) {
+            console.log("Error creating query", error);
+          }
           track("ask_ai", {
             languageModel: languageModel.valueOf().toString(),
             embeddingModel: embeddingModel.modelId,
@@ -228,30 +257,4 @@ export async function runRouteForAnthropic({
   });
 
   return createUIMessageStreamResponse({ stream: uiMessageStream });
-}
-
-async function runQueryTurbopuffer(
-  query: string | null | undefined,
-  opts: {
-    embeddingModel: EmbeddingModel<string>;
-    namespace: string;
-    topK?: number;
-    documentIdsToIgnore?: string[];
-  }
-) {
-  return query == null || query.trimStart().length === 0
-    ? []
-    : await queryTurbopuffer(query, {
-        namespace: opts.namespace,
-        apiKey: turbopufferApiKey(),
-        topK: opts.topK ?? 5,
-        vectorizer: async (text) => {
-          const embedding = await embed({
-            model: opts.embeddingModel,
-            value: text,
-          });
-          return embedding.embedding;
-        },
-        documentIdsToIgnore: opts.documentIdsToIgnore,
-      });
 }

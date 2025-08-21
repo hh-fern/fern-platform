@@ -1,17 +1,13 @@
-from typing import Optional
-
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy import and_
-from sqlalchemy import desc
-from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.fai.app import fai_app
-from src.fai.db_models.query import Query
 from src.fai.dependencies import get_db
+from src.fai.models.db.query import Query
 from src.settings import LOGGER
 
 

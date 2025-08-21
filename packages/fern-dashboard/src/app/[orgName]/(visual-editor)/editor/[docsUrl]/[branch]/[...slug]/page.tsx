@@ -1,26 +1,28 @@
+import "server-only";
+
 import { notFound, redirect } from "next/navigation";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import { FernNavigation } from "@fern-api/fdr-sdk";
-import { getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { NodeId, getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
-import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 import { mdxToHtml } from "@fern-docs/mdx";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import { UnsupportedContent } from "@/components/editor/UnsupportedContent";
-import { OriginalElementsProvider } from "@/providers/OriginalElementsContext";
+import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
+import { GitHubLoader } from "@/app/services/github/github-loader";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
+import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import { EncodedDocsUrl } from "@/utils/types";
 
-import PageContents from "./PageContents";
+import PageNode from "./PageNode";
 
 export const experimental_ppr = false;
 
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: Promise<{
     orgName: Auth0OrgName;
@@ -28,29 +30,34 @@ export default async function Page({
     branch: string;
     slug: string[];
   }>;
+  searchParams: Promise<Record<string, string>>;
 }) {
-  const session = await getCurrentSession();
-
-  if (session == null) {
-    redirect("/");
-  }
-
   const { orgName, docsUrl, branch, slug: slugArray } = await params;
+
+  const { githubUrl, session } = await assertAuthAndFetchGithubUrl({
+    orgName,
+    docsUrl: parseDocsUrlParam({ docsUrl }),
+  });
+
+  const resolvedSearchParams = await searchParams;
   const host = await getHostFromHeaders();
   const slugAlias = slugArray.join("/");
 
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
-    session?.accessToken
+    session.accessToken,
+    new GitHubLoader(githubUrl)
   );
   const root = await loader.getRoot();
 
   const slug = slugAlias === ROOT_SLUG_ALIAS ? root.slug : slugAlias;
   const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));
-
-  // If the page is not found, redirect to the root (index) page
-  if (foundNode.type !== "found") {
+  // Check if client-node-id is passed as search param
+  const clientNodeId = resolvedSearchParams["client-node-id"];
+  // If the page is not found and client-node-id is not passed, redirect to appropriate page
+  // For client pages, we allow not-found nodes as long as clientNodeId is provided
+  if (foundNode.type !== "found" && !clientNodeId) {
     if (foundNode.redirect) {
       redirect(
         constructEditorSlug({
@@ -77,14 +84,23 @@ export default async function Page({
     );
   }
 
-  const pageId = getPageId(foundNode.node);
+  const pageId =
+    foundNode.type === "found" ? getPageId(foundNode.node) : undefined;
 
-  const page = pageId && (await loader.getPage(pageId));
-  const mdx = page?.markdown ?? "";
-  const { html, frontmatter, originalElements } = mdxToHtml(mdx, {
-    treatAsCustomElement: ["code"],
-  });
+  // For client pages, don't try to load server data
+  const page =
+    pageId && !clientNodeId ? await loader.getPage(pageId) : undefined;
 
+  const filename = page?.filename;
+  const mdx = page?.markdown;
+  const cssConfig = page?.css; // Extract CSS configuration
+
+  const { html, frontmatter, originalElements, originalFrontmatter } = mdx
+    ? mdxToHtml(mdx, {
+        treatAsCustomElement: ["code"],
+        treatAsUnsupported: ["math"],
+      })
+    : {};
   return (
     // TODO: Currently, we are force-hiding the table of contents is within Visual Editor.
     // This is a temporary solution, as I anticipate we will want the TOC to be dynamic based
@@ -94,32 +110,29 @@ export default async function Page({
       frontmatter={frontmatter}
     >
       <div className="flex w-full flex-col gap-2 py-12">
-        <SetCurrentNavigationNode
-          nodeId={foundNode.node.id}
-          sidebarRootNodeId={foundNode.sidebar?.id}
-          tabId={foundNode.currentTab?.id}
-          productId={foundNode.currentProduct?.productId}
-          productSlug={foundNode.currentProduct?.slug}
-          versionId={foundNode.currentVersion?.versionId}
-          versionSlug={foundNode.currentVersion?.slug}
-          versionIsDefault={foundNode.isCurrentVersionDefault}
-          productIsDefault={foundNode.isCurrentProductDefault}
+        <PageNode
+          serializableFoundNode={
+            foundNode.type === "found"
+              ? {
+                  type: foundNode.type,
+                  node: foundNode.node,
+                  sidebar: foundNode.sidebar,
+                  currentTab: foundNode.currentTab,
+                  currentProduct: foundNode.currentProduct,
+                  currentVersion: foundNode.currentVersion,
+                  isCurrentVersionDefault: foundNode.isCurrentVersionDefault,
+                  isCurrentProductDefault: foundNode.isCurrentProductDefault,
+                }
+              : undefined
+          }
+          clientNodeId={clientNodeId as NodeId}
+          initialFilename={filename}
+          initialHtml={html}
+          initialFrontmatter={frontmatter}
+          initialOriginalElements={originalElements}
+          initialOriginalFrontmatter={originalFrontmatter}
+          cssConfig={cssConfig}
         />
-        {foundNode.node.type !== "page" ? (
-          <UnsupportedContent>
-            This page is not visible in the editor.
-          </UnsupportedContent>
-        ) : (
-          <OriginalElementsProvider originalElements={originalElements}>
-            <PageContents
-              // TODO: If there is no filename, it is an error we should surface
-              filename={page?.filename ?? ""}
-              initialHtml={html}
-              initialFrontmatter={frontmatter}
-              initialOriginalElements={originalElements}
-            />
-          </OriginalElementsProvider>
-        )}
       </div>
     </AbstractLayoutEvaluatorContent>
   );

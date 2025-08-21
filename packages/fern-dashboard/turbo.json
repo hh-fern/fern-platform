@@ -4,7 +4,13 @@
   "globalEnv": [],
   "tasks": {
     "build": {
-      "env": ["NEXT_RUNTIME", "SENTRY_AUTH_TOKEN"]
+      "env": [
+        "NEXT_RUNTIME",
+        "SENTRY_AUTH_TOKEN",
+        "FERN_SUPPORT_GITHUB_TOKEN",
+        "FERN_BOT_APP_ID",
+        "FERN_BOT_PRIVATE_KEY"
+      ]
     },
     "compile": {
       "outputs": ["tsconfig.tsbuildinfo"],

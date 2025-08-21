@@ -1,11 +1,11 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
-import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { MARKDOWN_PATTERN } from "@fern-api/docs-server/patterns";
-import { removeLeadingSlash } from "@fern-api/docs-utils";
+import { COOKIE_FERN_TOKEN, removeLeadingSlash } from "@fern-api/docs-utils";
 
 import {
   getMarkdownForPath,
@@ -20,7 +20,7 @@ export async function GET(
   req: NextRequest,
   props: { params: Promise<{ host: string; domain: string }> }
 ): Promise<NextResponse> {
-  if (isLocal() || isSelfHosted()) {
+  if (isLocal()) {
     return new NextResponse(".md preview is not available in local preview", {
       status: 400,
     });
@@ -28,11 +28,13 @@ export async function GET(
 
   const { host, domain } = await props.params;
 
+  const fernToken = (await cookies()).get(COOKIE_FERN_TOKEN)?.value;
+
   const path = req.nextUrl.pathname;
   const slug = path.replace(MARKDOWN_PATTERN, "");
   const cleanSlug = removeLeadingSlash(slug);
 
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, fernToken);
   const node = getPageNodeForPath(await loader.getRoot(), cleanSlug);
 
   if (node == null) {
@@ -40,9 +42,9 @@ export async function GET(
     notFound();
   }
 
-  // If the page is authed, but the user is not authed, return a 403
+  // if the page is authed, return 403
   if (node.authed) {
-    return new NextResponse(null, { status: 403 });
+    return new NextResponse("User is not logged in", { status: 403 });
   }
 
   const markdown = await getMarkdownForPath(node, loader);

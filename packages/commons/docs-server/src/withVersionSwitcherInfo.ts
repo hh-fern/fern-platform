@@ -43,6 +43,13 @@ export function withVersionSwitcherInfo({
   versions,
   slugMap,
 }: WithVersionSwitcherInfoArgs): VersionSwitcherInfo[] {
+  let defaultVersionIdx = versions.findIndex((child) => child.default);
+  if (defaultVersionIdx === -1) {
+    defaultVersionIdx = 0;
+  }
+
+  const defaultVersion = versions[defaultVersionIdx];
+
   const { version: currentVersion, nodes } =
     getNodesUnderCurrentVersionAscending(node, parents);
 
@@ -59,14 +66,17 @@ export function withVersionSwitcherInfo({
   return versions
     .filter((version) => !version.hidden)
     .map((version, index) => {
+      const isDefault = version.id === defaultVersion?.id;
       if (version.id === currentVersion?.id) {
         return {
           title: version.title,
           id: version.versionId,
           slug: version.slug,
-          landingPage: version.landingPage?.slug,
+          landingPage: isDefault
+            ? (version.landingPage?.canonicalSlug ?? version.landingPage?.slug)
+            : version.landingPage?.slug,
           // the current version should always point to the current node
-          pointsTo: node.slug,
+          pointsTo: isDefault ? (node.canonicalSlug ?? node.slug) : node.slug,
           index,
           availability: version.availability,
           hidden: version.hidden,
@@ -88,8 +98,9 @@ export function withVersionSwitcherInfo({
           }
 
           // if the node is a visitable page, return the slug
+          // for the default version, use the canonical slugs, if available
           else if (FernNavigation.isPage(node)) {
-            return node.slug;
+            return isDefault ? (node.canonicalSlug ?? node.slug) : node.slug;
           }
 
           // if the node is a redirect, return the slug it points to (which can be undefined)

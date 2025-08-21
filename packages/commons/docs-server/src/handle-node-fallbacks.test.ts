@@ -6,7 +6,8 @@ import { NodeId } from "@fern-api/fdr-sdk/navigation";
 import {
   getFallbackProduct,
   getFallbackVersion,
-  getHeaderTabs,
+  getProducts,
+  getTabs,
 } from "./handle-node-fallbacks";
 import {
   createFoundNode,
@@ -195,7 +196,7 @@ describe("handle-node-fallbacks", () => {
     });
   });
 
-  describe("getHeaderTabs", () => {
+  describe("getTabs", () => {
     it("should return tabs from found node if available", () => {
       const tabNode = createTabNode("tab1", "Tab 1");
       const pageNode = createPageNode("test-page", "Test Page");
@@ -215,7 +216,13 @@ describe("handle-node-fallbacks", () => {
       };
       const root = createRootNode([productNode], "productgroup");
 
-      const result = getHeaderTabs(foundNode, root, "test-product/test-page");
+      const result = getTabs(
+        foundNode,
+        root,
+        "test-product/test-page",
+        false,
+        []
+      );
       expect(result).toEqual([tabNode]);
     });
 
@@ -236,7 +243,13 @@ describe("handle-node-fallbacks", () => {
       }
       const foundNode: FernNavigation.utils.Node = createNotFoundNode();
 
-      const result = getHeaderTabs(foundNode, root, "test-product/test-page");
+      const result = getTabs(
+        foundNode,
+        root,
+        "test-product/test-page",
+        false,
+        []
+      );
       expect(result).toEqual([tabNode]);
     });
 
@@ -257,7 +270,13 @@ describe("handle-node-fallbacks", () => {
       const root = createRootNode([productNode], "unversioned");
       const foundNode: FernNavigation.utils.Node = createNotFoundNode();
 
-      const result = getHeaderTabs(foundNode, root, "test-product/test-page");
+      const result = getTabs(
+        foundNode,
+        root,
+        "test-product/test-page",
+        false,
+        []
+      );
       expect(result).toEqual([tabNode]);
     });
 
@@ -280,10 +299,12 @@ describe("handle-node-fallbacks", () => {
       const root = createRootNode([productNode], "versioned");
       const foundNode: FernNavigation.utils.Node = createNotFoundNode();
 
-      const result = getHeaderTabs(
+      const result = getTabs(
         foundNode,
         root,
-        "test-product/v1/test-page"
+        "test-product/v1/test-page",
+        false,
+        []
       );
       expect(result).toEqual([tabNode]);
     });
@@ -307,10 +328,12 @@ describe("handle-node-fallbacks", () => {
       const root = createRootNode([productNode], "versioned");
       const foundNode: FernNavigation.utils.Node = createNotFoundNode();
 
-      const result = getHeaderTabs(
+      const result = getTabs(
         foundNode,
         root,
-        "test-product/v1/test-page"
+        "test-product/v1/test-page",
+        false,
+        []
       );
       expect(result).toEqual([tabNode]);
     });
@@ -334,8 +357,221 @@ describe("handle-node-fallbacks", () => {
       const root = createRootNode([productNode], "productgroup");
       const foundNode: FernNavigation.utils.Node = createNotFoundNode();
 
-      const result = getHeaderTabs(foundNode, root, "test-product/test-page");
+      const result = getTabs(
+        foundNode,
+        root,
+        "test-product/test-page",
+        false,
+        []
+      );
       expect(result).toBeNull();
+    });
+
+    it("should filter authenticated tabs when showHiddenNodes is false", () => {
+      const authedTab = createTabNode("authed-tab", "Authed Tab");
+      authedTab.authed = true;
+      const publicTab = createTabNode("public-tab", "Public Tab");
+      publicTab.authed = false;
+
+      const foundNode: FernNavigation.utils.Node = {
+        ...createFoundNode(
+          createPageNode("test-page", "Test Page"),
+          [createProductNode("test-product", "Test Product", false)],
+          createRootNode([], "productgroup")
+        ),
+        tabs: [authedTab, publicTab],
+      };
+      const root = createRootNode([], "productgroup");
+
+      const result = getTabs(
+        foundNode,
+        root,
+        "test-product/test-page",
+        false,
+        []
+      );
+      expect(result).toEqual([publicTab]);
+    });
+
+    it("should return all tabs including authenticated ones when showHiddenNodes is true", () => {
+      const authedTab = createTabNode("authed-tab", "Authed Tab");
+      authedTab.authed = true;
+      const publicTab = createTabNode("public-tab", "Public Tab");
+      publicTab.authed = false;
+
+      const foundNode: FernNavigation.utils.Node = {
+        ...createFoundNode(
+          createPageNode("test-page", "Test Page"),
+          [createProductNode("test-product", "Test Product", false)],
+          createRootNode([], "productgroup")
+        ),
+        tabs: [authedTab, publicTab],
+      };
+      const root = createRootNode([], "productgroup");
+
+      const result = getTabs(
+        foundNode,
+        root,
+        "test-product/test-page",
+        true,
+        []
+      );
+      expect(result).toEqual([authedTab, publicTab]);
+    });
+
+    it("should return tabs with everyone viewer even when showHiddenNodes is false", () => {
+      const everyoneTab = createTabNode("everyone-tab", "Everyone Tab");
+      everyoneTab.viewers = [FernNavigation.RoleId("everyone")];
+      const restrictedTab = createTabNode("restricted-tab", "Restricted Tab");
+      restrictedTab.viewers = [FernNavigation.RoleId("admin")];
+      const publicTab = createTabNode("public-tab", "Public Tab");
+      publicTab.viewers = [];
+
+      const foundNode: FernNavigation.utils.Node = {
+        ...createFoundNode(
+          createPageNode("test-page", "Test Page"),
+          [createProductNode("test-product", "Test Product", false)],
+          createRootNode([], "productgroup")
+        ),
+        tabs: [everyoneTab, restrictedTab, publicTab],
+      };
+      const root = createRootNode([], "productgroup");
+
+      const result = getTabs(
+        foundNode,
+        root,
+        "test-product/test-page",
+        false,
+        []
+      );
+      expect(result).toEqual([everyoneTab, publicTab]);
+    });
+  });
+
+  describe("getProducts", () => {
+    it("should return null if root is not a productgroup", () => {
+      const root = createRootNode([], "unversioned");
+      const result = getProducts(root, false, []);
+      expect(result).toBeNull();
+    });
+
+    it("should return all products when showHiddenNodes is true", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      const root = createRootNode([product1, product2], "productgroup");
+
+      const result = getProducts(root, true, []);
+      expect(result).toEqual([product1, product2]);
+    });
+
+    it("should return all products when showHiddenNodes is true even if some are authenticated", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      product2.authed = true;
+      const root = createRootNode([product1, product2], "productgroup");
+
+      const result = getProducts(root, true, []);
+      expect(result).toEqual([product1, product2]);
+    });
+
+    it("should filter out authenticated products when showHiddenNodes is false", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      product2.authed = true;
+      const root = createRootNode([product1, product2], "productgroup");
+
+      const result = getProducts(root, false, []);
+      expect(result).toEqual([product1]);
+    });
+
+    it("should return products with no viewers when showHiddenNodes is false", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      product1.viewers = [];
+      product2.viewers = [];
+      const root = createRootNode([product1, product2], "productgroup");
+
+      const result = getProducts(root, false, []);
+      expect(result).toEqual([product1, product2]);
+    });
+
+    it("should return products with everyone viewer when showHiddenNodes is false", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      product1.viewers = [FernNavigation.RoleId("everyone")];
+      product2.viewers = [FernNavigation.RoleId("admin")];
+      const root = createRootNode([product1, product2], "productgroup");
+
+      const result = getProducts(root, false, []);
+      expect(result).toEqual([product1]);
+    });
+
+    it("should return products that match user roles when showHiddenNodes is false", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      const product3 = createProductNode("product3", "Product 3", false);
+      product1.viewers = [FernNavigation.RoleId("admin")];
+      product2.viewers = [FernNavigation.RoleId("user")];
+      product3.viewers = [FernNavigation.RoleId("everyone")];
+      const root = createRootNode(
+        [product1, product2, product3],
+        "productgroup"
+      );
+
+      const result = getProducts(root, false, ["admin", "user"]);
+      expect(result).toEqual([product1, product2, product3]);
+    });
+
+    it("should not return products that don't match user roles when showHiddenNodes is false", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      product1.viewers = [FernNavigation.RoleId("admin")];
+      product2.viewers = [FernNavigation.RoleId("user")];
+      const root = createRootNode([product1, product2], "productgroup");
+
+      const result = getProducts(root, false, ["admin"]);
+      expect(result).toEqual([product1]);
+    });
+
+    it("should return non-product nodes regardless of authentication status", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      product2.authed = true;
+      const root = createRootNode([product1, product2], "productgroup");
+
+      const result = getProducts(root, false, []);
+      expect(result).toEqual([product1]);
+    });
+
+    it("should return empty array when no products match criteria", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      product1.authed = true;
+      product2.authed = true;
+      const root = createRootNode([product1, product2], "productgroup");
+
+      const result = getProducts(root, false, []);
+      expect(result).toEqual([]);
+    });
+
+    it("should handle products with mixed viewer configurations", () => {
+      const product1 = createProductNode("product1", "Product 1", false);
+      const product2 = createProductNode("product2", "Product 2", false);
+      const product3 = createProductNode("product3", "Product 3", false);
+      const product4 = createProductNode("product4", "Product 4", false);
+
+      product1.viewers = [FernNavigation.RoleId("everyone")];
+      product2.viewers = [];
+      product3.viewers = [FernNavigation.RoleId("admin")];
+      product4.authed = true;
+
+      const root = createRootNode(
+        [product1, product2, product3, product4],
+        "productgroup"
+      );
+
+      const result = getProducts(root, false, ["admin"]);
+      expect(result).toEqual([product1, product2, product3]);
     });
   });
 });

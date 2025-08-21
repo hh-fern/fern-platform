@@ -211,8 +211,28 @@ export class ApiDefinitionV1ToLatest {
       queryParameters: this.migrateParameters(v1.queryParameters),
       requestHeaders: this.migrateParameters(v1.headers),
       responseHeaders: undefined,
-      requests: [this.migrateHttpRequest(v1.request)].filter(isNonNullish),
-      responses: [this.migrateHttpResponse(v1.response)].filter(isNonNullish),
+      requests: (() => {
+        const requests = v1.requestsV2?.requests
+          ?.map((request) => this.migrateHttpRequest(request))
+          ?.filter(isNonNullish);
+
+        if (requests != null && requests.length > 0) {
+          return requests;
+        }
+
+        return [this.migrateHttpRequest(v1.request)].filter(isNonNullish);
+      })(),
+      responses: (() => {
+        const responses = v1.responsesV2?.responses
+          ?.map((response) => this.migrateHttpResponse(response))
+          ?.filter(isNonNullish);
+
+        if (responses != null && responses.length > 0) {
+          return responses;
+        }
+
+        return [this.migrateHttpResponse(v1.response)].filter(isNonNullish);
+      })(),
       errors: this.migrateHttpErrors(v1.errorsV2),
       examples: undefined,
       snippetTemplates: v1.snippetTemplates,

@@ -62,10 +62,15 @@ export const middleware: NextMiddleware = async (request) => {
 
   const rewrite = (
     newPathname: string,
-    search?: string | URLSearchParams | Record<string, string>
+    search?: string | URLSearchParams | Record<string, string>,
+    customHeaders?: HeadersInit
   ) => {
+    const mergedHeaders = customHeaders
+      ? new Headers(customHeaders)
+      : new Headers(headers);
+
     if (pathname === newPathname && !search) {
-      return NextResponse.next({ request: { headers } });
+      return NextResponse.next({ request: { headers: mergedHeaders } });
     }
     const destination = withPathname(
       request,
@@ -81,7 +86,7 @@ export const middleware: NextMiddleware = async (request) => {
     );
 
     return NextResponse.rewrite(destination, {
-      request: { headers },
+      request: { headers: mergedHeaders },
     });
   };
 
@@ -127,12 +132,12 @@ export const middleware: NextMiddleware = async (request) => {
   if (pathname.includes("/_search/")) {
     const searchPath = withoutBasepath("/_search/");
     const cleanedPath = searchPath.replace("_search/", "");
-    const meiliUrl = `${process.env.NEXT_PUBLIC_MEILISEARCH_ORIGIN}/${cleanedPath}`;
+    const meiliUrl = `${process.env.NEXT_PUBLIC_MEILISEARCH_ORIGIN ?? "http://localhost:7700"}/${cleanedPath}`;
     // Clone headers and override Authorization
     const newHeaders = new Headers(headers);
     newHeaders.set(
       "Authorization",
-      `Bearer ${process.env.NEXT_PUBLIC_MEILISEARCH_API_KEY}`
+      `Bearer ${process.env.NEXT_PUBLIC_MEILISEARCH_API_KEY ?? "fern123!"}`
     );
 
     return NextResponse.rewrite(meiliUrl, {
@@ -205,7 +210,15 @@ export const middleware: NextMiddleware = async (request) => {
   if (pathname.match(RSS_PATTERN)) {
     const format = pathname.match(RSS_PATTERN)?.[1] ?? "rss";
     const slug = removeLeadingSlash(withoutEnding(RSS_PATTERN));
-    return rewrite(withDomain("/api/fern-docs/changelog"), { format, slug });
+    // standalone mode does not support search params, so we need to use headers
+    return rewrite(
+      withDomain("/api/fern-docs/changelog"),
+      { format, slug },
+      {
+        "x-fern-changelog-slug": slug,
+        "x-fern-changelog-format": format,
+      }
+    );
   }
 
   /**
@@ -242,7 +255,7 @@ export const middleware: NextMiddleware = async (request) => {
   let newToken: string | undefined;
 
   // ignore authentication in local preview
-  if (isLocal() || isSelfHosted()) {
+  if (isLocal()) {
     // serve local files directly
     if (pathname.startsWith("/_local/")) {
       const origin = process.env.NEXT_PUBLIC_FDR_ORIGIN;
@@ -258,6 +271,26 @@ export const middleware: NextMiddleware = async (request) => {
     return rewrite(
       withDomain(
         `/dynamic/${encodeURIComponent(conformTrailingSlash(pathname))}`
+      )
+    );
+  }
+
+  if (isSelfHosted()) {
+    // serve local files directly
+    if (pathname.startsWith("/_local/")) {
+      const origin = process.env.NEXT_PUBLIC_FDR_ORIGIN;
+      if (!origin) {
+        throw new Error(
+          "NEXT_PUBLIC_FDR_ORIGIN is required for local file handling"
+        );
+      }
+      const absoluteUrl = new URL(pathname, origin);
+      return NextResponse.redirect(absoluteUrl);
+    }
+
+    return rewrite(
+      withDomain(
+        `/static/${encodeURIComponent(conformTrailingSlash(pathname))}`
       )
     );
   }

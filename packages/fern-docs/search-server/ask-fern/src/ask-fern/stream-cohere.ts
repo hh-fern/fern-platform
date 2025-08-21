@@ -15,20 +15,19 @@ import z from "zod";
 
 import { postToSlack, track } from "@fern-api/docs-server";
 import {
+  fernToken_admin,
   getFaiOrigin,
   turbopufferApiKey,
 } from "@fern-api/docs-server/env-variables";
 import { FernFaiClient } from "@fern-api/fai-sdk";
 import { isNonNullish } from "@fern-api/ui-core-utils";
+import { FacetFilter } from "@fern-docs/search-keyword";
 
 import {
   convertTpufRecordToCitation,
   createChatSystemPrompt,
   queryTurbopuffer,
 } from "../index";
-
-export const maxDuration = 60;
-export const revalidate = 0;
 
 export async function runRouteForCohere({
   domain,
@@ -37,6 +36,7 @@ export async function runRouteForCohere({
   conversationId,
   lastUserMessage,
   messages,
+  filters,
   embeddingModel,
   turbopufferNamespace,
   languageModel,
@@ -47,6 +47,7 @@ export async function runRouteForCohere({
   conversationId: string;
   lastUserMessage: string;
   messages: UIMessage[];
+  filters: FacetFilter[];
   embeddingModel: EmbeddingModel<string>;
   turbopufferNamespace: string;
   languageModel: LanguageModel;
@@ -57,11 +58,12 @@ export async function runRouteForCohere({
     embeddingModel,
     namespace: turbopufferNamespace,
     topK: 3,
+    filters,
   });
   const searchResultSources = searchResults.map((hit) => {
     return {
       title: hit.attributes.title,
-      url: `https://${hit.attributes.domain}${hit.attributes.pathname}${hit.attributes.hash ?? ""}`,
+      url: hit.attributes.url,
     };
   });
 
@@ -161,18 +163,22 @@ export async function runRouteForCohere({
           const queryId = crypto.randomUUID();
           const faiClient = new FernFaiClient({
             baseUrl: getFaiOrigin(),
-            token: () => "",
+            token: fernToken_admin(),
           });
-          await faiClient.queries.createQuery({
-            query_id: queryId,
-            conversation_id: conversationId,
-            domain,
-            text: responseText,
-            role: "ASSISTANT",
-            source: chatSource.toUpperCase(),
-            created_at: new Date(end).toISOString(),
-            time_to_first_token: timeToFirstToken,
-          });
+          try {
+            await faiClient.queries.createQuery({
+              query_id: queryId,
+              conversation_id: conversationId,
+              domain,
+              text: responseText,
+              role: "ASSISTANT",
+              source: chatSource.toUpperCase(),
+              created_at: new Date(end).toISOString(),
+              time_to_first_token: timeToFirstToken,
+            });
+          } catch (error) {
+            console.log("Error creating query", error);
+          }
           track("ask_ai", {
             languageModel: languageModel.valueOf().toString(),
             embeddingModel: embeddingModel.modelId,
@@ -207,6 +213,7 @@ async function runQueryTurbopuffer(
     embeddingModel: EmbeddingModel<string>;
     namespace: string;
     topK?: number;
+    filters?: FacetFilter[];
     documentIdsToIgnore?: string[];
   }
 ) {
@@ -224,6 +231,7 @@ async function runQueryTurbopuffer(
           return embedding.embedding;
         },
         documentIdsToIgnore: opts.documentIdsToIgnore,
+        filters: opts.filters,
       });
 }
 

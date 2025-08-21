@@ -14,15 +14,16 @@ export default async function Page({
   const session = await getCurrentSession();
 
   if (session == null) {
-    redirect("/");
+    redirect("/login");
   }
+
+  const { orgName } = await params;
 
   const isDocsPageEnabled = await isFeatureFlagEnabledForUser(
     PosthogFeatureFlag.ENABLE_DOCS_PAGE,
-    session.user.sub
+    session.user.sub,
+    orgName
   );
-
-  const { orgName } = await params;
 
   if (isDocsPageEnabled) {
     redirect(`/${orgName}/docs`);

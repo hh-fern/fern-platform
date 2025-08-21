@@ -31,7 +31,7 @@ export declare namespace Analytics {
 }
 
 /**
- * APIs for the FAI (Acorn) Service
+ * FAI Analytics API
  */
 export class Analytics {
     protected readonly _options: Analytics.Options;
@@ -52,8 +52,6 @@ export class Analytics {
      *
      * @example
      *     await client.analytics.getHistogramAnalytics("domain", {
-     *         start_date: "2024-01-15T09:30:00Z",
-     *         end_date: "2024-01-15T09:30:00Z",
      *         groupBy: "DAY"
      *     })
      */
@@ -72,8 +70,14 @@ export class Analytics {
     ): Promise<core.WithRawResponse<FernFai.HistogramAnalytics>> {
         const { start_date: startDate, end_date: endDate, groupBy } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        _queryParams["start_date"] = startDate;
-        _queryParams["end_date"] = endDate;
+        if (startDate != null) {
+            _queryParams["start_date"] = startDate;
+        }
+
+        if (endDate != null) {
+            _queryParams["end_date"] = endDate;
+        }
+
         _queryParams["groupBy"] = groupBy;
         const _response = await core.fetcher({
             url: core.url.join(
@@ -142,14 +146,11 @@ export class Analytics {
      * @throws {@link FernFai.InternalError}
      *
      * @example
-     *     await client.analytics.getInsights("domain", {
-     *         start_date: "2024-01-15T09:30:00Z",
-     *         end_date: "2024-01-15T09:30:00Z"
-     *     })
+     *     await client.analytics.getInsights("domain")
      */
     public getInsights(
         domain: string,
-        request: FernFai.GetInsightsRequest,
+        request: FernFai.GetInsightsRequest = {},
         requestOptions?: Analytics.RequestOptions,
     ): core.HttpResponsePromise<FernFai.Insights> {
         return core.HttpResponsePromise.fromPromise(this.__getInsights(domain, request, requestOptions));
@@ -157,13 +158,19 @@ export class Analytics {
 
     private async __getInsights(
         domain: string,
-        request: FernFai.GetInsightsRequest,
+        request: FernFai.GetInsightsRequest = {},
         requestOptions?: Analytics.RequestOptions,
     ): Promise<core.WithRawResponse<FernFai.Insights>> {
         const { start_date: startDate, end_date: endDate } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        _queryParams["start_date"] = startDate;
-        _queryParams["end_date"] = endDate;
+        if (startDate != null) {
+            _queryParams["start_date"] = startDate;
+        }
+
+        if (endDate != null) {
+            _queryParams["end_date"] = endDate;
+        }
+
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??

@@ -1,12 +1,19 @@
 import { unstable_cacheTag } from "next/cache";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
-import { addLeadingSlash, slugToHref } from "@fern-api/docs-utils";
+import {
+  COOKIE_FERN_TOKEN,
+  addLeadingSlash,
+  slugToHref,
+} from "@fern-api/docs-utils";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, withDefaultProtocol } from "@fern-api/ui-core-utils";
+import { getAuthEdgeConfig } from "@fern-docs/edge-config";
+import { getEdgeFlags } from "@fern-docs/edge-config";
 
 import { generateHtml } from "@/app/utils";
 import { getMarkdownForPath } from "@/server/getMarkdownForPath";
@@ -39,8 +46,21 @@ export async function GET(
 ): Promise<NextResponse> {
   const { host, domain } = await props.params;
 
+  const [_, edgeFlags] = await Promise.all([
+    getAuthEdgeConfig(domain),
+    getEdgeFlags(domain),
+  ]);
+
+  if (edgeFlags.isLlmsTxtDisabled) {
+    return NextResponse.json("llms.txt is not enabled for this domain", {
+      status: 404,
+    });
+  }
+
+  const fernToken = (await cookies()).get(COOKIE_FERN_TOKEN)?.value;
+
   const path = slugToHref(req.nextUrl.searchParams.get("slug") ?? "");
-  const content = await getLlmsTxt(host, domain, path);
+  const content = await getLlmsTxt(host, domain, path, fernToken);
 
   const html = await generateHtml({
     host,
@@ -60,13 +80,14 @@ export async function GET(
 async function getLlmsTxt(
   host: string,
   domain: string,
-  path: string
+  path: string,
+  fernToken: string | undefined
 ): Promise<string> {
   "use cache";
 
   unstable_cacheTag(domain, "getLlmsTxt");
 
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, fernToken);
 
   const root = getSectionRoot(await loader.getRoot(), path);
 

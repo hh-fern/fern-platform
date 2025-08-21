@@ -15,6 +15,7 @@ import {
   ExamplesByStatusCode,
   StatusCode,
 } from "../type-definitions/EndpointContent";
+import { useEndpointContext } from "./EndpointContext";
 
 export declare namespace ErrorExampleSelect {
   export interface Props {
@@ -36,9 +37,12 @@ export const ErrorExampleSelect: FC<
   examplesByStatusCode,
   getExampleId,
 }) => {
+  const { setSelectedResponseByStatusCode } = useEndpointContext();
+
   const handleValueChange = (value: string) => {
     const [statusCode, responseIndex] = value.split(":");
     setSelectedExampleKey(String(statusCode ?? ""), Number(responseIndex ?? 0));
+    setSelectedResponseByStatusCode(statusCode ?? "");
   };
 
   const statusCode = selectedExample?.exampleCall.responseStatusCode;

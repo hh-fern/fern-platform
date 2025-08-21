@@ -1,13 +1,11 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useCallback } from "react";
 import { preload } from "react-dom";
 
-import {
-  ExclamationCircleIcon,
-  PencilSquareIcon,
-} from "@heroicons/react/24/outline";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 
 import {
   FernTooltip,
@@ -34,14 +32,15 @@ export function GoToEditorButton({
   session,
   sourceRepo,
   disabled = false,
-  disabledReason,
+  isValidatingSource,
 }: {
   orgName: Auth0OrgName;
   docsUrl: DocsUrl;
   session: Auth0SessionData;
-  sourceRepo: GithubSourceRepo;
+  sourceRepo?: GithubSourceRepo;
   disabled?: boolean;
   disabledReason?: string;
+  isValidatingSource?: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -51,7 +50,7 @@ export function GoToEditorButton({
     return (
       new Date().toISOString().split("T")[0] +
       "-" +
-      session.user.name?.toLowerCase().replaceAll(" ", "_") +
+      sanitizeGitHubUsername(session.user.name ?? "") +
       "-" +
       randomHexString
     );
@@ -73,7 +72,7 @@ export function GoToEditorButton({
         docsUrl,
       });
       router.prefetch(editorSlug);
-      preload(editorSlug, { as: "document", crossOrigin: "anonymous" });
+      preload(editorSlug, { as: "fetch", crossOrigin: "anonymous" });
     }
   }, [docsUrl, disabled, router, editorSlug]);
 
@@ -87,70 +86,66 @@ export function GoToEditorButton({
       return;
     }
 
-    // do not await -- we can let this run in the background
+    // Very important - the branch creation needs to be finished before navigation
+    // TODO: Move the branch creation logic into the editor page
     DashboardApiClient.postCreateBranch({
       owner: sourceRepo.owner,
       repo: sourceRepo.repo,
       branch: newBranchName,
       baseBranch: sourceRepo.baseBranch,
-    }).then((response) => {
-      if (!response.success) {
+    })
+      .then((response) => {
+        if (response.success) {
+          // TODO: client-side nav results in infinite loop, just use browser nav for now
+          window.location.href = editorSlug;
+          // router.push(editorSlug);
+        } else {
+          throw new Error();
+        }
+      })
+      .catch(() => {
         ErrorCreateBranchToast();
-        return;
-      }
-    });
-  }, [sourceRepo, newBranchName]);
+      });
+  }, [sourceRepo, newBranchName, editorSlug]);
 
   return (
-    <FernTooltipProvider>
-      <FernTooltip
-        content={disabledReason}
-        variant="dashboard"
-        delayDuration={0}
-        className="bg-gray-1200 rounded-md text-white"
-      >
-        <div className="flex flex-row items-center gap-1">
-          <Button
-            size="sm"
-            className="text-primary hover:text-primary w-fit"
-            variant="outline"
-            onClick={() => {
-              setIsLoading(true);
-              createBranch();
-            }}
-            disabled={isLoading || disabled}
-            asChild={!disabled}
-          >
-            <a href={editorSlug} className="flex flex-row items-center gap-1">
-              {isLoading ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <>
-                  <PencilSquareIcon />
-                  Go to Editor
-                </>
-              )}
-            </a>
-          </Button>
-          {disabled && disabledReason && (
-            <ExclamationCircleIcon className="h-4 w-4 text-red-600" />
-          )}
-        </div>
-      </FernTooltip>
-    </FernTooltipProvider>
-    // NOTE: This is the UI we want when we have a way to preview branches.
-    // <Button
-    //   variant="outline"
-    //   size="sm"
-    //   className="text-primary hover:text-primary"
-    //   onClick={() => {
-    //     setIsLoading(true);
-    //     void createBranch();
-    //   }}
-    //   disabled={isLoading}
-    // >
-    //   <PencilSquareIcon className="text-primary" />
-    //   Create a Branch
-    // </Button>
+    <div className="flex w-fit flex-row items-center gap-2">
+      <FernTooltipProvider>
+        <FernTooltip
+          content={isValidatingSource ? "Validating source repo..." : undefined}
+          variant="dashboard"
+          delayDuration={0}
+          side="bottom"
+          className="bg-gray-1200 rounded-md text-white"
+        >
+          <span className="pointer-events-auto">
+            <Button
+              onClick={() => {
+                setIsLoading(true);
+                createBranch();
+              }}
+              disabled={isLoading || disabled || isValidatingSource}
+              asChild={!disabled}
+            >
+              <div className="flex flex-row items-center gap-1">
+                {isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <>
+                    <Plus />
+                    New session
+                  </>
+                )}
+              </div>
+            </Button>
+          </span>
+        </FernTooltip>
+      </FernTooltipProvider>
+    </div>
   );
+}
+
+// Ensures branch name is url encodable
+function sanitizeGitHubUsername(name: string) {
+  return name.toLowerCase().replace(/[^a-z0-9_-]/g, "_");
 }

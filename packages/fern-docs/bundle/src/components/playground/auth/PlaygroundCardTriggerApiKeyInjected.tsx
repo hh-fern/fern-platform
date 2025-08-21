@@ -12,7 +12,9 @@ import { FernButton, FernCard } from "@fern-docs/components";
 import { Callout } from "@/mdx/components/callout";
 import {
   PLAYGROUND_AUTH_STATE_ATOM,
+  PLAYGROUND_AUTH_STATE_BASIC_AUTH_ATOM,
   PLAYGROUND_AUTH_STATE_BEARER_TOKEN_ATOM,
+  useResolvedPlaygroundState,
 } from "@/state/playground";
 
 import { useApiRoute } from "../../hooks/useApiRoute";
@@ -39,18 +41,35 @@ export function PlaygroundCardTriggerApiKeyInjected({
   const authState = useAtomValue(PLAYGROUND_AUTH_STATE_ATOM);
   const logoutApiRoute = useApiRoute("/api/fern-docs/auth/logout");
 
-  const apiKey = config.authenticated ? config.access_token : null;
+  const resolvedState = useResolvedPlaygroundState();
+  const apiKey = config.authenticated
+    ? (resolvedState?.auth?.bearer_token ?? config.access_token)
+    : null;
   const setBearerAuth = useSetAtom(PLAYGROUND_AUTH_STATE_BEARER_TOKEN_ATOM);
+  const setBasicAuth = useSetAtom(PLAYGROUND_AUTH_STATE_BASIC_AUTH_ATOM);
 
   // TODO change this to on-login
   useEffect(() => {
-    if (apiKey != null) {
+    if (
+      apiKey != null &&
+      (auth.type === "bearerAuth" || auth.type === "oAuth")
+    ) {
       setBearerAuth({ token: apiKey });
     }
-  }, [apiKey, setBearerAuth]);
+    if (apiKey != null && auth.type === "basicAuth") {
+      setBasicAuth({
+        username: apiKey.split(":")[0],
+        password: apiKey.split(":")[1],
+      });
+    }
+  }, [apiKey, setBearerAuth, setBasicAuth, auth]);
 
-  const handleResetBearerAuth = () => {
+  const handleResetAuth = () => {
     setBearerAuth({ token: apiKey ?? "" });
+    setBasicAuth({
+      username: apiKey?.split(":")[0] ?? "",
+      password: apiKey?.split(":")[1] ?? "",
+    });
   };
 
   const redirectOrOpenAuthForm = () => {
@@ -99,7 +118,7 @@ export function PlaygroundCardTriggerApiKeyInjected({
                 text="Reset token to default"
                 intent="none"
                 icon={<Key />}
-                onClick={handleResetBearerAuth}
+                onClick={handleResetAuth}
                 size="normal"
                 variant="outlined"
               />
@@ -120,25 +139,10 @@ export function PlaygroundCardTriggerApiKeyInjected({
                   returnTo.toString()
                 );
 
-                // invalidate bearer token cookie
-                document.cookie =
-                  "fern_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                // invalidate access token cookie
-                document.cookie =
-                  "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
                 // remove bearer token from state
                 setBearerAuth({ token: "" });
 
-                fetch(url)
-                  .then(() => {
-                    window.location.reload();
-                  })
-                  .catch((error: unknown) => {
-                    console.error(
-                      `[playground-card-trigger-api-key-injected] ${JSON.stringify(error)}`
-                    );
-                  });
+                window.location.href = url.toString();
               }}
               size="normal"
               variant="outlined"

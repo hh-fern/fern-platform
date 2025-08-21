@@ -2,11 +2,14 @@ import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import { Agent, setGlobalDispatcher } from "undici";
+
 import { isPreviewDomain, withoutStaging } from "@fern-api/docs-utils";
 import { APIResponse, FdrAPI } from "@fern-api/fdr-sdk/client/types";
 
 import { isLocal } from "./isLocal";
 import { isSelfHosted } from "./isSelfHosted";
+import { loadDocsDefinitionFromMinIO } from "./loadDocsDefinitionFromMinIO";
 import { loadDocsDefinitionFromS3 } from "./loadDocsDefinitionFromS3";
 import { provideRegistryService } from "./registry";
 
@@ -14,6 +17,14 @@ export type LoadWithUrlResponse = APIResponse<
   FdrAPI.docs.v2.read.LoadDocsForUrlResponse,
   FdrAPI.docs.v2.read.getDocsForUrl.Error
 >;
+
+setGlobalDispatcher(
+  new Agent({
+    connect: { timeout: 2147483647 },
+    bodyTimeout: 0,
+    headersTimeout: 2147483647,
+  })
+);
 
 /**
  * - If the token is a WorkOS token, we need to use the getPrivateDocsForUrl endpoint.
@@ -32,7 +43,7 @@ export const loadWithUrl = cache(
         // address FDR error: Failed to parse URL: %5Bdomain%5D
         // todo: figure out where these calls originate
         if (domain.includes("[") || domain.includes("%5B")) {
-          console.error("Cannot load docs from an invalid domain");
+          console.error(`Cannot load docs from an invalid domain: ${domain}`);
           notFound();
         }
 
@@ -52,20 +63,23 @@ export const loadWithUrl = cache(
 
         if (isSelfHosted()) {
           const docsUrl = process.env.NEXT_PUBLIC_DOCS_DOMAIN ?? "";
-          if (isSelfHosted() && !docsUrl) {
+          const docsBucketName = domain.replace(/^https?:\/\//, "");
+
+          if (!docsUrl) {
             notFound();
           }
 
-          const response =
-            await provideRegistryService().docs.v2.read.getDocsForUrl({
-              url: FdrAPI.Url(docsUrl),
-            });
-          if (response.ok) {
-            return response.body;
-          }
-          console.error("Failed to load docs", {
-            cause: response.error,
+          const response = await loadDocsDefinitionFromMinIO({
+            domain:
+              process.env.NEXT_PUBLIC_MINIO_BUCKET_HOST ??
+              "http://localhost:9000",
+            docsBucketName,
           });
+
+          if (response != null) {
+            return response;
+          }
+
           notFound();
         }
 

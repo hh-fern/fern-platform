@@ -1,9 +1,9 @@
 import React, { ReactElement, useEffect, useState } from "react";
 
 import { useAtom } from "jotai";
-import { parse } from "url";
 
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
+import { sanitizeUrl } from "@fern-api/ui-core-utils";
 import {
   FernButton,
   FernDropdown,
@@ -13,8 +13,10 @@ import {
 } from "@fern-docs/components";
 import { useBooleanState } from "@fern-ui/react-commons";
 
-import { SELECTED_ENVIRONMENT_ATOM } from "@/state/environment";
-import { PLAYGROUND_ENVIRONMENT_ATOM } from "@/state/playground";
+import {
+  SELECTED_ENVIRONMENT_ID_ATOM,
+  SELECTED_ENVIRONMENT_URL_ATOM,
+} from "@/state/environment";
 
 interface MaybeEnvironmentDropdownProps {
   baseUrl?: string;
@@ -38,57 +40,42 @@ export function MaybeEnvironmentDropdown({
   editable,
   isEditingEnvironment,
 }: MaybeEnvironmentDropdownProps): ReactElement<any> | null {
-  // const [allEnvironmentIds] = useAtom(ALL_ENVIRONMENTS_ATOM);
   const [selectedEnvironmentId, setSelectedEnvironmentId] = useAtom(
-    SELECTED_ENVIRONMENT_ATOM
+    SELECTED_ENVIRONMENT_ID_ATOM
   );
-  const [playgroundEnvironment, setPlaygroundEnvironment] = useAtom(
-    PLAYGROUND_ENVIRONMENT_ATOM
+  const [_selectedEnvironmentUrl, setSelectedEnvironmentUrl] = useAtom(
+    SELECTED_ENVIRONMENT_URL_ATOM
   );
   const [inputValue, setInputValue] = useState<string | undefined>(undefined);
   const [initialState, setInitialState] = useState<string | undefined>(
     undefined
   );
 
-  const selectedEnvironment =
-    options?.find((option) => option.id === selectedEnvironmentId) ??
-    options?.[0];
-
-  // const environmentIds = environmentFilters
-  //     ? environmentFilters.filter((environmentFilter) => allEnvironmentIds.includes(environmentFilter))
-  //     : allEnvironmentIds;
-
-  // useEffect(() => {
-  //     if (environmentFilters && environmentId && !environmentFilters.includes(environmentId)) {
-  //         setSelectedEnvironmentId(environmentId);
-  //     }
-  // }, [environmentFilters, environmentId, setSelectedEnvironmentId]);
-
-  // TODO: revisit the order of precedence for the baseUrl... this is a temporary fix
-  const preParsedUrl =
-    playgroundEnvironment ?? selectedEnvironment?.baseUrl ?? baseUrl;
-  const url = preParsedUrl && parse(preParsedUrl);
-
-  // TODO: clean up this component
   useEffect(() => {
-    if (
-      !!url &&
-      url.host &&
-      url.host !== "" &&
-      url.protocol &&
-      url.protocol !== ""
-    ) {
-      setInputValue(preParsedUrl);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playgroundEnvironment]);
+    setInputValue(sanitizeUrl(baseUrl));
+    setInitialState(sanitizeUrl(baseUrl));
+  }, [baseUrl]);
 
+  // if we have selected a new environment id, update the selected url to match
+  useEffect(() => {
+    if (selectedEnvironmentId) {
+      const envBaseUrl =
+        options?.find((option) => option.id === selectedEnvironmentId)
+          ?.baseUrl ?? undefined;
+      setSelectedEnvironmentUrl(envBaseUrl);
+    }
+  }, [selectedEnvironmentId, options, setSelectedEnvironmentUrl]);
+
+  // input value is for editing and validation
+  const parsedInputValue = safeParseUrl(inputValue);
   const isValidInput =
     inputValue != null &&
     inputValue !== "" &&
-    parse(inputValue).host != null &&
-    parse(inputValue).protocol != null;
+    parsedInputValue?.host != null &&
+    parsedInputValue?.protocol != null;
 
+  // url is for splitting into parts
+  const url = baseUrl && safeParseUrl(sanitizeUrl(baseUrl) ?? "");
   const urlProtocol = url ? url.protocol : "";
   const fullyQualifiedDomainAndBasePath = url
     ? url.pathname != null && url.pathname !== "/"
@@ -113,55 +100,41 @@ export function MaybeEnvironmentDropdown({
             }}
             onBlur={(e) => {
               if (isValidInput) {
-                if (playgroundEnvironment) {
-                  setInputValue(playgroundEnvironment);
-                }
                 isEditingEnvironment.setFalse();
+                setSelectedEnvironmentId(undefined);
+                setSelectedEnvironmentUrl(inputValue);
               } else {
                 e.preventDefault();
                 e.stopPropagation();
                 setInputValue(initialState);
-                setPlaygroundEnvironment(initialState);
                 isEditingEnvironment.setFalse();
               }
             }}
             onValueChange={(value) => {
-              if (
-                value === "" ||
-                value == null ||
-                parse(value).host == null ||
-                parse(value).protocol == null
-              ) {
-                setInputValue(value);
-              } else {
-                setInputValue(value);
-                setPlaygroundEnvironment(value);
-              }
+              setInputValue(value);
             }}
             onKeyDownCapture={(e) => {
               if (e.key === "Enter" && isValidInput) {
-                if (playgroundEnvironment) {
-                  setInputValue(playgroundEnvironment);
-                }
                 isEditingEnvironment.setFalse();
+                setSelectedEnvironmentId(undefined);
+                setSelectedEnvironmentUrl(inputValue);
               } else if (e.key === "Escape") {
                 e.preventDefault();
                 e.stopPropagation();
                 setInputValue(initialState);
-                setPlaygroundEnvironment(initialState);
                 isEditingEnvironment.setFalse();
               }
             }}
             className={cn(
               "p-0",
               isValidInput ? "" : "error",
-              "h-auto",
+              "h-auto w-fit",
               "flex flex-col"
             )}
             inputClassName={cn(
               "px-1",
               "py-0.5",
-              "h-auto",
+              "h-auto w-fit",
               "font-mono",
               small ? "text-xs" : "text-sm"
             )}
@@ -179,10 +152,10 @@ export function MaybeEnvironmentDropdown({
                   type: "value",
                 }))}
                 onValueChange={(value) => {
-                  setPlaygroundEnvironment(undefined);
                   setSelectedEnvironmentId(value);
+                  // useEffect updates the URL
                 }}
-                value={selectedEnvironment?.id ?? environmentId}
+                value={selectedEnvironmentId ?? environmentId}
               >
                 <FernButton
                   style={{ pointerEvents: "auto" }}
@@ -260,3 +233,15 @@ export function MaybeEnvironmentDropdown({
     </>
   );
 }
+
+const safeParseUrl = (url: string | undefined): URL | null => {
+  return url
+    ? (() => {
+        try {
+          return new URL(url);
+        } catch {
+          return null;
+        }
+      })()
+    : null;
+};

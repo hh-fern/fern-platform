@@ -1,11 +1,15 @@
 name: Deploy @fern-docs/icons-cdn
-
+env:
+  VERCEL_ORG_ID: team_6FKOM5nw037hv8g2mTk3gaH7
+  VERCEL_PROJECT_ID: prj_MO0ayWSAeIoBYh8Cd13oigkd9knl
 on:
   push:
     branches:
-      - main
+      - app
+  workflow_dispatch:
+  # allow manual run
 
-# Cancel previous workflows on previous push so we don't have deploys overwriting eachother here
+# cancel previous workflows on previous push so we don't have deploys overwriting each other here
 concurrency:
   group: icons.ferndocs.com
   cancel-in-progress: true
@@ -17,20 +21,23 @@ jobs:
       continue: ${{ steps.has-changed.outputs.RESULT == 'true' }}
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 2
+          
       - name: 🔎 Has changed
         id: has-changed
         # if there are changes, npx turbo-ignore returns a failure exit code
         # which makes steps.has-changed.outputs.RESULT = 'true'
-        run: npx turbo-ignore @fern-docs/icons-cdn || echo "RESULT=true" >> $GITHUB_OUTPUT
+        run: npx turbo-ignore @fern-docs/icons-cdn HEAD~1 || echo "RESULT=true" >> $GITHUB_OUTPUT
 
   deploy:
     needs: ignore
     if: needs.ignore.outputs.continue == 'true'
     runs-on: ubuntu-latest
-    env:
-      VERCEL_PROJECT_ID: prj_MO0ayWSAeIoBYh8Cd13oigkd9knl
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # This helps turbo resolve changes faster
       - name: Install
         uses: ./.github/actions/install
       - name: Install Vercel CLI

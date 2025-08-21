@@ -5,11 +5,14 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const CSP_HEADER = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usepylon.com *.posthog.com *.pusher.com d3vl36l12sfx26.cloudfront.net;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usepylon.com *.posthog.com *.pusher.com d3vl36l12sfx26.cloudfront.net cdn.jsdelivr.net;
   connect-src 'self' * ws:;
-  style-src 'self' 'unsafe-inline' *.usepylon.com *.posthog.com;
+  style-src 'self' 'unsafe-inline' *.usepylon.com *.posthog.com cdn.jsdelivr.net;
   font-src 'self' pylon-avatars.s3.us-west-1.amazonaws.com *.usepylon.com *.buildwithfern.com;
   img-src 'self' *;
+  frame-src 'self' *;
+  object-src 'self' *;
+  media-src 'self' *;
 `.replace(/\n/g, "");
 
 const nextConfig: NextConfig = {
@@ -48,8 +51,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (webpackConfig) => {
+  webpack: (webpackConfig, { isServer }) => {
     webpackConfig.externals.push("sharp");
+
+    // esbuild is only used on the server (mdx-bundler), so only externalize it there
+    if (isServer) {
+      webpackConfig.externals = webpackConfig.externals || [];
+      webpackConfig.externals.push("esbuild");
+    }
+
     webpackConfig.module.rules.push({
       test: /\.(glsl|vs|fs|vert|frag)$/,
       exclude: /node_modules/,
@@ -71,6 +81,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
     tsconfigPath: "./tsconfig.app.json",
   },
+
+  // Exclude esbuild from server bundle to avoid .d.ts parsing issues
+  serverExternalPackages: ["esbuild"],
 
   // so it doesn't cover the theme toggle
   devIndicators: { position: "bottom-right" },

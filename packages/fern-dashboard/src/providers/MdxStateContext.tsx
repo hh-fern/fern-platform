@@ -12,7 +12,7 @@ import {
 
 import { ChangedNodes, MdxToHtmlResponse, htmlToMdx } from "@fern-docs/mdx";
 
-import { setMdxFile } from "@/app/actions/setMdxFile";
+import { createMdxFrontmatter } from "@/utils/createMdxFrontmatter";
 import { DocsUrl } from "@/utils/types";
 
 type Filename = string;
@@ -26,6 +26,7 @@ interface MdxDependencies {
   html?: MdxToHtmlResponse["html"];
   frontmatter?: MdxToHtmlResponse["frontmatter"];
   originalElements?: MdxToHtmlResponse["originalElements"];
+  originalFrontmatter?: MdxToHtmlResponse["originalFrontmatter"];
   /**
    * Flag if the file should be considered changed.
    * This is used to determine if content changes should be committed to repo.
@@ -36,17 +37,28 @@ interface MdxDependencies {
    * This is used to determine if we should use the original MDX content formatting from originalElements.
    */
   changedNodes?: ChangedNodes;
+  /**
+   * Flag if the frontmatter has changed.
+   * This is used to determine if we should use the original frontmatter formatting from originalFrontmatter.
+   */
+  changedFrontmatter?: boolean;
 }
 
 export const MdxStateContext = createContext<{
   changedMdxFiles: Record<Filename, Markdown>;
+  allMdxFiles: Record<Filename, Markdown>;
+  frontmatterData: Record<Filename, MdxToHtmlResponse["frontmatter"]>;
   mdxSyncedStatus: Record<Filename, SyncedStatus>;
+  mdxDepsStore: Record<Filename, MdxDependencies>;
   updateDependencies: (filename: Filename, state: MdxDependencies) => void;
   stageChanges: (filename: Filename, state: MdxDependencies) => void;
   syncChanges: (filename: Filename) => Promise<void>;
 }>({
   changedMdxFiles: {},
+  allMdxFiles: {},
+  frontmatterData: {},
   mdxSyncedStatus: {},
+  mdxDepsStore: {},
   updateDependencies: () => undefined,
   stageChanges: () => undefined,
   syncChanges: () => Promise.resolve(),
@@ -54,7 +66,7 @@ export const MdxStateContext = createContext<{
 
 export function MdxStateProvider({
   children,
-  docsUrl,
+  docsUrl: _docsUrl,
 }: {
   children: ReactNode;
   docsUrl: DocsUrl;
@@ -67,31 +79,60 @@ export function MdxStateProvider({
     Record<Filename, SyncedStatus>
   >({});
 
+  const initialFrontmatter = useRef<
+    Record<string, MdxToHtmlResponse["frontmatter"]>
+  >({});
+
   // Track debounce timeouts for each file to prevent excessive syncs
   const debounceTimeouts = useRef<Record<string, NodeJS.Timeout | null>>({});
 
   // Stablilize updateDependencies identity to prevent unnecessary re-renders
   const updateDependencies = useCallback(
     (filename: Filename, state: MdxDependencies) => {
-      setMdxDepsStore((prev) => ({
-        ...prev,
-        [filename]: {
-          html: state.html ?? prev[filename]?.html,
-          frontmatter: {
-            // Merge existing frontmatter with new frontmatter
-            ...prev[filename]?.frontmatter,
-            // Only override frontmatter properties that are newly provided
-            ...state.frontmatter,
+      setMdxDepsStore((prev) => {
+        if (state.frontmatter && !initialFrontmatter.current[filename]) {
+          // Store reference to initial frontmatter for changedFrontmatter comparison
+          initialFrontmatter.current[filename] = state.frontmatter;
+        }
+        return {
+          ...prev,
+          [filename]: {
+            html: state.html ?? prev[filename]?.html,
+            frontmatter: (() => {
+              const existingFrontmatter = prev[filename]?.frontmatter || {};
+              const newFrontmatter = state.frontmatter || {};
+              const mergedFrontmatter = {
+                ...existingFrontmatter,
+              };
+
+              // Apply new frontmatter changes, removing fields with undefined values
+              Object.entries(newFrontmatter).forEach(([key, value]) => {
+                if (value == null) {
+                  mergedFrontmatter[key] = key === "title" ? "" : undefined; // Always keep title field
+                } else {
+                  mergedFrontmatter[key] = value;
+                }
+              });
+
+              return mergedFrontmatter;
+            })(),
+            originalElements:
+              state.originalElements ?? prev[filename]?.originalElements,
+            originalFrontmatter:
+              state.originalFrontmatter ?? prev[filename]?.originalFrontmatter,
+            changed: state.changed ?? prev[filename]?.changed,
+            changedNodes: {
+              ...prev[filename]?.changedNodes,
+              ...state.changedNodes,
+            },
+            // If we're setting frontmatter, check if it's different from the initial frontmatter, otherwise use the previous value
+            changedFrontmatter: state.frontmatter
+              ? JSON.stringify(state.frontmatter) !==
+                JSON.stringify(initialFrontmatter.current[filename])
+              : (prev[filename]?.changedFrontmatter ?? false),
           },
-          originalElements:
-            state.originalElements ?? prev[filename]?.originalElements,
-          changed: state.changed ?? prev[filename]?.changed,
-          changedNodes: {
-            ...prev[filename]?.changedNodes,
-            ...state.changedNodes,
-          },
-        },
-      }));
+        };
+      });
     },
     [setMdxDepsStore]
   );
@@ -123,13 +164,60 @@ export function MdxStateProvider({
             state.html,
             state.frontmatter,
             state.originalElements,
-            state.changedNodes
+            state.originalFrontmatter,
+            state.changedNodes,
+            // state.changedFrontmatter
+            true //  TODO: re-enable (force true for now, there's a bug in the loader/FDR that provides malformed frontmatter)
           ).mdx;
         }
         return acc;
       },
       {}
     );
+  }, [mdxDepsStore]);
+
+  // Build a map of all files (both initial and changed) and their markdown contents
+  const allMdxFiles = useMemo(() => {
+    return Object.entries(mdxDepsStore).reduce<Record<Filename, Markdown>>(
+      (acc, [filename, state]) => {
+        if (state.html && state.frontmatter && state.originalElements) {
+          acc[filename] = htmlToMdx(
+            state.html,
+            state.frontmatter,
+            state.originalElements,
+            state.originalFrontmatter,
+            state.changedNodes,
+            // state.changedFrontmatter
+            true // TODO: re-enable (force true for now, there's a bug in the loader/FDR that provides malformed frontmatter)
+          ).mdx;
+        } else if (state.html || state.frontmatter || state.originalElements) {
+          // Generate minimal markdown when page data is incomplete
+          // Prevents dev panel from showing "// Loading content..." for partial data
+          const title = state.frontmatter?.title;
+          const subtitle = state.frontmatter?.subtitle;
+          const slug = state.frontmatter?.slug;
+          acc[filename] = createMdxFrontmatter({
+            title: typeof title === "string" ? title : "Untitled",
+            subtitle: typeof subtitle === "string" ? subtitle : undefined,
+            slug: typeof slug === "string" ? slug : undefined,
+          });
+        }
+        return acc;
+      },
+      {}
+    );
+  }, [mdxDepsStore]);
+
+  // Build a map of frontmatter data for all files
+  const frontmatterData = useMemo(() => {
+    return Object.entries(mdxDepsStore).reduce<
+      Record<Filename, MdxToHtmlResponse["frontmatter"]>
+    >((acc, [filename, state]) => {
+      if (state.frontmatter) {
+        acc[filename] = state.frontmatter;
+      }
+      return acc;
+    }, {});
   }, [mdxDepsStore]);
 
   // Sync changes to the server via debounced setMdxFile server action
@@ -148,36 +236,44 @@ export function MdxStateProvider({
         debounceTimeouts.current[filename] = setTimeout(() => {
           setMdxSyncedStatus((prev) => ({
             ...prev,
-            [filename]: "SYNCING",
+            [filename]: "SYNCED",
           }));
-          setMdxFile(docsUrl, filename, content)
-            .then(() => {
-              // If successful, mark file as synced
-              setMdxSyncedStatus((prev) => ({
-                ...prev,
-                [filename]: "SYNCED",
-              }));
-            })
-            .catch(() => {
-              // If error, mark file as error
-              setMdxSyncedStatus((prev) => ({
-                ...prev,
-                [filename]: "ERROR",
-              }));
-            });
+          // TODO: sync changes to the server once we have need for this data on the server
+          // setMdxSyncedStatus((prev) => ({
+          //   ...prev,
+          //   [filename]: "SYNCING",
+          // }));
+          // setMdxFile(docsUrl, filename, content)
+          //   .then(() => {
+          //     // If successful, mark file as synced
+          //     setMdxSyncedStatus((prev) => ({
+          //       ...prev,
+          //       [filename]: "SYNCED",
+          //     }));
+          //   })
+          //   .catch(() => {
+          //     // If error, mark file as error
+          //     setMdxSyncedStatus((prev) => ({
+          //       ...prev,
+          //       [filename]: "ERROR",
+          //     }));
+          //   });
           // Always clear the timeout on run
           debounceTimeouts.current[filename] = null;
         }, DEBOUNCE_TIMEOUT_DELAY);
       }
     },
-    [docsUrl, changedMdxFiles]
+    [changedMdxFiles]
   );
 
   return (
     <MdxStateContext.Provider
       value={{
         changedMdxFiles,
+        allMdxFiles,
+        frontmatterData,
         mdxSyncedStatus,
+        mdxDepsStore,
         updateDependencies,
         stageChanges,
         syncChanges,

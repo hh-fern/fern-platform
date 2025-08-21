@@ -21,9 +21,13 @@ import {
   getDocsUrlMetadata,
   isLocal,
   isSelfHosted,
+  provideRegistryService,
   pruneWithAuthState,
 } from "@fern-api/docs-server";
-import { loadWithUrl as uncachedLoadWithUrl } from "@fern-api/docs-server";
+import {
+  loadDynamicIRWithUrl as uncachedLoadDynamicIRWithUrl,
+  loadWithUrl as uncachedLoadWithUrl,
+} from "@fern-api/docs-server";
 import {
   type DocsLoader,
   type DocsMetadata,
@@ -73,6 +77,7 @@ import { isNonNullish, isPlainObject } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 
 const loadWithUrl = uncachedLoadWithUrl;
+const loadDynamicIRWithUrl = uncachedLoadDynamicIRWithUrl;
 
 // Add cache configuration interface
 export interface CacheConfig {
@@ -328,10 +333,17 @@ const getApi = async (domain: string, id: string) => {
   if (latest != null) {
     return latest;
   }
-  const v1 = response.definition.apis[ApiDefinitionId(id)];
+  let v1 = response.definition.apis[ApiDefinitionId(id)];
   if (v1 == null) {
-    console.error("Could not get API with ID", ApiDefinitionId(id));
-    notFound();
+    const response = await provideRegistryService().api.v1.read.getApi(
+      ApiDefinitionId(id)
+    );
+    if (response.ok) {
+      v1 = response.body;
+    } else {
+      console.error("Could not get API with ID", ApiDefinitionId(id));
+      notFound();
+    }
   }
   const flags = await cachedGetEdgeFlags(domain);
   return ApiDefinitionV1ToLatest.from(v1, flags).migrate();
@@ -430,54 +442,58 @@ const getAllApisForDomain = async (
   );
 };
 
-const getEndpointById =
-  (cacheConfig: Required<CacheConfig>) =>
-  async (
-    domain: string,
-    apiDefinitionId: string,
-    endpointId: EndpointId
-  ): Promise<{
-    endpoint: ApiDefinition.EndpointDefinition;
-    nodes: FernNavigation.EndpointNode[];
-    globalHeaders: ObjectProperty[];
-    authSchemes: AuthScheme[];
-    types: Record<TypeId, TypeDefinition>;
-  }> => {
-    "use cache";
-    unstable_cacheTag(domain, "getEndpointById", apiDefinitionId, endpointId);
+const getEndpointById = async ({
+  domain,
+  apiDefinitionId,
+  endpointId,
+  cacheConfig,
+}: {
+  domain: string;
+  apiDefinitionId: string;
+  endpointId: EndpointId;
+  cacheConfig: Required<CacheConfig>;
+}): Promise<{
+  endpoint: ApiDefinition.EndpointDefinition;
+  nodes: FernNavigation.EndpointNode[];
+  globalHeaders: ObjectProperty[];
+  authSchemes: AuthScheme[];
+  types: Record<TypeId, TypeDefinition>;
+}> => {
+  "use cache";
+  unstable_cacheTag(domain, "getEndpointById", apiDefinitionId, endpointId);
 
-    const api = await createGetPrunedApiCached(domain, cacheConfig)(
-      apiDefinitionId,
-      {
-        type: "endpoint",
-        endpointId,
-      }
-    );
-
-    const endpoint = api.endpoints[endpointId];
-    if (endpoint == null) {
-      console.error("Could not find endpoint with ID", endpointId);
-      notFound();
+  const api = await createGetPrunedApiCached(domain, cacheConfig)(
+    apiDefinitionId,
+    {
+      type: "endpoint",
+      endpointId,
     }
+  );
 
-    const root = await unsafe_getFullRoot(domain);
-    return {
-      endpoint,
-      nodes: FernNavigation.NodeCollector.collect(root)
-        .getNodesInOrder()
-        .filter(FernNavigation.hasMetadata)
-        .filter(
-          (node): node is FernNavigation.EndpointNode =>
-            node.type === "endpoint" &&
-            node.apiDefinitionId === api.id &&
-            node.endpointId === endpoint.id
-        ),
-      globalHeaders: api.globalHeaders ?? [],
-      authSchemes:
-        endpoint.auth?.map((id) => api.auths[id]).filter(isNonNullish) ?? [],
-      types: api.types,
-    };
+  const endpoint = api.endpoints[endpointId];
+  if (endpoint == null) {
+    console.error("Could not find endpoint with ID", endpointId);
+    notFound();
+  }
+
+  const root = await unsafe_getFullRoot(domain);
+  return {
+    endpoint,
+    nodes: FernNavigation.NodeCollector.collect(root)
+      .getNodesInOrder()
+      .filter(FernNavigation.hasMetadata)
+      .filter(
+        (node): node is FernNavigation.EndpointNode =>
+          node.type === "endpoint" &&
+          node.apiDefinitionId === api.id &&
+          node.endpointId === endpoint.id
+      ),
+    globalHeaders: api.globalHeaders ?? [],
+    authSchemes:
+      endpoint.auth?.map((id) => api.auths[id]).filter(isNonNullish) ?? [],
+    types: api.types,
   };
+};
 
 const getEndpointByLocator = async (
   domain: string,
@@ -706,10 +722,12 @@ const getPage = (cacheConfig: Required<CacheConfig>) =>
         cacheConfig.cacheKeySuffix
       );
       if (page != null && isPlainObject(page) && "markdown" in page) {
+        const config = await getConfig(cacheConfig)(domain);
         return {
           filename: pageId,
           markdown: page.markdown,
           editThisPageUrl: page.editThisPageUrl,
+          css: config.css,
         };
       }
     } catch (error) {
@@ -737,6 +755,7 @@ const getPage = (cacheConfig: Required<CacheConfig>) =>
       filename: pageId,
       markdown: page.markdown,
       editThisPageUrl: page.editThisPageUrl,
+      css: response.definition.config.css,
     };
   });
 
@@ -948,6 +967,23 @@ const getLayout = (cacheConfig: Required<CacheConfig>) =>
     };
   });
 
+const getDynamicIr = (apiNames: string[]) =>
+  cache(async (orgId: string) => {
+    "use cache";
+    unstable_cacheTag(orgId, "getDynamicIr");
+
+    const response = await loadDynamicIRWithUrl({
+      orgId,
+      apiNames,
+    });
+
+    if (response) {
+      return response;
+    }
+
+    return undefined;
+  });
+
 function defaultTabsPlacement(domain: string) {
   if (domain.includes("cohere")) {
     return "HEADER";
@@ -994,7 +1030,8 @@ export const createCachedDocsLoader = async (
   host: string,
   domain: string,
   fern_token?: string,
-  cacheConfig?: CacheConfig
+  cacheConfig?: CacheConfig,
+  skipAuth?: boolean
 ): Promise<DocsLoader & { clearKvCache: () => Promise<void> }> => {
   assertDocsDomain(domain);
 
@@ -1005,19 +1042,28 @@ export const createCachedDocsLoader = async (
     await clearKvCache(domain);
   }
 
-  const authConfig = getAuthConfig(domain);
+  const authConfig = skipAuth
+    ? Promise.resolve(undefined)
+    : getAuthConfig(domain);
   const metadata = getMetadata(config)(withoutStaging(domain));
 
-  const getAuthState = cache(async (pathname?: string) => {
-    const { getAuthState } = await createGetAuthState(
-      host,
-      domain,
-      fern_token,
-      await authConfig,
-      await metadata
-    );
-    return await getAuthState(pathname);
-  });
+  const getAuthState = skipAuth
+    ? async (_pathname?: string) => ({
+        authed: true as const,
+        ok: true as const,
+        user: {},
+        partner: "custom" as const,
+      })
+    : cache(async (pathname?: string) => {
+        const { getAuthState } = await createGetAuthState(
+          host,
+          domain,
+          fern_token,
+          await authConfig,
+          await metadata
+        );
+        return await getAuthState(pathname);
+      });
 
   return {
     domain,
@@ -1027,13 +1073,13 @@ export const createCachedDocsLoader = async (
     getFiles: () => getFiles(config)(domain),
     getMdxBundlerFiles: () => getMdxBundlerFiles(config)(domain),
     getPrunedApi: cache(createGetPrunedApiCached(domain, config)),
-    getEndpointById: cache(
-      unstable_cache(
-        (apiDefinitionId: string, endpointId: EndpointId) =>
-          getEndpointById(config)(domain, apiDefinitionId, endpointId),
-        [domain, cacheSeed(), config.cacheKeySuffix],
-        { tags: [domain, "endpointById"] }
-      )
+    getEndpointById: cache((apiDefinitionId: string, endpointId: EndpointId) =>
+      getEndpointById({
+        domain,
+        apiDefinitionId,
+        endpointId,
+        cacheConfig: config,
+      })
     ),
     getEndpointByLocator: cache(
       unstable_cache(
@@ -1063,6 +1109,10 @@ export const createCachedDocsLoader = async (
     getBaseUrl: async () => {
       const m = await metadata;
       return `https://${m.domain}${m.basePath}`;
+    },
+    getDynamicIr: async (apiNames: string[]) => {
+      const m = await metadata;
+      return getDynamicIr(apiNames)(m.org);
     },
     clearKvCache: () => clearKvCache(domain),
   };

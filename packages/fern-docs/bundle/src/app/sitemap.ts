@@ -4,7 +4,6 @@ import urljoin from "url-join";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
-import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import {
   getDocsDomainApp,
   getDocsHostApp,
@@ -17,7 +16,7 @@ import { getCanonicalUrl } from "@fern-docs/edge-config";
 import { getFernToken } from "./fern-token";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  if (isLocal() || isSelfHosted()) {
+  if (isLocal()) {
     return [];
   }
 

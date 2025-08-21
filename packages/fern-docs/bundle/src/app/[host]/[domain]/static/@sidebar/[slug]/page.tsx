@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { getTabs } from "@fern-api/docs-server/handle-node-fallbacks";
 import {
   getIsSidebarFixed,
   getIsSingleOverviewPage,
@@ -22,19 +23,17 @@ export default async function SidebarPage({
   const config = await loader.getConfig();
   const isSidebarFixed = getIsSidebarFixed(config);
 
-  const rootPromise = loader.getRoot();
+  const root = await loader.getRoot();
+
+  const authState = await loader.getAuthState();
+
+  const showHiddenNodes = (await loader.getEdgeFlags())
+    .isAuthenticatedPagesDiscoverable;
 
   // preload:
-  await Promise.all([
-    loader.getLayout(),
-    loader.getAuthState(),
-    loader.getEdgeFlags(),
-  ]);
+  await loader.getLayout();
 
-  const found = FernNavigation.utils.findNode(
-    await rootPromise,
-    slugjoin(slug)
-  );
+  const found = FernNavigation.utils.findNode(root, slugjoin(slug));
   if (found.type !== "found") {
     return null;
   }
@@ -45,11 +44,19 @@ export default async function SidebarPage({
 
   const isSingleOverviewPage = getIsSingleOverviewPage(found);
 
+  const tabs = getTabs(
+    found,
+    root,
+    slug,
+    showHiddenNodes,
+    authState.authed ? (authState.user.roles ?? []) : []
+  );
+
   return (
     <>
-      {found.tabs && found.tabs.length > 0 && (
+      {tabs && tabs.length > 0 && (
         <SidebarTabsRootServer loader={loader}>
-          <SidebarTabsList tabs={found.tabs} />
+          <SidebarTabsList tabs={tabs} />
         </SidebarTabsRootServer>
       )}
       {isSingleOverviewPage && !isSidebarFixed ? (

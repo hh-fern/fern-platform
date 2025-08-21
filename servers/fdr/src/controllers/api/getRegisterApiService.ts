@@ -11,6 +11,10 @@ import {
 
 import { APIV1WriteService } from "../../api";
 import { SdkRequest } from "../../api/generated/api";
+import {
+  DynamicIr,
+  DynamicIrUpload,
+} from "../../api/generated/api/resources/api/resources/v1/resources/register";
 import type { FdrApplication } from "../../app";
 import { LOGGER } from "../../app/FdrApplication";
 import { SdkIdForPackage } from "../../db/sdk/SdkDao";
@@ -193,6 +197,26 @@ export function getRegisterApiService(app: FdrApplication): APIV1WriteService {
         );
       }
 
+      let dynamicIRsUploads: Record<string, DynamicIrUpload> | undefined;
+      if (req.body.dynamicIRs) {
+        app.logger.debug(
+          `Preparing dynamic IR upload URLs for {orgId: "${req.body.orgId}", apiId: "${req.body.apiId}"}`,
+          REGISTER_API_DEFINITION_META
+        );
+        dynamicIRsUploads = await getDynamicIrsUploads({
+          app,
+          orgId: req.body.orgId,
+          apiId: apiDefinitionId,
+          dynamicIRs: req.body.dynamicIRs,
+        });
+
+        logOperationTime("getDynamicIrsUploads");
+        app.logger.debug(
+          "Successfully prepared dynamic IR upload URLs",
+          REGISTER_API_DEFINITION_META
+        );
+      }
+
       app.logger.debug(
         `Creating API Definition in database with id=${apiDefinitionId}, name=${req.body.apiId} for org ${req.body.orgId}`,
         REGISTER_API_DEFINITION_META
@@ -224,6 +248,7 @@ export function getRegisterApiService(app: FdrApplication): APIV1WriteService {
       return res.send({
         apiDefinitionId,
         sources,
+        dynamicIRs: dynamicIRsUploads,
       });
     },
   });
@@ -536,6 +561,38 @@ async function getSnippetTemplatesIfEnabled({
   }
 }
 
+async function getDynamicIrsUploads({
+  app,
+  orgId,
+  apiId,
+  dynamicIRs,
+}: {
+  app: FdrApplication;
+  orgId: FdrAPI.OrgId;
+  apiId: APIV1Db.ApiDefinitionId;
+  dynamicIRs: Record<string, DynamicIr> | undefined;
+}): Promise<Record<string, DynamicIrUpload>> {
+  const sourceUploadUrls =
+    await app.services.s3.getPresignedApiDefinitionDynamicIRsUploadUrls({
+      orgId,
+      apiId,
+      dynamicIRs,
+    });
+
+  const sourceUploads = await Promise.all(
+    Object.entries(sourceUploadUrls).map(async ([language, fileInfo]) => {
+      return [
+        language,
+        {
+          uploadUrl: fileInfo.presignedUrl,
+        },
+      ];
+    })
+  );
+
+  return Object.fromEntries(sourceUploads);
+}
+
 async function getSourceUploads({
   app,
   orgId,
@@ -545,7 +602,7 @@ async function getSourceUploads({
   app: FdrApplication;
   orgId: FdrAPI.OrgId;
   apiId: FdrAPI.ApiId;
-  sources: Record<string, APIV1Write.Source>;
+  sources: Record<string, APIV1Write.Source> | undefined;
 }): Promise<Record<string, APIV1Write.SourceUpload>> {
   const sourceUploadUrls =
     await app.services.s3.getPresignedApiDefinitionSourceUploadUrls({

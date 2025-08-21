@@ -232,6 +232,14 @@ function transformEndpoint({
       writeShape.request != null
         ? transformHttpRequestToDb({ writeShape: writeShape.request })
         : undefined,
+    requestsV2:
+      writeShape.requestsV2 != null
+        ? {
+            requests: writeShape.requestsV2.requests?.map((request) =>
+              transformHttpRequestToDb({ writeShape: request })
+            ),
+          }
+        : undefined,
     response:
       writeShape.response != null
         ? convertResponseToDb({
@@ -240,6 +248,19 @@ function transformEndpoint({
             sdkSnippetHolder: snippets,
             endpointDefinition: writeShape,
           })
+        : undefined,
+    responsesV2:
+      writeShape.responsesV2 != null
+        ? {
+            responses: writeShape.responsesV2.responses?.map((response) =>
+              convertResponseToDb({
+                writeShape: response,
+                apiDefinition,
+                sdkSnippetHolder: snippets,
+                endpointDefinition: writeShape,
+              })
+            ),
+          }
         : undefined,
     errors: writeShape.errors ?? [],
     errorsV2: transformErrorsV2(writeShape),
@@ -479,7 +500,7 @@ function transformHttpRequestToDb({
       };
     case "bytes":
       return {
-        contentType: "application/octet-stream",
+        contentType: writeShape.type.contentType ?? "application/octet-stream",
         description: writeShape.description,
         type: {
           type: "bytes",

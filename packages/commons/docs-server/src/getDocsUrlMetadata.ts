@@ -2,12 +2,22 @@ import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import { Agent, setGlobalDispatcher } from "undici";
+
 import { withoutStaging } from "@fern-api/docs-utils";
 
 import { cacheSeed } from "./cache-seed";
 import { fernToken_admin, getFdrOrigin } from "./env-variables";
 import { isLocal } from "./isLocal";
 import { isSelfHosted } from "./isSelfHosted";
+
+setGlobalDispatcher(
+  new Agent({
+    connect: { timeout: 2147483647 },
+    bodyTimeout: 0,
+    headersTimeout: 2147483647,
+  })
+);
 
 export const uncachedGetDocsUrlMetadata = async (
   domain: string
@@ -16,7 +26,7 @@ export const uncachedGetDocsUrlMetadata = async (
   org: string;
   isPreview: boolean;
 }> => {
-  if (isLocal() || isSelfHosted()) {
+  if (isLocal()) {
     return {
       url: domain,
       org: domain.split(".")[0] ?? domain,
@@ -25,13 +35,22 @@ export const uncachedGetDocsUrlMetadata = async (
   }
 
   try {
+    // address FDR error: Failed to parse URL: %5Bdomain%5D
+    // todo: figure out where these calls originate
+    if (domain.includes("[") || domain.includes("%5B")) {
+      console.error(
+        `Cannot get docs url metadata for an invalid domain: ${domain}`
+      );
+      notFound();
+    }
+
     const response = await fetch(
       `${getFdrOrigin()}/v2/registry/docs/metadata-for-url`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${fernToken_admin()}`,
+          Authorization: isSelfHosted() ? "" : `Bearer ${fernToken_admin()}`,
         },
         body: JSON.stringify({ url: withoutStaging(domain) }),
       }
@@ -39,7 +58,7 @@ export const uncachedGetDocsUrlMetadata = async (
 
     if (!response.ok) {
       throw new Error(
-        `Invalid docs url metadata (response is not ok) ${response.status} ${response.statusText}`
+        `Invalid docs url metadata for ${withoutStaging(domain)} (response is not ok) ${response.status} ${response.statusText}`
       );
     }
 
@@ -64,9 +83,12 @@ export const uncachedGetDocsUrlMetadata = async (
       isPreview: body.isPreviewUrl,
     };
   } catch (error) {
-    console.error("Failed to get docs url metadata", {
-      cause: error,
-    });
+    console.error(
+      `Failed to get docs url metadata for ${withoutStaging(domain)}`,
+      {
+        cause: error,
+      }
+    );
     notFound();
   }
 };

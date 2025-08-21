@@ -6,23 +6,21 @@ import { FernFai } from "@fern-api/fai-sdk";
 
 import { getDomainAnalytics } from "@/app/actions/getAnalytics";
 import { getQueries } from "@/app/actions/getQueries";
-import { Pagination } from "@/components/ui/pagination";
-import { cn } from "@/utils/utils";
+import { useSidepanel } from "@/components/layout/SidepanelContext";
 
 import { AnalyticsHistogram } from "./AnalyticsHistogram";
-import { TimeRangeSelect } from "./AnalyticsHistogramRangeSelector";
-import { AnalyticsHistogramTabBar } from "./AnalyticsHistogramTabBar";
+import { ITEMS_PER_PAGE } from "./AnalyticsPage";
 import { AnalyticsPageHeader } from "./AnalyticsPageHeader";
 import { ConversationSidePanel } from "./ConversationSidePanel";
 import { QueriesTable } from "./QueriesTable";
-import { TimeRange } from "./get-request-params";
+import { TimeRange } from "./utils/get-request-params";
 
 export type RenderType = "QUERIES" | "CONVERSATIONS";
 
-const borderStyles =
-  "border-gray-0 mb-4 flex w-full flex-col items-center rounded-2xl border p-4";
-
-const ITEMS_PER_PAGE = 10;
+const ANALYTICS_PAGE_STYLES =
+  "flex min-w-0 flex-1 flex-col items-center transition-[flex] duration-500 ease-out";
+export const BORDER_STYLES =
+  "mb-4 flex w-full flex-col items-center rounded-2xl p-4";
 
 export function AnalyticsPageClient({
   baseDocsUrl,
@@ -30,17 +28,27 @@ export function AnalyticsPageClient({
   initialHistogramData,
   initialTotalQueries,
   cutoffTime,
+  analyticsBillingEnabled,
 }: {
   baseDocsUrl: string;
   initialQueriesData: FernFai.Query[];
   initialHistogramData: FernFai.HistogramAnalytics;
   initialTotalQueries: number;
   cutoffTime: string;
+  analyticsBillingEnabled: boolean;
 }) {
   const [renderType, setRenderType] = useState<RenderType>("QUERIES");
-  const [timeRange, setTimeRange] = useState<TimeRange>(TimeRange.LAST_WEEK);
+  const [histogramTimeRange, setHistogramTimeRange] = useState<TimeRange>(
+    TimeRange.LAST_WEEK
+  );
   const [histogramData, setHistogramData] = useState(initialHistogramData);
+  const [queryTimeRange, setQueryTimeRange] = useState<TimeRange>(
+    TimeRange.LAST_WEEK
+  );
   const [queriesData, setQueriesData] = useState(initialQueriesData);
+  const [totalQueriesPages, setTotalQueriesPages] = useState(
+    Math.ceil(initialTotalQueries / ITEMS_PER_PAGE)
+  );
   const [selectedConversation, setSelectedConversation] =
     useState<FernFai.Conversation | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,13 +56,14 @@ export function AnalyticsPageClient({
   const [pageCache, setPageCache] = useState<Record<number, FernFai.Query[]>>(
     {}
   );
+  const { setContent, clear } = useSidepanel();
 
   useEffect(() => {
     async function fetchHistogramData() {
       try {
         const data = await getDomainAnalytics({
           docsUrl: baseDocsUrl,
-          timeRange,
+          timeRange: histogramTimeRange,
         });
         setHistogramData(data);
       } catch (error) {
@@ -63,11 +72,7 @@ export function AnalyticsPageClient({
     }
 
     void fetchHistogramData();
-  }, [baseDocsUrl, timeRange]);
-
-  useEffect(() => {
-    setPageCache({});
-  }, [timeRange, cutoffTime]);
+  }, [baseDocsUrl, histogramTimeRange]);
 
   useEffect(() => {
     async function fetchQueriesData() {
@@ -84,6 +89,7 @@ export function AnalyticsPageClient({
           page: currentPage,
           limit: ITEMS_PER_PAGE,
           cutoffTime,
+          timeRange: queryTimeRange,
         });
 
         setPageCache((prev) => ({
@@ -92,6 +98,7 @@ export function AnalyticsPageClient({
         }));
 
         setQueriesData(response.queries);
+        setTotalQueriesPages(Math.ceil(response.total / ITEMS_PER_PAGE));
       } catch (error) {
         console.error("Failed to fetch queries data:", error);
       } finally {
@@ -100,78 +107,53 @@ export function AnalyticsPageClient({
     }
 
     void fetchQueriesData();
-  }, [baseDocsUrl, currentPage, timeRange, cutoffTime, pageCache]);
+  }, [baseDocsUrl, currentPage, queryTimeRange, cutoffTime, pageCache]);
 
-  const totalPages = Math.ceil(initialTotalQueries / ITEMS_PER_PAGE);
+  useEffect(() => {
+    setPageCache({});
+  }, [queryTimeRange, cutoffTime]);
 
-  const chartConfig = {
-    queries: {
-      label: "Queries",
-      color: "var(--chart-1)",
-    },
-  };
-
-  const chartData = histogramData.bars.map((bar) => ({
-    label: bar.label,
-    count: renderType === "QUERIES" ? bar.queryCount : bar.conversationCount,
-  }));
+  function handleSelectConversation(convo: FernFai.Conversation | null) {
+    if (convo) {
+      setSelectedConversation(convo);
+      setContent(
+        <ConversationSidePanel
+          conversation={convo}
+          onClose={() => {
+            clear();
+            setSelectedConversation(null);
+          }}
+        />
+      );
+    } else {
+      setSelectedConversation(null);
+      clear();
+    }
+  }
 
   return (
-    <div className="flex w-full flex-row gap-4 p-4">
-      <div
-        className={cn(
-          "flex min-w-0 flex-col items-center transition-[flex] duration-500 ease-out",
-          selectedConversation ? "flex-[2]" : "flex-1"
-        )}
-      >
-        <div className={cn(borderStyles, "w-full")}>
-          <AnalyticsPageHeader />
-        </div>
-        <div className={cn(borderStyles, "w-full")}>
-          <div className="border-gray-0 mb-4 flex w-full justify-between border-b">
-            <AnalyticsHistogramTabBar
-              renderType={renderType}
-              onChangeRenderType={setRenderType}
-            />
-            <TimeRangeSelect value={timeRange} onChange={setTimeRange} />
-          </div>
-          <AnalyticsHistogram
-            chartData={chartData}
-            renderType={renderType}
-            chartConfig={chartConfig}
-          />
-        </div>
-        <div className={cn(borderStyles, "w-full")}>
-          <QueriesTable
-            queries={queriesData}
-            baseDocsUrl={baseDocsUrl}
-            onSelectConversation={setSelectedConversation}
-            selectedConversation={selectedConversation}
-          />
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            isLoading={isLoading}
-          />
-        </div>
-      </div>
-
-      <div
-        className={cn(
-          "flex-shrink-0 overflow-hidden transition-[width,opacity] duration-500 ease-out",
-          selectedConversation ? "w-80 opacity-100" : "w-0 opacity-0"
-        )}
-      >
-        {selectedConversation && (
-          <div className={cn(borderStyles, "h-full w-80")}>
-            <ConversationSidePanel
-              conversation={selectedConversation}
-              onClose={() => setSelectedConversation(null)}
-            />
-          </div>
-        )}
-      </div>
+    <div className={ANALYTICS_PAGE_STYLES}>
+      <AnalyticsPageHeader analyticsBillingEnabled={analyticsBillingEnabled} />
+      <AnalyticsHistogram
+        renderType={renderType}
+        setRenderType={setRenderType}
+        histogramTimeRange={histogramTimeRange}
+        setHistogramTimeRange={setHistogramTimeRange}
+        histogramData={histogramData}
+      />
+      <QueriesTable
+        queries={queriesData}
+        baseDocsUrl={baseDocsUrl}
+        onSelectConversation={handleSelectConversation}
+        selectedConversation={selectedConversation}
+        totalPages={totalQueriesPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        isLoading={isLoading}
+        cutoffTime={cutoffTime}
+        queryTimeRange={queryTimeRange}
+        setQueryTimeRange={setQueryTimeRange}
+      />
     </div>
   );
 }

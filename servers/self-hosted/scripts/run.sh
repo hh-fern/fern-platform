@@ -7,17 +7,21 @@ if [ ! -d "/fern" ]; then
 fi
 
 export ORG_NAME=$(jq -r '.organization' < /fern/fern.config.json)
-export MINIO_BUCKET_NAME=${ORG_NAME}.${MINIO_BUCKET_NAME_SUFFIX}
-export NEXT_PUBLIC_DOCS_DOMAIN_URL=${ORG_NAME}.docs.buildwithfern.com
+CUSTOM_DOMAIN=$(yq '.instances[0]."custom-domain"' /fern/docs.yml 2>/dev/null | tr -d '"')
+if [ -n "$CUSTOM_DOMAIN" ] && [ "$CUSTOM_DOMAIN" != "null" ]; then
+    export NEXT_PUBLIC_DOCS_DOMAIN_URL="$CUSTOM_DOMAIN"
+else
+    export NEXT_PUBLIC_DOCS_DOMAIN_URL="${ORG_NAME}.docs.buildwithfern.com"
+fi
 
 # -----------  Start Postgres setup  -----------
 echo "Starting PostgreSQL service..."
-service postgresql start
+# Use pg_ctl instead of service command (which doesn't exist in Wolfi)
+su - postgres -c "pg_ctl -D /var/lib/postgresql/data start"
 echo "PostgreSQL service started."
 
-# 'pgrep' may not be available in slim images; use alternative to get postgres PID
-# 'ps' is not available; fallback to pgrep or skip PID retrieval if unavailable
-postgres_pid=$(pgrep -u postgres -n postgres || true)
+# Use pidof or ps to get postgres PID (pgrep might not be available)
+postgres_pid=$(pidof postgres || ps aux | grep postgres | grep -v grep | awk '{print $2}' | head -1 || true)
 echo "PostgreSQL PID: $postgres_pid"
 
 echo "Creating Postgres database..."
@@ -54,11 +58,27 @@ echo "MinIO is ready!"
 
 # Initialize MinIO
 mc alias set minio ${MINIO_URL} ${MINIO_USERNAME} ${MINIO_PASSWORD}
-mc mb minio/${MINIO_BUCKET_NAME}
+
+# Always create the .docs.buildwithfern.com bucket
+mc mb minio/${ORG_NAME}.docs.buildwithfern.com
+mc anonymous set download minio/${ORG_NAME}.docs.buildwithfern.com
+export MINIO_BUCKET_NAME=${ORG_NAME}.docs.buildwithfern.com
+
+# Also create the custom domain bucket if specified and not null
+if [ -n "$CUSTOM_DOMAIN" ] && [ "$CUSTOM_DOMAIN" != "null" ]; then
+    mc mb minio/${CUSTOM_DOMAIN}
+    mc anonymous set download minio/${CUSTOM_DOMAIN}
+    export MINIO_BUCKET_NAME=${CUSTOM_DOMAIN}
+fi
+
+# Make bucket public
 
 # map custom domain to local machine
 echo "127.0.0.1 $ORG_NAME.docs.buildwithfern.com.localhost" >> /etc/hosts
 echo "::1 $ORG_NAME.docs.buildwithfern.com.localhost" >> /etc/hosts
+echo "127.0.0.1 $CUSTOM_DOMAIN.localhost" >> /etc/hosts
+echo "::1 $CUSTOM_DOMAIN.localhost" >> /etc/hosts
+
 # -----------  End MINIO setup  -----------
 
 echo "Starting FDR server..."
@@ -93,6 +113,9 @@ HOSTNAME="0.0.0.0" \
 PORT=3000 \
 NEXT_PUBLIC_FDR_ORIGIN_PORT=8080 \
 NEXT_PUBLIC_FDR_ORIGIN="http://localhost:8080" \
+NEXT_PUBLIC_MINIO_BUCKET_HOST=${MINIO_URL} \
+NEXT_PUBLIC_MINIO_ACCESS_KEY=${MINIO_ROOT_USER} \
+NEXT_PUBLIC_MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD} \
 NEXT_PUBLIC_FILES_ORIGIN="http://${NEXT_PUBLIC_DOCS_DOMAIN_URL}.localhost:9000" \
 NEXT_PUBLIC_ASSET_HOSTING="1" \
 NEXT_PUBLIC_DOCS_DOMAIN=${NEXT_PUBLIC_DOCS_DOMAIN_URL} \

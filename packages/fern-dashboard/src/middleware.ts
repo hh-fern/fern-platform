@@ -52,15 +52,33 @@ async function applyAuth0Middleware(req: NextRequest): Promise<NextResponse> {
     });
   }
 
-  // const session = await auth0.getSession(req);
+  // Handle invitation redirects after successful authentication
+  const organizationName = req.nextUrl.searchParams.get("organization_name");
 
-  // if (!session) {
-  //   // user is not authenticated, redirect to login page
-  //   return NextResponse.redirect(new URL("/auth/login", req.nextUrl.origin));
-  // }
+  // If the user is logging in and they are invited to an organization, we need to store the organization name
+  // in a cookie so we can redirect them to the organization after they log in
+  if (req.nextUrl.pathname === "/auth/login" && organizationName) {
+    // Store organization_name in a cookie during login so we can use it later in callback
+    authResponse.cookies.set("pending_org_redirect", organizationName, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 300, // 5 minutes
+    });
+  }
 
-  // // refresh the access token
-  // await auth0.getAccessToken(req, authResponse);
+  // Let Auth0 handle the callback first, then check for pending redirects on the next request
+  // Don't intercept /auth/callback as it prevents Auth0 from establishing the session properly
+
+  // Clear the pending_org_redirect cookie when user accesses any org page
+  // This ensures the cookie doesn't persist after the invitation flow is complete
+  const pendingOrgRedirect = req.cookies.get("pending_org_redirect")?.value;
+  if (
+    pendingOrgRedirect &&
+    req.nextUrl.pathname.startsWith(`/${pendingOrgRedirect}`)
+  ) {
+    authResponse.cookies.delete("pending_org_redirect");
+  }
 
   return authResponse;
 }

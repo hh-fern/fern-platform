@@ -4,7 +4,9 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { UIMessage } from "ai";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { createGetAuthStateEdge } from "@fern-api/docs-server/auth/getAuthStateEdge";
 import {
+  fernToken_admin,
   getFaiOrigin,
   openaiApiKey,
 } from "@fern-api/docs-server/env-variables";
@@ -15,13 +17,13 @@ import { FernFaiClient } from "@fern-api/fai-sdk";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
   getLanguageModel,
+  getQueryIndexName,
   getTurbopufferNamespace,
   runRouteForAnthropic,
   runRouteForCohere,
 } from "@fern-docs/search-ask-fern";
+import { FacetFilter } from "@fern-docs/search-keyword";
 import { MAX_AI_CHAT_MESSAGE_LENGTH } from "@fern-docs/search-ui";
-
-import { ModelProvider } from "@/app/utils";
 
 export const maxDuration = 60;
 export const revalidate = 0;
@@ -37,6 +39,13 @@ export async function POST(req: NextRequest) {
   const createdAt = new Date();
   const host = req.nextUrl.host;
   const domain = getDocsDomainEdge(req);
+
+  const { getAuthState } = await createGetAuthStateEdge(req);
+  const authState = await getAuthState(req.nextUrl.pathname);
+  if (!authState.ok) {
+    return NextResponse.json("Unauthorized", { status: 401 });
+  }
+
   const loader = await createCachedDocsLoader(host, domain);
   const metadata = await loader.getMetadata();
   if (metadata == null) {
@@ -62,11 +71,13 @@ export async function POST(req: NextRequest) {
   const {
     messages,
     source,
+    filters,
     conversationId,
   }: {
     url: string;
     messages: UIMessage[];
     source: string;
+    filters: FacetFilter[];
     conversationId: string;
   } = await req.json();
 
@@ -82,31 +93,33 @@ export async function POST(req: NextRequest) {
   const chatSource = source ?? "CHAT";
 
   const modelId = config.aiChatConfig?.model ?? "claude-3.5";
-  let modelProvider: ModelProvider = "anthropic";
-  if (modelId === "claude-4" || modelId === "claude-3.5")
-    modelProvider = "anthropic";
-  if (modelId === "command-a") modelProvider = "cohere";
-  const languageModel = getLanguageModel(modelId);
+  const { model: languageModel, provider: modelProvider } =
+    getLanguageModel(modelId);
 
   const openai = createOpenAI({ apiKey: openaiApiKey() });
   const embeddingModel = openai.embedding("text-embedding-3-large");
 
   const faiClient = new FernFaiClient({
     baseUrl: getFaiOrigin(),
-    token: () => "",
+    token: fernToken_admin(),
   });
-  await faiClient.queries.createQuery({
-    query_id: queryId,
-    conversation_id: conversationId,
-    domain,
-    text: lastUserMessage,
-    role: "USER",
-    source: chatSource.toUpperCase(),
-    created_at: createdAt.toISOString(),
-    time_to_first_token: undefined,
-  });
+  try {
+    await faiClient.queries.createQuery({
+      query_id: queryId,
+      conversation_id: conversationId,
+      domain,
+      text: lastUserMessage,
+      role: "USER",
+      source: chatSource.toUpperCase(),
+      created_at: createdAt.toISOString(),
+      time_to_first_token: undefined,
+    });
+  } catch (error) {
+    console.log("Error creating query", error);
+  }
 
-  if (modelProvider === "anthropic") {
+  const queryIndexName = getQueryIndexName();
+  if (modelProvider === "anthropic" || modelProvider === "bedrock") {
     return runRouteForAnthropic({
       domain,
       chatSource,
@@ -114,8 +127,9 @@ export async function POST(req: NextRequest) {
       conversationId,
       lastUserMessage,
       messages,
+      filters,
       embeddingModel,
-      turbopufferNamespace: getTurbopufferNamespace(domain, embeddingModel),
+      turbopufferNamespace: getTurbopufferNamespace(domain, queryIndexName),
       languageModel,
     });
   } else if (modelProvider === "cohere") {
@@ -126,8 +140,9 @@ export async function POST(req: NextRequest) {
       conversationId,
       lastUserMessage,
       messages,
+      filters,
       embeddingModel,
-      turbopufferNamespace: getTurbopufferNamespace(domain, embeddingModel),
+      turbopufferNamespace: getTurbopufferNamespace(domain, queryIndexName),
       languageModel,
     });
   } else {

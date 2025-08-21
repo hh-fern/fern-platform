@@ -1,10 +1,9 @@
-import {
-  FilterCondition,
-  Filters,
-  Turbopuffer,
-} from "@turbopuffer/turbopuffer";
+import { Turbopuffer } from "@turbopuffer/turbopuffer";
+
+import { FacetFilter } from "@fern-docs/search-keyword";
 
 import { TurbopufferRecord } from "../types";
+import { buildQueryFilters } from "./query-filters";
 import { reciprocalRankFusion } from "./reciprocal-rank-fusion";
 
 interface SemanticSearchOptions {
@@ -12,7 +11,7 @@ interface SemanticSearchOptions {
   namespace: string;
   apiKey: string;
   topK: number;
-  filters?: { facet: string; value: string }[];
+  filters?: FacetFilter[];
 
   /**
    * The search mode to use.
@@ -20,8 +19,9 @@ interface SemanticSearchOptions {
    */
   mode?: "semantic" | "bm25" | "hybrid";
 
-  // ignore these document ids; used to avoid tool-calls returning the same document over and over
+  // ignore these document ids & urls; used to avoid tool-calls returning the same document over and over
   documentIdsToIgnore?: string[];
+  urlsToIgnore?: string[];
 }
 
 export async function queryTurbopuffer(
@@ -34,6 +34,7 @@ export async function queryTurbopuffer(
     filters,
     mode = "hybrid",
     documentIdsToIgnore = [],
+    urlsToIgnore = [],
   }: SemanticSearchOptions
 ): Promise<TurbopufferRecord[]> {
   const tpuf = new Turbopuffer({
@@ -44,33 +45,11 @@ export async function queryTurbopuffer(
 
   const vector = await vectorizer(query);
 
-  const documentIdFilters: FilterCondition[] = documentIdsToIgnore.map((id) => [
-    "id",
-    "NotEq",
-    id,
-  ]);
-
-  const versionFilters = filters
-    ? filters.filter((f) => f.facet === "version.title")
-    : [];
-
-  const queryFilters: Filters | undefined =
-    versionFilters.length > 0
-      ? [
-          "And",
-          [
-            ...versionFilters.map((f) => {
-              const filter: FilterCondition = ["version", "Eq", f.value];
-              return filter;
-            }),
-            ...documentIdFilters,
-          ],
-        ]
-      : documentIdFilters.length > 0
-        ? documentIdFilters.length === 1
-          ? documentIdFilters[0]
-          : ["And", documentIdFilters]
-        : undefined;
+  const queryFilters = buildQueryFilters({
+    filters: filters ?? [],
+    documentIdsToIgnore,
+    urlsToIgnore,
+  });
 
   const semanticResults =
     mode !== "bm25"
@@ -92,7 +71,6 @@ export async function queryTurbopuffer(
           rank_by: [
             "Sum",
             [
-              ["chunk", "BM25", query],
               ["title", "BM25", query],
               ["keywords", "BM25", query],
             ],

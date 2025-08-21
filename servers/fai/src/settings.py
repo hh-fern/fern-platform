@@ -8,6 +8,9 @@ from typing import Optional
 
 from dotenv import load_dotenv
 
+from src.fai.enums.embedding_models import EmbeddingModels
+from src.fai.models.types.model import EmbeddingModel
+
 
 load_dotenv()
 logging.config.fileConfig("logging.conf")
@@ -29,6 +32,14 @@ class Variables:
                     raise ValueError(f"Setup: Environment variable {attr_name} is not set.")
 
 
+class Config:
+    INSIGHTS_NUM_CLUSTERS: int = 8
+    EMBEDDING_BATCH_SIZE: int = 100
+    INSIGHTS_MAX_EXAMPLES: int = 25
+    TURBOPUFFER_DEFAULT_REGION: str = "gcp-us-east4"
+    DEFAULT_EMBEDDING_MODEL: EmbeddingModel = EmbeddingModels.TEXT_EMBEDDING_3_LARGE.value
+
+
 class SingletonFactory:
     _instances: Dict[Any, Any] = {}
 
@@ -40,4 +51,5 @@ class SingletonFactory:
 
 
 VARIABLES = SingletonFactory.get_instance(Variables)
+CONFIG = SingletonFactory.get_instance(Config)
 VARIABLES.validate_env_variables()

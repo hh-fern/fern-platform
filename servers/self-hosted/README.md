@@ -6,7 +6,7 @@ This repo contains a Dockerfile for self-hosting Fern's docs product. This proje
 
 ### Pre-requisites
 
-- Make sure Node.js 18+ and pnpm are installed on your machine
+- Make sure Node.js 22+ and pnpm are installed on your machine
 - Have Docker installed and have the daemon open on your machine
 
 ## Building the Docker Image:
@@ -49,8 +49,8 @@ Rebuilding the docker container is slow and if you were to rebuild the container
 ```
 cd /fern-platform
 Run pnpm docs:self-hosted-bundle:build
+Run pnpm --filter=@fern-platform/fdr build:tsup:cjs
 Run pnpm --filter=@fern-platform/self-hosted docker:build
-
 Run pnpm --filter=@fern-platform/self-hosted docker:run
 ```
 

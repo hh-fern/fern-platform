@@ -16,13 +16,14 @@
     "dist"
   ],
   "scripts": {
+    "build": "tsc",
     "cdk": "cdk",
-    "deploy-app:dev2": "cdk deploy local-preview-bundle4-dev2 --require-approval never --progress events",
-    "deploy-app:prod": "cdk deploy local-preview-bundle4-prod --require-approval never --progress events",
-    "deploy:dev2": "cdk deploy local-preview-bundle2-dev2 --require-approval never --progress events",
-    "deploy:prod": "cdk deploy local-preview-bundle2-prod --require-approval never --progress events",
-    "synth-app:dev2": "cdk synth local-preview-bundle4-dev2",
-    "synth:dev2": "cdk synth local-preview-bundle2-dev2",
+    "deploy-app:dev2": "pnpm build && cdk deploy local-preview-bundle4-dev2 --require-approval never --progress events",
+    "deploy-app:prod": "pnpm build && cdk deploy local-preview-bundle4-prod --require-approval never --progress events",
+    "deploy:dev2": "pnpm build && cdk deploy local-preview-bundle2-dev2 --require-approval never --progress events",
+    "deploy:prod": "pnpm build && cdk deploy local-preview-bundle2-prod --require-approval never --progress events",
+    "synth-app:dev2": "pnpm build && cdk synth local-preview-bundle4-dev2",
+    "synth:dev2": "pnpm build && cdk synth local-preview-bundle2-dev2",
     "zip:local:bundle": "tsx scripts/zip-local-bundle.ts"
   },
   "dependencies": {
@@ -35,7 +36,7 @@
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
     "@types/archiver": "^6.0.2",
-    "@types/node": "^18.11.9",
+    "@types/node": "^22.0.0",
     "aws-cdk": "^2.179.0",
     "typescript": "^5"
   }

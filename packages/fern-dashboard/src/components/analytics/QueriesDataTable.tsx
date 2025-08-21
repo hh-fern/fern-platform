@@ -1,14 +1,15 @@
 "use client";
 
 import {
+  Cell,
   ColumnDef,
+  Row,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowRight } from "lucide-react";
 
 import { FernFai } from "@fern-api/fai-sdk";
 
@@ -16,6 +17,7 @@ import { getConversation } from "@/app/actions/getConversation";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import { QueriesDataTableHeader } from "./QueriesDataTableHeader";
+import { TimeRange } from "./utils/get-request-params";
 
 interface QueriesDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -23,6 +25,10 @@ interface QueriesDataTableProps<TData, TValue> {
   baseDocsUrl: string;
   onSelectConversation: (conversation: FernFai.Conversation) => void;
   selectedConversation: FernFai.Conversation | null;
+  queryTimeRange: TimeRange;
+  setQueryTimeRange: (range: TimeRange) => void;
+  onExport: () => void;
+  isExporting?: boolean;
 }
 
 export function QueriesDataTable<TData, TValue>({
@@ -31,6 +37,10 @@ export function QueriesDataTable<TData, TValue>({
   baseDocsUrl,
   onSelectConversation,
   selectedConversation,
+  queryTimeRange,
+  setQueryTimeRange,
+  onExport,
+  isExporting,
 }: QueriesDataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -40,10 +50,43 @@ export function QueriesDataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  function onClickRow(row: Row<TData>) {
+    return async () => {
+      const conversation = await getConversation({
+        domain: baseDocsUrl,
+        conversationId: (row.original as FernFai.Query).conversation_id,
+      });
+      onSelectConversation(conversation);
+    };
+  }
+
+  function renderCell(cell: Cell<TData, TValue>) {
+    return (
+      <TableCell
+        key={cell.id}
+        className={
+          cell.column.id === "created_at"
+            ? "w-32"
+            : cell.column.id === "actions"
+              ? "w-16"
+              : undefined
+        }
+      >
+        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+      </TableCell>
+    );
+  }
+
   return (
     <div className="flex flex-row gap-6 rounded-md p-4">
       <div className="grow">
-        <QueriesDataTableHeader table={table} />
+        <QueriesDataTableHeader
+          table={table}
+          queryTimeRange={queryTimeRange}
+          setQueryTimeRange={setQueryTimeRange}
+          onExport={onExport}
+          isExporting={isExporting}
+        />
         <div className="max-h-[400px] min-h-[400px] overflow-y-auto">
           <Table className="table-fixed">
             <TableBody>
@@ -57,32 +100,9 @@ export function QueriesDataTable<TData, TValue>({
                       "selected"
                     }
                     className="data-[state=selected]:bg-accent cursor-pointer border-none"
-                    onClick={async () => {
-                      const conversation = await getConversation({
-                        domain: baseDocsUrl,
-                        conversationId: (row.original as FernFai.Query)
-                          .conversation_id,
-                      });
-                      onSelectConversation(conversation);
-                    }}
+                    onClick={onClickRow(row)}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={
-                          cell.column.id === "created_at"
-                            ? "w-32"
-                            : cell.column.id === "actions"
-                              ? "w-16"
-                              : undefined
-                        }
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+                    {row.getVisibleCells().map((cell) => renderCell(cell))}
                   </TableRow>
                 ))
               ) : (
@@ -102,52 +122,3 @@ export function QueriesDataTable<TData, TValue>({
     </div>
   );
 }
-
-export const columns: ColumnDef<FernFai.Query>[] = [
-  {
-    id: "query",
-    accessorFn: (query) => query.text,
-    header: "Query",
-    cell: ({ row }) => {
-      const text = row.getValue("query") as string;
-      return (
-        <div
-          className="truncate hover:text-clip hover:whitespace-normal"
-          title={text}
-        >
-          {text}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "created_at",
-    header: "",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("created_at") as string);
-      return (
-        <div>
-          {date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}
-        </div>
-      );
-    },
-  },
-  {
-    header: () => {
-      return <div></div>;
-    },
-    id: "actions",
-    cell: () => {
-      return (
-        <div className="text-radix-gray-11 flex flex-row items-center">
-          View
-          <ArrowRight className="ml-1 h-3 w-3" />
-        </div>
-      );
-    },
-  },
-];

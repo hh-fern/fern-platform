@@ -86,3 +86,5 @@ types:
       - CSHARP
       - TYPESCRIPT
       - PHP
+      - RUST
+      - SWIFT

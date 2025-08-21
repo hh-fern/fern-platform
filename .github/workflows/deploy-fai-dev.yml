@@ -1,0 +1,43 @@
+name: Deploy FAI Dev
+
+on:
+  push:
+    tags:
+      - "fai@*" 
+    branches:
+      - app
+
+jobs:
+  deploy-dev:
+    if: github.ref == 'refs/heads/app'
+    runs-on: ubuntu-latest
+    environment: Fern Dev
+    env:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TURBOPUFFER_API_KEY: ${{ secrets.TURBOPUFFER_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.FERN_GITHUB_TOKEN }}
+      POSTGRES_DATABASE_URL: ${{ secrets.POSTGRES_DATABASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create .env file
+        run: |
+          cd servers/fai
+          echo "TURBOPUFFER_API_KEY=${{ env.TURBOPUFFER_API_KEY }}" >> .env
+          echo "ANTHROPIC_API_KEY=${{ env.ANTHROPIC_API_KEY }}" >> .env
+          echo "OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}" >> .env
+          echo "POSTGRES_DATABASE_URL=${{ env.POSTGRES_DATABASE_URL }}" >> .env
+      - name: Deploy to Dev
+        run: |
+          git_version="$(scripts/fai-version.sh)"
+          cd servers/fai
+          ./scripts/create_docker.sh "${git_version}"
+          cd deploy
+          npm install
+          VERSION="${git_version}" npm run cdk deploy fai-dev2 --require-approval never --progress events

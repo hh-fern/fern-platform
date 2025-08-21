@@ -1,11 +1,12 @@
 import { unstable_cacheTag } from "next/cache";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 import { uniqBy } from "es-toolkit/array";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
-import { slugToHref } from "@fern-api/docs-utils";
+import { COOKIE_FERN_TOKEN, slugToHref } from "@fern-api/docs-utils";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish } from "@fern-api/ui-core-utils";
@@ -24,7 +25,9 @@ export async function GET(
 
   const path = slugToHref(req.nextUrl.searchParams.get("slug") ?? "");
 
-  const content = await getLlmsFullTxt(host, domain, path);
+  const fernToken = (await cookies()).get(COOKIE_FERN_TOKEN)?.value;
+
+  const content = await getLlmsFullTxt(host, domain, path, fernToken);
 
   const html = await generateHtml({
     host,
@@ -45,13 +48,14 @@ export async function GET(
 async function getLlmsFullTxt(
   host: string,
   domain: string,
-  path: string
+  path: string,
+  fernToken: string | undefined
 ): Promise<string> {
   "use cache";
 
   unstable_cacheTag(domain, "getLlmsFullTxt");
 
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, fernToken);
 
   const root = getSectionRoot(await loader.getRoot(), path);
 

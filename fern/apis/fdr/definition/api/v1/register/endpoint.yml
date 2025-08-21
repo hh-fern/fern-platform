@@ -32,7 +32,9 @@ types:
       queryParameters: list<QueryParameter>
       headers: list<Header>
       request: optional<HttpRequest>
+      requestsV2: optional<HttpRequestsV2>
       response: optional<HttpResponse>
+      responsesV2: optional<HttpResponsesV2>
       errors:
         type: optional<list<ErrorDeclaration>>
         availability: deprecated
@@ -78,6 +80,10 @@ types:
     extends: commons.WithDescription
     properties:
       type: HttpRequestBodyShape
+  
+  HttpRequestsV2:
+    properties:
+      requests: optional<list<HttpRequest>>
 
   HttpRequestBodyShape:
     union:
@@ -113,6 +119,10 @@ types:
       statusCode:
         type: optional<integer>
         docs: Defaults to 200
+  
+  HttpResponsesV2:
+    properties:
+      responses: optional<list<HttpResponse>>
 
   ErrorDeclaration:
     extends:

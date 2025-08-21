@@ -88,7 +88,28 @@ function transformEndpoint({
       dbShape.request != null
         ? transformHttpRequest({ dbShape: dbShape.request })
         : undefined,
+    requestsV2: (() => {
+      if (dbShape.requestsV2 == null) {
+        return undefined;
+      }
+      if (
+        dbShape.requestsV2.requests == null ||
+        dbShape.requestsV2.requests.length === 0
+      ) {
+        return dbShape.request != null
+          ? {
+              requests: [transformHttpRequest({ dbShape: dbShape.request })],
+            }
+          : undefined;
+      }
+      return {
+        requests: dbShape.requestsV2.requests.map((request) =>
+          transformHttpRequest({ dbShape: request })
+        ),
+      };
+    })(),
     response: dbShape.response,
+    responsesV2: dbShape.responsesV2,
     errors: dbShape.errors ?? [],
     errorsV2: transformErrorsV2(dbShape),
     examples: dbShape.examples.map((example) =>

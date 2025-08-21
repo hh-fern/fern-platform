@@ -29,10 +29,12 @@ export interface EdgeFlags {
   isSearchV2Enabled: boolean;
   isAuthedPreview: boolean;
   isSearchDisabled: boolean;
-  isDefaultSearchFilterOff: boolean;
+  isDefaultSearchFilterOn: boolean;
   isChangelogRedirects: boolean;
   isPosthogDisabled: boolean;
   isNextMdxRef: boolean;
+  isLlmsTxtDisabled: boolean;
+  isDynamicSnippetsEnabled: boolean;
 }
 
 export const DEFAULT_EDGE_FLAGS: EdgeFlags = {
@@ -66,13 +68,23 @@ export const DEFAULT_EDGE_FLAGS: EdgeFlags = {
   isSearchV2Enabled: false,
   isAuthedPreview: false,
   isSearchDisabled: false,
-  isDefaultSearchFilterOff: false,
+  isDefaultSearchFilterOn: false,
   isChangelogRedirects: false,
   isPosthogDisabled: false,
   isNextMdxRef: false,
+  isLlmsTxtDisabled: false,
+  isDynamicSnippetsEnabled: false,
 };
 
 export const DEFAULT_SELF_HOSTED_EDGE_FLAGS: EdgeFlags = {
   ...DEFAULT_EDGE_FLAGS,
   isWhitelabeled: true,
+};
+
+export interface OrgEdgeFlags {
+  bypassExtendedGithubAuth: boolean;
+}
+
+export const DEFAULT_ORG_EDGE_FLAGS: OrgEdgeFlags = {
+  bypassExtendedGithubAuth: false,
 };

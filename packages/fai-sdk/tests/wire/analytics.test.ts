@@ -25,8 +25,6 @@ describe("Analytics", () => {
             .build();
 
         const response = await client.analytics.getHistogramAnalytics("domain", {
-            start_date: "2024-01-15T09:30:00Z",
-            end_date: "2024-01-15T09:30:00Z",
             groupBy: "DAY",
         });
         expect(response).toEqual({
@@ -63,10 +61,7 @@ describe("Analytics", () => {
             .jsonBody(rawResponseBody)
             .build();
 
-        const response = await client.analytics.getInsights("domain", {
-            start_date: "2024-01-15T09:30:00Z",
-            end_date: "2024-01-15T09:30:00Z",
-        });
+        const response = await client.analytics.getInsights("domain");
         expect(response).toEqual({
             insights: [
                 {

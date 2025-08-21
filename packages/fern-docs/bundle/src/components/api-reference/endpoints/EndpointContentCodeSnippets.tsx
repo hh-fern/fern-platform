@@ -304,13 +304,21 @@ export const EndpointContentCodeSnippets = memo(
   UnmemoizedEndpointContentCodeSnippets
 );
 
-function renderResponseTitle(title: string, statusCode: number | string) {
+export function renderResponseTitle(
+  title: string,
+  statusCode: number | string,
+  hideTitle?: boolean
+) {
   return (
     <span className="inline-flex items-center gap-2">
       <StatusCodeBadge statusCode={statusCode} />
-      <span className={`text-intent-${statusCodeToIntent(String(statusCode))}`}>
-        {title}
-      </span>
+      {!hideTitle && (
+        <span
+          className={`text-intent-${statusCodeToIntent(String(statusCode))}`}
+        >
+          {title}
+        </span>
+      )}
     </span>
   );
 }
@@ -323,6 +331,11 @@ const resolveEnvironmentUrlInCodeSnippet = (
   const urlToReplace = endpoint.environments?.find((env) =>
     requestCodeSnippet.includes(env.baseUrl)
   )?.baseUrl;
+
+  if (baseUrl?.endsWith("/")) {
+    baseUrl = baseUrl.replace(/\/$/, "");
+  }
+
   return urlToReplace && baseUrl
     ? requestCodeSnippet.replace(urlToReplace, baseUrl)
     : requestCodeSnippet;
