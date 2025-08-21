@@ -25,8 +25,3 @@ async function mainZipLocalBundle() {
     process.exit(1);
   }
 }
-
-// Allow running from command line
-if (require.main === module) {
-  void mainZipLocalBundle();
-}
