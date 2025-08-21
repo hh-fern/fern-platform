@@ -51,25 +51,25 @@ export default async function Page(props: {
   return <ExplorerContent loader={loader} node={node} />;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ host: string; domain: string; slug: string }>;
-}): Promise<Metadata> {
-  const { host, domain, slug: slugProp } = await params;
-  const slug = FernNavigation.slugjoin(slugProp);
-  const loader = await createCachedDocsLoader(
-    host,
-    domain,
-    await getFernToken()
-  );
-  const root = await loader.getRoot();
-  const found = FernNavigation.utils.findNode(root, slug);
+// export async function generateMetadata({
+//   params,
+// }: {
+//   params: Promise<{ host: string; domain: string; slug: string }>;
+// }): Promise<Metadata> {
+//   const { host, domain, slug: slugProp } = await params;
+//   const slug = FernNavigation.slugjoin(slugProp);
+//   const loader = await createCachedDocsLoader(
+//     host,
+//     domain,
+//     await getFernToken()
+//   );
+//   const root = await loader.getRoot();
+//   const found = FernNavigation.utils.findNode(root, slug);
 
-  if (found.type !== "found") {
-    return {};
-  }
-  return {
-    title: found.node.title,
-  };
-}
+//   if (found.type !== "found") {
+//     return {};
+//   }
+//   return {
+//     title: found.node.title,
+//   };
+// }
