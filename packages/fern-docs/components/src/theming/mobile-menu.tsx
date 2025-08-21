@@ -7,7 +7,6 @@ import { Portal } from "@radix-ui/react-portal";
 import { compact } from "es-toolkit/array";
 import {
   AnimatePresence,
-  Easing,
   motion,
   useDragControls,
   useMotionValue,
@@ -33,11 +32,10 @@ export const MainCtx = React.createContext<
 });
 
 const transition = {
-  ease: "easeInOut" as Easing,
+  ease: "easeInOut",
   easings: [0.25, 0.46, 0.45, 0.94],
   duration: 0.3,
 };
-
 
 export function MobileMenu({
   children,

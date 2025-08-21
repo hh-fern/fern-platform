@@ -115,7 +115,7 @@ export async function getOrganization(orgName: Auth0OrgName) {
           name: orgName,
         });
 
-      return organization as unknown as Auth0Organization;
+      return organization as Auth0Organization;
     }
   );
 }
