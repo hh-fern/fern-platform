@@ -133,7 +133,7 @@ export async function zipLocalBundle(zipFilePath: string): Promise<void> {
 
 export function resolveLocalPreviewBundleTarPath(zipFilePath?: string) {
   if (!zipFilePath) {
-    return path.resolve(__dirname, "../../fern-docs/bundle/next.tar.gz");;
+    return path.resolve(__dirname, "../../fern-docs/bundle/next.tar.gz");
   }
   return path.isAbsolute(zipFilePath)
     ? zipFilePath
