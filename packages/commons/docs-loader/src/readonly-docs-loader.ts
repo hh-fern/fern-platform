@@ -4,7 +4,7 @@ import { after } from "next/server";
 import { cache } from "react";
 
 import { kv } from "@vercel/kv";
-import { Semaphore } from "es-toolkit/promise";
+import { Semaphore } from "es-toolkit/compat";
 import { mapValues } from "es-toolkit/object";
 import { type AsyncOrSync, UnreachableCaseError } from "ts-essentials";
 
