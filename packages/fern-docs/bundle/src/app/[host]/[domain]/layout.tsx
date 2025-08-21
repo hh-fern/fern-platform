@@ -1,7 +1,7 @@
 import "server-only";
 
 import Script from "next/script";
-import { Metadata } from "next/types";
+// import { Metadata } from "next/types";
 import React from "react";
 import { preload } from "react-dom";
 
@@ -36,7 +36,7 @@ import { JavascriptProvider } from "@/components/JavascriptProvider";
 import { CustomerAnalytics } from "@/components/analytics/CustomerAnalytics";
 import { FernUser } from "@/components/fern-user";
 import SearchV2 from "@/components/search";
-import { generateMetadataFromConfig } from "@/components/seo";
+// import { generateMetadataFromConfig } from "@/components/seo";
 import { withJsConfig } from "@/components/with-js-config";
 import { SetColors } from "@/state/colors";
 import { DarkCode } from "@/state/dark-code";
@@ -204,11 +204,11 @@ async function getLaunchDarklyInfo(
   };
 }
 
-export async function generateMetadata(props: {
-  params: Promise<{ host: string; domain: string }>;
-}): Promise<Metadata> {
-  return await generateMetadataFromConfig({ params: props.params });
-}
+// export async function generateMetadata(props: {
+//   params: Promise<{ host: string; domain: string }>;
+// }): Promise<Metadata> {
+//   return await generateMetadataFromConfig({ params: props.params });
+// }
 
 function generatePreloadHrefs(
   typography: DocsV2Read.LoadDocsForUrlResponse["definition"]["config"]["typographyV2"],
