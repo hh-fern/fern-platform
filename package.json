@@ -15,7 +15,7 @@
     "depcheck": "turbo depcheck",
     "docs:build": "turbo docs:build",
     "docs:dev": "turbo docs:dev",
-    "docs:local-bundle:build": "pnpm --filter=@fern-docs/bundle docs:make:local && pnpm --filter=@fern-platform/cdk zip:local:bundle ../../../docs_bundle.tar.gz",
+    "docs:local-bundle:build": "pnpm --filter=@fern-docs/bundle docs:make:local && pnpm --filter=@fern-platform/cdk docs:local:zipBundle ../../../docs_bundle.tar.gz",
     "docs:local-bundle:deploy": "pnpm docs:local-bundle:resetDir && pnpm docs:local-bundle:unzip && echo 'Use local bundle by running: fern docs dev --bundle-path ~/.fern/app-preview-local/.next'",
     "docs:local-bundle:redeploy": "pnpm docs:local-bundle:build && pnpm docs:local-bundle:deploy",
     "docs:local-bundle:resetDir": "rm -rf ~/.fern/app-preview-local && mkdir -p ~/.fern/app-preview-local && mkdir -p ~/.fern/app-preview-local/.next",
