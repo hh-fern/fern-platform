@@ -6,7 +6,7 @@ import {
 
 /**
  * Command-line wrapper for zipLocalBundle.
- * Usage: tsx docs-fe-stack.ts [zipFilePath]
+ * Usage: tsx zip-local-bundle.ts [zipFilePath]
  */
 async function mainZipLocalBundle() {
   const [, , zipFilePathArg] = process.argv;
