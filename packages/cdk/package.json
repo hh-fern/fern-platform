@@ -24,7 +24,7 @@
     "deploy:prod": "pnpm build && cdk deploy local-preview-bundle2-prod --require-approval never --progress events",
     "synth-app:dev2": "pnpm build && cdk synth local-preview-bundle4-dev2",
     "synth:dev2": "pnpm build && cdk synth local-preview-bundle2-dev2",
-    "zip:local:bundle": "tsx scripts/zip-local-bundle.ts"
+    "zip:local:bundle": "ts-node --compiler-options='{\"module\":\"commonjs\"}' scripts/zip-local-bundle.ts"
   },
   "dependencies": {
     "@fern-fern/fern-cloud-sdk": "^0.0.305",
@@ -38,6 +38,7 @@
     "@types/archiver": "^6.0.2",
     "@types/node": "^22.0.0",
     "aws-cdk": "^2.179.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
