@@ -207,19 +207,28 @@ export function MdxStateProvider({
         const filePath = change.path;
         const mdxContent = change.content;
 
-        // Convert MDX back to HTML for editor
-        const { html, frontmatter, originalElements } = mdxToHtml(mdxContent, {
-          treatAsCustomElement: ["code"],
-          treatAsUnsupported: ["math"],
-        });
+        try {
+          // Convert MDX back to HTML for editor
+          const { html, frontmatter, originalElements } = mdxToHtml(
+            mdxContent,
+            {
+              treatAsCustomElement: ["code"],
+              treatAsUnsupported: ["math"],
+            }
+          );
 
-        // Update the editor state with loaded changes
-        updateDependencies(filePath, {
-          html,
-          frontmatter,
-          originalElements,
-          changed: true, // Mark as changed since it's from storage
-        });
+          // Update the editor state with loaded changes
+          updateDependencies(filePath, {
+            html,
+            frontmatter,
+            originalElements,
+            changed: true, // Mark as changed since it's from storage
+          });
+        } catch (error) {
+          console.error(`Failed to parse MDX content for ${filePath}:`, error);
+          // Skip this file if it can't be parsed
+          continue;
+        }
       }
     }
   }, [changeSet, isLoading, updateDependencies]);
