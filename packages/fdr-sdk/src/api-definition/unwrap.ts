@@ -150,6 +150,29 @@ export function unwrapReference(
       console.error(
         `Type reference is invalid. Falling back to unknown type. types=[${[...visitedTypeIds].join(", ")}]`
       );
+      console.debug("typeRef: ", JSON.stringify(typeRef, null, 2));
+      console.debug("types: ", JSON.stringify(types, null, 2));
+      console.debug("defaults: ", JSON.stringify(defaults, null, 2));
+      console.debug(
+        "availabilities: ",
+        JSON.stringify(availabilities, null, 2)
+      );
+      console.debug("descriptions: ", JSON.stringify(descriptions, null, 2));
+      console.debug(
+        "visitedTypeIds: ",
+        JSON.stringify(visitedTypeIds, null, 2)
+      );
+      console.debug("isOptional: ", JSON.stringify(isOptional, null, 2));
+      console.debug("isNullable: ", JSON.stringify(isNullable, null, 2));
+      console.debug(
+        "internalTypeRef: ",
+        JSON.stringify(internalTypeRef, null, 2)
+      );
+      console.debug("loop: ", JSON.stringify(loop, null, 2));
+      console.debug(
+        "circularReference: ",
+        JSON.stringify(circularReference, null, 2)
+      );
     }
   }
 
