@@ -165,6 +165,10 @@ export function useDocumentChanges(
 
   const changeTracker = useMemo(() => new DocumentChangeTracker(), []);
 
+  // Destructure config to stable individual values
+  const { branchId, autoSave, autoSaveDelayMs, onError, onStateChange } =
+    config;
+
   // Initialize change set on mount or when base state changes
   useEffect(() => {
     let mounted = true;
@@ -180,14 +184,14 @@ export function useDocumentChanges(
 
         if (mounted) {
           setChangeSet(initialChangeSet);
-          config.onStateChange?.(initialChangeSet);
+          onStateChange?.(initialChangeSet);
         }
       } catch (err) {
         if (mounted) {
           const error =
             err instanceof Error ? err : new Error("Failed to initialize");
           setError(error);
-          config.onError?.(error);
+          onError?.(error);
         }
       } finally {
         if (mounted) {
@@ -202,19 +206,19 @@ export function useDocumentChanges(
     return () => {
       mounted = false;
     };
-  }, [changeTracker, baseState, config, config.branchId]);
+  }, [changeTracker, baseState, branchId, onError, onStateChange]);
 
   // Auto-save effect
   useEffect(() => {
-    if (!changeSet || !config.autoSave) return;
+    if (!changeSet || !autoSave) return;
 
     const timeoutId = setTimeout(() => {
       // Here you would integrate with the storage system
-      config.onStateChange?.(changeSet);
-    }, config.autoSaveDelayMs);
+      onStateChange?.(changeSet);
+    }, autoSaveDelayMs);
 
     return () => clearTimeout(timeoutId);
-  }, [changeSet, config, config.autoSave, config.autoSaveDelayMs]);
+  }, [changeSet, autoSave, autoSaveDelayMs, onStateChange]);
 
   const updateChangeSet = useCallback(
     (updater: (current: DocumentChangeSet) => DocumentChangeSet) => {
@@ -222,11 +226,11 @@ export function useDocumentChanges(
         if (!current) return null;
 
         const updated = updater(current);
-        config.onStateChange?.(updated);
+        onStateChange?.(updated);
         return updated;
       });
     },
-    [config]
+    [onStateChange]
   );
 
   const createFile = useCallback(

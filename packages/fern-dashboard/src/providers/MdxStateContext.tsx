@@ -101,15 +101,21 @@ export function MdxStateProvider({
     []
   );
 
+  // Stabilize config object to prevent infinite re-renders
+  const documentChangesConfig = useMemo(
+    () => ({
+      branchId: branch || "default",
+      autoSave: true,
+      autoSaveDelayMs: DEBOUNCE_TIMEOUT_DELAY,
+      onError: (error: Error) => {
+        console.error("Document change tracking error:", error);
+      },
+    }),
+    [branch]
+  );
+
   // New document change tracking system
-  const { updateFile } = useDocumentChanges(baseState, {
-    branchId: branch || "default",
-    autoSave: true,
-    autoSaveDelayMs: DEBOUNCE_TIMEOUT_DELAY,
-    onError: (error: Error) => {
-      console.error("Document change tracking error:", error);
-    },
-  });
+  const { updateFile } = useDocumentChanges(baseState, documentChangesConfig);
 
   // Stable updateDependencies identity to prevent unnecessary re-renders
   const updateDependencies = useCallback(

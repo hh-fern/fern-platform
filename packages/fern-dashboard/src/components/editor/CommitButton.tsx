@@ -111,13 +111,19 @@ export function CommitButton() {
     []
   );
 
-  // Use new document changes system
-  const { changeSet, hasChanges, getCommitPlan, isLoading } =
-    useDocumentChanges(baseState, {
+  // Stabilize config object to prevent infinite re-renders
+  const documentChangesConfig = useMemo(
+    () => ({
       branchId: branch || "default",
       autoSave: true,
       autoSaveDelayMs: 300,
-    });
+    }),
+    [branch]
+  );
+
+  // Use new document changes system
+  const { changeSet, hasChanges, getCommitPlan, isLoading } =
+    useDocumentChanges(baseState, documentChangesConfig);
 
   useEffect(() => {
     // NOTE: This is a temporary solution to persist the PR URL across route changes/refreshes.

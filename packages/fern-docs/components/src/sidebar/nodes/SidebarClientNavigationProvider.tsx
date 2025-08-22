@@ -175,13 +175,19 @@ export function SidebarClientNavigationProvider({
     []
   );
 
-  // Integrate with document changes system
-  const { createFile, deleteFile, addPageToDocsYml, removePageFromDocsYml } =
-    useDocumentChanges(baseState, {
+  // Stabilize config object to prevent infinite re-renders
+  const documentChangesConfig = useMemo(
+    () => ({
       branchId: branchName,
       autoSave: true,
       autoSaveDelayMs: 300,
-    });
+    }),
+    [branchName]
+  );
+
+  // Integrate with document changes system
+  const { createFile, deleteFile, addPageToDocsYml, removePageFromDocsYml } =
+    useDocumentChanges(baseState, documentChangesConfig);
 
   // Lazy initialization to load client pages synchronously on first access
   const [state, setState] = useState<{
