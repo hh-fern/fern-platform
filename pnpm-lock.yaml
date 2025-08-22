@@ -54,8 +54,8 @@ importers:
   .:
     dependencies:
       fern-api:
-        specifier: 0.57.0
-        version: 0.57.0
+        specifier: 0.66.21
+        version: 0.66.21
     dependenciesMeta:
       jsonc-parser@2.2.1:
         unplugged: true
@@ -13162,8 +13162,8 @@ packages:
     resolution: {integrity: sha512-/Zf/24Cg4YoRsbwJ8Joot0AcosQwUyvGQvZ6Qi0Cu/c83FfrWvQ73cb3ddJQCyzWhM06McgO5uguviSmgFyQWQ==}
     hasBin: true
 
-  fern-api@0.57.0:
-    resolution: {integrity: sha512-trVnQtNi61/wNznfJeYyspDfGFgVwIOQKGEqXPFcPf4IlRiS8R8NOLB3fpnFZ+Aj8wiWA3PFIT7pxtElcOrWcw==}
+  fern-api@0.66.21:
+    resolution: {integrity: sha512-MMah7FeDTXQ7WVUg8q82XRfXIuVxDPw2HpWwJ10GXGXvxAIpvQFkFjy/C+FTzE+gNz/T2/LpRkG4KgG9cbuYhg==}
     hasBin: true
 
   fflate@0.4.8:
@@ -34764,7 +34764,7 @@ snapshots:
 
   fern-api@0.21.0: {}
 
-  fern-api@0.57.0: {}
+  fern-api@0.66.21: {}
 
   fflate@0.4.8: {}
 
