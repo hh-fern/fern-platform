@@ -1,11 +1,9 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { type BaseState, useDocumentChanges } from "@fern-docs/components";
 import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 import { MdxToHtmlResponse, mdxToHtml } from "@fern-docs/mdx";
@@ -47,27 +45,12 @@ export default function PageNode({
   clientNodeId,
   ...props
 }: PageNode.Props) {
-  const params = useParams();
-  const branchName = params.branch as string;
   const { clientFoundNodes } = useSidebarClientNavigation();
   const clientFoundNode = clientNodeId
     ? clientFoundNodes?.[clientNodeId]
     : undefined;
 
-  // Initialize new document system
-  const baseState: BaseState = useMemo(
-    () => ({
-      files: new Map(),
-      docsYml: "",
-    }),
-    []
-  );
-
-  const { getFileContent } = useDocumentChanges(baseState, {
-    branchId: branchName,
-    autoSave: false,
-    autoSaveDelayMs: 300,
-  });
+  // File content will come from server props or be generated as needed
 
   const foundNode:
     | SerializableFoundNode
@@ -100,28 +83,8 @@ export default function PageNode({
       : undefined;
   }, [initialHtml, initialFrontmatter, initialOriginalElements]);
 
-  // Try to get latest content from new document system
-  if (initialFilename) {
-    const latestContent = getFileContent(initialFilename);
-    if (latestContent) {
-      // Parse MDX back to get latest edited version
-      try {
-        const { html, frontmatter, originalElements } = mdxToHtml(
-          latestContent,
-          {
-            treatAsCustomElement: ["code"],
-            treatAsUnsupported: ["math"],
-          }
-        );
-        initialHtml = html;
-        initialFrontmatter = frontmatter;
-        initialOriginalElements = originalElements;
-      } catch (error) {
-        console.warn("Failed to parse latest content from new system:", error);
-        // Fall back to props data
-      }
-    }
-  }
+  // Latest content is now handled by MdxStateContext and PageContents
+  // No need to manually fetch from document changes system
 
   // No initial data provided, so we need to generate it
   if (!initialHtml || !initialFrontmatter || !initialOriginalElements) {

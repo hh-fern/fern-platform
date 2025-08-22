@@ -4,12 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import {
-  type BaseState,
-  NavigationContext,
-  // New architecture only
-  useDocumentChanges,
-} from "@fern-docs/components";
+import { NavigationContext } from "@fern-docs/components";
 import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 import { mdxToHtml } from "@fern-docs/mdx";
 
@@ -28,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGitHubRepo } from "@/providers/GitHubRepoContext";
 import { useMdxState } from "@/providers/MdxStateContext";
 import { createMdxFrontmatter } from "@/utils/createMdxFrontmatter";
 import { constructEditorSlug } from "@/utils/editor-routing";
@@ -57,21 +51,8 @@ export function CreateClientPage({
   const [isCreating, setIsCreating] = useState(false);
   const { stageChanges } = useMdxState();
 
-  // Initialize new document changes system
-  const baseState: BaseState = useMemo(
-    () => ({
-      files: new Map(),
-      docsYml: "", // Would be loaded from actual docs.yml in real implementation
-    }),
-    []
-  );
-
-  const { branch } = useGitHubRepo();
-  const { createFile, addPageToDocsYml } = useDocumentChanges(baseState, {
-    branchId: branch || "default",
-    autoSave: true,
-    autoSaveDelayMs: 300,
-  });
+  // Use shared document changes system from MdxStateContext
+  // No need for separate instance - stageChanges handles everything
   const router = useRouter();
   const params = useParams();
 
@@ -227,8 +208,7 @@ export function CreateClientPage({
         originalElements,
       });
 
-      // Track changes in unified system
-      createFile(`${fullSlug}.mdx`, mdx, selectedSection.title);
+      // Changes are already tracked via stageChanges above
 
       // Close popover and reset form
       setIsPopoverOpen(false);
@@ -254,8 +234,7 @@ export function CreateClientPage({
         slug: fullSlug,
       });
 
-      // Update docs.yml with the new page
-      addPageToDocsYml(`${fullSlug}.mdx`, selectedSection.title);
+      // Docs.yml updates are handled by stageChanges
 
       // Create a client node for the new page
       const nodeId = `client-${crypto.randomUUID()}` as FernNavigation.NodeId;
@@ -310,8 +289,6 @@ export function CreateClientPage({
     pageTitle,
     finalSlug,
     stageChanges,
-    createFile,
-    addPageToDocsYml,
     prependClientNode,
     root,
     allSections,

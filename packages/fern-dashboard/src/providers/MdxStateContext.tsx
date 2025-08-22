@@ -124,17 +124,20 @@ export function MdxStateProvider({
   );
 
   // Stabilize config object to prevent infinite re-renders
-  const documentChangesConfig = useMemo(
-    () => ({
-      branchId: branch || "default",
+  const documentChangesConfig = useMemo(() => {
+    const branchId = branch || "default";
+    console.log(
+      `[DEBUG] MdxStateContext using branchId: ${branchId} (branch was: ${branch})`
+    );
+    return {
+      branchId,
       autoSave: true,
       autoSaveDelayMs: DEBOUNCE_TIMEOUT_DELAY,
       onError: (error: Error) => {
         console.error("Document change tracking error:", error);
       },
-    }),
-    [branch]
-  );
+    };
+  }, [branch]);
 
   // New document change tracking system
   const { changeSet, updateFile, hasChanges, getCommitPlan, isLoading } =
@@ -202,19 +205,31 @@ export function MdxStateProvider({
         [filename]: "STAGED",
       }));
 
-      // Update the new system
-      if (state.html && state.frontmatter && state.originalElements) {
+      // Update the new system - require at least html and frontmatter
+      if (state.html && state.frontmatter) {
         const mdxContent = htmlToMdx(
           state.html,
           state.frontmatter,
-          state.originalElements,
+          state.originalElements || {}, // Fallback to empty object if missing
           state.originalFrontmatter,
           state.changedNodes,
           true // Force frontmatter processing
         ).mdx;
 
         // Update the new change tracking system
+        console.log(
+          `[DEBUG] stageChanges calling updateFile for ${filename}:`,
+          mdxContent.slice(0, 100) + "..."
+        );
         updateFile(filename, mdxContent);
+      } else {
+        console.log(
+          `[DEBUG] stageChanges skipped updateFile for ${filename}:`,
+          {
+            hasHtml: !!state.html,
+            hasFrontmatter: !!state.frontmatter,
+          }
+        );
       }
     },
     [updateDependencies, updateFile]

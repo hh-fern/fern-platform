@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { DocumentChangeTracker } from "./DocumentChangeTracker";
-import { ChangeStorage } from "./storage";
+import { ChangeStorage, LocalStorageChangeStorage } from "./storage";
 import {
   BaseState,
   Change,
@@ -164,6 +164,7 @@ export function useDocumentChanges(
   const [error, setError] = useState<Error | null>(null);
 
   const changeTracker = useMemo(() => new DocumentChangeTracker(), []);
+  const storage = useMemo(() => new LocalStorageChangeStorage(), []);
 
   // Destructure config to stable individual values
   const { branchId, autoSave, autoSaveDelayMs, onError, onStateChange } =
@@ -178,9 +179,28 @@ export function useDocumentChanges(
         setIsLoading(true);
         setError(null);
 
-        // For this example, we'll use a simple initialization
-        // In practice, this would integrate with the storage system
-        const initialChangeSet = changeTracker.createChangeSet(baseState);
+        // Try to load existing changes from storage
+        const existingChangeSet = await storage.load(branchId);
+        console.log(
+          `[DEBUG] Loading changes for branch ${branchId}:`,
+          existingChangeSet
+            ? `${existingChangeSet.changes.length} changes found`
+            : "no existing changes"
+        );
+
+        let initialChangeSet: DocumentChangeSet;
+        if (existingChangeSet) {
+          // For now, always use existing changes if they exist
+          // TODO: In future, properly compare base states when we load actual server content
+          initialChangeSet = existingChangeSet;
+          console.log(
+            `[DEBUG] Using existing changeSet with ${existingChangeSet.changes.length} changes`
+          );
+        } else {
+          // Create fresh change set if no storage
+          initialChangeSet = changeTracker.createChangeSet(baseState);
+          console.log(`[DEBUG] Created fresh changeSet`);
+        }
 
         if (mounted) {
           setChangeSet(initialChangeSet);
@@ -206,19 +226,32 @@ export function useDocumentChanges(
     return () => {
       mounted = false;
     };
-  }, [changeTracker, baseState, branchId, onError, onStateChange]);
+  }, [changeTracker, storage, baseState, branchId, onError, onStateChange]);
 
   // Auto-save effect
   useEffect(() => {
     if (!changeSet || !autoSave) return;
 
     const timeoutId = setTimeout(() => {
-      // Here you would integrate with the storage system
-      onStateChange?.(changeSet);
+      void (async () => {
+        try {
+          // Save to storage
+          console.log(
+            `[DEBUG] Auto-saving changes for branch ${branchId}:`,
+            changeSet.changes.length,
+            "changes"
+          );
+          await storage.save(branchId, changeSet);
+          // Notify of state change
+          onStateChange?.(changeSet);
+        } catch (error: unknown) {
+          console.error("Failed to auto-save changes:", error);
+        }
+      })();
     }, autoSaveDelayMs);
 
     return () => clearTimeout(timeoutId);
-  }, [changeSet, autoSave, autoSaveDelayMs, onStateChange]);
+  }, [changeSet, autoSave, autoSaveDelayMs, storage, branchId, onStateChange]);
 
   const updateChangeSet = useCallback(
     (updater: (current: DocumentChangeSet) => DocumentChangeSet) => {
@@ -227,10 +260,23 @@ export function useDocumentChanges(
 
         const updated = updater(current);
         onStateChange?.(updated);
+
+        // Save immediately on manual changes (auto-save will also run, but this ensures immediate persistence)
+        if (autoSave) {
+          console.log(
+            `[DEBUG] Saving changes immediately for branch ${branchId}:`,
+            updated.changes.length,
+            "changes"
+          );
+          storage.save(branchId, updated).catch((error: unknown) => {
+            console.error("Failed to save changes immediately:", error);
+          });
+        }
+
         return updated;
       });
     },
-    [onStateChange]
+    [onStateChange, autoSave, storage, branchId]
   );
 
   const createFile = useCallback(
