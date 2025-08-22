@@ -5,6 +5,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -16,7 +17,12 @@ import {
   type DocumentChangeSet,
   useDocumentChanges,
 } from "@fern-docs/components";
-import { ChangedNodes, MdxToHtmlResponse, htmlToMdx } from "@fern-docs/mdx";
+import {
+  ChangedNodes,
+  MdxToHtmlResponse,
+  htmlToMdx,
+  mdxToHtml,
+} from "@fern-docs/mdx";
 
 import { createMdxFrontmatter } from "@/utils/createMdxFrontmatter";
 import { DocsUrl } from "@/utils/types";
@@ -96,7 +102,6 @@ export function MdxStateProvider({
   docsUrl: DocsUrl;
   branch: string;
 }) {
-
   // HTML/MDX conversion state for editor compatibility
   const [mdxDepsStore, setMdxDepsStore] = useState<
     Record<Filename, MdxDependencies>
@@ -192,6 +197,41 @@ export function MdxStateProvider({
     },
     [setMdxDepsStore]
   );
+
+  // Process loaded changes into editor state when changeSet loads
+  useEffect(() => {
+    if (!changeSet || isLoading) return;
+
+    console.log(
+      `[DEBUG] Processing loaded changeSet with ${changeSet.changes.length} changes`
+    );
+
+    // Process each file change back into mdxDepsStore
+    for (const change of changeSet.changes) {
+      if (change.type === "file:update" || change.type === "file:create") {
+        const filePath = change.path;
+        const mdxContent = change.content;
+
+        console.log(
+          `[DEBUG] Converting loaded change back to editor state for ${filePath}`
+        );
+
+        // Convert MDX back to HTML for editor
+        const { html, frontmatter, originalElements } = mdxToHtml(mdxContent, {
+          treatAsCustomElement: ["code"],
+          treatAsUnsupported: ["math"],
+        });
+
+        // Update the editor state with loaded changes
+        updateDependencies(filePath, {
+          html,
+          frontmatter,
+          originalElements,
+          changed: true, // Mark as changed since it's from storage
+        });
+      }
+    }
+  }, [changeSet, isLoading, updateDependencies]);
 
   // Alias for updateDependencies that sets the changed flag to true by default
   const stageChanges = useCallback(
