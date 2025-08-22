@@ -10,7 +10,12 @@ import {
   useState,
 } from "react";
 
-import { type BaseState, useDocumentChanges } from "@fern-docs/components";
+import {
+  type BaseState,
+  type CommitPlan,
+  type DocumentChangeSet,
+  useDocumentChanges,
+} from "@fern-docs/components";
 import { ChangedNodes, MdxToHtmlResponse, htmlToMdx } from "@fern-docs/mdx";
 
 import { createMdxFrontmatter } from "@/utils/createMdxFrontmatter";
@@ -56,6 +61,13 @@ export const MdxStateContext = createContext<{
   updateDependencies: (filename: Filename, state: MdxDependencies) => void;
   stageChanges: (filename: Filename, state: MdxDependencies) => void;
   syncChanges: (filename: Filename) => Promise<void>;
+  // Expose document changes system
+  documentChanges: {
+    changeSet: DocumentChangeSet | null;
+    hasChanges: () => boolean;
+    getCommitPlan: () => CommitPlan;
+    isLoading: boolean;
+  };
 }>({
   changedMdxFiles: {},
   allMdxFiles: {},
@@ -65,6 +77,16 @@ export const MdxStateContext = createContext<{
   updateDependencies: () => undefined,
   stageChanges: () => undefined,
   syncChanges: () => Promise.resolve(),
+  documentChanges: {
+    changeSet: null,
+    hasChanges: () => false,
+    getCommitPlan: () => ({
+      filesToCommit: new Map(),
+      filesToDelete: [],
+      hasChanges: false,
+    }),
+    isLoading: false,
+  },
 });
 
 export function MdxStateProvider({
@@ -115,7 +137,8 @@ export function MdxStateProvider({
   );
 
   // New document change tracking system
-  const { updateFile } = useDocumentChanges(baseState, documentChangesConfig);
+  const { changeSet, updateFile, hasChanges, getCommitPlan, isLoading } =
+    useDocumentChanges(baseState, documentChangesConfig);
 
   // Stable updateDependencies identity to prevent unnecessary re-renders
   const updateDependencies = useCallback(
@@ -302,6 +325,12 @@ export function MdxStateProvider({
         updateDependencies,
         stageChanges,
         syncChanges,
+        documentChanges: {
+          changeSet,
+          hasChanges,
+          getCommitPlan,
+          isLoading,
+        },
       }}
     >
       {children}

@@ -3,14 +3,13 @@
 import { useEffect, useMemo, useRef } from "react";
 
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { useDocumentChanges, type BaseState } from "@fern-docs/components";
+import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 import { MdxToHtmlResponse } from "@fern-docs/mdx";
 
+import { useBranch } from "@/providers/BranchContext";
 import { useCurrentPage } from "@/providers/CurrentPageContext";
 import { useMdxState } from "@/providers/MdxStateContext";
 import { useOriginalElements } from "@/providers/OriginalElementsContext";
-import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
-import { useBranch } from "@/providers/BranchContext";
 
 import PageEditor from "./PageEditor";
 import PageSubtitle from "./PageSubtitle";
@@ -55,21 +54,8 @@ export default function PageContents({
   const { branch } = useBranch();
   const { updateClientPageData } = useSidebarClientNavigation();
 
-  // Initialize base state for new document change tracking
-  const baseState: BaseState = useMemo(
-    () => ({
-      files: new Map(),
-      docsYml: "",
-    }),
-    []
-  );
-
-  // Use new document changes system
-  const { updateFile, getFileContent: _getFileContent } = useDocumentChanges(baseState, {
-    branchId: branch || "default",
-    autoSave: true,
-    autoSaveDelayMs: 300,
-  });
+  // Use shared document changes system from MdxStateContext
+  // The updateFile call will be handled through stageChanges which calls updateFile internally
 
   // Sync page changes to localStorage and staging (works for both client and server pages)
   const pageData = useMemo(() => {
@@ -126,20 +112,11 @@ export default function PageContents({
     if (clientNodeId) {
       // This is a client page - update client navigation data
       if (updateClientPageData) {
-        updateClientPageData(clientNodeId, completePageData);
+        void updateClientPageData(clientNodeId, completePageData);
       }
     }
 
-    // Convert page data to MDX content and update in new system
-    const mdxContent = `---
-${Object.entries(completePageData.frontmatter)
-  .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
-  .join('\n')}
----
-
-${completePageData.html}`;
-
-    updateFile(filename, mdxContent);
+    // Document changes are now handled through stageChanges in MdxStateContext
 
     // Stage changes for commit
     if (stageChanges && lastStagedDataHash.current !== currentDataHash) {
@@ -182,7 +159,6 @@ ${completePageData.html}`;
     updateClientPageData,
     stageChanges,
     serverData,
-    updateFile,
   ]);
 
   const { originalElements, setOriginalElements } = useOriginalElements();

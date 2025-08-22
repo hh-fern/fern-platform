@@ -3,10 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  type BaseState,
   // New architecture only
   CommitOrchestrator,
-  useDocumentChanges,
 } from "@fern-docs/components";
 
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
@@ -18,6 +16,7 @@ import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useBranch } from "@/providers/BranchContext";
 import { useGitHubRepo } from "@/providers/GitHubRepoContext";
 import { useGitPrInfo } from "@/providers/GitPRContext";
+import { useMdxState } from "@/providers/MdxStateContext";
 import {
   addPageToDocsYml,
   parseYaml,
@@ -102,28 +101,9 @@ export function CommitButton() {
   const isEditingDisabled = useEditingDisabled();
   const { owner, repo, baseBranch } = useGitHubRepo();
 
-  // Initialize base state from git (in practice, loaded from server)
-  const baseState: BaseState = useMemo(
-    () => ({
-      files: new Map(),
-      docsYml: "", // Would be loaded from actual git state
-    }),
-    []
-  );
-
-  // Stabilize config object to prevent infinite re-renders
-  const documentChangesConfig = useMemo(
-    () => ({
-      branchId: branch || "default",
-      autoSave: true,
-      autoSaveDelayMs: 300,
-    }),
-    [branch]
-  );
-
-  // Use new document changes system
-  const { changeSet, hasChanges, getCommitPlan, isLoading } =
-    useDocumentChanges(baseState, documentChangesConfig);
+  // Use shared document changes system from MdxStateContext
+  const { documentChanges } = useMdxState();
+  const { changeSet, hasChanges, getCommitPlan, isLoading } = documentChanges;
 
   useEffect(() => {
     // NOTE: This is a temporary solution to persist the PR URL across route changes/refreshes.
