@@ -181,25 +181,15 @@ export function useDocumentChanges(
 
         // Try to load existing changes from storage
         const existingChangeSet = await storage.load(branchId);
-        console.log(
-          `[DEBUG] Loading changes for branch ${branchId}:`,
-          existingChangeSet
-            ? `${existingChangeSet.changes.length} changes found`
-            : "no existing changes"
-        );
 
         let initialChangeSet: DocumentChangeSet;
         if (existingChangeSet) {
           // For now, always use existing changes if they exist
           // TODO: In future, properly compare base states when we load actual server content
           initialChangeSet = existingChangeSet;
-          console.log(
-            `[DEBUG] Using existing changeSet with ${existingChangeSet.changes.length} changes`
-          );
         } else {
           // Create fresh change set if no storage
           initialChangeSet = changeTracker.createChangeSet(baseState);
-          console.log(`[DEBUG] Created fresh changeSet`);
         }
 
         if (mounted) {
@@ -236,11 +226,6 @@ export function useDocumentChanges(
       void (async () => {
         try {
           // Save to storage
-          console.log(
-            `[DEBUG] Auto-saving changes for branch ${branchId}:`,
-            changeSet.changes.length,
-            "changes"
-          );
           await storage.save(branchId, changeSet);
           // Notify of state change
           onStateChange?.(changeSet);

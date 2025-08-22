@@ -66,15 +66,12 @@ export class LocalStorageChangeStorage implements ChangeStorage {
 
     try {
       const key = this.getStorageKey(branchId);
-      console.log(`[DEBUG] Loading from localStorage with key: ${key}`);
       const stored = localStorage.getItem(key);
 
       if (!stored) {
-        console.log(`[DEBUG] No data found in localStorage for key: ${key}`);
         return null;
       }
 
-      console.log(`[DEBUG] Found stored data for ${key}, size:`, stored.length);
       const parsed = JSON.parse(stored) as SerializedChangeSet;
 
       // Version check for future migrations
@@ -86,25 +83,13 @@ export class LocalStorageChangeStorage implements ChangeStorage {
         return null;
       }
 
-      console.log(`[DEBUG] Successfully parsed stored data for ${key}:`, {
-        changesCount: parsed.changes.length,
-        timestamp: new Date(parsed.timestamp).toISOString()
-      });
-
       // Reconstruct the change set
       const baseState: BaseState = {
         files: new Map(parsed.baseState.files),
         docsYml: parsed.baseState.docsYml,
       };
 
-      const reconstructed = new DocumentChangeSetImpl(baseState, parsed.changes);
-      
-      console.log(`[DEBUG] Reconstructed changeSet for ${key}:`, {
-        changesCount: reconstructed.changes.length,
-        hasChanges: reconstructed.hasChanges()
-      });
-
-      return reconstructed;
+      return new DocumentChangeSetImpl(baseState, parsed.changes);
     } catch (error) {
       console.error(`Failed to load change set for branch ${branchId}:`, error);
       return null;
@@ -129,15 +114,7 @@ export class LocalStorageChangeStorage implements ChangeStorage {
         timestamp: Date.now(),
       };
 
-      console.log(`[DEBUG] Saving to localStorage with key: ${key}`, {
-        changesCount: changeSet.changes.length,
-        serializedSize: JSON.stringify(serialized).length
-      });
       localStorage.setItem(key, JSON.stringify(serialized));
-      
-      // Verify save worked
-      const verification = localStorage.getItem(key);
-      console.log(`[DEBUG] Save verification for ${key}:`, verification ? 'SUCCESS' : 'FAILED');
     } catch (error) {
       console.error(`Failed to save change set for branch ${branchId}:`, error);
       throw error;

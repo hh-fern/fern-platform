@@ -132,7 +132,6 @@ export function MdxStateProvider({
     if (!branch) {
       throw new Error("Branch name is required for document changes tracking");
     }
-    console.log(`[DEBUG] MdxStateContext using branchId: ${branch}`);
     return {
       branchId: branch,
       autoSave: true,
@@ -202,19 +201,11 @@ export function MdxStateProvider({
   useEffect(() => {
     if (!changeSet || isLoading) return;
 
-    console.log(
-      `[DEBUG] Processing loaded changeSet with ${changeSet.changes.length} changes`
-    );
-
     // Process each file change back into mdxDepsStore
     for (const change of changeSet.changes) {
       if (change.type === "file:update" || change.type === "file:create") {
         const filePath = change.path;
         const mdxContent = change.content;
-
-        console.log(
-          `[DEBUG] Converting loaded change back to editor state for ${filePath}`
-        );
 
         // Convert MDX back to HTML for editor
         const { html, frontmatter, originalElements } = mdxToHtml(mdxContent, {
@@ -256,19 +247,7 @@ export function MdxStateProvider({
         ).mdx;
 
         // Update the new change tracking system
-        console.log(
-          `[DEBUG] stageChanges calling updateFile for ${filename}:`,
-          mdxContent.slice(0, 100) + "..."
-        );
         updateFile(filename, mdxContent);
-      } else {
-        console.log(
-          `[DEBUG] stageChanges skipped updateFile for ${filename}:`,
-          {
-            hasHtml: !!state.html,
-            hasFrontmatter: !!state.frontmatter,
-          }
-        );
       }
     },
     [updateDependencies, updateFile]
