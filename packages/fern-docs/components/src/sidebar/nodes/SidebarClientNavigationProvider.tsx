@@ -12,8 +12,91 @@ import {
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
 
-import { ClientPageStorage } from "./clientPageStorage";
+import {
+  type BaseState,
+  LocalStorageChangeStorage,
+  useDocumentChanges,
+} from "../../document-changes";
 import { NavigationContext, PageData } from "./types";
+
+// Simple localStorage interface for client pages
+interface StoredClientPage {
+  node: FernNavigation.PageNode;
+  parentNodeId: NodeId;
+  sidebar?: FernNavigation.SidebarRootNode;
+  pageData?: PageData;
+  fullSlug: string;
+  navigationContext?: NavigationContext;
+  createdAt: number;
+}
+
+// Enhanced client page storage using the new architecture
+class ClientPageStorage {
+  private static storage = new LocalStorageChangeStorage();
+
+  static loadClientPages(branchName: string): Record<string, StoredClientPage> {
+    if (typeof window === "undefined") return {};
+    try {
+      const stored = localStorage.getItem(`client-pages-${branchName}`);
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.error("Failed to load client pages:", error);
+      return {};
+    }
+  }
+
+  static async addClientPage(
+    branchName: string,
+    nodeId: NodeId,
+    pageData: StoredClientPage
+  ) {
+    if (typeof window === "undefined") return;
+    try {
+      const existing = this.loadClientPages(branchName);
+      existing[nodeId] = { ...pageData, createdAt: Date.now() };
+      localStorage.setItem(
+        `client-pages-${branchName}`,
+        JSON.stringify(existing)
+      );
+    } catch (error) {
+      console.error("Failed to save client page:", error);
+    }
+  }
+
+  static async removeClientPage(branchName: string, nodeId: NodeId) {
+    if (typeof window === "undefined") return;
+    try {
+      const existing = this.loadClientPages(branchName);
+      const { [nodeId]: removed, ...newExisting } = existing;
+      localStorage.setItem(
+        `client-pages-${branchName}`,
+        JSON.stringify(newExisting)
+      );
+    } catch (error) {
+      console.error("Failed to remove client page:", error);
+    }
+  }
+
+  static async updateClientPageData(
+    branchName: string,
+    nodeId: NodeId,
+    pageData: PageData
+  ) {
+    if (typeof window === "undefined") return;
+    try {
+      const existing = this.loadClientPages(branchName);
+      if (existing[nodeId]) {
+        existing[nodeId].pageData = pageData;
+        localStorage.setItem(
+          `client-pages-${branchName}`,
+          JSON.stringify(existing)
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update client page data:", error);
+    }
+  }
+}
 
 type ClientNodes = Record<NodeId, FernNavigation.PageNode[]>;
 
@@ -30,9 +113,9 @@ interface SidebarClientNavigationContextValue {
     pageData?: PageData,
     fullSlug?: string,
     navigationContext?: NavigationContext
-  ) => void;
-  removeClientNode?: (nodeId: NodeId) => void;
-  updateClientPageData?: (nodeId: NodeId, pageData: PageData) => void;
+  ) => Promise<void>;
+  removeClientNode?: (nodeId: NodeId) => Promise<void>;
+  updateClientPageData?: (nodeId: NodeId, pageData: PageData) => Promise<void>;
 }
 
 const SidebarClientNavigationContext =
@@ -91,6 +174,23 @@ export function SidebarClientNavigationProvider({
   children,
   branchName,
 }: SidebarClientNavigationProviderProps) {
+  // Initialize base state for document changes integration
+  const baseState: BaseState = useMemo(
+    () => ({
+      files: new Map(),
+      docsYml: "",
+    }),
+    []
+  );
+
+  // Integrate with document changes system
+  const { createFile, deleteFile, addPageToDocsYml, removePageFromDocsYml } =
+    useDocumentChanges(baseState, {
+      branchId: branchName,
+      autoSave: true,
+      autoSaveDelayMs: 300,
+    });
+
   // Lazy initialization to load client pages synchronously on first access
   const [state, setState] = useState<{
     clientNodes: ClientNodes;
@@ -124,7 +224,7 @@ export function SidebarClientNavigationProvider({
   const { clientNodes, clientFoundNodes, isInitialized } = state;
 
   const prependClientNode = useCallback(
-    (
+    async (
       parentNodeId: NodeId,
       node: FernNavigation.PageNode,
       sidebar?: FernNavigation.SidebarRootNode,
@@ -159,21 +259,48 @@ export function SidebarClientNavigationProvider({
         },
       }));
 
+      const fileName = `${fullSlug || node.slug || "untitled"}.mdx`;
+
+      // Integrate with document changes system
+      if (pageData) {
+        // Create MDX content from page data
+        const mdxContent = `---
+title: ${node.title}
+${Object.entries(pageData.frontmatter || {})
+  .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+  .join("\n")}
+---
+
+${pageData.html || ""}`;
+
+        // Track as document change
+        createFile(fileName, mdxContent, node.title);
+        addPageToDocsYml(fileName, node.title);
+      }
+
       // Persist to localStorage
-      ClientPageStorage.addClientPage(branchName, node.id, {
+      await ClientPageStorage.addClientPage(branchName, node.id, {
         node,
         parentNodeId,
         sidebar,
         pageData,
         fullSlug: fullSlug || node.slug || "",
         navigationContext,
+        createdAt: Date.now(),
       });
     },
-    [branchName]
+    [branchName, createFile, addPageToDocsYml]
   );
 
   const removeClientNode = useCallback(
-    (nodeId: NodeId) => {
+    async (nodeId: NodeId) => {
+      // Get the page data before removal for document changes
+      const storedPages = ClientPageStorage.loadClientPages(branchName);
+      const pageToRemove = storedPages[nodeId];
+      const fileName = pageToRemove?.fullSlug
+        ? `${pageToRemove.fullSlug}.mdx`
+        : `${nodeId}.mdx`;
+
       setState((prevState) => {
         // Find the parent node ID to remove from clientNodes
         let parentNodeId: NodeId | undefined;
@@ -201,17 +328,46 @@ export function SidebarClientNavigationProvider({
         };
       });
 
+      // Integrate with document changes system
+      deleteFile(fileName);
+      removePageFromDocsYml(fileName);
+
       // Remove from localStorage
-      ClientPageStorage.removeClientPage(branchName, nodeId);
+      await ClientPageStorage.removeClientPage(branchName, nodeId);
     },
-    [branchName]
+    [branchName, deleteFile, removePageFromDocsYml]
   );
 
   const updateClientPageData = useCallback(
-    (nodeId: NodeId, pageData: PageData) => {
-      ClientPageStorage.updateClientPageData(branchName, nodeId, pageData);
+    async (nodeId: NodeId, pageData: PageData) => {
+      // Get current page data to create file name
+      const storedPages = ClientPageStorage.loadClientPages(branchName);
+      const currentPage = storedPages[nodeId];
+      const fileName = currentPage?.fullSlug
+        ? `${currentPage.fullSlug}.mdx`
+        : `${nodeId}.mdx`;
+
+      // Create updated MDX content
+      const mdxContent = `---
+title: ${currentPage?.node.title || "Untitled"}
+${Object.entries(pageData.frontmatter || {})
+  .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+  .join("\n")}
+---
+
+${pageData.html || ""}`;
+
+      // Update in document changes system
+      createFile(fileName, mdxContent);
+
+      // Update localStorage
+      await ClientPageStorage.updateClientPageData(
+        branchName,
+        nodeId,
+        pageData
+      );
     },
-    [branchName]
+    [branchName, createFile]
   );
 
   const contextValue = useMemo(

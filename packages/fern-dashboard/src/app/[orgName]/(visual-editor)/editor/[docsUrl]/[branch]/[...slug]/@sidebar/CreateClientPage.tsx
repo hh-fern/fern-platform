@@ -279,7 +279,7 @@ export function CreateClientPage({
       };
 
       // Cache the client node and the sidebar root node with page data
-      prependClientNode?.(
+      await prependClientNode?.(
         selectedSection.id,
         clientNode,
         root,

@@ -1,17 +1,16 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { ReactNode, useRef } from "react";
+import { ReactNode, useMemo, useRef } from "react";
 
 import { MinusCircleIcon } from "lucide-react";
 
+import { type BaseState, useDocumentChanges } from "../../document-changes";
 import { useScrollSidebarNodeIntoView } from "../../hooks/sidebar-scroll";
 import { useIsSelectedSidebarNode } from "../../state/navigation";
 import { SidebarLink } from "../SidebarLink";
 import { useSidebarClientNavigation } from "./SidebarClientNavigationProvider";
 import { SidebarPageNodeProps } from "./SidebarPageNode";
-import { ClientPageStorage } from "./clientPageStorage";
-import { DocsYmlStorage } from "./docsYmlStorage";
 
 // Mirror the SidebarPageNodeProps interface
 interface SidebarClientPageNodeProps extends SidebarPageNodeProps {}
@@ -29,6 +28,33 @@ export function SidebarClientPageNode({
   const selected = useIsSelectedSidebarNode(node.id);
   const router = useRouter();
 
+  // Initialize base state for new document change tracking
+  const baseState: BaseState = useMemo(
+    () => ({
+      files: new Map(),
+      docsYml: "",
+    }),
+    []
+  );
+
+  const { deleteFile, removePageFromDocsYml } = useDocumentChanges(baseState, {
+    branchId: (params?.branch as string) || "default",
+    autoSave: true,
+    autoSaveDelayMs: 300,
+  });
+
+  // Simple localStorage helper for client pages
+  const getClientPageData = (branch: string, nodeId: string) => {
+    if (typeof window === "undefined") return null;
+    try {
+      const stored = localStorage.getItem(`client-pages-${branch}`);
+      const pages = stored ? JSON.parse(stored) : {};
+      return pages[nodeId] || null;
+    } catch {
+      return null;
+    }
+  };
+
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
 
@@ -38,8 +64,7 @@ export function SidebarClientPageNode({
       const branch = params.branch as string;
 
       // Get the stored full slug from localStorage
-      const storedPages = ClientPageStorage.loadClientPages(branch);
-      const storedPage = storedPages[node.id];
+      const storedPage = getClientPageData(branch, node.id);
       const fullSlug = storedPage?.fullSlug || node.slug;
 
       // Navigate directly without loading states since all data is client-side
@@ -48,7 +73,7 @@ export function SidebarClientPageNode({
     }
   };
 
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -56,17 +81,17 @@ export function SidebarClientPageNode({
       const branch = params.branch as string;
 
       // Get the stored page data to extract the full path
-      const storedPages = ClientPageStorage.loadClientPages(branch);
-      const storedPage = storedPages[node.id];
+      const storedPage = getClientPageData(branch, node.id);
       const pagePath = storedPage?.fullSlug
         ? `${storedPage.fullSlug}.mdx`
         : `${node.slug}.mdx`;
 
-      // Add a removal update to DocsYmlStorage
-      DocsYmlStorage.addRemovalUpdate(branch, pagePath);
+      // Use new document change tracking for page deletion
+      deleteFile(pagePath);
+      removePageFromDocsYml(pagePath);
 
       // Remove the client node from the sidebar
-      removeClientNode(node.id);
+      await removeClientNode(node.id);
 
       // Navigate directly to special "root" page, use router.push instead of window.location.href so navigation happens instantly
       // TODO: clean this up
@@ -94,7 +119,7 @@ export function SidebarClientPageNode({
         selected={selected}
       />
       <button
-        onClick={handleDelete}
+        onClick={(e) => void handleDelete(e)}
         className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-md p-1 text-red-600 opacity-0 transition-opacity duration-200 hover:bg-red-50 hover:text-red-700 group-hover:opacity-100 dark:text-red-400 dark:hover:bg-red-950/20 dark:hover:text-red-300"
         title="Delete page"
         aria-label="Delete page"
