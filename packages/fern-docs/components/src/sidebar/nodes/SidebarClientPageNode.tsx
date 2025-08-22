@@ -37,8 +37,13 @@ export function SidebarClientPageNode({
     []
   );
 
+  const branch = params?.branch as string;
+  if (!branch) {
+    throw new Error("Branch parameter is required for client page operations");
+  }
+
   const { deleteFile, removePageFromDocsYml } = useDocumentChanges(baseState, {
-    branchId: (params?.branch as string) || "default",
+    branchId: branch,
     autoSave: true,
     autoSaveDelayMs: 300,
   });

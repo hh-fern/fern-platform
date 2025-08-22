@@ -67,7 +67,7 @@ export default async function EditorLayout({
           <SidebarClientNavigationProvider branchName={branch}>
             <ClientPageManager branchName={branch} />
             <DevModeProvider>
-              <MdxStateProvider docsUrl={docsUrl}>
+              <MdxStateProvider docsUrl={docsUrl} branch={branch}>
                 <CurrentPageProvider>
                   <BranchProvider branch={branch}>
                     <EditorProvider>

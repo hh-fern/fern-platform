@@ -21,8 +21,6 @@ import { ChangedNodes, MdxToHtmlResponse, htmlToMdx } from "@fern-docs/mdx";
 import { createMdxFrontmatter } from "@/utils/createMdxFrontmatter";
 import { DocsUrl } from "@/utils/types";
 
-import { useBranch } from "./BranchContext";
-
 type Filename = string;
 type Markdown = string;
 type SyncedStatus = "STAGED" | "SYNCING" | "SYNCED" | "ERROR";
@@ -92,11 +90,12 @@ export const MdxStateContext = createContext<{
 export function MdxStateProvider({
   children,
   docsUrl: _docsUrl,
+  branch,
 }: {
   children: ReactNode;
   docsUrl: DocsUrl;
+  branch: string;
 }) {
-  const { branch } = useBranch();
 
   // HTML/MDX conversion state for editor compatibility
   const [mdxDepsStore, setMdxDepsStore] = useState<
@@ -125,12 +124,12 @@ export function MdxStateProvider({
 
   // Stabilize config object to prevent infinite re-renders
   const documentChangesConfig = useMemo(() => {
-    const branchId = branch || "default";
-    console.log(
-      `[DEBUG] MdxStateContext using branchId: ${branchId} (branch was: ${branch})`
-    );
+    if (!branch) {
+      throw new Error("Branch name is required for document changes tracking");
+    }
+    console.log(`[DEBUG] MdxStateContext using branchId: ${branch}`);
     return {
-      branchId,
+      branchId: branch,
       autoSave: true,
       autoSaveDelayMs: DEBOUNCE_TIMEOUT_DELAY,
       onError: (error: Error) => {
