@@ -250,7 +250,7 @@ export function MdxStateProvider({
           state.html,
           state.frontmatter,
           state.originalElements || {}, // Fallback to empty object if missing
-          state.originalFrontmatter,
+          undefined, // Don't pass originalFrontmatter to avoid YAML duplication
           state.changedNodes,
           true // Force frontmatter processing
         ).mdx;
@@ -276,7 +276,7 @@ export function MdxStateProvider({
             state.html,
             state.frontmatter,
             state.originalElements,
-            state.originalFrontmatter,
+            undefined, // Don't pass originalFrontmatter to avoid YAML duplication
             state.changedNodes,
             true // Force frontmatter processing
           ).mdx;
@@ -296,7 +296,7 @@ export function MdxStateProvider({
             state.html,
             state.frontmatter,
             state.originalElements,
-            state.originalFrontmatter,
+            undefined, // Don't pass originalFrontmatter to avoid YAML duplication
             state.changedNodes,
             true
           ).mdx;
