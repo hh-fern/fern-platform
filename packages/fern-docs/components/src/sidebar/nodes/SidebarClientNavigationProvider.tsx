@@ -12,11 +12,7 @@ import {
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
 
-import {
-  type BaseState,
-  LocalStorageChangeStorage,
-  useDocumentChanges,
-} from "../../document-changes";
+import { type BaseState, useDocumentChanges } from "../../document-changes";
 import { NavigationContext, PageData } from "./types";
 
 // Simple localStorage interface for client pages
@@ -30,71 +26,67 @@ interface StoredClientPage {
   createdAt: number;
 }
 
-// Enhanced client page storage using the new architecture
-class ClientPageStorage {
-  private static storage = new LocalStorageChangeStorage();
-
-  static loadClientPages(branchName: string): Record<string, StoredClientPage> {
-    if (typeof window === "undefined") return {};
-    try {
-      const stored = localStorage.getItem(`client-pages-${branchName}`);
-      return stored ? JSON.parse(stored) : {};
-    } catch (error) {
-      console.error("Failed to load client pages:", error);
-      return {};
-    }
+// Client page helper functions using localStorage directly (temporary until full migration)
+function loadClientPages(branchName: string): Record<string, StoredClientPage> {
+  if (typeof window === "undefined") return {};
+  try {
+    const stored = localStorage.getItem(`client-pages-${branchName}`);
+    return stored ? JSON.parse(stored) : {};
+  } catch (error) {
+    console.error("Failed to load client pages:", error);
+    return {};
   }
+}
 
-  static async addClientPage(
-    branchName: string,
-    nodeId: NodeId,
-    pageData: StoredClientPage
-  ) {
-    if (typeof window === "undefined") return;
-    try {
-      const existing = this.loadClientPages(branchName);
-      existing[nodeId] = { ...pageData, createdAt: Date.now() };
+function addClientPage(
+  branchName: string,
+  nodeId: NodeId,
+  pageData: StoredClientPage
+) {
+  if (typeof window === "undefined") return;
+  try {
+    const existing = loadClientPages(branchName);
+    existing[nodeId] = { ...pageData, createdAt: Date.now() };
+    localStorage.setItem(
+      `client-pages-${branchName}`,
+      JSON.stringify(existing)
+    );
+  } catch (error) {
+    console.error("Failed to save client page:", error);
+  }
+}
+
+function removeClientPage(branchName: string, nodeId: NodeId) {
+  if (typeof window === "undefined") return;
+  try {
+    const existing = loadClientPages(branchName);
+    const { [nodeId]: removed, ...newExisting } = existing;
+    localStorage.setItem(
+      `client-pages-${branchName}`,
+      JSON.stringify(newExisting)
+    );
+  } catch (error) {
+    console.error("Failed to remove client page:", error);
+  }
+}
+
+function updateClientPageDataInStorage(
+  branchName: string,
+  nodeId: NodeId,
+  pageData: PageData
+) {
+  if (typeof window === "undefined") return;
+  try {
+    const existing = loadClientPages(branchName);
+    if (existing[nodeId]) {
+      existing[nodeId].pageData = pageData;
       localStorage.setItem(
         `client-pages-${branchName}`,
         JSON.stringify(existing)
       );
-    } catch (error) {
-      console.error("Failed to save client page:", error);
     }
-  }
-
-  static async removeClientPage(branchName: string, nodeId: NodeId) {
-    if (typeof window === "undefined") return;
-    try {
-      const existing = this.loadClientPages(branchName);
-      const { [nodeId]: removed, ...newExisting } = existing;
-      localStorage.setItem(
-        `client-pages-${branchName}`,
-        JSON.stringify(newExisting)
-      );
-    } catch (error) {
-      console.error("Failed to remove client page:", error);
-    }
-  }
-
-  static async updateClientPageData(
-    branchName: string,
-    nodeId: NodeId,
-    pageData: PageData
-  ) {
-    if (typeof window === "undefined") return;
-    try {
-      const existing = this.loadClientPages(branchName);
-      if (existing[nodeId]) {
-        existing[nodeId].pageData = pageData;
-        localStorage.setItem(
-          `client-pages-${branchName}`,
-          JSON.stringify(existing)
-        );
-      }
-    } catch (error) {
-      console.error("Failed to update client page data:", error);
-    }
+  } catch (error) {
+    console.error("Failed to update client page data:", error);
   }
 }
 
@@ -133,7 +125,7 @@ function loadAndProcessStoredPages(branchName: string) {
     return { clientNodes: {}, clientFoundNodes: {} };
   }
 
-  const storedPages = ClientPageStorage.loadClientPages(branchName);
+  const storedPages = loadClientPages(branchName);
 
   const clientNodes: ClientNodes = {};
   const clientFoundNodes: ClientFoundNodes = {};
@@ -279,7 +271,7 @@ ${pageData.html || ""}`;
       }
 
       // Persist to localStorage
-      await ClientPageStorage.addClientPage(branchName, node.id, {
+      addClientPage(branchName, node.id, {
         node,
         parentNodeId,
         sidebar,
@@ -295,7 +287,7 @@ ${pageData.html || ""}`;
   const removeClientNode = useCallback(
     async (nodeId: NodeId) => {
       // Get the page data before removal for document changes
-      const storedPages = ClientPageStorage.loadClientPages(branchName);
+      const storedPages = loadClientPages(branchName);
       const pageToRemove = storedPages[nodeId];
       const fileName = pageToRemove?.fullSlug
         ? `${pageToRemove.fullSlug}.mdx`
@@ -333,7 +325,7 @@ ${pageData.html || ""}`;
       removePageFromDocsYml(fileName);
 
       // Remove from localStorage
-      await ClientPageStorage.removeClientPage(branchName, nodeId);
+      removeClientPage(branchName, nodeId);
     },
     [branchName, deleteFile, removePageFromDocsYml]
   );
@@ -341,7 +333,7 @@ ${pageData.html || ""}`;
   const updateClientPageData = useCallback(
     async (nodeId: NodeId, pageData: PageData) => {
       // Get current page data to create file name
-      const storedPages = ClientPageStorage.loadClientPages(branchName);
+      const storedPages = loadClientPages(branchName);
       const currentPage = storedPages[nodeId];
       const fileName = currentPage?.fullSlug
         ? `${currentPage.fullSlug}.mdx`
@@ -361,11 +353,7 @@ ${pageData.html || ""}`;
       createFile(fileName, mdxContent);
 
       // Update localStorage
-      await ClientPageStorage.updateClientPageData(
-        branchName,
-        nodeId,
-        pageData
-      );
+      updateClientPageDataInStorage(branchName, nodeId, pageData);
     },
     [branchName, createFile]
   );
