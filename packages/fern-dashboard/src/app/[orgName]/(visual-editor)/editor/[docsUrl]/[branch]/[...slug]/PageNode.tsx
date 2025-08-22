@@ -5,7 +5,7 @@ import { useMemo } from "react";
 
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { ClientPageStorage, PageStorage } from "@fern-docs/components";
+import { type BaseState, useDocumentChanges } from "@fern-docs/components";
 import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 import { MdxToHtmlResponse, mdxToHtml } from "@fern-docs/mdx";
@@ -54,6 +54,21 @@ export default function PageNode({
     ? clientFoundNodes?.[clientNodeId]
     : undefined;
 
+  // Initialize new document system
+  const baseState: BaseState = useMemo(
+    () => ({
+      files: new Map(),
+      docsYml: "",
+    }),
+    []
+  );
+
+  const { getFileContent } = useDocumentChanges(baseState, {
+    branchId: branchName,
+    autoSave: false,
+    autoSaveDelayMs: 300,
+  });
+
   const foundNode:
     | SerializableFoundNode
     | FernNavigation.utils.Node.Found
@@ -85,25 +100,26 @@ export default function PageNode({
       : undefined;
   }, [initialHtml, initialFrontmatter, initialOriginalElements]);
 
-  if (clientNodeId) {
-    // For client pages, ALWAYS use localStorage data (latest version) over any other data
-    const storedPages = ClientPageStorage.loadClientPages(branchName);
-    const storedPage = storedPages[clientNodeId];
-
-    if (storedPage?.pageData) {
-      initialHtml = storedPage.pageData.html;
-      initialFrontmatter = storedPage.pageData.frontmatter;
-      initialOriginalElements = storedPage.pageData.originalElements;
-    }
-  } else if (initialFilename) {
-    // For server pages, prefer localStorage data if it exists and is newer
-    const storedPage = PageStorage.getPage(branchName, initialFilename);
-
-    if (storedPage && storedPage.pageType === "server") {
-      // Use localStorage data as it represents the latest edited version
-      initialHtml = storedPage.html;
-      initialFrontmatter = storedPage.frontmatter;
-      initialOriginalElements = storedPage.originalElements;
+  // Try to get latest content from new document system
+  if (initialFilename) {
+    const latestContent = getFileContent(initialFilename);
+    if (latestContent) {
+      // Parse MDX back to get latest edited version
+      try {
+        const { html, frontmatter, originalElements } = mdxToHtml(
+          latestContent,
+          {
+            treatAsCustomElement: ["code"],
+            treatAsUnsupported: ["math"],
+          }
+        );
+        initialHtml = html;
+        initialFrontmatter = frontmatter;
+        initialOriginalElements = originalElements;
+      } catch (error) {
+        console.warn("Failed to parse latest content from new system:", error);
+        // Fall back to props data
+      }
     }
   }
 

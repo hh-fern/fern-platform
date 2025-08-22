@@ -10,10 +10,13 @@ import {
   useState,
 } from "react";
 
+import { type BaseState, useDocumentChanges } from "@fern-docs/components";
 import { ChangedNodes, MdxToHtmlResponse, htmlToMdx } from "@fern-docs/mdx";
 
 import { createMdxFrontmatter } from "@/utils/createMdxFrontmatter";
 import { DocsUrl } from "@/utils/types";
+
+import { useBranch } from "./BranchContext";
 
 type Filename = string;
 type Markdown = string;
@@ -71,6 +74,9 @@ export function MdxStateProvider({
   children: ReactNode;
   docsUrl: DocsUrl;
 }) {
+  const { branch } = useBranch();
+
+  // HTML/MDX conversion state for editor compatibility
   const [mdxDepsStore, setMdxDepsStore] = useState<
     Record<Filename, MdxDependencies>
   >({});
@@ -86,7 +92,26 @@ export function MdxStateProvider({
   // Track debounce timeouts for each file to prevent excessive syncs
   const debounceTimeouts = useRef<Record<string, NodeJS.Timeout | null>>({});
 
-  // Stablilize updateDependencies identity to prevent unnecessary re-renders
+  // Initialize base state for new system
+  const baseState: BaseState = useMemo(
+    () => ({
+      files: new Map(),
+      docsYml: "", // Would be loaded from actual docs.yml
+    }),
+    []
+  );
+
+  // New document change tracking system
+  const { updateFile } = useDocumentChanges(baseState, {
+    branchId: branch || "default",
+    autoSave: true,
+    autoSaveDelayMs: DEBOUNCE_TIMEOUT_DELAY,
+    onError: (error: Error) => {
+      console.error("Document change tracking error:", error);
+    },
+  });
+
+  // Stable updateDependencies identity to prevent unnecessary re-renders
   const updateDependencies = useCallback(
     (filename: Filename, state: MdxDependencies) => {
       setMdxDepsStore((prev) => {
@@ -141,13 +166,29 @@ export function MdxStateProvider({
   const stageChanges = useCallback(
     (filename: Filename, state: MdxDependencies) => {
       updateDependencies(filename, { ...state, changed: true });
+
       // Immediately mark file as staged when changes are made
       setMdxSyncedStatus((prev) => ({
         ...prev,
         [filename]: "STAGED",
       }));
+
+      // Update the new system
+      if (state.html && state.frontmatter && state.originalElements) {
+        const mdxContent = htmlToMdx(
+          state.html,
+          state.frontmatter,
+          state.originalElements,
+          state.originalFrontmatter,
+          state.changedNodes,
+          true // Force frontmatter processing
+        ).mdx;
+
+        // Update the new change tracking system
+        updateFile(filename, mdxContent);
+      }
     },
-    [updateDependencies]
+    [updateDependencies, updateFile]
   );
 
   // Build a map of changed files (changed flag is true) and their contents
@@ -166,8 +207,7 @@ export function MdxStateProvider({
             state.originalElements,
             state.originalFrontmatter,
             state.changedNodes,
-            // state.changedFrontmatter
-            true //  TODO: re-enable (force true for now, there's a bug in the loader/FDR that provides malformed frontmatter)
+            true // Force frontmatter processing
           ).mdx;
         }
         return acc;
@@ -187,12 +227,10 @@ export function MdxStateProvider({
             state.originalElements,
             state.originalFrontmatter,
             state.changedNodes,
-            // state.changedFrontmatter
-            true // TODO: re-enable (force true for now, there's a bug in the loader/FDR that provides malformed frontmatter)
+            true
           ).mdx;
         } else if (state.html || state.frontmatter || state.originalElements) {
           // Generate minimal markdown when page data is incomplete
-          // Prevents dev panel from showing "// Loading content..." for partial data
           const title = state.frontmatter?.title;
           const subtitle = state.frontmatter?.subtitle;
           const slug = state.frontmatter?.slug;
@@ -238,26 +276,7 @@ export function MdxStateProvider({
             ...prev,
             [filename]: "SYNCED",
           }));
-          // TODO: sync changes to the server once we have need for this data on the server
-          // setMdxSyncedStatus((prev) => ({
-          //   ...prev,
-          //   [filename]: "SYNCING",
-          // }));
-          // setMdxFile(docsUrl, filename, content)
-          //   .then(() => {
-          //     // If successful, mark file as synced
-          //     setMdxSyncedStatus((prev) => ({
-          //       ...prev,
-          //       [filename]: "SYNCED",
-          //     }));
-          //   })
-          //   .catch(() => {
-          //     // If error, mark file as error
-          //     setMdxSyncedStatus((prev) => ({
-          //       ...prev,
-          //       [filename]: "ERROR",
-          //     }));
-          //   });
+
           // Always clear the timeout on run
           debounceTimeouts.current[filename] = null;
         }, DEBOUNCE_TIMEOUT_DELAY);

@@ -35,3 +35,4 @@ export * from "./syntax-highlighter";
 export * from "./theme";
 export * from "./FernLinkButton";
 export * from "./sidebar/nodes";
+export * from "./document-changes";

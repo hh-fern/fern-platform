@@ -200,7 +200,7 @@ export function useDocumentChanges(
     return () => {
       mounted = false;
     };
-  }, [baseState, config.branchId]);
+  }, [changeTracker, baseState, config, config.branchId]);
 
   // Auto-save effect
   useEffect(() => {

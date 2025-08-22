@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useRef } from "react";
 
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { usePageSync } from "@fern-docs/components";
+import { useDocumentChanges, type BaseState } from "@fern-docs/components";
 import { MdxToHtmlResponse } from "@fern-docs/mdx";
 
 import { useCurrentPage } from "@/providers/CurrentPageContext";
 import { useMdxState } from "@/providers/MdxStateContext";
 import { useOriginalElements } from "@/providers/OriginalElementsContext";
+import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
+import { useBranch } from "@/providers/BranchContext";
 
 import PageEditor from "./PageEditor";
 import PageSubtitle from "./PageSubtitle";
@@ -50,6 +52,24 @@ export default function PageContents({
     mdxDepsStore,
     stageChanges,
   } = useMdxState();
+  const { branch } = useBranch();
+  const { updateClientPageData } = useSidebarClientNavigation();
+
+  // Initialize base state for new document change tracking
+  const baseState: BaseState = useMemo(
+    () => ({
+      files: new Map(),
+      docsYml: "",
+    }),
+    []
+  );
+
+  // Use new document changes system
+  const { updateFile, getFileContent: _getFileContent } = useDocumentChanges(baseState, {
+    branchId: branch || "default",
+    autoSave: true,
+    autoSaveDelayMs: 300,
+  });
 
   // Sync page changes to localStorage and staging (works for both client and server pages)
   const pageData = useMemo(() => {
@@ -60,7 +80,110 @@ export default function PageContents({
       originalElements: currentPageData?.originalElements,
     };
   }, [mdxDepsStore, filename]);
-  usePageSync(filename, pageData, clientNodeId, serverData, stageChanges);
+
+  // Track what we've already synced to prevent infinite loops
+  const lastSyncedData = useRef<string>("");
+  const hasStagedChanges = useRef<boolean>(false);
+  const lastStagedDataHash = useRef<string>("");
+
+  // Replace usePageSync with new document change tracking
+  useEffect(() => {
+    // Only sync if we have the required data
+    if (
+      !branch ||
+      !pageData.html ||
+      !pageData.frontmatter ||
+      !pageData.originalElements
+    ) {
+      return;
+    }
+
+    const completePageData = pageData as {
+      html: string;
+      frontmatter: Record<string, any>;
+      originalElements: any;
+    };
+
+    // Create a hash of the current data to detect changes
+    const currentDataHash = JSON.stringify({
+      html: completePageData.html,
+      frontmatter: completePageData.frontmatter,
+      originalElements: completePageData.originalElements,
+    });
+
+    // Skip if we've already synced this exact data
+    if (lastSyncedData.current === currentDataHash) {
+      return;
+    }
+
+    lastSyncedData.current = currentDataHash;
+
+    // Reset staging flag when data actually changes
+    if (lastStagedDataHash.current !== currentDataHash) {
+      hasStagedChanges.current = false;
+    }
+
+    if (clientNodeId) {
+      // This is a client page - update client navigation data
+      if (updateClientPageData) {
+        updateClientPageData(clientNodeId, completePageData);
+      }
+    }
+
+    // Convert page data to MDX content and update in new system
+    const mdxContent = `---
+${Object.entries(completePageData.frontmatter)
+  .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+  .join('\n')}
+---
+
+${completePageData.html}`;
+
+    updateFile(filename, mdxContent);
+
+    // Stage changes for commit
+    if (stageChanges && lastStagedDataHash.current !== currentDataHash) {
+      let shouldStage = false;
+
+      if (clientNodeId) {
+        // Always stage client pages since they don't exist on server
+        shouldStage = true;
+      } else if (serverData) {
+        // For server pages, check if data differs from server
+        const dataHasChanges =
+          completePageData.html !== serverData.html ||
+          JSON.stringify(completePageData.frontmatter) !==
+            JSON.stringify(serverData.frontmatter) ||
+          JSON.stringify(completePageData.originalElements) !==
+            JSON.stringify(serverData.originalElements);
+
+        shouldStage = dataHasChanges;
+      } else {
+        // Server page without server data - stage to be safe
+        shouldStage = true;
+      }
+
+      if (shouldStage) {
+        stageChanges(filename, {
+          html: completePageData.html,
+          frontmatter: completePageData.frontmatter,
+          originalElements: completePageData.originalElements,
+          changed: true,
+        });
+        lastStagedDataHash.current = currentDataHash;
+        hasStagedChanges.current = true;
+      }
+    }
+  }, [
+    clientNodeId,
+    branch,
+    filename,
+    pageData,
+    updateClientPageData,
+    stageChanges,
+    serverData,
+    updateFile,
+  ]);
 
   const { originalElements, setOriginalElements } = useOriginalElements();
 

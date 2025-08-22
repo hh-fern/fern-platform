@@ -5,9 +5,10 @@ import React, { useCallback, useMemo, useState } from "react";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import {
-  type DocsYmlPageEntry,
-  DocsYmlStorage,
+  type BaseState,
   NavigationContext,
+  // New architecture only
+  useDocumentChanges,
 } from "@fern-docs/components";
 import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 import { mdxToHtml } from "@fern-docs/mdx";
@@ -55,7 +56,22 @@ export function CreateClientPage({
   const [error, setError] = useState<string>("");
   const [isCreating, setIsCreating] = useState(false);
   const { stageChanges } = useMdxState();
-  const { owner, repo, branch } = useGitHubRepo();
+
+  // Initialize new document changes system
+  const baseState: BaseState = useMemo(
+    () => ({
+      files: new Map(),
+      docsYml: "", // Would be loaded from actual docs.yml in real implementation
+    }),
+    []
+  );
+
+  const { branch } = useGitHubRepo();
+  const { createFile, addPageToDocsYml } = useDocumentChanges(baseState, {
+    branchId: branch || "default",
+    autoSave: true,
+    autoSaveDelayMs: 300,
+  });
   const router = useRouter();
   const params = useParams();
 
@@ -174,52 +190,6 @@ export function CreateClientPage({
     return true;
   }, [pageTitle, selectedSection, finalSlug, clientNodes]);
 
-  const updateDocsYml = useCallback(
-    async (sectionTitle: string, pageEntry: DocsYmlPageEntry) => {
-      try {
-        // First get the current docs.yml content
-        // TODO: we cannot assume that the whole navigation structure lives in one file
-        const response = await fetch("/api/get-docs-yml", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            owner,
-            repo,
-            branch,
-            orgName: params.orgName,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(
-            "API response error:",
-            response.status,
-            response.statusText,
-            errorText
-          );
-          throw new Error(
-            `Failed to get docs.yml: ${response.status} ${response.statusText} - ${errorText}`
-          );
-        }
-
-        const { docsYmlContent } = await response.json();
-
-        // Set the base content and add the update
-        DocsYmlStorage.setBaseContent(branch, docsYmlContent);
-        DocsYmlStorage.addUpdate(branch, sectionTitle, pageEntry);
-
-        return true;
-      } catch (error) {
-        console.error("Error updating docs.yml:", error);
-        return false;
-      }
-    },
-    [owner, repo, branch, params.orgName]
-  );
-
   const handleCreatePage = useCallback(async () => {
     if (!validateForm()) {
       return;
@@ -250,12 +220,15 @@ export function CreateClientPage({
         ? `docs/pages/${selectedSection.slug}/${slug}`
         : slug;
 
-      // Stage the changes
+      // Stage the changes for editor compatibility
       stageChanges(`${fullSlug}.mdx`, {
         html,
         frontmatter,
         originalElements,
       });
+
+      // Track changes in unified system
+      createFile(`${fullSlug}.mdx`, mdx, selectedSection.title);
 
       // Close popover and reset form
       setIsPopoverOpen(false);
@@ -282,19 +255,7 @@ export function CreateClientPage({
       });
 
       // Update docs.yml with the new page
-      const pageEntry: DocsYmlPageEntry = {
-        page: pageTitle,
-        path: `${fullSlug}.mdx`,
-      };
-
-      const docsYmlUpdateSuccessful = await updateDocsYml(
-        selectedSection.title,
-        pageEntry
-      );
-
-      if (!docsYmlUpdateSuccessful) {
-        console.warn("Failed to update docs.yml, but page was created locally");
-      }
+      addPageToDocsYml(`${fullSlug}.mdx`, selectedSection.title);
 
       // Create a client node for the new page
       const nodeId = `client-${crypto.randomUUID()}` as FernNavigation.NodeId;
@@ -349,12 +310,13 @@ export function CreateClientPage({
     pageTitle,
     finalSlug,
     stageChanges,
+    createFile,
+    addPageToDocsYml,
     prependClientNode,
     root,
     allSections,
     router,
     params,
-    updateDocsYml,
     navigationContext,
   ]);
 
