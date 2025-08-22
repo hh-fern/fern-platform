@@ -5,6 +5,7 @@ import path from "path";
 const DEFAULT_BUNDLE_PATH = "~/.fern/app-preview-local/.next";
 
 function setupLocalBundle(specifiedBundlePath?: string) {
+  const originalCwd = process.cwd(); // Store original directory
   const bundlePath = specifiedBundlePath ?? DEFAULT_BUNDLE_PATH;
 
   // Resolve the bundle path (expand ~ to home directory)
@@ -30,6 +31,9 @@ function setupLocalBundle(specifiedBundlePath?: string) {
   } catch (error) {
     console.error("Error setting up local bundle:", error);
     throw error;
+  } finally {
+    // Always restore original directory
+    process.chdir(originalCwd);
   }
 }
 
