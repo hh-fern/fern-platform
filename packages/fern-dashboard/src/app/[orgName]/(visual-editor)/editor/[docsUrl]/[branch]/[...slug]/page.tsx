@@ -39,8 +39,11 @@ export default async function Page({
     docsUrl: parseDocsUrlParam({ docsUrl }),
   });
 
-  const resolvedSearchParams = await searchParams;
-  const host = await getHostFromHeaders();
+  const [resolvedSearchParams, host] = await Promise.all([
+    searchParams,
+    getHostFromHeaders(),
+  ]);
+
   const slugAlias = slugArray.join("/");
 
   const loader = await createEditableDocsLoader(
