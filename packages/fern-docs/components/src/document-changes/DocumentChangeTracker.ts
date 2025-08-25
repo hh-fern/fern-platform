@@ -90,10 +90,20 @@ export class DocumentChangeSetImpl implements DocumentChangeSet {
       (c) => c.type === "docs.yml:add-page" || c.type === "docs.yml:remove-page"
     );
 
+    DebugLogger.debug(
+      `[DocumentChangeSet] Found ${docsYmlChanges.length} docs.yml changes:`,
+      docsYmlChanges.map((c) => `${c.type}:${(c as any).pagePath || "unknown"}`)
+    );
+
     if (docsYmlChanges.length > 0) {
       // For now, mark that docs.yml needs updating
       // The actual content generation will be handled by the CommitOrchestrator
       docsYmlContent = currentState.docsYml;
+      DebugLogger.debug(
+        `[DocumentChangeSet] Setting docsYmlContent (length: ${docsYmlContent.length})`
+      );
+    } else {
+      DebugLogger.debug(`[DocumentChangeSet] No docs.yml changes found`);
     }
 
     const hasChanges =
@@ -224,6 +234,10 @@ export class DocumentChangeTracker {
    */
   compactChanges(changeSet: DocumentChangeSet): DocumentChangeSet {
     const originalChangeCount = changeSet.changes.length;
+    DebugLogger.info(
+      `[DocumentChangeTracker] Starting compaction with ${originalChangeCount} changes`
+    );
+
     const compactedChanges: Change[] = [];
     const fileChangeMap = new Map<FilePath, Change[]>();
     const docsYmlChanges: Change[] = [];
@@ -244,15 +258,45 @@ export class DocumentChangeTracker {
       }
     }
 
+    DebugLogger.debug(
+      `[DocumentChangeTracker] Grouped changes: ${fileChangeMap.size} files, ${docsYmlChanges.length} docs.yml changes`
+    );
+    DebugLogger.debug(
+      `[DocumentChangeTracker] Docs.yml changes:`,
+      docsYmlChanges.map((c) => `${c.type}:${(c as any).pagePath || "unknown"}`)
+    );
+
+    // Track files that were created and then deleted (net zero effect)
+    const cancelledFiles = new Set<FilePath>();
+
     // Compact changes for each file
-    for (const [_, fileChanges] of Array.from(fileChangeMap)) {
+    for (const [filePath, fileChanges] of Array.from(fileChangeMap)) {
       const compactedFileChanges = this.compactFileChanges(fileChanges);
       compactedChanges.push(...compactedFileChanges);
+
+      // Check if this file was created and then deleted (no net change)
+      if (compactedFileChanges.length === 0) {
+        // File had changes that cancelled out completely
+        const hasCreate = fileChanges.some((c) => c.type === "file:create");
+        const hasDelete = fileChanges.some((c) => c.type === "file:delete");
+        if (hasCreate && hasDelete) {
+          cancelledFiles.add(filePath);
+        }
+      }
     }
 
-    // For docs.yml changes, we keep them all for now
-    // More sophisticated compaction could be added later
-    compactedChanges.push(...docsYmlChanges);
+    // Compact docs.yml changes, removing add/remove pairs for cancelled files
+    DebugLogger.debug(
+      `[DocumentChangeTracker] Cancelled files: ${Array.from(cancelledFiles)}`
+    );
+    const compactedDocsYmlChanges = this.compactDocsYmlChanges(
+      docsYmlChanges,
+      cancelledFiles
+    );
+    DebugLogger.debug(
+      `[DocumentChangeTracker] After docs.yml compaction: ${compactedDocsYmlChanges.length} changes`
+    );
+    compactedChanges.push(...compactedDocsYmlChanges);
 
     // Sort by timestamp to maintain chronological order
     compactedChanges.sort((a, b) => a.timestamp - b.timestamp);
@@ -330,6 +374,62 @@ export class DocumentChangeTracker {
     // Don't forget the last change
     if (lastChange) {
       result.push(lastChange);
+    }
+
+    return result;
+  }
+
+  /**
+   * Compacts docs.yml changes, removing add/remove pairs for cancelled files
+   */
+  private compactDocsYmlChanges(
+    docsYmlChanges: Change[],
+    cancelledFiles: Set<FilePath>
+  ): Change[] {
+    const result: Change[] = [];
+    const addChangeMap = new Map<FilePath, Change>();
+    const removeChangeMap = new Map<FilePath, Change>();
+
+    // Sort changes by timestamp first
+    const sortedChanges = [...docsYmlChanges].sort(
+      (a, b) => a.timestamp - b.timestamp
+    );
+
+    // Separate add and remove changes
+    for (const change of sortedChanges) {
+      if (change.type === "docs.yml:add-page") {
+        const addChange = change as any;
+        addChangeMap.set(addChange.pagePath, change);
+      } else if (change.type === "docs.yml:remove-page") {
+        const removeChange = change as any;
+        removeChangeMap.set(removeChange.pagePath, change);
+      }
+    }
+
+    // For each cancelled file, remove both add and remove operations
+    for (const cancelledFile of cancelledFiles) {
+      addChangeMap.delete(cancelledFile);
+      removeChangeMap.delete(cancelledFile);
+    }
+
+    // For remaining files, check for add+remove pairs and cancel them out
+    for (const [filePath, addChange] of addChangeMap) {
+      if (removeChangeMap.has(filePath)) {
+        // This file has both add and remove - they cancel out
+        removeChangeMap.delete(filePath);
+        // Don't add either change to result
+        DebugLogger.debug(
+          `[DocumentChangeTracker] Cancelled docs.yml add+remove for ${filePath}`
+        );
+      } else {
+        // Only add change remains
+        result.push(addChange);
+      }
+    }
+
+    // Add remaining remove changes (those without corresponding add)
+    for (const removeChange of removeChangeMap.values()) {
+      result.push(removeChange);
     }
 
     return result;

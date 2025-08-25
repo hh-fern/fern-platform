@@ -14,6 +14,7 @@ import {
 import {
   type BaseState,
   type CommitPlan,
+  DebugLogger,
   type DocumentChangeSet,
   useDocumentChanges,
 } from "@fern-docs/components";
@@ -118,14 +119,20 @@ export function MdxStateProvider({
   // Track debounce timeouts for each file to prevent excessive syncs
   const debounceTimeouts = useRef<Record<string, NodeJS.Timeout | null>>({});
 
-  // Initialize base state for new system
+  // For now, initialize with empty docs.yml to avoid timing issues
+  // TODO: Properly load docs.yml content without causing re-initialization
   const baseState: BaseState = useMemo(
     () => ({
       files: new Map(),
-      docsYml: "", // Would be loaded from actual docs.yml
+      docsYml: "", // TODO: Load actual docs.yml content
     }),
     []
   );
+
+  // Stable error handler to prevent hook re-initialization
+  const onError = useCallback((error: Error) => {
+    console.error("Document change tracking error:", error);
+  }, []);
 
   // Stabilize config object to prevent infinite re-renders
   const documentChangesConfig = useMemo(() => {
@@ -136,15 +143,20 @@ export function MdxStateProvider({
       branchId: branch,
       autoSave: true,
       autoSaveDelayMs: DEBOUNCE_TIMEOUT_DELAY,
-      onError: (error: Error) => {
-        console.error("Document change tracking error:", error);
-      },
+      onError,
     };
-  }, [branch]);
+  }, [branch, onError]);
 
   // New document change tracking system
-  const { changeSet, updateFile, hasChanges, getCommitPlan, isLoading } =
-    useDocumentChanges(baseState, documentChangesConfig);
+  const {
+    changeSet,
+    updateFile,
+    createFile,
+    addPageToDocsYml,
+    hasChanges,
+    getCommitPlan,
+    isLoading,
+  } = useDocumentChanges(baseState, documentChangesConfig);
 
   // Stable updateDependencies identity to prevent unnecessary re-renders
   const updateDependencies = useCallback(
@@ -236,6 +248,13 @@ export function MdxStateProvider({
   // Alias for updateDependencies that sets the changed flag to true by default
   const stageChanges = useCallback(
     (filename: Filename, state: MdxDependencies) => {
+      console.log(`[stageChanges] Called for ${filename}`, {
+        hasHtml: !!state.html,
+        hasFrontmatter: !!state.frontmatter,
+        hasOriginalElements: !!state.originalElements,
+        changed: state.changed,
+        stack: new Error().stack?.split("\n").slice(1, 4).join("\n"),
+      });
       updateDependencies(filename, { ...state, changed: true });
 
       // Immediately mark file as staged when changes are made
@@ -255,11 +274,108 @@ export function MdxStateProvider({
           true // Force frontmatter processing
         ).mdx;
 
-        // Update the new change tracking system
-        updateFile(filename, mdxContent);
+        // Check if this file exists in the base repository (not just locally)
+        // A file is "new" if it doesn't exist in the baseState (the committed repository state)
+        const fileExistsInRepo =
+          changeSet?.baseState.files.has(filename) ?? false;
+        const isNewFile = !fileExistsInRepo;
+
+        console.log(
+          `[stageChanges] File ${filename}: isNewFile=${isNewFile}, existsInRepo=${fileExistsInRepo}`
+        );
+        DebugLogger.debug(
+          `[stageChanges] File ${filename}: isNewFile=${isNewFile}, existsInRepo=${fileExistsInRepo}`
+        );
+
+        if (isNewFile) {
+          // Check if we've already created this file in the current change set
+          const hasExistingCreateChange =
+            changeSet?.changes.some(
+              (change) =>
+                change.type === "file:create" &&
+                (change as any).path === filename
+            ) ?? false;
+          
+          console.log(`[stageChanges] hasExistingCreateChange for ${filename}: ${hasExistingCreateChange}`);
+          console.log(`[stageChanges] Current changeSet has ${changeSet?.changes.length || 0} changes`);
+          DebugLogger.debug(`[stageChanges] hasExistingCreateChange for ${filename}: ${hasExistingCreateChange}`);
+
+          if (!hasExistingCreateChange) {
+            // Create new file and add to docs.yml navigation
+            console.log(`[stageChanges] Creating new file: ${filename}`);
+            DebugLogger.debug(`[stageChanges] Creating new file: ${filename}`);
+            createFile(filename, mdxContent);
+
+            // Extract section from frontmatter, file path, or use a default section
+            let sectionTitle = state.frontmatter.section as string;
+            
+            if (!sectionTitle) {
+              // Try to infer section from file path
+              // e.g., "docs/pages/get-started/file.mdx" -> "Get Started"
+              const pathParts = filename.split('/');
+              const sectionFolder = pathParts.find(part => 
+                part !== 'docs' && part !== 'pages' && !part.endsWith('.mdx')
+              );
+              
+              if (sectionFolder) {
+                // Convert kebab-case to Title Case
+                sectionTitle = sectionFolder
+                  .split('-')
+                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ');
+              } else {
+                sectionTitle = "API Reference"; // fallback
+              }
+            }
+            // Check if we've already added this file to docs.yml
+            const hasExistingDocsYmlChange = changeSet?.changes.some(
+              (change) =>
+                change.type === "docs.yml:add-page" &&
+                (change as any).pagePath === filename
+            ) ?? false;
+            
+            console.log(
+              `[stageChanges] Adding to docs.yml section: ${sectionTitle}`
+            );
+            console.log(`[stageChanges] hasExistingDocsYmlChange for ${filename}: ${hasExistingDocsYmlChange}`);
+            DebugLogger.debug(
+              `[stageChanges] Adding to docs.yml section: ${sectionTitle}`
+            );
+            
+            if (!hasExistingDocsYmlChange) {
+              addPageToDocsYml(filename, sectionTitle);
+            } else {
+              console.log(`[stageChanges] Skipping docs.yml change - already exists for ${filename}`);
+              DebugLogger.debug(`[stageChanges] Skipping docs.yml change - already exists for ${filename}`);
+            }
+          } else {
+            // File already created in change set, just update it
+            console.log(
+              `[stageChanges] File already created in changeset, updating: ${filename}`
+            );
+            DebugLogger.debug(
+              `[stageChanges] File already created in changeset, updating: ${filename}`
+            );
+            updateFile(filename, mdxContent);
+          }
+        } else {
+          // Update existing file
+          console.log(`[stageChanges] Updating existing file: ${filename}`);
+          DebugLogger.debug(
+            `[stageChanges] Updating existing file: ${filename}`
+          );
+          updateFile(filename, mdxContent);
+        }
       }
     },
-    [updateDependencies, updateFile]
+    [
+      updateDependencies,
+      updateFile,
+      createFile,
+      addPageToDocsYml,
+      changeSet?.baseState.files,
+      changeSet?.changes,
+    ]
   );
 
   // Build a map of changed files (changed flag is true) and their contents

@@ -32,7 +32,11 @@ export {
 
 // Commit orchestration
 export { CommitOrchestrator } from "./CommitOrchestrator";
-export type { GitHubApi, DocsYmlUpdater } from "./CommitOrchestrator";
+export type {
+  GitHubApi,
+  DocsYmlUpdater,
+  FileContentLoader,
+} from "./CommitOrchestrator";
 
 // Re-export key types for convenience
 export type {

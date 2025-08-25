@@ -39,7 +39,7 @@ export class GitHubLoader implements GitLoader {
    *
    * NOTE: I have not yet handled the recursion needed to get all docs.yml files and sub-files.
    */
-  private async getFileContent(
+  async getFileContent(
     owner: string,
     repo: string,
     ref: string,

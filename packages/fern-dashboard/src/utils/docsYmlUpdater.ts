@@ -217,7 +217,34 @@ export function addPageToDocsYml(
   sectionTitle: string,
   pageEntry: PageEntry
 ): string {
-  const docsConfig = parseYaml(docsYmlContent);
+  let docsConfig: DocsConfig;
+
+  try {
+    docsConfig = parseYaml(docsYmlContent);
+  } catch (error) {
+    // Handle empty or invalid docs.yml by creating a basic structure
+    console.warn(
+      "Creating basic docs.yml structure due to empty/invalid content:",
+      error,
+      "Original content length:",
+      docsYmlContent.length
+    );
+
+    // If the content is empty, we shouldn't be creating a new structure
+    // This indicates that the baseState wasn't properly initialized with actual docs.yml content
+    if (docsYmlContent.trim().length === 0) {
+      console.error(
+        "[addPageToDocsYml] ERROR: Starting with empty docs.yml content - this will overwrite existing navigation structure!"
+      );
+      console.error(
+        "[addPageToDocsYml] This indicates the baseState was not properly loaded with actual repository content"
+      );
+    }
+
+    docsConfig = {
+      navigation: [],
+    };
+  }
 
   // Handle different docs.yml structures
   if (docsConfig.products && Array.isArray(docsConfig.products)) {
@@ -226,22 +253,47 @@ export function addPageToDocsYml(
     return docsYmlContent;
   } else if (docsConfig.navigation && Array.isArray(docsConfig.navigation)) {
     // Direct navigation structure - update the navigation array
-    const updatedNavigation = addPageToSection(
-      docsConfig.navigation,
-      sectionTitle,
-      pageEntry
-    );
+    try {
+      const updatedNavigation = addPageToSection(
+        docsConfig.navigation,
+        sectionTitle,
+        pageEntry
+      );
 
-    const updatedConfig = {
-      ...docsConfig,
-      navigation: updatedNavigation,
+      const updatedConfig = {
+        ...docsConfig,
+        navigation: updatedNavigation,
+      };
+
+      return stringifyYaml(updatedConfig);
+    } catch (_sectionError) {
+      // Section doesn't exist, create it
+      console.warn(`Section "${sectionTitle}" not found, creating it`);
+      const newSection = {
+        section: sectionTitle,
+        contents: [pageEntry],
+      };
+
+      const updatedConfig = {
+        ...docsConfig,
+        navigation: [...docsConfig.navigation, newSection],
+      };
+
+      return stringifyYaml(updatedConfig);
+    }
+  } else {
+    // No valid structure exists, create a basic one
+    console.warn("Creating basic docs.yml structure with new section");
+    const newSection = {
+      section: sectionTitle,
+      contents: [pageEntry],
     };
 
-    return stringifyYaml(updatedConfig);
-  } else {
-    throw new Error(
-      "Invalid docs.yml: missing navigation array and no products structure found"
-    );
+    const newConfig = {
+      navigation: [newSection],
+    };
+
+    return stringifyYaml(newConfig);
   }
 }
 
@@ -252,7 +304,15 @@ export function removePageFromDocsYml(
   docsYmlContent: string,
   pagePath: string
 ): string {
-  const docsConfig = parseYaml(docsYmlContent);
+  let docsConfig: DocsConfig;
+
+  try {
+    docsConfig = parseYaml(docsYmlContent);
+  } catch (error) {
+    // Handle empty or invalid docs.yml - nothing to remove
+    console.warn("Cannot remove from empty/invalid docs.yml:", error);
+    return docsYmlContent;
+  }
 
   // Handle different docs.yml structures
   if (docsConfig.products && Array.isArray(docsConfig.products)) {
@@ -273,8 +333,8 @@ export function removePageFromDocsYml(
 
     return stringifyYaml(updatedConfig);
   } else {
-    throw new Error(
-      "Invalid docs.yml: missing navigation array and no products structure found"
-    );
+    // No valid navigation structure - nothing to remove
+    console.warn("No navigation structure found, nothing to remove");
+    return docsYmlContent;
   }
 }

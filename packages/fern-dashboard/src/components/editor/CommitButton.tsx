@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   // New architecture only
   CommitOrchestrator,
+  type FileContentLoader,
 } from "@fern-docs/components";
 
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
@@ -55,8 +56,34 @@ const docsYmlUpdater = {
   parseYaml,
 };
 
+// Client-side FileContentLoader that uses the API route
+const createClientFileContentLoader = (): FileContentLoader => ({
+  async getFileContent(
+    owner: string,
+    repo: string,
+    ref: string,
+    path: string
+  ): Promise<string | null> {
+    try {
+      const response = await fetch(
+        `/api/github/docs-yml?owner=${owner}&repo=${repo}&branch=${ref}`
+      );
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        console.warn(`Failed to fetch ${path}:`, data.error);
+        return null;
+      }
+
+      return data.content;
+    } catch (error) {
+      console.error(`Error fetching ${path}:`, error);
+      return null;
+    }
+  },
+});
+
 // Initialize the new architecture components
-const commitOrchestrator = new CommitOrchestrator(githubApi, docsYmlUpdater);
 
 /**
  * Generates a hash from commit plan with consistent ordering
@@ -100,6 +127,20 @@ export function CommitButton() {
   const { branch } = useBranch();
   const isEditingDisabled = useEditingDisabled();
   const { owner, repo, baseBranch } = useGitHubRepo();
+
+  // Create CommitOrchestrator with client-side FileContentLoader for docs.yml content fetching
+  const commitOrchestrator = useMemo(() => {
+    if (!owner || !repo) return null;
+
+    const fileContentLoader = createClientFileContentLoader();
+
+    return new CommitOrchestrator(
+      githubApi,
+      docsYmlUpdater,
+      "Update documentation files",
+      fileContentLoader
+    );
+  }, [owner, repo]);
 
   // Use shared document changes system from MdxStateContext
   const { documentChanges } = useMdxState();
@@ -152,6 +193,10 @@ export function CommitButton() {
     }
     if (!changeSet) {
       WarningNoChangesToast();
+      return;
+    }
+    if (!commitOrchestrator) {
+      ErrorNoGithubSourceToast();
       return;
     }
 
@@ -218,6 +263,7 @@ export function CommitButton() {
     owner,
     repo,
     baseBranch,
+    commitOrchestrator,
   ]);
 
   const commitDisabledReason = useMemo(() => {

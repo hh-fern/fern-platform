@@ -1,11 +1,30 @@
 import { DebugLogger } from "./DebugLogger";
-import { CommitPlan, CommitResult, DocumentChangeSet, FilePath } from "./types";
+import {
+  CommitPlan,
+  CommitResult,
+  DocsYmlAddPageChange,
+  DocsYmlRemovePageChange,
+  DocumentChangeSet,
+  FilePath,
+} from "./types";
 
 /**
  * GitHub API interface for committing changes
  */
 export interface GitHubApi {
   createCommit(request: GitHubCommitRequest): Promise<GitHubCommitResponse>;
+}
+
+/**
+ * File content loader interface for fetching current repository content
+ */
+export interface FileContentLoader {
+  getFileContent(
+    owner: string,
+    repo: string,
+    ref: string,
+    path: string
+  ): Promise<string | null>;
 }
 
 export interface GitHubCommitRequest {
@@ -61,15 +80,18 @@ export interface CommitConfig {
 export class CommitOrchestrator {
   private githubApi: GitHubApi;
   private docsYmlUpdater: DocsYmlUpdater;
+  private fileContentLoader?: FileContentLoader;
   private defaultCommitMessage: string;
 
   constructor(
     githubApi: GitHubApi,
     docsYmlUpdater: DocsYmlUpdater,
-    defaultCommitMessage = "Update documentation files"
+    defaultCommitMessage = "Update documentation files",
+    fileContentLoader?: FileContentLoader
   ) {
     this.githubApi = githubApi;
     this.docsYmlUpdater = docsYmlUpdater;
+    this.fileContentLoader = fileContentLoader;
     this.defaultCommitMessage = defaultCommitMessage;
   }
 
@@ -86,6 +108,29 @@ export class CommitOrchestrator {
       DebugLogger.info(
         `[CommitOrchestrator] Planning commit for ${changeSet.changes.length} changes`
       );
+
+      // Debug all changes in the changeSet
+      DebugLogger.debug(
+        `[CommitOrchestrator] All changes:`,
+        changeSet.changes.map(
+          (c) =>
+            `${c.type}:${(c as any).path || (c as any).pagePath || "unknown"}`
+        )
+      );
+
+      // Debug baseState
+      DebugLogger.debug(
+        `[CommitOrchestrator] BaseState docsYml length: ${changeSet.baseState.docsYml.length}`
+      );
+
+      // Debug the commit plan details
+      DebugLogger.debug(`[CommitOrchestrator] Commit plan details:`, {
+        filesToCommit: commitPlan.filesToCommit.size,
+        filesToDelete: commitPlan.filesToDelete.length,
+        hasDocsYml: commitPlan.docsYmlContent !== undefined,
+        docsYmlContentLength: commitPlan.docsYmlContent?.length || 0,
+        hasChanges: commitPlan.hasChanges,
+      });
 
       if (!commitPlan.hasChanges) {
         DebugLogger.warn(`[CommitOrchestrator] No changes to commit`);
@@ -178,12 +223,18 @@ export class CommitOrchestrator {
 
     // Handle docs.yml updates
     if (commitPlan.docsYmlContent !== undefined) {
-      const updatedDocsYml = await this.buildUpdatedDocsYml(changeSet);
+      DebugLogger.info(
+        `[CommitOrchestrator] Building updated docs.yml content`
+      );
+      const updatedDocsYml = await this.buildUpdatedDocsYml(changeSet, config);
       gitFiles.push({
         path: `${pathPrefix}docs.yml`,
         content: updatedDocsYml,
         mode: "100644",
       });
+      DebugLogger.debug(
+        `[CommitOrchestrator] Added docs.yml to commit (${updatedDocsYml.length} chars)`
+      );
     }
 
     return gitFiles;
@@ -193,9 +244,14 @@ export class CommitOrchestrator {
    * Builds the updated docs.yml content by applying all docs.yml changes
    */
   private async buildUpdatedDocsYml(
-    changeSet: DocumentChangeSet
+    changeSet: DocumentChangeSet,
+    config: CommitConfig
   ): Promise<string> {
     let currentContent = changeSet.baseState.docsYml;
+
+    DebugLogger.debug(
+      `[CommitOrchestrator] Starting with baseState docsYml content: "${currentContent}" (length: ${currentContent.length})`
+    );
 
     // Get all docs.yml-related changes in chronological order
     const docsYmlChanges = changeSet.changes
@@ -206,24 +262,91 @@ export class CommitOrchestrator {
       )
       .sort((a, b) => a.timestamp - b.timestamp);
 
+    DebugLogger.info(
+      `[CommitOrchestrator] Processing ${docsYmlChanges.length} docs.yml changes`
+    );
+
+    // If we have docs.yml changes but our baseState content is empty/minimal,
+    // we need to fetch the actual current docs.yml content from the repository
+    if (
+      docsYmlChanges.length > 0 &&
+      currentContent.trim().length === 0 &&
+      this.fileContentLoader
+    ) {
+      DebugLogger.info(
+        `[CommitOrchestrator] BaseState has empty docs.yml but we have ${docsYmlChanges.length} docs.yml changes - fetching current repository content`
+      );
+
+      try {
+        const actualDocsYmlContent =
+          await this.fileContentLoader.getFileContent(
+            config.owner,
+            config.repo,
+            config.branch,
+            `${config.pathPrefix || ""}docs.yml`
+          );
+
+        if (actualDocsYmlContent != null) {
+          currentContent = actualDocsYmlContent;
+          DebugLogger.info(
+            `[CommitOrchestrator] Successfully fetched current docs.yml content (${currentContent.length} chars)`
+          );
+        } else {
+          DebugLogger.warn(
+            `[CommitOrchestrator] No docs.yml found in repository - will create new one`
+          );
+        }
+      } catch (error) {
+        DebugLogger.error(
+          `[CommitOrchestrator] Failed to fetch current docs.yml content:`,
+          error
+        );
+        // Continue with empty content - will create a new structure
+      }
+    } else if (
+      docsYmlChanges.length > 0 &&
+      currentContent.trim().length === 0
+    ) {
+      DebugLogger.warn(
+        `[CommitOrchestrator] No fileContentLoader provided - cannot fetch current docs.yml content, will create new structure`
+      );
+    }
+
     // Apply each change in order
     for (const change of docsYmlChanges) {
-      if (change.type === "docs.yml:add-page") {
-        const addChange = change as any;
-        currentContent = this.docsYmlUpdater.addPageToDocsYml(
-          currentContent,
-          addChange.section,
-          {
-            path: addChange.pagePath,
-            page: this.extractPageName(addChange.pagePath),
-          }
+      try {
+        if (change.type === "docs.yml:add-page") {
+          const addChange = change as DocsYmlAddPageChange;
+          DebugLogger.debug(
+            `[CommitOrchestrator] Adding page ${addChange.pagePath} to section ${addChange.section}`
+          );
+
+          currentContent = this.docsYmlUpdater.addPageToDocsYml(
+            currentContent,
+            addChange.section,
+            {
+              path: addChange.pagePath,
+              page: this.extractPageName(addChange.pagePath),
+            }
+          );
+        } else if (change.type === "docs.yml:remove-page") {
+          const removeChange = change as DocsYmlRemovePageChange;
+          DebugLogger.debug(
+            `[CommitOrchestrator] Removing page ${removeChange.pagePath}`
+          );
+
+          currentContent = this.docsYmlUpdater.removePageFromDocsYml(
+            currentContent,
+            removeChange.pagePath
+          );
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        DebugLogger.error(
+          `[CommitOrchestrator] Failed to apply docs.yml change (${change.type}): ${errorMessage}`
         );
-      } else if (change.type === "docs.yml:remove-page") {
-        const removeChange = change as any;
-        currentContent = this.docsYmlUpdater.removePageFromDocsYml(
-          currentContent,
-          removeChange.pagePath
-        );
+        // Continue with other changes rather than failing the entire commit
       }
     }
 
@@ -341,7 +464,7 @@ export class CommitOrchestrator {
     let hasDocsYmlChanges = false;
     if (commitPlan.docsYmlContent !== undefined) {
       hasDocsYmlChanges = true;
-      const updatedDocsYml = await this.buildUpdatedDocsYml(changeSet);
+      const updatedDocsYml = await this.buildUpdatedDocsYml(changeSet, config);
       files.push({
         path: `${pathPrefix}docs.yml`,
         action: "update",
