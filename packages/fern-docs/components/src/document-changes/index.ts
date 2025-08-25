@@ -34,9 +34,6 @@ export {
 export { CommitOrchestrator } from "./CommitOrchestrator";
 export type { GitHubApi, DocsYmlUpdater } from "./CommitOrchestrator";
 
-// Migration utilities
-export * from "./migration";
-
 // Re-export key types for convenience
 export type {
   DocumentChangeSet,
@@ -49,3 +46,6 @@ export type {
   CommitResult,
   ChangeTrackingConfig,
 } from "./types";
+
+// Debug logger
+export { DebugLogger } from "./DebugLogger";

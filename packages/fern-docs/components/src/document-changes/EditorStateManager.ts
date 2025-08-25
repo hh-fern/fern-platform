@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { DebugLogger } from "./DebugLogger";
 import { DocumentChangeTracker } from "./DocumentChangeTracker";
 import { ChangeStorage, LocalStorageChangeStorage } from "./storage";
 import {
@@ -46,14 +47,23 @@ export class EditorStateManager {
     baseState: BaseState,
     branchId: string
   ): Promise<DocumentChangeSet> {
+    DebugLogger.info(
+      `[EditorStateManager] Initializing for branch: ${branchId}`
+    );
+
     // Try to load existing changes from storage
     const existingChangeSet = await this.storage.load(branchId);
 
     if (existingChangeSet) {
+      DebugLogger.info(
+        `[EditorStateManager] Loaded ${existingChangeSet.changes.length} existing changes from storage`
+      );
+
       // Update base state if it has changed
       if (this.hasBaseStateChanged(existingChangeSet.baseState, baseState)) {
-        // In a real implementation, we might want to handle base state conflicts
-        // For now, we'll create a new change set with updated base state
+        DebugLogger.warn(
+          `[EditorStateManager] Base state has changed, recreating change set`
+        );
         return this.changeTracker.createChangeSetFromChanges(
           baseState,
           existingChangeSet.changes
@@ -62,6 +72,9 @@ export class EditorStateManager {
       return existingChangeSet;
     }
 
+    DebugLogger.info(
+      `[EditorStateManager] No existing changes found, creating fresh change set`
+    );
     // Create new change set
     return this.changeTracker.createChangeSet(baseState);
   }
@@ -179,15 +192,23 @@ export function useDocumentChanges(
         setIsLoading(true);
         setError(null);
 
+        DebugLogger.info(
+          `[useDocumentChanges] Initializing hook for branch: ${branchId}`
+        );
+
         // Try to load existing changes from storage
         const existingChangeSet = await storage.load(branchId);
 
         let initialChangeSet: DocumentChangeSet;
         if (existingChangeSet) {
+          DebugLogger.info(
+            `[useDocumentChanges] Loaded existing change set with ${existingChangeSet.changes.length} changes`
+          );
           // For now, always use existing changes if they exist
           // TODO: In future, properly compare base states when we load actual server content
           initialChangeSet = existingChangeSet;
         } else {
+          DebugLogger.info(`[useDocumentChanges] Creating fresh change set`);
           // Create fresh change set if no storage
           initialChangeSet = changeTracker.createChangeSet(baseState);
         }
@@ -200,6 +221,9 @@ export function useDocumentChanges(
         if (mounted) {
           const error =
             err instanceof Error ? err : new Error("Failed to initialize");
+          DebugLogger.error(
+            `[useDocumentChanges] Initialization error: ${error.message}`
+          );
           setError(error);
           onError?.(error);
         }
@@ -230,7 +254,9 @@ export function useDocumentChanges(
           // Notify of state change
           onStateChange?.(changeSet);
         } catch (error: unknown) {
-          console.error("Failed to auto-save changes:", error);
+          DebugLogger.error(
+            `[useDocumentChanges] Failed to auto-save changes: ${error}`
+          );
         }
       })();
     }, autoSaveDelayMs);
@@ -248,13 +274,13 @@ export function useDocumentChanges(
 
         // Save immediately on manual changes (auto-save will also run, but this ensures immediate persistence)
         if (autoSave) {
-          console.log(
-            `[DEBUG] Saving changes immediately for branch ${branchId}:`,
-            updated.changes.length,
-            "changes"
+          DebugLogger.debug(
+            `[useDocumentChanges] Saving ${updated.changes.length} changes immediately for branch ${branchId}`
           );
           storage.save(branchId, updated).catch((error: unknown) => {
-            console.error("Failed to save changes immediately:", error);
+            DebugLogger.error(
+              `[useDocumentChanges] Failed to save changes immediately: ${error}`
+            );
           });
         }
 

@@ -1,3 +1,4 @@
+import { DebugLogger } from "./DebugLogger";
 import { CommitPlan, CommitResult, DocumentChangeSet, FilePath } from "./types";
 
 /**
@@ -82,17 +83,31 @@ export class CommitOrchestrator {
     try {
       const commitPlan = this.generateCommitPlan(changeSet);
 
+      DebugLogger.info(
+        `[CommitOrchestrator] Planning commit for ${changeSet.changes.length} changes`
+      );
+
       if (!commitPlan.hasChanges) {
+        DebugLogger.warn(`[CommitOrchestrator] No changes to commit`);
         return {
           success: false,
           error: "No changes to commit",
         };
       }
 
+      const stats = this.getCommitStats(changeSet);
+      DebugLogger.info(
+        `[CommitOrchestrator] Commit stats: ${stats.filesCreated} created, ${stats.filesUpdated} updated, ${stats.filesDeleted} deleted, ${stats.docsYmlChanges} docs.yml changes`
+      );
+
       const gitFiles = await this.buildGitHubFiles(
         commitPlan,
         changeSet,
         config
+      );
+
+      DebugLogger.info(
+        `[CommitOrchestrator] Committing ${gitFiles.length} files to ${config.owner}/${config.repo}#${config.branch}`
       );
 
       const response = await this.githubApi.createCommit({
@@ -103,12 +118,24 @@ export class CommitOrchestrator {
         files: gitFiles,
       });
 
+      if (response.success) {
+        DebugLogger.info(
+          `[CommitOrchestrator] Commit successful: ${response.commitSha}`
+        );
+      } else {
+        DebugLogger.error(
+          `[CommitOrchestrator] Commit failed: ${response.error}`
+        );
+      }
+
       return response;
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      DebugLogger.error(`[CommitOrchestrator] Commit error: ${errorMessage}`);
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : "Unknown error occurred",
+        error: errorMessage,
       };
     }
   }

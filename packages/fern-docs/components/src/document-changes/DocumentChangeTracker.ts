@@ -1,3 +1,4 @@
+import { DebugLogger } from "./DebugLogger";
 import {
   BaseState,
   Change,
@@ -115,6 +116,10 @@ export class DocumentChangeSetImpl implements DocumentChangeSet {
       timestamp: Date.now(),
     } as Change;
 
+    DebugLogger.debug(
+      `[DocumentChangeSet] Adding change: ${change.type} ${(change as any).path || ""}`
+    );
+
     // Create new instance with the added change
     const newChanges = [...this.changes, change];
 
@@ -218,6 +223,7 @@ export class DocumentChangeTracker {
    * For example: create -> delete = no net change
    */
   compactChanges(changeSet: DocumentChangeSet): DocumentChangeSet {
+    const originalChangeCount = changeSet.changes.length;
     const compactedChanges: Change[] = [];
     const fileChangeMap = new Map<FilePath, Change[]>();
     const docsYmlChanges: Change[] = [];
@@ -250,6 +256,13 @@ export class DocumentChangeTracker {
 
     // Sort by timestamp to maintain chronological order
     compactedChanges.sort((a, b) => a.timestamp - b.timestamp);
+
+    const newChangeCount = compactedChanges.length;
+    if (originalChangeCount !== newChangeCount) {
+      DebugLogger.info(
+        `[DocumentChangeTracker] Compacted ${originalChangeCount} changes to ${newChangeCount} changes`
+      );
+    }
 
     return new DocumentChangeSetImpl(changeSet.baseState, compactedChanges);
   }

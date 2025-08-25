@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useRef } from "react";
 
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { useSidebarClientNavigation } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 import { MdxToHtmlResponse } from "@fern-docs/mdx";
 
-import { useBranch } from "@/providers/BranchContext";
 import { useCurrentPage } from "@/providers/CurrentPageContext";
 import { useMdxState } from "@/providers/MdxStateContext";
 import { useOriginalElements } from "@/providers/OriginalElementsContext";
@@ -38,8 +36,6 @@ export default function PageContents({
   initialFrontmatter,
   initialOriginalElements,
   initialOriginalFrontmatter,
-  clientNodeId,
-  serverData,
 }: PageContents.Props) {
   const { title, subtitle } = initialFrontmatter ?? {};
 
@@ -51,8 +47,6 @@ export default function PageContents({
     mdxDepsStore,
     stageChanges,
   } = useMdxState();
-  const { branch } = useBranch();
-  const { updateClientPageData } = useSidebarClientNavigation();
 
   // Use shared document changes system from MdxStateContext
   // The updateFile call will be handled through stageChanges which calls updateFile internally
@@ -74,12 +68,12 @@ export default function PageContents({
 
   // Replace usePageSync with new document change tracking
   useEffect(() => {
-    // Only sync if we have the required data
+    // Only sync if we have the required data and stageChanges is available
     if (
-      !branch ||
       !pageData.html ||
       !pageData.frontmatter ||
-      !pageData.originalElements
+      !pageData.originalElements ||
+      !stageChanges
     ) {
       return;
     }
@@ -109,57 +103,19 @@ export default function PageContents({
       hasStagedChanges.current = false;
     }
 
-    if (clientNodeId) {
-      // This is a client page - update client navigation data
-      if (updateClientPageData) {
-        void updateClientPageData(clientNodeId, completePageData);
-      }
+    // Stage changes for localStorage persistence
+    if (lastStagedDataHash.current !== currentDataHash) {
+      // Always stage changes from the editor to ensure localStorage persistence
+      stageChanges(filename, {
+        html: completePageData.html,
+        frontmatter: completePageData.frontmatter,
+        originalElements: completePageData.originalElements,
+        changed: true,
+      });
+      lastStagedDataHash.current = currentDataHash;
+      hasStagedChanges.current = true;
     }
-
-    // Document changes are now handled through stageChanges in MdxStateContext
-
-    // Stage changes for commit
-    if (stageChanges && lastStagedDataHash.current !== currentDataHash) {
-      let shouldStage = false;
-
-      if (clientNodeId) {
-        // Always stage client pages since they don't exist on server
-        shouldStage = true;
-      } else if (serverData) {
-        // For server pages, check if data differs from server
-        const dataHasChanges =
-          completePageData.html !== serverData.html ||
-          JSON.stringify(completePageData.frontmatter) !==
-            JSON.stringify(serverData.frontmatter) ||
-          JSON.stringify(completePageData.originalElements) !==
-            JSON.stringify(serverData.originalElements);
-
-        shouldStage = dataHasChanges;
-      } else {
-        // Server page without server data - stage to be safe
-        shouldStage = true;
-      }
-
-      if (shouldStage) {
-        stageChanges(filename, {
-          html: completePageData.html,
-          frontmatter: completePageData.frontmatter,
-          originalElements: completePageData.originalElements,
-          changed: true,
-        });
-        lastStagedDataHash.current = currentDataHash;
-        hasStagedChanges.current = true;
-      }
-    }
-  }, [
-    clientNodeId,
-    branch,
-    filename,
-    pageData,
-    updateClientPageData,
-    stageChanges,
-    serverData,
-  ]);
+  }, [filename, pageData, stageChanges]);
 
   const { originalElements, setOriginalElements } = useOriginalElements();
 

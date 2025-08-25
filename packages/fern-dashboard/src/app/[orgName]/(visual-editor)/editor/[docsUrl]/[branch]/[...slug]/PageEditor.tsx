@@ -24,7 +24,7 @@ export default function PageEditor({
   filename,
   initialHtml,
 }: PageEditor.Props) {
-  const { stageChanges, changedMdxFiles } = useMdxState();
+  const { stageChanges, changedMdxFiles, documentChanges } = useMdxState();
   const { setOriginalElements } = useOriginalElements();
 
   // Store the first normalized HTML string from the editor
@@ -36,6 +36,9 @@ export default function PageEditor({
 
   // Track whether the last change came from internal TipTap editing or external source
   const lastChangeFromTiptap = useRef(false);
+
+  // Track if we've loaded localStorage data for this file
+  const hasLoadedFromStorage = useRef(false);
 
   function onTiptapEditorCreate(props: EditorEvents["create"]) {
     const latestTiptapHtml = props.editor.getHTML();
@@ -60,6 +63,12 @@ export default function PageEditor({
   }
 
   useEffect(() => {
+    // Check if we have localStorage data loaded and this file has changed content
+    const hasStoredChanges =
+      changedMdxFiles[filename] &&
+      documentChanges.changeSet &&
+      !documentChanges.isLoading;
+
     if (changedMdxFiles[filename]) {
       const currHtmlFromMdx = mdxToHtml(changedMdxFiles[filename], {
         treatAsCustomElement: ["code"],
@@ -69,8 +78,15 @@ export default function PageEditor({
       if (currHtmlFromMdx.html !== currentHtmlRef.current) {
         currentHtmlRef.current = currHtmlFromMdx.html;
 
+        // Mark as loaded from storage if this is the first time we're seeing stored data
+        if (hasStoredChanges && !hasLoadedFromStorage.current) {
+          hasLoadedFromStorage.current = true;
+          // When loading from storage, don't treat it as a TipTap change
+          lastChangeFromTiptap.current = false;
+        }
+
         // Only update originalElements if this change did NOT come from TipTap editing
-        // (i.e., it came from an external source like the dev panel)
+        // (i.e., it came from an external source like the dev panel or localStorage load)
         // This prevents the originalElements from being updated when the user is typing in the editor (yields flashing)
         if (!lastChangeFromTiptap.current) {
           setOriginalElements(currHtmlFromMdx.originalElements);
@@ -80,7 +96,13 @@ export default function PageEditor({
         lastChangeFromTiptap.current = false;
       }
     }
-  }, [changedMdxFiles, filename, setOriginalElements]);
+  }, [
+    changedMdxFiles,
+    filename,
+    setOriginalElements,
+    documentChanges.changeSet,
+    documentChanges.isLoading,
+  ]);
 
   // TODO: add a loading state, possibly as a Suspense boundary
   return (
