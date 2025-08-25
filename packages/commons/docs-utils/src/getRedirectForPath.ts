@@ -17,7 +17,7 @@ export function matchPath(
   path: string
 ): ReturnType<ReturnType<typeof match>> {
   if (pattern === path) {
-    return { params: {}, path, index: 0 };
+    return { params: {}, path };
   }
   try {
     return match(pattern)(path);
