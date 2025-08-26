@@ -353,52 +353,6 @@ const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
   );
 };
 
-// const DropZoneContent: React.FC<{ maxSize: number; limit: number }> = ({
-//   maxSize,
-//   limit,
-// }) => (
-//   <>
-//     <div
-//       className={cn(
-//         "relative flex w-full max-w-none cursor-pointer justify-center rounded-lg border-2 border-dashed border-gray-500 text-center transition-colors",
-//         {
-//           "border-blue-500 bg-blue-50": isDragOver,
-//           "hover:bg-gray-50": !isDragOver,
-//         }
-//       )}
-//       onDragOver={handleDragOver}
-//       onDragLeave={handleDragLeave}
-//       onDrop={handleDrop}
-//     >
-//       <div className="text-muted-foreground flex items-center gap-2">
-//         <CloudArrowUpIcon className="size-8" />
-//         <p>Add an image</p>
-//       </div>
-//     </div>
-{
-  /* 
-
-    <div className="tiptap-image-upload-dropzone">
-      <FileIcon />
-      <FileCornerIcon />
-      <div className="tiptap-image-upload-icon-container">
-        <CloudUploadIcon />
-      </div>
-    </div>
-
-    <div className="tiptap-image-upload-content">
-      <span className="tiptap-image-upload-text">
-        <em>Click to upload</em> or drag and drop
-      </span>
-      <span className="tiptap-image-upload-subtext">
-        Maximum {limit} file{limit === 1 ? "" : "s"}, {maxSize / 1024 / 1024}MB
-        each.
-      </span>
-    </div> */
-}
-//   </>
-// );
-
 export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   const { accept, limit, maxSize } = props.node.attrs;
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -488,7 +442,16 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
                     <input
                       type="file"
                       accept="image/*"
-                      // onChange={handleFileSelect}
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (!files || files.length === 0) {
+                          extension.options.onError?.(
+                            new Error("No file selected")
+                          );
+                          return;
+                        }
+                        void handleUpload(Array.from(files));
+                      }}
                       className="absolute inset-0 cursor-pointer opacity-0"
                     />
                   </button>
