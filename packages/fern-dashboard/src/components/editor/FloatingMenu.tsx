@@ -83,7 +83,7 @@ export default function FloatingMenu() {
           editor.chain().focus().toggleBlockquote().run();
           break;
         case "toggleImage":
-          editor.chain().focus().insertImage().run();
+          editor.chain().focus().setImageUploadNode().run();
           break;
         // TODO: Add link
         // case "setLink":

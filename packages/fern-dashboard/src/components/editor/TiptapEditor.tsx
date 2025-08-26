@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
+import { Image } from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import UniqueID from "@tiptap/extension-unique-id";
 import {
@@ -12,6 +13,7 @@ import {
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
+import "@/components/editor/tiptap-node/image-node/image-node.scss";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useEditor } from "@/providers/EditorContext";
 
@@ -20,7 +22,7 @@ import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
 import CustomElement from "./extension-custom-element";
 import GlobalDataHashAttribute from "./extension-global-data-hash-attribute";
-import ImageNode from "./extension-image/image-node";
+import { ImageUploadNode } from "./tiptap-node/image-upload-node";
 
 // These node types are the ones that will have data attributes set on them
 const dataAttributeNodeTypes = [
@@ -40,7 +42,23 @@ const dataAttributeNodeTypes = [
 const extensions = [
   StarterKit,
   CustomElement,
-  ImageNode,
+  Image,
+  ImageUploadNode.configure({
+    accept: "image/*",
+    maxSize: 1024 * 1024 * 5, // 5MB
+    limit: 1,
+    upload: async () =>
+      new Promise<string>((resolve) =>
+        setTimeout(
+          () =>
+            resolve(
+              "https://files.buildwithfern.com/fern.docs.buildwithfern.com/learn/2025-08-25T21:13:03.657Z/products/docs/pages/getting-started/images/configure.png"
+            ),
+          2000
+        )
+      ),
+    onError: (error) => console.error("Upload failed:", error),
+  }),
   UniqueID.configure({
     types: dataAttributeNodeTypes,
   }),
