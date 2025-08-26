@@ -28,7 +28,7 @@ export default function NodeHoverHandle() {
         type: "paragraph",
         content: [{ type: "text", text: "/" }],
       })
-      .setTextSelection(nodeEnd + 2) // Position cursor after the "/"
+      .setTextSelection(nodeEnd + 1) // Position cursor after the "/"
       .run();
   };
 

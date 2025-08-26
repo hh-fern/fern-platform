@@ -151,10 +151,7 @@ const ALIASED_HTML_COMPONENTS = {
   H4: (props: ComponentProps<"h4">) => HeadingRenderer(4, props),
   H5: (props: ComponentProps<"h5">) => HeadingRenderer(5, props),
   H6: (props: ComponentProps<"h6">) => HeadingRenderer(6, props),
-  Image: (props: any) => {
-    console.log("🔗 MDX Components: Image component triggered with props:", props);
-    return SelfResolvingImage(props);
-  },
+  Image: (props: any) => SelfResolvingImage(props),
   Li,
   Ol,
   Strong,
@@ -170,9 +167,6 @@ export const MDX_COMPONENTS = {
 } as unknown as MDXComponents;
 
 export function createMdxComponents(jsxElements: string[]): MDXComponents {
-  console.log("🏗️ Creating MDX components with jsxElements:", jsxElements);
-  console.log("🏗️ Available MDX_COMPONENTS keys:", Object.keys(MDX_COMPONENTS).filter(k => k.includes('img') || k.includes('Image')));
-  
   return {
     // spread in jsx elements that may be unsupported
     // TODO: fix this type, any is used here just to get this working

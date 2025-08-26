@@ -4,6 +4,9 @@ import { ReactNodeViewRenderer } from "@tiptap/react";
 
 import { ImageUploadNode as ImageUploadNodeComponent } from "@/components/editor/tiptap-node/image-upload-node/image-upload-node";
 
+/**
+ * This file is boilerplate from Tiptap's image-upload-node.
+ */
 export type UploadFunction = (
   file: File,
   onProgress?: (event: { progress: number }) => void,
