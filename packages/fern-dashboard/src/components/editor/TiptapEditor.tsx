@@ -20,6 +20,7 @@ import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
 import CustomElement from "./extension-custom-element";
 import GlobalDataHashAttribute from "./extension-global-data-hash-attribute";
+import ImageNode from "./extension-image/image-node";
 
 // These node types are the ones that will have data attributes set on them
 const dataAttributeNodeTypes = [
@@ -39,6 +40,7 @@ const dataAttributeNodeTypes = [
 const extensions = [
   StarterKit,
   CustomElement,
+  ImageNode,
   UniqueID.configure({
     types: dataAttributeNodeTypes,
   }),

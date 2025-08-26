@@ -1,37 +1,62 @@
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, useMemo } from "react";
 
 import { useCurrentEditor } from "@tiptap/react";
 import { FloatingMenu as EditorFloatingMenu } from "@tiptap/react/menus";
 
 import { Icon } from "@/components/icon/Icon";
 
-type FloatingMenuAction =
-  | "toggleHeading1"
-  | "toggleHeading2"
-  | "toggleHeading3"
-  | "toggleBulletList"
-  | "toggleOrderedList"
-  | "toggleQuote"
-  | "setLink"
-  | "plainText";
+import { FloatingMenuAction, menuItems } from "./floating-menu-options";
 
 export default function FloatingMenu() {
   const { editor } = useCurrentEditor();
+
+  // Get the search query from the current text after "/"
+  const searchQuery = useMemo(() => {
+    if (!editor) return "";
+
+    const { selection } = editor.state;
+    const { $from } = selection;
+
+    if (
+      $from.parent.type.name !== "paragraph" ||
+      !$from.parent.textContent.startsWith("/")
+    ) {
+      return "";
+    }
+
+    // Extract text after "/" for filtering
+    return $from.parent.textContent.slice(1).toLowerCase();
+  }, [editor?.state.selection]);
+
+  // Filter menu items based on search query
+  const filteredItems = useMemo(() => {
+    if (!searchQuery) return menuItems;
+
+    return menuItems.filter(
+      (item) =>
+        item.title.toLowerCase().includes(searchQuery) ||
+        item.keywords.some((keyword) => keyword.includes(searchQuery))
+    );
+  }, [searchQuery]);
 
   function menuItemClickHandler(action: FloatingMenuAction) {
     return () => {
       if (!editor) return;
 
-      // Remove the "/" character first
+      // Remove the entire search text (including "/" and any typed text)
       const { selection } = editor.state;
       const { $from } = selection;
 
       if ($from.parent.textContent.startsWith("/")) {
-        // Delete the "/" character
+        // Delete the entire search text from start of paragraph
+        const searchTextLength = $from.parent.textContent.length;
         editor
           .chain()
           .focus()
-          .deleteRange({ from: $from.start(), to: $from.start() + 1 })
+          .deleteRange({
+            from: $from.start(),
+            to: $from.start() + searchTextLength,
+          })
           .run();
       }
 
@@ -56,6 +81,9 @@ export default function FloatingMenu() {
           break;
         case "toggleQuote":
           editor.chain().focus().toggleBlockquote().run();
+          break;
+        case "toggleImage":
+          editor.chain().focus().insertImage().run();
           break;
         // TODO: Add link
         // case "setLink":
@@ -92,41 +120,20 @@ export default function FloatingMenu() {
     >
       <div className="border-1 text-gray-1100 rounded-2 flex min-w-60 flex-col border-gray-500 bg-white p-1 pt-2 shadow-sm">
         <FloatingMenuHeading title="Basics" />
-        <FloatingMenuItem
-          title="Text"
-          iconProps={{ variant: "Type" }}
-          onClick={menuItemClickHandler("plainText")}
-        />
-        <FloatingMenuItem
-          title="Heading 1"
-          iconProps={{ variant: "Heading1" }}
-          onClick={menuItemClickHandler("toggleHeading1")}
-        />
-        <FloatingMenuItem
-          title="Heading 2"
-          iconProps={{ variant: "Heading2" }}
-          onClick={menuItemClickHandler("toggleHeading2")}
-        />
-        <FloatingMenuItem
-          title="Heading 3"
-          iconProps={{ variant: "Heading3" }}
-          onClick={menuItemClickHandler("toggleHeading3")}
-        />
-        <FloatingMenuItem
-          title="Bulleted list"
-          iconProps={{ variant: "List" }}
-          onClick={menuItemClickHandler("toggleBulletList")}
-        />
-        <FloatingMenuItem
-          title="Numbered list"
-          iconProps={{ variant: "ListOrdered" }}
-          onClick={menuItemClickHandler("toggleOrderedList")}
-        />
-        <FloatingMenuItem
-          title="Quote"
-          iconProps={{ variant: "MessageSquareQuote" }}
-          onClick={menuItemClickHandler("toggleQuote")}
-        />
+        {filteredItems.length > 0 ? (
+          filteredItems.map((item) => (
+            <FloatingMenuItem
+              key={item.action}
+              title={item.title}
+              iconProps={item.iconProps}
+              onClick={menuItemClickHandler(item.action)}
+            />
+          ))
+        ) : (
+          <div className="px-3 py-2 text-sm text-gray-500">
+            No components found for &ldquo;{searchQuery}&rdquo;
+          </div>
+        )}
         {/* 
         TODO: Add link
         <FloatingMenuItem
