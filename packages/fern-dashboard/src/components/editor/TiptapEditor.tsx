@@ -18,6 +18,7 @@ import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useEditor } from "@/providers/EditorContext";
 
 import BubbleMenu from "./BubbleMenu";
+import { ErrorUploadImageToast } from "./EditorToasts";
 import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
 import CustomElement from "./extension-custom-element";
@@ -57,7 +58,7 @@ const extensions = [
           2000
         )
       ),
-    onError: (error) => console.error("Upload failed:", error),
+    onError: (error) => ErrorUploadImageToast(error),
   }),
   UniqueID.configure({
     types: dataAttributeNodeTypes,
