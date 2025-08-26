@@ -2,11 +2,11 @@ import {
   type ReactNode,
   createContext,
   useContext,
-  useMemo,
+  useRef,
   useSyncExternalStore,
 } from "react";
 
-import { SiteEditorLocalStorage } from "./SiteEditorStorage";
+import { createSiteEditorLocalStorage } from "./SiteEditorStorage";
 import { SiteEditorStore } from "./SiteEditorStore";
 
 const SiteEditorContext = createContext<SiteEditorStore | null>(null);
@@ -20,10 +20,15 @@ export function SiteEditorProvider({
   children,
   store,
 }: SiteEditorProviderProps) {
-  const defaultStore = useMemo(
-    () => store ?? new SiteEditorStore(new SiteEditorLocalStorage()),
-    [store]
-  );
+  const defaultStoreRef = useRef<SiteEditorStore | null>(null);
+
+  if (!store && !defaultStoreRef.current) {
+    defaultStoreRef.current = new SiteEditorStore(
+      createSiteEditorLocalStorage()
+    );
+  }
+
+  const defaultStore = store ?? defaultStoreRef.current;
 
   return (
     <SiteEditorContext.Provider value={defaultStore}>
@@ -42,19 +47,7 @@ export function useSiteEditorStore() {
     );
   }
 
-  const changes = useSyncExternalStore(
-    store.subscribe,
-    store.getSnapshot,
-    store.getServerSnapshot
-  );
+  const snapshot = useSyncExternalStore(store.subscribe, store.getSnapshot);
 
-  return {
-    changes,
-    isReady: store.isReady(),
-    hasChanges: store.hasChanges(),
-    getChange: (key: string) => store.getChange(key),
-    setChange: (key: string, value: string) => store.setChange(key, value),
-    removeChange: (key: string) => store.removeChange(key),
-    clearAllChanges: () => store.clearAllChanges(),
-  };
+  return snapshot;
 }

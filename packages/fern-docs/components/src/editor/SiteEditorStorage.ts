@@ -1,48 +1,121 @@
-export interface SiteEditorStorage {
-  get(key: string): Promise<string | null>;
-  set(key: string, value: string): Promise<void>;
-  remove(key: string): Promise<void>;
-  clear(): Promise<void>;
-  keys(): Promise<string[]>;
-}
+import {
+  SiteEditorPageStore,
+  SiteEditorRootStore,
+  SiteEditorYmlConfigStore,
+} from "./types";
 
-export class SiteEditorLocalStorage implements SiteEditorStorage {
-  private prefix: string;
+const STORAGE_KEY = "site-editor:";
+const PAGE_KEY = "page:";
+const YML_CONFIG_KEY = "yml-config:";
 
-  constructor(prefix = "site-editor:") {
-    this.prefix = prefix;
+// TODO: add Zod validation to all get/set methods
+export class SiteEditorStorage {
+  private _storage: Storage;
+  private _pageKey: string;
+  private _ymlConfigKey: string;
+
+  constructor(
+    storage: Storage,
+    pageKey = PAGE_KEY,
+    ymlConfigKey = YML_CONFIG_KEY
+  ) {
+    this._storage = storage;
+    this._pageKey = pageKey;
+    this._ymlConfigKey = ymlConfigKey;
   }
 
-  async get(key: string): Promise<string | null> {
+  getPage(pagePath: string): SiteEditorPageStore | null {
+    const page = this._storage.get(this._pageKey + pagePath);
+    return page ? JSON.parse(page) : null;
+  }
+
+  setPage(page: SiteEditorPageStore): void {
+    this._storage.set(this._pageKey + page.path, JSON.stringify(page));
+  }
+
+  removePage(pagePath: string): void {
+    this._storage.remove(this._pageKey + pagePath);
+  }
+
+  getYmlConfig(configPath: string): SiteEditorYmlConfigStore | null {
+    const ymlConfig = this._storage.get(this._ymlConfigKey + configPath);
+    return ymlConfig ? JSON.parse(ymlConfig) : null;
+  }
+
+  setYmlConfig(config: SiteEditorYmlConfigStore): void {
+    this._storage.set(this._ymlConfigKey, JSON.stringify(config));
+  }
+
+  removeYmlConfig(): void {
+    this._storage.remove(this._ymlConfigKey);
+  }
+
+  getRoot(): SiteEditorRootStore | null {
+    const configPath: SiteEditorRootStore["path"] = "fern/docs.yml";
+    return this.getYmlConfig(configPath) as SiteEditorRootStore | null;
+  }
+
+  setRoot(root: SiteEditorRootStore): void {
+    this.setYmlConfig(root);
+  }
+
+  removeRoot(): void {
+    this.removeYmlConfig();
+  }
+}
+
+export function createSiteEditorLocalStorage(): SiteEditorStorage {
+  return new SiteEditorStorage(new LocalStorage());
+}
+
+export function createSiteEditorMemoryStorage(): SiteEditorStorage {
+  return new SiteEditorStorage(new MapStorage());
+}
+
+interface Storage {
+  get(key: string): string | null;
+  set(key: string, value: string): void;
+  remove(key: string): void;
+  clear(): void;
+}
+
+class LocalStorage implements Storage {
+  private _storageKey: string;
+
+  constructor(storageKey = STORAGE_KEY) {
+    this._storageKey = storageKey;
+  }
+
+  get(key: string): string | null {
     try {
-      return localStorage.getItem(this.prefix + key);
+      return localStorage.getItem(this._storageKey + key);
     } catch (error) {
       console.error(error);
       return null;
     }
   }
 
-  async set(key: string, value: string): Promise<void> {
+  set(key: string, value: string): void {
     try {
-      localStorage.setItem(this.prefix + key, value);
+      localStorage.setItem(this._storageKey + key, value);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async remove(key: string): Promise<void> {
+  remove(key: string): void {
     try {
-      localStorage.removeItem(this.prefix + key);
+      localStorage.removeItem(this._storageKey + key);
     } catch (error) {
       console.error(error);
     }
   }
 
-  async clear(): Promise<void> {
+  clear(): void {
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key?.startsWith(this.prefix)) {
+        if (key?.startsWith(this._storageKey)) {
           localStorage.removeItem(key);
         }
       }
@@ -50,44 +123,24 @@ export class SiteEditorLocalStorage implements SiteEditorStorage {
       console.error(error);
     }
   }
-
-  async keys(): Promise<string[]> {
-    try {
-      const keys: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith(this.prefix)) {
-          keys.push(key.substring(this.prefix.length));
-        }
-      }
-      return keys;
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
-  }
 }
 
-export class SiteEditorMemoryStorage implements SiteEditorStorage {
-  private storage = new Map<string, string>();
+class MapStorage implements Storage {
+  private _map = new Map<string, string>();
 
-  async get(key: string): Promise<string | null> {
-    return this.storage.get(key) ?? null;
+  get(key: string): string | null {
+    return this._map.get(key) ?? null;
   }
 
-  async set(key: string, value: string): Promise<void> {
-    this.storage.set(key, value);
+  set(key: string, value: string): void {
+    this._map.set(key, value);
   }
 
-  async remove(key: string): Promise<void> {
-    this.storage.delete(key);
+  remove(key: string): void {
+    this._map.delete(key);
   }
 
-  async clear(): Promise<void> {
-    this.storage.clear();
-  }
-
-  async keys(): Promise<string[]> {
-    return Array.from(this.storage.keys());
+  clear(): void {
+    this._map.clear();
   }
 }
