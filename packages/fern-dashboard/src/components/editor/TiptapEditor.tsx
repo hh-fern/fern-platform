@@ -13,6 +13,7 @@ import {
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
+import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import "@/components/editor/tiptap-node/image-node/image-node.scss";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useEditor } from "@/providers/EditorContext";
@@ -48,16 +49,56 @@ const extensions = [
     accept: "image/*",
     maxSize: 1024 * 1024 * 5, // 5MB
     limit: 1,
-    upload: async () =>
-      new Promise<string>((resolve) =>
-        setTimeout(
-          () =>
-            resolve(
-              "https://files.buildwithfern.com/fern.docs.buildwithfern.com/learn/2025-08-25T21:13:03.657Z/products/docs/pages/getting-started/images/configure.png"
-            ),
-          2000
-        )
-      ),
+    upload: async (
+      file: File,
+      onProgress?: (event: { progress: number }) => void,
+      signal?: AbortSignal
+    ) => {
+      try {
+        // Get pre-signed URL from our API
+        const response = await DashboardApiClient.uploadImage({
+          fileName: file.name,
+          contentType: file.type,
+          docsUrl: "visual-editor-test.docs.buildwithfern.com",
+          slug: "test/slug",
+        });
+        console.log("response", response);
+
+        // Upload file directly to S3 using pre-signed URL (avoids excess server load)
+        const uploadResponse = await fetch(response.uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type,
+          },
+          signal,
+        });
+        console.log("uploadresponse", uploadResponse);
+
+        if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
+          console.error("S3 upload failed:", {
+            status: uploadResponse.status,
+            statusText: uploadResponse.statusText,
+            errorText,
+          });
+          throw new Error(
+            `Failed to upload file: ${uploadResponse.status} ${uploadResponse.statusText}. ${errorText}`
+          );
+        }
+
+        // Report progress as completed
+        onProgress?.({ progress: 100 });
+
+        // Return the final image URL
+        return response.imageUrl;
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error("Upload failed");
+      }
+    },
     onError: (error) => ErrorUploadImageToast(error),
   }),
   UniqueID.configure({
