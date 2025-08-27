@@ -56,6 +56,20 @@ const extensions = [
     ) => {
       try {
         // Get pre-signed URL from our API
+        // Simulate a 15 second upload process
+        await new Promise((resolve) => {
+          const interval = setInterval(() => {
+            const progress = Math.min(85, (Date.now() - start) / 150);
+            onProgress?.({ progress });
+          }, 100);
+
+          const start = Date.now();
+          setTimeout(() => {
+            clearInterval(interval);
+            resolve(null);
+          }, 15000);
+        });
+
         const response = await DashboardApiClient.generateSignedUploadUrl({
           fileName: file.name,
           contentType: file.type,
