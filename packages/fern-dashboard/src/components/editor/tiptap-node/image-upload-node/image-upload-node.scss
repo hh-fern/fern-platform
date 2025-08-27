@@ -2,13 +2,11 @@
   --tiptap-image-upload-active: var(--blue-5);
   --tiptap-image-upload-progress-bg: var(--green-3);
   --tiptap-image-upload-icon-bg: var(--green-5);
-
   --tiptap-image-upload-text-color: var(--grayscale-8);
   --tiptap-image-upload-subtext-color: var(--grayscale-a6);
   --tiptap-image-upload-border: var(--tt-gray-light-a-300);
   --tiptap-image-upload-border-hover: var(--blue-5);
   --tiptap-image-upload-border-active: var(--blue-500);
-
   --tiptap-image-upload-icon-color: var(--white);
 }
 
@@ -16,19 +14,17 @@
   --tiptap-image-upload-active: var(--tt-brand-color-400);
   --tiptap-image-upload-progress-bg: var(--tt-brand-color-900);
   --tiptap-image-upload-icon-bg: var(--grayscale-a1);
-
   --tiptap-image-upload-text-color: var(--grayscale-a8);
   --tiptap-image-upload-subtext-color: var(--grayscale-a6);
   --tiptap-image-upload-border: var(--tt-gray-dark-a-300);
   --tiptap-image-upload-border-hover: var(--tt-gray-dark-a-400);
   --tiptap-image-upload-border-active: var(--tt-brand-color-400);
-
   --tiptap-image-upload-icon-color: var(--black);
 }
 
 .tiptap-image-upload {
   margin: 2rem 0;
-  font-family: "gtPlanar";
+  font-family: gtPlanar;
 
   input[type="file"] {
     display: none;

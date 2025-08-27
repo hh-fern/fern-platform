@@ -26,7 +26,7 @@ export default function FloatingMenu() {
 
     // Extract text after "/" for filtering
     return $from.parent.textContent.slice(1).toLowerCase();
-  }, [editor?.state.selection]);
+  }, [editor]);
 
   // Filter menu items based on search query
   const filteredItems = useMemo(() => {
