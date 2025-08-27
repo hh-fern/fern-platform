@@ -82,6 +82,8 @@ export default function PageEditor({
     }
   }, [changedMdxFiles, filename, setOriginalElements]);
 
+  console.log(currentHtmlRef.current);
+
   // TODO: add a loading state, possibly as a Suspense boundary
   return (
     <TiptapEditor

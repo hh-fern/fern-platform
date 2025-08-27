@@ -8,7 +8,7 @@ import { CustomElementNodeView } from "./CustomElementNodeView";
 /**
  * The tag name for the custom element node. Also used as the node name and the plugin key.
  */
-const TAG = "custom-element";
+const TAG = "custom-element-v2";
 
 export interface CustomElementOptions {
   /**
@@ -27,15 +27,15 @@ export const CustomElement = Node.create<CustomElementOptions>({
 
   group: "block",
 
-  content: "text*",
+  content: "block*",
 
-  atom: true,
+  atom: false,
 
   draggable: true,
 
   selectable: false,
 
-  code: true,
+  // code: true,
 
   /**
    * The data attributes are used to store the original content of the custom element.
@@ -43,27 +43,30 @@ export const CustomElement = Node.create<CustomElementOptions>({
    */
   addAttributes() {
     return {
-      "data-hash": {
+      "fve-data-hash": {
         default: null,
       },
-      "data-type": {
+      "fve-data-type": {
         default: null,
       },
-      "data-name": {
+      "fve-data-name": {
+        default: null,
+      },
+      "fve-data-props": {
         default: null,
       },
       /**
        * Set contenteditable to false to prevent the custom element from being edited.
        */
       contenteditable: {
-        default: false,
+        default: true,
       },
     };
   },
 
   addNodeView() {
     return ReactNodeViewRenderer(CustomElementNodeView, {
-      as: "custom-element",
+      as: "custom-element-v2",
       attrs: ({ node }) => ({
         ...node.attrs,
       }),
