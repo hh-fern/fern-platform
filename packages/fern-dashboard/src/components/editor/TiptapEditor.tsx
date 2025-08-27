@@ -56,13 +56,13 @@ const extensions = [
     ) => {
       try {
         // Get pre-signed URL from our API
-        const response = await DashboardApiClient.uploadImage({
+        const response = await DashboardApiClient.generateSignedUploadUrl({
           fileName: file.name,
           contentType: file.type,
           docsUrl: "visual-editor-test.docs.buildwithfern.com",
           slug: "test/slug",
         });
-        console.log("response", response);
+        onProgress?.({ progress: 90 });
 
         // Upload file directly to S3 using pre-signed URL (avoids excess server load)
         const uploadResponse = await fetch(response.uploadUrl, {
@@ -73,7 +73,6 @@ const extensions = [
           },
           signal,
         });
-        console.log("uploadresponse", uploadResponse);
 
         if (!uploadResponse.ok) {
           const errorText = await uploadResponse.text();
@@ -90,7 +89,6 @@ const extensions = [
         // Report progress as completed
         onProgress?.({ progress: 100 });
 
-        // Return the final image URL
         return response.imageUrl;
       } catch (error) {
         if (error instanceof Error) {
