@@ -15,6 +15,7 @@ import { postCreatePr } from "@/app/api/post-git-create-pr/route";
 import { preloadEditorData } from "@/app/api/preload-editor-data/route";
 import { updatePrStatus } from "@/app/api/update-pr-status/route";
 import { updatePrTitle } from "@/app/api/update-pr-title/route";
+import { uploadImage } from "@/app/api/upload-image/route";
 
 export const DashboardApiClient = {
   getMyDocsSites: (
@@ -73,6 +74,8 @@ export const DashboardApiClient = {
     typedFetch<updatePrTitle.Response>("/api/update-pr-title", request),
   updatePrStatus: (request: updatePrStatus.Request) =>
     typedFetch<updatePrStatus.Response>("/api/update-pr-status", request),
+  uploadImage: (request: uploadImage.Request) =>
+    typedFetch<uploadImage.Response>("/api/upload-image", request),
 };
 
 export class ApiError extends Error {
