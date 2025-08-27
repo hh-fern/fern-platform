@@ -308,7 +308,6 @@ interface ImageUploadPreviewProps {
  */
 const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
   fileItem,
-  // onRemove,
 }) => {
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
@@ -413,8 +412,27 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
     void handleUpload(Array.from(files));
   };
 
+  // Handles URL submission via input field in URL tab
   const handleUrlSubmit = () => {
-    console.log("handleUrlSubmit", imageUrl);
+    const pos = props.getPos();
+    if (pos == null) {
+      extension.options.onError?.(new Error("No position found"));
+      return;
+    }
+    props.editor
+      .chain()
+      .focus()
+      .deleteRange({ from: pos, to: pos + props.node.nodeSize })
+      .insertContentAt(pos, {
+        type: extension.options.type,
+        attrs: {
+          ...extension.options,
+          src: imageUrl,
+          alt: "image",
+          title: "image",
+        },
+      })
+      .run();
   };
 
   const hasFiles = fileItems.length > 0;
@@ -425,8 +443,8 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
         <Popover>
           <PopoverTrigger className="w-full">
             <ImageUploadDragArea onFile={(files) => void handleUpload(files)}>
-              <div className="flex w-full items-center justify-center rounded-lg border-2 border-dashed border-gray-500">
-                <div className="text-muted-foreground flex items-center gap-2">
+              <div className="flex w-full items-center justify-center rounded-lg border-2 border-dashed border-gray-500 p-3">
+                <div className="tiptap-image-upload-text flex items-center gap-2">
                   <CloudArrowUpIcon className="size-8" />
                   <p>Add an image</p>
                 </div>
