@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 
 import { useMDXComponents } from "@mdx-js/react";
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import DOMPurify from "dompurify";
 import { getMDXComponent } from "mdx-bundler/client";
+
+import { ChildrenMiddlewareProvider } from "@fern-docs/components";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "@/docs/components/error-boundary";
@@ -27,12 +29,7 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
   const { originalElements } = useOriginalElements();
   const components = useMDXComponents();
 
-  const originalElement = useMemo(
-    () => originalElements[hash],
-    [originalElements, hash]
-  );
-
-  console.log("boopy", attrs, originalElements, originalElement);
+  const originalElement = originalElements[hash];
 
   // Check that the element has code and is supported, otherwise return undefined
   function getComponentIfExists(
@@ -84,8 +81,14 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
   }, [originalElement?.content]);
 
   const Component = useMemo(() => {
-    // If element exists but hasn't been bundled yet AND we have content to bundle, show loading
+    // Logging: Check if we're about to show the loading skeleton
     if (originalElement?.content && !originalElement?.bundleAttempted) {
+      console.info(
+        "[CustomElementNodeView] Showing loading skeleton for element with hash:",
+        hash,
+        "name:",
+        originalElement?.name
+      );
       const LoadingComponent = () => <Skeleton className="h-24 w-full" />;
       LoadingComponent.displayName = "LoadingComponent";
       return LoadingComponent;
@@ -98,18 +101,48 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
       typeof MDX_COMPONENTS[originalElement.name] !== "undefined"
     ) {
       try {
+        console.info(
+          "[CustomElementNodeView] Rendering MDX component:",
+          originalElement.name,
+          "with hash:",
+          hash
+        );
         const MDXComponent = getMDXComponent(originalElement.code);
         const MDXWrapper = () => <MDXComponent components={components} />;
         MDXWrapper.displayName = "MDXWrapper";
         return MDXWrapper;
       } catch (error) {
-        console.warn("Failed to create MDX component:", error);
+        console.warn(
+          "[CustomElementNodeView] Failed to create MDX component:",
+          originalElement.name,
+          "with hash:",
+          hash,
+          "Error:",
+          error
+        );
         // Fall through to HTML rendering if MDX fails
       }
+    } else if (
+      originalElement?.code &&
+      originalElement?.name &&
+      typeof MDX_COMPONENTS[originalElement.name] === "undefined"
+    ) {
+      console.warn(
+        "[CustomElementNodeView] MDX component name not found in MDX_COMPONENTS:",
+        originalElement.name,
+        "with hash:",
+        hash
+      );
     }
 
     // Step 2: Try HTML rendering if content looks like HTML
     if (htmlContent) {
+      console.info(
+        "[CustomElementNodeView] Rendering HTML content for element with hash:",
+        hash,
+        "name:",
+        originalElement?.name
+      );
       const HTMLWrapper = () => (
         <>
           <StyleInjector
@@ -138,6 +171,16 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
     }
 
     // Step 3: Fallback to unsupported content
+    console.warn(
+      "[CustomElementNodeView] Falling back to unsupported content for element with hash:",
+      hash,
+      "name:",
+      originalElement?.name,
+      "textContent:",
+      textContent,
+      "originalElements:",
+      originalElements
+    );
     const fallbackComponent =
       getComponentIfExists(originalElement?.code, originalElement?.name) ??
       (() => <UnsupportedContent>{textContent}</UnsupportedContent>);
@@ -163,7 +206,9 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
       }
     >
       <NodeViewWrapper>
-        <Component />
+        <ChildrenMiddlewareProvider value={(_) => <NodeViewContent />}>
+          <Component />
+        </ChildrenMiddlewareProvider>
       </NodeViewWrapper>
     </ErrorBoundary>
   );

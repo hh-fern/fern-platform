@@ -35,3 +35,7 @@ export * from "./syntax-highlighter";
 export * from "./theme";
 export * from "./FernLinkButton";
 export * from "./sidebar/nodes";
+export {
+  ChildrenMiddlewareProvider,
+  useChildrenMiddleware,
+} from "./ChildrenMiddlewareContext";

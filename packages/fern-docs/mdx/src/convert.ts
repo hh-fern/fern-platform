@@ -188,7 +188,6 @@ export function mdxToHtml(
   // Note: this will only include top-level elements, not nested ones
   const originalElements: OriginalElements = {};
 
-  console.log("HELLO THERE");
   // Default handler for base elements
   function baseElementHandler(
     state: ToHastState,
@@ -231,9 +230,6 @@ export function mdxToHtml(
     }
     const { hash, content } = getNodeContent(node, rootContent);
     originalElements[hash] = { content, type, name };
-
-    console.log(JSON.stringify(node, null, 2));
-    console.log("---bop---");
 
     if (isMdxJsxElement(node)) {
       return mdxCustomElementNodev2(hash, nodeType, node, state);
@@ -349,13 +345,36 @@ export function htmlToMdx(
     let name: string | null = null;
     const attributes: MdxJsxAttribute[] = [];
 
+    // Deserialize fve-data-props if present and add as attributes
+    if (typeof props["fve-data-props"] === "string") {
+      try {
+        const deserializedProps = JSON.parse(props["fve-data-props"]);
+        if (deserializedProps && typeof deserializedProps === "object") {
+          for (const [propName, propValue] of Object.entries(
+            deserializedProps
+          )) {
+            attributes.push({
+              type: "mdxJsxAttribute",
+              name: propName,
+              value: propValue as string,
+            });
+          }
+        }
+      } catch (err) {
+        throw new Error(
+          `Failed to parse fve-data-props as JSON: ${(err as Error).message}`
+        );
+      }
+    }
+
+    // Also handle fve-data-name for the element name
+    if (typeof props["fve-data-name"] === "string") {
+      name = props["fve-data-name"];
+    }
+
+    // Optionally, handle legacy fve-data-prop-* attributes (if any)
     for (const [key, value] of Object.entries(props)) {
-      if (key === "fve-data-name" && typeof value === "string") {
-        name = value;
-      } else if (
-        key.startsWith("fve-data-prop-") &&
-        typeof value === "string"
-      ) {
+      if (key.startsWith("fve-data-prop-") && typeof value === "string") {
         // Custom prop, strip prefix
         attributes.push({
           type: "mdxJsxAttribute",
@@ -820,9 +839,12 @@ function mdxCustomElementNodev2(
     processedChildren = state.all(node);
   }
 
-  const mappedAttrs = attributes.map(({ name, value }) => {
-    return [`fve-data-prop-${name}`, value];
-  });
+  // Serialize all props to a JSON string for fve-data-props
+  const propsObject: Record<string, string> = {};
+  for (const { name, value } of attributes) {
+    propsObject[name] = value;
+  }
+  const serializedProps = JSON.stringify(propsObject);
 
   return {
     type: "element" as const,
@@ -832,7 +854,7 @@ function mdxCustomElementNodev2(
       "fve-data-hash": hash,
       "fve-data-type": type,
       "fve-data-name": node.name,
-      ...Object.fromEntries(mappedAttrs),
+      "fve-data-props": serializedProps,
     },
     children: processedChildren,
   };
