@@ -21,7 +21,7 @@ import {
 
 export const CustomElementNodeView = (props: NodeViewProps) => {
   const { attrs, textContent } = props.node;
-  const hash = attrs["data-hash"];
+  const hash = attrs["fve-data-hash"];
 
   const cssConfig = useCSS();
   const { originalElements } = useOriginalElements();
@@ -31,6 +31,8 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
     () => originalElements[hash],
     [originalElements, hash]
   );
+
+  console.log("boopy", attrs, originalElements, originalElement);
 
   // Check that the element has code and is supported, otherwise return undefined
   function getComponentIfExists(

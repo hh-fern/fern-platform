@@ -110,6 +110,8 @@ export default async function Page({
             treatAsUnsupported: ["math"],
           })
         : {};
+
+  console.log(html);
   return (
     // TODO: Currently, we are force-hiding the table of contents is within Visual Editor.
     // This is a temporary solution, as I anticipate we will want the TOC to be dynamic based

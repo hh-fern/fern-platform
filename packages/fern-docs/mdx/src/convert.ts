@@ -15,7 +15,13 @@ import {
   frontmatterToMarkdown,
 } from "mdast-util-frontmatter";
 import { mathFromMarkdown, mathToMarkdown } from "mdast-util-math";
-import { mdxFromMarkdown, mdxToMarkdown } from "mdast-util-mdx";
+import {
+  MdxJsxAttribute,
+  MdxJsxFlowElement,
+  MdxJsxTextElement,
+  mdxFromMarkdown,
+  mdxToMarkdown,
+} from "mdast-util-mdx";
 import {
   Handler as ToHastHandler,
   State as ToHastState,
@@ -26,6 +32,8 @@ import { toMarkdown } from "mdast-util-to-markdown";
 import { frontmatter as fm } from "micromark-extension-frontmatter";
 import { math } from "micromark-extension-math";
 import { mdxjs } from "micromark-extension-mdxjs";
+
+import { MdxJsxElement } from "./mdast";
 
 // Options for how yaml is written to the frontmatter
 const FRONTMATTER_YAML_OPTIONS: yaml.DumpOptions = {
@@ -180,6 +188,7 @@ export function mdxToHtml(
   // Note: this will only include top-level elements, not nested ones
   const originalElements: OriginalElements = {};
 
+  console.log("HELLO THERE");
   // Default handler for base elements
   function baseElementHandler(
     state: ToHastState,
@@ -209,14 +218,27 @@ export function mdxToHtml(
   }
 
   // Default handler for custom elements
-  function customElementHandler(_: ToHastState, node: any, __?: MdastParents) {
+  function customElementHandler(
+    state: ToHastState,
+    node: any,
+    __?: MdastParents
+  ) {
     const { type, name } = getNodeInfo(node);
+
     const nodeType = type as CustomElementsType;
     if (treatAsUnsupported.includes(nodeType)) {
       throw new Error(`Unsupported node type: ${nodeType}`);
     }
     const { hash, content } = getNodeContent(node, rootContent);
     originalElements[hash] = { content, type, name };
+
+    console.log(JSON.stringify(node, null, 2));
+    console.log("---bop---");
+
+    if (isMdxJsxElement(node)) {
+      return mdxCustomElementNodev2(hash, nodeType, node, state);
+    }
+
     return mdxCustomElementNode(hash, content, nodeType, name);
   }
 
@@ -270,6 +292,8 @@ export function mdxToHtml(
   // Get html from hast
   const html = toHtml(hast);
 
+  console.log(html);
+
   return { html, frontmatter, originalFrontmatter, originalElements };
 }
 
@@ -317,6 +341,37 @@ export function htmlToMdx(
     );
 
     return { type: "html", value: placeholder } as any;
+  };
+
+  const customElementv2Handler: ToMdastHandle = (state, element) => {
+    // Parse fve-data-* properties into MDX attributes and extract name/type/hash
+    const props = element.properties || {};
+    let name: string | null = null;
+    const attributes: MdxJsxAttribute[] = [];
+
+    for (const [key, value] of Object.entries(props)) {
+      if (key === "fve-data-name" && typeof value === "string") {
+        name = value;
+      } else if (
+        key.startsWith("fve-data-prop-") &&
+        typeof value === "string"
+      ) {
+        // Custom prop, strip prefix
+        attributes.push({
+          type: "mdxJsxAttribute",
+          name: key.replace(/^fve-data-prop-/, ""),
+          value,
+        });
+      }
+    }
+
+    // TODO(cberry): don't coerce the type here, handle the error, with honor
+    return {
+      type: "mdxJsxFlowElement",
+      name,
+      attributes,
+      children: state.all(element),
+    } as MdxJsxFlowElement;
   };
 
   // Get mdast from hast (and handle custom elements)
@@ -459,6 +514,7 @@ export function htmlToMdx(
 
       // Custom elements
       ["custom-element"]: customElementHandler,
+      ["custom-element-v2"]: customElementv2Handler,
     } as any,
     newlines: true,
   });
@@ -532,6 +588,14 @@ function getNodeInfo(node: any) {
     type: node.type as string,
     name: node.name as string | undefined,
   };
+}
+
+function isMdxJsxElement(node: any): node is MdxJsxElement {
+  return (
+    node &&
+    typeof node === "object" &&
+    (node.type === "mdxJsxFlowElement" || node.type === "mdxJsxTextElement")
+  );
 }
 
 // Get node content in a type-safe way
@@ -723,5 +787,53 @@ function mdxCustomElementNode(
         value: content,
       },
     ],
+  };
+}
+
+function getAttributes(node: MdxJsxElement): { name: string; value: string }[] {
+  // Extracts attributes from an MdxJsxElement node and returns them as an array of { name, value } objects.
+  // Handles both string and expression attribute values.
+  if (!node || !Array.isArray(node.attributes)) {
+    return [];
+  }
+  return node.attributes
+    .filter((attr) => attr.type === "mdxJsxAttribute" && attr.value != null)
+    .map((attr) => {
+      const coerced = attr as MdxJsxAttribute;
+      return {
+        name: coerced.name,
+        value: coerced.value!.toString(),
+      };
+    });
+}
+
+// Create node for a custom element -- colton v2 test
+function mdxCustomElementNodev2(
+  hash: NodeHash,
+  type: CustomElementsType,
+  node: MdxJsxElement,
+  state: ToHastState
+) {
+  const attributes = getAttributes(node);
+  let processedChildren: ReturnType<typeof state.all> = [];
+  if (node.children.length > 0) {
+    processedChildren = state.all(node);
+  }
+
+  const mappedAttrs = attributes.map(({ name, value }) => {
+    return [`fve-data-prop-${name}`, value];
+  });
+
+  return {
+    type: "element" as const,
+    tagName: "custom-element-v2",
+    // These data attributes help the client to handle the custom element
+    properties: {
+      "fve-data-hash": hash,
+      "fve-data-type": type,
+      "fve-data-name": node.name,
+      ...Object.fromEntries(mappedAttrs),
+    },
+    children: processedChildren,
   };
 }
