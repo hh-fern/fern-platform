@@ -195,9 +195,20 @@ export function mdxToHtml(
       // Early return if the node is not hashable
       return getToHastDefaultHandler(nodeType)(state, node, parents);
     }
+    if (nodeType === "image" || nodeType === "imageReference") {
+      console.log("[1 - mdxToHtml] IMAGE NODE", node, nodeType, state, parents);
+
+      return {
+        type: "html",
+        value: `<img src="${node.url}" alt="${node.alt || ""}" title="${node.title || ""}" />`,
+      } as any;
+    }
+
     const { hash, content } = getNodeContent(node, rootContent);
     originalElements[hash] = { content, type, name };
-    return mdxBaseElementNode(
+
+    // Fallback to default handler
+    const baseElementNode = mdxBaseElementNode(
       hash,
       content,
       nodeType,
@@ -206,18 +217,53 @@ export function mdxToHtml(
       node,
       parents
     );
+    console.log("[2 - mdxToHtml] BASE ELEMENT NODE", baseElementNode);
+    return baseElementNode;
   }
 
   // Default handler for custom elements
   function customElementHandler(_: ToHastState, node: any, __?: MdastParents) {
+    console.log("[2 - mdxToHtml] CUSTOM ELEMENT NODE", node);
     const { type, name } = getNodeInfo(node);
     const nodeType = type as CustomElementsType;
     if (treatAsUnsupported.includes(nodeType)) {
       throw new Error(`Unsupported node type: ${nodeType}`);
     }
+
+    if (type === "image" || name === "img") {
+      console.log("[2 - mdxToHtml] USTOM ELEMENT NODE - IMAGE", node, nodeType);
+      const src = node?.attributes?.find(
+        (attr: any) => attr.name === "src"
+      )?.value;
+      const alt = node?.attributes?.find(
+        (attr: any) => attr.name === "alt"
+      )?.value;
+      const title = node?.attributes?.find(
+        (attr: any) => attr.name === "title"
+      )?.value;
+      return {
+        type: "element",
+        tagName: "img",
+        properties: {
+          src,
+          ...(alt ? { alt } : {}),
+          ...(title ? { title } : {}),
+        },
+      } as any;
+    }
+
     const { hash, content } = getNodeContent(node, rootContent);
     originalElements[hash] = { content, type, name };
-    return mdxCustomElementNode(hash, content, nodeType, name);
+
+    // Create custom element node
+    const customElementNode = mdxCustomElementNode(
+      hash,
+      content,
+      nodeType,
+      name
+    );
+    console.log("[3 - mdxToHtml] CUSTOM ELEMENT NODE", customElementNode);
+    return customElementNode;
   }
 
   // Get hast from mdast (and handle custom elements)
@@ -267,8 +313,12 @@ export function mdxToHtml(
     },
   });
 
+  console.log("[1 - mdxToHtml] HAST", hast);
+
   // Get html from hast
   const html = toHtml(hast);
+
+  console.log("[1 - mdxToHtml] HTML", html);
 
   return { html, frontmatter, originalFrontmatter, originalElements };
 }
@@ -290,9 +340,18 @@ export function htmlToMdx(
 ): HtmlToMdxResponse {
   // Get hast from html
   const hast = fromHtml(html);
+  console.log("hast", hast);
 
   // Default handler for base elements
   const baseElementHandler: ToMdastHandle = (state, element) => {
+    console.log(`🔧 [htmlToMdx] Processing ${element.tagName}:`, element);
+    if (element.tagName === "img") {
+      return {
+        type: "html",
+        value: `<img src="${element.properties?.src || ""}" alt="${element.properties?.alt || ""}" title="${element.properties?.title || ""}" />`,
+      };
+    }
+
     if (
       element.properties?.dataHash &&
       typeof element.properties.dataHash === "string" &&
@@ -303,9 +362,9 @@ export function htmlToMdx(
       const placeholder = getCustomElementPlaceholder(
         String(element.properties.dataHash)
       );
-
-      return { type: "html", value: placeholder } as any;
+      return { type: "html", value: placeholder };
     }
+
     return getToMdastDefaultHandler(element.tagName as any)(state, element);
   };
 
