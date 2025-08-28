@@ -195,12 +195,6 @@ export function mdxToHtml(
       // Early return if the node is not hashable
       return getToHastDefaultHandler(nodeType)(state, node, parents);
     }
-    if (nodeType === "image" || nodeType === "imageReference") {
-      return {
-        type: "html",
-        value: `<img src="${node.url}" alt="${node.alt || ""}" title="${node.title || ""}" />`,
-      };
-    }
 
     const { hash, content } = getNodeContent(node, rootContent);
     originalElements[hash] = { content, type, name };
@@ -344,13 +338,17 @@ export function htmlToMdx(
 
   // Default handler for base elements
   const baseElementHandler: ToMdastHandle = (state, element) => {
+    // Handle image nodes manually to ensure they don't get translated into markdown images !()[]
     if (element.tagName === "img") {
       return {
         type: "html",
-        value: `<img src="${element.properties?.src || ""}" alt="${element.properties?.alt || ""}" title="${element.properties?.title || ""}" />`,
+        value: `<img src="${element.properties?.src || ""}"${
+          element.properties?.alt ? ` alt="${element.properties?.alt}"` : ""
+        }${element.properties?.title ? ` title="${element.properties?.title}"` : ""} />`,
       };
     }
 
+    // Handle image upload nodes manually to ensure they maintain their data-type attribute
     if (
       element.tagName === "div" &&
       element.properties?.dataType === "image-upload"
