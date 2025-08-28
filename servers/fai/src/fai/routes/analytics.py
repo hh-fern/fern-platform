@@ -1,3 +1,4 @@
+from ast import Pass
 from datetime import datetime
 from typing import List
 from typing import Optional
@@ -8,6 +9,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from fern.src.fern.fai.resources.analytics.service.service import AbstractAnalyticsService
 from src.fai.app import fai_app
 from src.fai.dependencies import get_db
 from src.fai.models.api.query import QueryApi
@@ -16,6 +18,16 @@ from src.fai.utils.histogram_utils import fetch_grouped_data
 from src.fai.utils.histogram_utils import fill_date_gaps
 from src.fai.utils.insights_utils import get_insights_from_queries
 from src.settings import LOGGER
+
+
+class AnalyticsSerivce(AbstractAnalyticsService):
+    def get_histogram_analytics(self):
+        pass
+
+    def get_insights(self):
+        pass
+
+AnalyticsSerivce();
 
 
 @fai_app.get("/analytics/histogram/{domain}")
