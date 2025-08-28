@@ -12,6 +12,8 @@ import {
 } from "@fern-docs/components/constants";
 
 import { SparklesIcon } from "@/components/PageActionsDropdownAssets";
+import { useIsAskAiEnabled } from "./search";
+import { isPreviewDomain } from "@fern-api/docs-utils";
 
 export const searchPanelInitializedAtom = atom(false);
 export const searchPanelOpenAtom = atom(false);
@@ -33,6 +35,7 @@ export const SearchPanelTrigger = React.memo(function SearchPanelTrigger({
   const isInitialized = useAtomValue(searchPanelInitializedAtom);
   const toggleAskAiSidePanel = useToggleSearchPanel();
   const isLocalEnvironment = isLocal();
+  const isAskAiEnabled = useIsAskAiEnabled();
 
   return (
     <FernButton
@@ -51,7 +54,11 @@ export const SearchPanelTrigger = React.memo(function SearchPanelTrigger({
         isSearchInSidebar && "w-9",
         (!isInitialized || isLocalEnvironment) && "cursor-not-allowed"
       )}
-      onClick={toggleAskAiSidePanel}
+      onClick={() => {
+        if (isAskAiEnabled && !isPreviewDomain(window.location.hostname)) {
+          toggleAskAiSidePanel();
+        }
+      }}
     />
   );
 });
