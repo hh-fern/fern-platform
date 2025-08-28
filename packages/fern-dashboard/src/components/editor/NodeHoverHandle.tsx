@@ -1,24 +1,25 @@
-import { useState } from "react";
-
 import { DragHandle } from "@tiptap/extension-drag-handle-react";
 import { useCurrentEditor } from "@tiptap/react";
 import { GripVertical, Plus } from "lucide-react";
 
 export default function NodeHoverHandle() {
   const { editor } = useCurrentEditor();
-  const [currentNode, setCurrentNode] = useState<{ pos: number } | null>(null);
 
   if (!editor) return null;
 
   const handleAddNodeBelow = () => {
-    if (!editor || !currentNode) return;
+    if (!editor) return;
+
+    // Get the current selection position
+    const selection = editor.state.selection;
+    const currentPos = selection.$anchor.pos;
 
     // Find the node at the current position
-    const node = editor.state.doc.nodeAt(currentNode.pos);
+    const node = editor.state.doc.nodeAt(currentPos);
     if (!node) return;
 
-    // Find the position after the current hovered node
-    const nodeEnd = currentNode.pos + node.nodeSize;
+    // Find the position after the current node
+    const nodeEnd = currentPos + node.nodeSize;
 
     // Insert a new paragraph after the current node and add "/" to trigger the floating menu
     editor
@@ -29,16 +30,12 @@ export default function NodeHoverHandle() {
         content: [{ type: "text", text: "/" }],
       })
       .setTextSelection(nodeEnd + 1) // Position cursor after the "/"
+      .focus(nodeEnd + 2)
       .run();
   };
 
   return (
-    <DragHandle
-      editor={editor}
-      onNodeChange={({ pos }) => {
-        setCurrentNode({ pos });
-      }}
-    >
+    <DragHandle editor={editor}>
       <div className="mr-2 flex cursor-grab flex-row items-center">
         <button
           onClick={handleAddNodeBelow}

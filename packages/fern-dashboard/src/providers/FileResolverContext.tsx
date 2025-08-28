@@ -20,14 +20,17 @@ export const FileResolverProvider = ({
 }) => {
   console.log("🔧 FileResolverProvider created with files:", {
     fileCount: Object.keys(files).length,
-    fileKeys: Object.keys(files).slice(0, 5)
+    fileKeys: Object.keys(files).slice(0, 5),
   });
 
   const resolveFileSrc = createDashboardFileResolver(files);
-  
+
   // Wrap the resolver to add more logging
   const wrappedResolver = async (src: string | undefined) => {
-    console.log("🎯 FileResolverProvider resolveFileSrc wrapper called with:", src);
+    console.log(
+      "🎯 FileResolverProvider resolveFileSrc wrapper called with:",
+      src
+    );
     const result = await resolveFileSrc(src);
     console.log("🎯 FileResolverProvider resolver returned:", result);
     return result;
