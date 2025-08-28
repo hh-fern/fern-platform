@@ -12,7 +12,6 @@ import {
   ErrorBoundaryFallback,
 } from "@/docs/components/error-boundary";
 
-import { SelfResolvingImage } from "./SelfResolvingImage";
 import { Accordion, AccordionGroup } from "./accordion";
 import { Availability } from "./availability";
 import { Badge } from "./badge";
@@ -38,7 +37,7 @@ import { Template } from "./code/Template";
 import { Column, ColumnGroup } from "./columns";
 import { Feature } from "./feature";
 import { Frame } from "./frame";
-import { A, HeadingRenderer, Li, Ol, Strong, Ul } from "./html";
+import { A, HeadingRenderer, Image, Li, Ol, Strong, Ul } from "./html";
 import { Table } from "./html-table";
 import { Icon } from "./icon/Icon";
 import { If } from "./if";
@@ -127,10 +126,7 @@ const HTML_COMPONENTS = {
   h4: (props: ComponentProps<"h4">) => HeadingRenderer(4, props),
   h5: (props: ComponentProps<"h5">) => HeadingRenderer(5, props),
   h6: (props: ComponentProps<"h6">) => HeadingRenderer(6, props),
-  img: (props: any) => {
-    console.log("🔗 MDX Components: img tag triggered with props:", props);
-    return SelfResolvingImage(props);
-  },
+  img: Image,
   li: Li,
   ol: Ol,
   strong: Strong,
@@ -151,7 +147,7 @@ const ALIASED_HTML_COMPONENTS = {
   H4: (props: ComponentProps<"h4">) => HeadingRenderer(4, props),
   H5: (props: ComponentProps<"h5">) => HeadingRenderer(5, props),
   H6: (props: ComponentProps<"h6">) => HeadingRenderer(6, props),
-  Image: (props: any) => SelfResolvingImage(props),
+  Image,
   Li,
   Ol,
   Strong,
