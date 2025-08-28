@@ -40,8 +40,11 @@ export default function PageEditor({
     originalTiptapHtml.current = latestTiptapHtml;
   }
 
+  console.log("current currentHtmlRef.current", currentHtmlRef.current);
+
   function onTiptapEditorUpdate(props: EditorEvents["update"]) {
     const latestTiptapHtml = props.editor.getHTML();
+    console.log("LATEST TIPTAP HTML", latestTiptapHtml);
 
     console.log("updated", latestTiptapHtml);
 

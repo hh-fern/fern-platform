@@ -381,9 +381,8 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
           const filename =
             files[index]?.name.replace(/\.[^/.]+$/, "") || "unknown";
           return {
-            type: extension.options.type,
+            type: "image" as const,
             attrs: {
-              ...extension.options,
               src: url,
               alt: filename,
               title: filename,
@@ -397,6 +396,8 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
           .deleteRange({ from: pos, to: pos + props.node.nodeSize })
           .insertContentAt(pos, imageNodes)
           .run();
+
+        console.log("NEW CONTENT", props.editor.getHTML());
 
         // focusNextNode(props.editor);
       }
@@ -424,15 +425,15 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
       .focus()
       .deleteRange({ from: pos, to: pos + props.node.nodeSize })
       .insertContentAt(pos, {
-        type: extension.options.type,
+        type: "image" as const,
         attrs: {
-          ...extension.options,
           src: imageUrl,
           alt: "image",
           title: "image",
         },
       })
       .run();
+    console.log("NEW CONTENT", props.editor.getHTML());
   };
 
   const hasFiles = fileItems.length > 0;

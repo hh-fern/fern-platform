@@ -44,7 +44,11 @@ const dataAttributeNodeTypes = [
 const extensions = [
   StarterKit,
   CustomElement,
-  Image,
+  Image.extend({
+    renderHTML({ HTMLAttributes }) {
+      return ["img", HTMLAttributes];
+    },
+  }),
   ImageUploadNode.configure({
     accept: "image/*",
     maxSize: 1024 * 1024 * 5, // 5MB
