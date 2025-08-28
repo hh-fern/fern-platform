@@ -59,6 +59,8 @@ const extensions = [
       signal?: AbortSignal
     ) => {
       try {
+        onProgress?.({ progress: 20 });
+
         // Get pre-signed URL from our API
         const response = await DashboardApiClient.generateSignedUploadUrl({
           fileName: file.name,

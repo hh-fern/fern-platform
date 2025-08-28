@@ -297,10 +297,6 @@ interface ImageUploadPreviewProps {
    * The file item to preview
    */
   fileItem: FileItem;
-  /**
-   * Callback to remove this file from upload queue
-   */
-  onRemove: () => void;
 }
 
 /**
@@ -367,8 +363,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
     onError: extension.options.onError,
   };
 
-  const { fileItems, uploadFiles, removeFileItem, clearAllFiles } =
-    useFileUpload(uploadOptions);
+  const { fileItems, uploadFiles } = useFileUpload(uploadOptions);
 
   const handleUpload = async (files: File[]) => {
     const urls = await uploadFiles(files);
@@ -396,10 +391,6 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
           .deleteRange({ from: pos, to: pos + props.node.nodeSize })
           .insertContentAt(pos, imageNodes)
           .run();
-
-        console.log("NEW CONTENT", props.editor.getHTML());
-
-        // focusNextNode(props.editor);
       }
     }
   };
@@ -416,6 +407,10 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   // Handles URL submission via input field in URL tab
   const handleUrlSubmit = () => {
     const pos = props.getPos();
+    if (imageUrl.trim() == null) {
+      extension.options.onError?.(new Error("No image URL provided"));
+      return;
+    }
     if (pos == null) {
       extension.options.onError?.(new Error("No position found"));
       return;
@@ -433,7 +428,6 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
         },
       })
       .run();
-    console.log("NEW CONTENT", props.editor.getHTML());
   };
 
   const hasFiles = fileItems.length > 0;
@@ -501,27 +495,8 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
 
       {hasFiles && (
         <div className="tiptap-image-upload-previews">
-          {fileItems.length > 1 && (
-            <div className="tiptap-image-upload-header">
-              <span>Uploading {fileItems.length} files</span>
-              <Button
-                type="button"
-                data-style="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  clearAllFiles();
-                }}
-              >
-                Clear All
-              </Button>
-            </div>
-          )}
           {fileItems.map((fileItem) => (
-            <ImageUploadPreview
-              key={fileItem.id}
-              fileItem={fileItem}
-              onRemove={() => removeFileItem(fileItem.id)}
-            />
+            <ImageUploadPreview key={fileItem.id} fileItem={fileItem} />
           ))}
         </div>
       )}

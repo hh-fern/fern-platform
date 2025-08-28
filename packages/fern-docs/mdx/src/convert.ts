@@ -196,12 +196,10 @@ export function mdxToHtml(
       return getToHastDefaultHandler(nodeType)(state, node, parents);
     }
     if (nodeType === "image" || nodeType === "imageReference") {
-      console.log("[1 - mdxToHtml] IMAGE NODE", node, nodeType, state, parents);
-
       return {
         type: "html",
         value: `<img src="${node.url}" alt="${node.alt || ""}" title="${node.title || ""}" />`,
-      } as any;
+      };
     }
 
     const { hash, content } = getNodeContent(node, rootContent);
@@ -217,21 +215,35 @@ export function mdxToHtml(
       node,
       parents
     );
-    console.log("[2 - mdxToHtml] BASE ELEMENT NODE", baseElementNode);
     return baseElementNode;
   }
 
   // Default handler for custom elements
   function customElementHandler(_: ToHastState, node: any, __?: MdastParents) {
-    console.log("[2 - mdxToHtml] CUSTOM ELEMENT NODE", node);
     const { type, name } = getNodeInfo(node);
     const nodeType = type as CustomElementsType;
     if (treatAsUnsupported.includes(nodeType)) {
       throw new Error(`Unsupported node type: ${nodeType}`);
     }
 
-    if (type === "image" || name === "img") {
-      console.log("[2 - mdxToHtml] USTOM ELEMENT NODE - IMAGE", node, nodeType);
+    // Handle image upload nodes
+    if (type === "mdxJsxFlowElement" && name === "div") {
+      const maybeDataType = node?.attributes?.find(
+        (attr: any) => attr.name === "data-type"
+      )?.value;
+      if (maybeDataType === "image-upload") {
+        return {
+          type: "element",
+          tagName: "div",
+          properties: {
+            dataType: "image-upload",
+          },
+        };
+      }
+    }
+
+    // Handle image nodes
+    if (type === "mdxJsxFlowElement" && name === "img") {
       const src = node?.attributes?.find(
         (attr: any) => attr.name === "src"
       )?.value;
@@ -249,21 +261,14 @@ export function mdxToHtml(
           ...(alt ? { alt } : {}),
           ...(title ? { title } : {}),
         },
-      } as any;
+      };
     }
 
     const { hash, content } = getNodeContent(node, rootContent);
     originalElements[hash] = { content, type, name };
 
     // Create custom element node
-    const customElementNode = mdxCustomElementNode(
-      hash,
-      content,
-      nodeType,
-      name
-    );
-    console.log("[3 - mdxToHtml] CUSTOM ELEMENT NODE", customElementNode);
-    return customElementNode;
+    return mdxCustomElementNode(hash, content, nodeType, name);
   }
 
   // Get hast from mdast (and handle custom elements)
@@ -313,12 +318,8 @@ export function mdxToHtml(
     },
   });
 
-  console.log("[1 - mdxToHtml] HAST", hast);
-
   // Get html from hast
   const html = toHtml(hast);
-
-  console.log("[1 - mdxToHtml] HTML", html);
 
   return { html, frontmatter, originalFrontmatter, originalElements };
 }
@@ -340,15 +341,23 @@ export function htmlToMdx(
 ): HtmlToMdxResponse {
   // Get hast from html
   const hast = fromHtml(html);
-  console.log("hast", hast);
 
   // Default handler for base elements
   const baseElementHandler: ToMdastHandle = (state, element) => {
-    console.log(`🔧 [htmlToMdx] Processing ${element.tagName}:`, element);
     if (element.tagName === "img") {
       return {
         type: "html",
         value: `<img src="${element.properties?.src || ""}" alt="${element.properties?.alt || ""}" title="${element.properties?.title || ""}" />`,
+      };
+    }
+
+    if (
+      element.tagName === "div" &&
+      element.properties?.dataType === "image-upload"
+    ) {
+      return {
+        type: "html",
+        value: `<div data-type="image-upload" />`,
       };
     }
 
