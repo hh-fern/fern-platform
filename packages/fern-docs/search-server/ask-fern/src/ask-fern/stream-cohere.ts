@@ -7,7 +7,6 @@ import {
   convertToModelMessages,
   createUIMessageStream,
   createUIMessageStreamResponse,
-  embed,
   stepCountIs,
   streamText,
 } from "ai";
@@ -15,20 +14,15 @@ import z from "zod";
 
 import { postToSlack, track } from "@fern-api/docs-server";
 import {
+  fernToken_admin,
   getFaiOrigin,
-  turbopufferApiKey,
 } from "@fern-api/docs-server/env-variables";
 import { FernFaiClient } from "@fern-api/fai-sdk";
 import { isNonNullish } from "@fern-api/ui-core-utils";
+import { FacetFilter } from "@fern-docs/search-keyword";
 
-import {
-  convertTpufRecordToCitation,
-  createChatSystemPrompt,
-  queryTurbopuffer,
-} from "../index";
-
-export const maxDuration = 60;
-export const revalidate = 0;
+import { convertTpufRecordToCitation, createChatSystemPrompt } from "../index";
+import { runQueryTurbopuffer } from "./run-query-turbopuffer";
 
 export async function runRouteForCohere({
   domain,
@@ -37,6 +31,8 @@ export async function runRouteForCohere({
   conversationId,
   lastUserMessage,
   messages,
+  filters,
+  explodedRoles,
   embeddingModel,
   turbopufferNamespace,
   languageModel,
@@ -47,6 +43,8 @@ export async function runRouteForCohere({
   conversationId: string;
   lastUserMessage: string;
   messages: UIMessage[];
+  filters: FacetFilter[];
+  explodedRoles: string[];
   embeddingModel: EmbeddingModel<string>;
   turbopufferNamespace: string;
   languageModel: LanguageModel;
@@ -57,11 +55,13 @@ export async function runRouteForCohere({
     embeddingModel,
     namespace: turbopufferNamespace,
     topK: 3,
+    filters,
+    explodedRoles,
   });
   const searchResultSources = searchResults.map((hit) => {
     return {
       title: hit.attributes.title,
-      url: `https://${hit.attributes.domain}${hit.attributes.pathname}${hit.attributes.hash ?? ""}`,
+      url: hit.attributes.url,
     };
   });
 
@@ -161,7 +161,7 @@ export async function runRouteForCohere({
           const queryId = crypto.randomUUID();
           const faiClient = new FernFaiClient({
             baseUrl: getFaiOrigin(),
-            token: () => "",
+            token: fernToken_admin(),
           });
           try {
             await faiClient.queries.createQuery({
@@ -203,32 +203,6 @@ export async function runRouteForCohere({
   });
 
   return createUIMessageStreamResponse({ stream: uiMessageStream });
-}
-
-async function runQueryTurbopuffer(
-  query: string | null | undefined,
-  opts: {
-    embeddingModel: EmbeddingModel<string>;
-    namespace: string;
-    topK?: number;
-    documentIdsToIgnore?: string[];
-  }
-) {
-  return query == null || query.trimStart().length === 0
-    ? []
-    : await queryTurbopuffer(query, {
-        namespace: opts.namespace,
-        apiKey: turbopufferApiKey(),
-        topK: opts.topK ?? 5,
-        vectorizer: async (text) => {
-          const embedding = await embed({
-            model: opts.embeddingModel,
-            value: text,
-          });
-          return embedding.embedding;
-        },
-        documentIdsToIgnore: opts.documentIdsToIgnore,
-      });
 }
 
 const rawCitationChunkFormatSchema = z.object({

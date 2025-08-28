@@ -10,7 +10,6 @@ import {
   convertToModelMessages,
   createUIMessageStream,
   createUIMessageStreamResponse,
-  embed,
   stepCountIs,
   streamText,
   tool,
@@ -19,23 +18,19 @@ import z from "zod";
 
 import { postToSlack, track } from "@fern-api/docs-server";
 import {
+  fernToken_admin,
   getFaiOrigin,
-  turbopufferApiKey,
 } from "@fern-api/docs-server/env-variables";
 import { FernFaiClient } from "@fern-api/fai-sdk";
+import { FacetFilter } from "@fern-docs/search-keyword";
 
 import {
   TurbopufferRecord,
   convertTpufRecordsToDocuments,
   createChatSystemPrompt,
-  queryTurbopuffer,
 } from "../index";
-
-export const maxDuration = 60;
-export const revalidate = 0;
-
-const TOP_K = 5;
-const MAX_QUERY_ATTEMPTS = 5;
+import { runQueryTurbopuffer } from "./run-query-turbopuffer";
+import { MAX_QUERY_ATTEMPTS, TOP_K } from "./stream-constants";
 
 export async function runRouteForAnthropic({
   domain,
@@ -44,6 +39,8 @@ export async function runRouteForAnthropic({
   conversationId,
   lastUserMessage,
   messages,
+  filters,
+  explodedRoles,
   embeddingModel,
   turbopufferNamespace,
   languageModel,
@@ -54,6 +51,8 @@ export async function runRouteForAnthropic({
   conversationId: string;
   lastUserMessage: string;
   messages: UIMessage[];
+  filters: FacetFilter[];
+  explodedRoles: string[];
   embeddingModel: EmbeddingModel<string>;
   turbopufferNamespace: string;
   languageModel: LanguageModel;
@@ -84,6 +83,8 @@ export async function runRouteForAnthropic({
     embeddingModel,
     namespace: turbopufferNamespace,
     topK: 3,
+    filters,
+    explodedRoles,
   });
   for (const result of turbopufferResults) {
     if (result.attributes.url) {
@@ -99,7 +100,7 @@ export async function runRouteForAnthropic({
   const searchResultSources = searchResults.map((hit) => {
     return {
       title: hit.attributes.title,
-      url: `https://${hit.attributes.domain}${hit.attributes.pathname}${hit.attributes.hash ?? ""}`,
+      url: hit.attributes.url,
     };
   });
 
@@ -148,22 +149,26 @@ export async function runRouteForAnthropic({
                   topK: TOP_K,
                   documentIdsToIgnore: documentIdsToIgnore,
                   urlsToIgnore: urlsToIgnore,
+                  filters,
+                  explodedRoles,
                 });
                 for (const hit of result) {
-                  const url =
-                    hit.attributes.url ??
-                    `https://${hit.attributes.domain}${hit.attributes.pathname}${hit.attributes.hash ?? ""}`;
+                  const url = hit.attributes.url;
                   documentIdsToIgnore.push(hit.id);
-                  if (!urlsToIgnore.includes(url)) {
+                  if (url != null && !urlsToIgnore.includes(url)) {
                     urlsToIgnore.push(url);
                     if (hit.attributes.document.length > 20000) {
                       response.push({
                         ...hit.attributes,
-                        url,
                         document: hit.attributes.document.slice(0, 20000),
+                        url,
                       });
                     } else {
-                      response.push({ url, ...hit.attributes });
+                      response.push({
+                        ...hit.attributes,
+                        document: hit.attributes.document,
+                        url,
+                      });
                     }
                     if (response.length >= TOP_K) {
                       return response;
@@ -214,7 +219,7 @@ export async function runRouteForAnthropic({
           const queryId = crypto.randomUUID();
           const faiClient = new FernFaiClient({
             baseUrl: getFaiOrigin(),
-            token: () => "",
+            token: fernToken_admin(),
           });
           try {
             await faiClient.queries.createQuery({
@@ -256,32 +261,4 @@ export async function runRouteForAnthropic({
   });
 
   return createUIMessageStreamResponse({ stream: uiMessageStream });
-}
-
-async function runQueryTurbopuffer(
-  query: string | null | undefined,
-  opts: {
-    embeddingModel: EmbeddingModel<string>;
-    namespace: string;
-    topK?: number;
-    documentIdsToIgnore?: string[];
-    urlsToIgnore?: string[];
-  }
-) {
-  return query == null || query.trimStart().length === 0
-    ? []
-    : await queryTurbopuffer(query, {
-        namespace: opts.namespace,
-        apiKey: turbopufferApiKey(),
-        topK: opts.topK ?? 5,
-        vectorizer: async (text) => {
-          const embedding = await embed({
-            model: opts.embeddingModel,
-            value: text,
-          });
-          return embedding.embedding;
-        },
-        documentIdsToIgnore: opts.documentIdsToIgnore,
-        urlsToIgnore: opts.urlsToIgnore,
-      });
 }

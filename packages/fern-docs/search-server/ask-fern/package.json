@@ -16,6 +16,7 @@
     "dist"
   ],
   "scripts": {
+    "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "tsc --build",
     "depcheck": "depcheck",
     "dev": "tsc --watch",
@@ -37,16 +38,18 @@
     "@fern-api/fai-sdk": "workspace:*",
     "@fern-api/fdr-sdk": "workspace:*",
     "@fern-api/ui-core-utils": "workspace:*",
+    "@fern-docs/search-keyword": "workspace:*",
     "@fern-docs/search-utils": "workspace:*",
     "@turbopuffer/turbopuffer": "^0.5.11",
     "ai": "5.0.0-beta.2",
+    "ai-fallback": "^1.0.2",
     "es-toolkit": "^1.32.0",
     "gpt-tokenizer": "2.9.0",
     "zod": "^3.25.49"
   },
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
-    "@types/node": "^18.11.9",
+    "@types/node": "^22.0.0",
     "depcheck": "^1.4.7",
     "stylelint": "^16.1.0",
     "tmp-promise": "^3.0.3",

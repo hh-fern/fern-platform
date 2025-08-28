@@ -1,10 +1,9 @@
-import {
-  FilterCondition,
-  Filters,
-  Turbopuffer,
-} from "@turbopuffer/turbopuffer";
+import { Turbopuffer } from "@turbopuffer/turbopuffer";
+
+import { FacetFilter } from "@fern-docs/search-keyword";
 
 import { TurbopufferRecord } from "../types";
+import { buildQueryFilters } from "./query-filters";
 import { reciprocalRankFusion } from "./reciprocal-rank-fusion";
 
 interface SemanticSearchOptions {
@@ -12,7 +11,8 @@ interface SemanticSearchOptions {
   namespace: string;
   apiKey: string;
   topK: number;
-  filters?: { facet: string; value: string }[];
+  filters?: FacetFilter[];
+  explodedRoles: string[];
 
   /**
    * The search mode to use.
@@ -33,6 +33,7 @@ export async function queryTurbopuffer(
     apiKey,
     topK,
     filters,
+    explodedRoles,
     mode = "hybrid",
     documentIdsToIgnore = [],
     urlsToIgnore = [],
@@ -46,40 +47,12 @@ export async function queryTurbopuffer(
 
   const vector = await vectorizer(query);
 
-  const documentIdFilters: FilterCondition[] = documentIdsToIgnore.map((id) => [
-    "id",
-    "NotEq",
-    id,
-  ]);
-
-  const urlFilters: FilterCondition[] = urlsToIgnore.map((url) => [
-    "url",
-    "NotEq",
-    url,
-  ]);
-
-  const versionFilters = filters
-    ? filters.filter((f) => f.facet === "version.title")
-    : [];
-
-  const queryFilters: Filters | undefined =
-    versionFilters.length > 0
-      ? [
-          "And",
-          [
-            ...versionFilters.map((f) => {
-              const filter: FilterCondition = ["version", "Eq", f.value];
-              return filter;
-            }),
-            ...documentIdFilters,
-            ...urlFilters,
-          ],
-        ]
-      : documentIdFilters.length > 0
-        ? documentIdFilters.length === 1
-          ? documentIdFilters[0]
-          : ["And", documentIdFilters]
-        : undefined;
+  const queryFilters = buildQueryFilters({
+    filters: filters ?? [],
+    explodedRoles,
+    documentIdsToIgnore,
+    urlsToIgnore,
+  });
 
   const semanticResults =
     mode !== "bm25"
@@ -101,7 +74,6 @@ export async function queryTurbopuffer(
           rank_by: [
             "Sum",
             [
-              ["chunk", "BM25", query],
               ["title", "BM25", query],
               ["keywords", "BM25", query],
             ],
