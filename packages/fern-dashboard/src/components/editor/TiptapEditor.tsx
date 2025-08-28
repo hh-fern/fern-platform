@@ -13,18 +13,16 @@ import {
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import "@/components/editor/tiptap-node/image-node/image-node.scss";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useEditor } from "@/providers/EditorContext";
 
 import BubbleMenu from "./BubbleMenu";
-import { ErrorUploadImageToast } from "./EditorToasts";
 import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
 import CustomElement from "./extension-custom-element";
 import GlobalDataHashAttribute from "./extension-global-data-hash-attribute";
-import { ImageUploadNode } from "./tiptap-node/image-upload-node";
+import { ConfiguredImageUploadNode } from "./tiptap-node/image-upload-node/configured-upload-node";
 
 // These node types are the ones that will have data attributes set on them
 const dataAttributeNodeTypes = [
@@ -48,62 +46,6 @@ const extensions = [
     renderHTML({ HTMLAttributes }) {
       return ["img", HTMLAttributes];
     },
-  }),
-  ImageUploadNode.configure({
-    accept: "image/*",
-    maxSize: 1024 * 1024 * 5, // 5MB
-    limit: 1,
-    upload: async (
-      file: File,
-      onProgress?: (event: { progress: number }) => void,
-      signal?: AbortSignal
-    ) => {
-      try {
-        onProgress?.({ progress: 20 });
-
-        // Get pre-signed URL from our API
-        const response = await DashboardApiClient.generateSignedUploadUrl({
-          fileName: file.name,
-          contentType: file.type,
-          docsUrl: "visual-editor-test.docs.buildwithfern.com", // TODO
-          slug: "test/slug", // TODO
-        });
-        onProgress?.({ progress: 90 });
-
-        // Upload file directly to S3 using pre-signed URL (avoids excess server load)
-        const uploadResponse = await fetch(response.uploadUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-          },
-          signal,
-        });
-
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text();
-          console.error("S3 upload failed:", {
-            status: uploadResponse.status,
-            statusText: uploadResponse.statusText,
-            errorText,
-          });
-          throw new Error(
-            `Failed to upload file: ${uploadResponse.status} ${uploadResponse.statusText}. ${errorText}`
-          );
-        }
-
-        // Report progress as completed
-        onProgress?.({ progress: 100 });
-
-        return response.imageUrl;
-      } catch (error) {
-        if (error instanceof Error) {
-          throw error;
-        }
-        throw new Error("Upload failed");
-      }
-    },
-    onError: (error) => ErrorUploadImageToast(error),
   }),
   UniqueID.configure({
     types: dataAttributeNodeTypes,
@@ -144,7 +86,7 @@ export default function TiptapEditor({
   return (
     <EditorProvider
       autofocus={autofocus}
-      extensions={extensions}
+      extensions={[...extensions, ConfiguredImageUploadNode()]}
       content={content}
       editorProps={{
         attributes: {
