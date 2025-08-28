@@ -1,11 +1,14 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 
 import { useMDXComponents } from "@mdx-js/react";
 import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import DOMPurify from "dompurify";
 import { getMDXComponent } from "mdx-bundler/client";
 
-import { ChildrenMiddlewareProvider } from "@fern-docs/components";
+import {
+  ChildrenMiddlewareProvider,
+  useChildrenMiddleware,
+} from "@fern-docs/components";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "@/docs/components/error-boundary";
@@ -206,10 +209,18 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
       }
     >
       <NodeViewWrapper>
-        <ChildrenMiddlewareProvider value={(_) => <NodeViewContent />}>
+        {/* <ChildrenMiddlewareProvider value={(_) => <NodeViewContent />}>
           <Component />
+        </ChildrenMiddlewareProvider> */}
+        <ChildrenMiddlewareProvider value={(_) => <NodeViewContent />}>
+          <Testing />
         </ChildrenMiddlewareProvider>
       </NodeViewWrapper>
     </ErrorBoundary>
   );
 };
+
+function Testing({ children }: React.PropsWithChildren) {
+  const intercepted = useChildrenMiddleware(children);
+  return intercepted;
+}
