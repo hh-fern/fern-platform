@@ -5,6 +5,7 @@ import React from "react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
+import { isPreviewDomain } from "@fern-api/docs-utils";
 import { FernButton, cn } from "@fern-docs/components";
 import {
   FERN_ASK_AI_BUTTON_ICON_ID,
@@ -12,8 +13,8 @@ import {
 } from "@fern-docs/components/constants";
 
 import { SparklesIcon } from "@/components/PageActionsDropdownAssets";
+
 import { useIsAskAiEnabled } from "./search";
-import { isPreviewDomain } from "@fern-api/docs-utils";
 
 export const searchPanelInitializedAtom = atom(false);
 export const searchPanelOpenAtom = atom(false);
