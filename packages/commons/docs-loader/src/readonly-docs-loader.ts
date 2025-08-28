@@ -227,7 +227,10 @@ export const getMetadataFromResponse = async (
   };
 };
 
-export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
+export const getMetadata = (
+  source: string,
+  cacheConfig: Required<CacheConfig>
+) =>
   cache(async (domain: string): Promise<DocsMetadata> => {
     "use cache";
     unstable_cacheTag(domain, "getMetadata");
@@ -242,12 +245,12 @@ export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
         )
       );
       if (cached.success) {
-        console.log("[getMetadata] cache hit:", cached.data);
+        console.log(`[getMetadata:${source}] cache hit:`, cached.data);
         return cached.data;
       }
     } catch (error) {
       console.warn(
-        `Failed to get metadata for ${domain} from kv, fallback to uncached`,
+        `[getMetadata:${source}] Failed to get metadata for ${domain} from kv, fallback to uncached`,
         error
       );
     }
@@ -1058,7 +1061,8 @@ export const createCachedDocsLoader = async (
   const authConfig = options?.skipAuth
     ? Promise.resolve(undefined)
     : getAuthConfig(domain);
-  const metadata = getMetadata(config)(withoutStaging(domain));
+  const source = "createCachedDocsLoader-host:" + host + "-domain:" + domain;
+  const metadata = getMetadata(source, config)(withoutStaging(domain));
 
   const getAuthState = options?.skipAuth
     ? async (_pathname?: string) => ({
