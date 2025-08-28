@@ -20,6 +20,9 @@ export default async function StaticPage({
   if (slug === "index.html") {
     return <RootPage />;
   }
+  if (domain === "[domain]") {
+    return <RootPage />;
+  }
   const loader = await createCachedDocsLoader(host, domain);
   return <SharedPage loader={loader} slug={slugjoin(slug)} />;
 }
