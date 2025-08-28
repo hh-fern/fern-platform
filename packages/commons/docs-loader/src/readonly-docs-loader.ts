@@ -227,11 +227,8 @@ export const getMetadataFromResponse = async (
   };
 };
 
-export const getMetadata = (
-  source: string,
-  cacheConfig: Required<CacheConfig>
-) =>
-  cache(async (domain: string): Promise<DocsMetadata> => {
+export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
+  cache(async (domain: string, source: string): Promise<DocsMetadata> => {
     "use cache";
     unstable_cacheTag(domain, "getMetadata");
     assertDocsDomain(domain);
@@ -1061,8 +1058,10 @@ export const createCachedDocsLoader = async (
   const authConfig = options?.skipAuth
     ? Promise.resolve(undefined)
     : getAuthConfig(domain);
-  const source = "createCachedDocsLoader-host:" + host + "-domain:" + domain;
-  const metadata = getMetadata(source, config)(withoutStaging(domain));
+  const metadata = getMetadata(config)(
+    withoutStaging(domain),
+    "createCachedDocsLoader"
+  );
 
   const getAuthState = options?.skipAuth
     ? async (_pathname?: string) => ({
