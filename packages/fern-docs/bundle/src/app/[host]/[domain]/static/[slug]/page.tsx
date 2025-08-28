@@ -20,7 +20,7 @@ export default async function StaticPage({
   if (slug === "index.html") {
     return <RootPage />;
   }
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, "static-page");
   return <SharedPage loader={loader} slug={slugjoin(slug)} />;
 }
 
@@ -30,6 +30,10 @@ export async function generateMetadata({
   params: Promise<{ host: string; domain: string; slug: string }>;
 }): Promise<Metadata> {
   const { host, domain, slug } = await params;
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(
+    host,
+    domain,
+    "generate-metadata"
+  );
   return generateMetadataFromPage({ loader, slug: slugjoin(slug) });
 }

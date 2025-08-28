@@ -24,6 +24,7 @@ export default async function VersionSelectPage({
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
+    "visual-editor-version-select-page",
     session?.accessToken
   );
 

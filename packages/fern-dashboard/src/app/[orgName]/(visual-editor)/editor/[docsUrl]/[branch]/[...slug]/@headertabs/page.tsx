@@ -19,6 +19,7 @@ export default async function HeaderTabsPage({
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
+    "visual-editor-header-tabs-page",
     session?.accessToken
   );
   const layout = await loader.getLayout();

@@ -19,6 +19,7 @@ export default async function EndpointSelectorPage({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "endpoint-selector-page",
     await getFernToken()
   );
   const root = await loader.getRoot();

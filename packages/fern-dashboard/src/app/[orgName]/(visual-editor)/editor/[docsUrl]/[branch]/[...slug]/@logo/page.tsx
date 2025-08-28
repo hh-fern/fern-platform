@@ -21,6 +21,7 @@ export default async function LogoPage({
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
+    "visual-editor-logo-page",
     session?.accessToken
   );
 

@@ -113,14 +113,22 @@ export const createEditableDocsLoader = cache(
   async (
     host: string,
     encodedDocsUrl: string,
+    source: string, // tracking down getMetadata() usage
     fern_token?: string,
     gitLoader?: GitLoader,
     forceRevalidate?: boolean
   ) => {
+    console.log(
+      "[created-editable-docs-loader] host:",
+      host,
+      "encodedDocsUrl:",
+      encodedDocsUrl
+    );
     // TODO: derive the domain from the workspace
     const docsLoader = await createCachedDocsLoader(
       host,
       decodeURIComponent(encodedDocsUrl),
+      `[source:${source}] createEditableDocsLoader`,
       fern_token,
       {
         returnRawMarkdown: true,

@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "sitemap",
     await getFernToken()
   );
   const root = await loader.getRoot();

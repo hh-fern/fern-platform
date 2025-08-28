@@ -33,6 +33,7 @@ export default async function ExplorerPage({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "explorer-page",
     await getFernToken()
   );
   const root = await loader.getRoot();

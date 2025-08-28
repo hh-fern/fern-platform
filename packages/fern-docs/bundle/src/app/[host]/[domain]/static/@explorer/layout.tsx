@@ -16,7 +16,7 @@ export default async function ExplorerLayout({
 }) {
   const { host, domain } = await params;
 
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, "explorer-layout");
   const edgeFlags = await loader.getEdgeFlags();
 
   return (

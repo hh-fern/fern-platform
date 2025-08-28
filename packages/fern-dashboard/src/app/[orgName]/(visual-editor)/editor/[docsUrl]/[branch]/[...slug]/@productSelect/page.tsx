@@ -21,6 +21,7 @@ export default async function ProductSelectPage({
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
+    "visual-editor-product-select-page",
     session?.accessToken
   );
 

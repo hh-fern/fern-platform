@@ -17,6 +17,7 @@ export default async function HeaderTabsPage({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "header-tabs-page",
     await getFernToken()
   );
   const layout = await loader.getLayout();

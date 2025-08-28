@@ -20,6 +20,7 @@ export default async function ExplorerLayout({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "dynamic-explorer-layout",
     await getFernToken()
   );
   const edgeFlags = await loader.getEdgeFlags();

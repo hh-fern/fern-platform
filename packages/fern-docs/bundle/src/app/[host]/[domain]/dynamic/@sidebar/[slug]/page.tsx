@@ -27,6 +27,7 @@ export default async function SidebarPage({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "sidebar-page",
     await getFernToken()
   );
   const config = await loader.getConfig();

@@ -1043,6 +1043,7 @@ export type DocsLoaderOptions = {
 export const createCachedDocsLoader = async (
   host: string,
   domain: string,
+  source: string, // tracking down getMetadata() usage
   fern_token?: string,
   options?: DocsLoaderOptions
 ): Promise<DocsLoader & { clearKvCache: () => Promise<void> }> => {
@@ -1060,7 +1061,7 @@ export const createCachedDocsLoader = async (
     : getAuthConfig(domain);
   const metadata = getMetadata(config)(
     withoutStaging(domain),
-    "createCachedDocsLoader"
+    `[source:${source}] createCachedDocsLoader`
   );
 
   const getAuthState = options?.skipAuth

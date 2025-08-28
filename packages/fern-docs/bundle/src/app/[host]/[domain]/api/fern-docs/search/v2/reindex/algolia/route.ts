@@ -34,7 +34,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const domain = getDocsDomainEdge(req);
 
   try {
-    const loader = await createCachedDocsLoader(host, domain);
+    const loader = await createCachedDocsLoader(
+      host,
+      domain,
+      "algolia-reindex"
+    );
     const metadata = await loader.getMetadata();
     if (metadata == null) {
       return NextResponse.json("Not found", { status: 404 });

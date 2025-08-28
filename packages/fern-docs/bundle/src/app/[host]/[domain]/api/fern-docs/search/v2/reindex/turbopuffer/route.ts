@@ -48,7 +48,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const namespace = getTurbopufferNamespace(domain, fernDocsIndexName);
 
   try {
-    const loader = await createCachedDocsLoader(host, domain);
+    const loader = await createCachedDocsLoader(
+      host,
+      domain,
+      "turbopuffer-reindex"
+    );
     const metadata = await loader.getMetadata();
     if (metadata == null) {
       return NextResponse.json("Not found", { status: 404 });

@@ -23,6 +23,7 @@ export default async function Page(props: {
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "page",
     await getFernToken()
   );
 
@@ -61,6 +62,7 @@ export async function generateMetadata({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "generate-metadata",
     await getFernToken()
   );
   const root = await loader.getRoot();

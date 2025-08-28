@@ -24,7 +24,7 @@ export default async function Layout({
   explorer: React.ReactNode;
 }) {
   const { host, domain } = await params;
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, "layout");
   return (
     <SharedLayout
       loader={loader}

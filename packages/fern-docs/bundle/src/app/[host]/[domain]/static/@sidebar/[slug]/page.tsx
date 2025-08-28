@@ -19,7 +19,7 @@ export default async function SidebarPage({
   params: Promise<{ host: string; domain: string; slug: string }>;
 }) {
   const { host, domain, slug } = await params;
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, "sidebar-page");
   const config = await loader.getConfig();
   const isSidebarFixed = getIsSidebarFixed(config);
 

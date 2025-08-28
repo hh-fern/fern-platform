@@ -23,6 +23,7 @@ export default async function Layout({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "explorer-layout",
     await getFernToken()
   );
   const edgeFlags = await loader.getEdgeFlags();

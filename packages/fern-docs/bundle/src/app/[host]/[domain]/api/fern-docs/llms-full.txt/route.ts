@@ -55,7 +55,12 @@ async function getLlmsFullTxt(
 
   unstable_cacheTag(domain, "getLlmsFullTxt");
 
-  const loader = await createCachedDocsLoader(host, domain, fernToken);
+  const loader = await createCachedDocsLoader(
+    host,
+    domain,
+    "get-llms-full-txt",
+    fernToken
+  );
 
   const root = getSectionRoot(await loader.getRoot(), path);
 

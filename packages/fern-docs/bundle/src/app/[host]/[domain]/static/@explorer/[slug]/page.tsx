@@ -29,7 +29,7 @@ export default async function ExplorerPage({
 
   const slug = FernNavigation.slugjoin(slugProp);
 
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, "explorer-page");
   const root = await loader.getRoot();
 
   const found = FernNavigation.utils.findNode(root, slug);

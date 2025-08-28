@@ -19,6 +19,7 @@ export default async function LogoPage({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "logo-page",
     await getFernToken()
   );
 

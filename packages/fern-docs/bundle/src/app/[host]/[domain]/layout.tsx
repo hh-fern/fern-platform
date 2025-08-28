@@ -54,7 +54,7 @@ export default async function Layout({
 }) {
   const { host, domain } = await params;
   const isLocalEnvironment = isLocal();
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, "layout");
   const [
     { basePath },
     config,

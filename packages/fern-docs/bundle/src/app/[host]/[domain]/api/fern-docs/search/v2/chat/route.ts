@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   const roles = authState.authed ? (authState.user.roles ?? []) : [];
   const explodedRoles = createDelimitedRolesetCombinations({ roleset: roles });
 
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, "ai-chat");
   const metadata = await loader.getMetadata();
   if (metadata == null) {
     return NextResponse.json("Not found", { status: 404 });

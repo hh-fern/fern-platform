@@ -15,6 +15,7 @@ export async function FernUser({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "fern-user",
     await getFernToken()
   );
   const authState = await loader.getAuthState();

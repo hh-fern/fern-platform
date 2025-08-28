@@ -46,6 +46,7 @@ export default async function Page({
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
+    "visual-editor-page",
     session.accessToken,
     new GitHubLoader(githubUrl)
   );

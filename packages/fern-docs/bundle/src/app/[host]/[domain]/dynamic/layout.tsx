@@ -26,7 +26,12 @@ export default async function Layout({
 }) {
   const { host, domain } = await params;
   const fernToken = await getFernToken();
-  const loader = await createCachedDocsLoader(host, domain, fernToken);
+  const loader = await createCachedDocsLoader(
+    host,
+    domain,
+    "dynamic-layout",
+    fernToken
+  );
 
   return (
     <SharedLayout

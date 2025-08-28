@@ -17,6 +17,7 @@ export default async function ProductSelectPage({
   const loader = await createCachedDocsLoader(
     host,
     domain,
+    "product-select-page",
     await getFernToken()
   );
 

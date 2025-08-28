@@ -15,7 +15,11 @@ export default async function EndpointSelectorPage({
 }) {
   const { host, domain, slug } = await params;
 
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(
+    host,
+    domain,
+    "endpoint-selector-page"
+  );
   const root = await loader.getRoot();
 
   const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));

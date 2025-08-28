@@ -16,7 +16,9 @@ export async function generateHtml({
   let faviconUrl: string | undefined;
 
   const loader =
-    host && domain ? await createCachedDocsLoader(host, domain) : undefined;
+    host && domain
+      ? await createCachedDocsLoader(host, domain, "generate-html")
+      : undefined;
 
   if (loader) {
     const [config, files] = await Promise.all([

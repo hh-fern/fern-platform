@@ -27,6 +27,7 @@ export default async function SidebarPage({
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
+    "visual-editor-sidebar-page",
     session?.accessToken
   );
   const [config, root] = await Promise.all([

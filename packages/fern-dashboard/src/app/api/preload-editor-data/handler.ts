@@ -19,9 +19,10 @@ export default async function preloadEditorData(request: {
     const loader = await createEditableDocsLoader(
       request.host, // Use the host from the request parameter instead of trying to get it from headers
       request.docsUrl,
+      "preload-editor-data",
       session.accessToken,
       undefined, // No GitHubLoader for preload since we don't have orgName context
-      true // force revalidate when preloading
+      true // force revalidate when preloading,
     );
 
     // Preload root and config in parallel

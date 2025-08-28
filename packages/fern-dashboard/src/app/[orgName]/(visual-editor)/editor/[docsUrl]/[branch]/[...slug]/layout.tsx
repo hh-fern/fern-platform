@@ -63,6 +63,7 @@ export default async function VisualEditorPreviewLayout({
   const loader = await createEditableDocsLoader(
     host,
     docsUrl,
+    "visual-editor-layout",
     session.accessToken,
     new GitHubLoader(githubUrl)
   );

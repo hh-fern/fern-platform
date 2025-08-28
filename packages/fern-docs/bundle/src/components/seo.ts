@@ -143,7 +143,11 @@ export async function generateMetadataFromConfig(props: {
 }): Promise<Metadata> {
   const { host, domain } = await props.params;
 
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(
+    host,
+    domain,
+    "generate-metadata-from-config"
+  );
   const [files, config, seoDisabled] = await Promise.all([
     loader.getFiles(),
     loader.getConfig(),

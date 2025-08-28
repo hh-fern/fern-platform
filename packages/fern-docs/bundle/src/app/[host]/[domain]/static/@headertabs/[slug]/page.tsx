@@ -12,7 +12,7 @@ export default async function HeaderTabsPage({
   params: Promise<{ host: string; domain: string; slug: string }>;
 }) {
   const { host, domain, slug } = await params;
-  const loader = await createCachedDocsLoader(host, domain);
+  const loader = await createCachedDocsLoader(host, domain, "header-tabs-page");
   const layout = await loader.getLayout();
 
   if (layout.tabsPlacement !== "HEADER") {

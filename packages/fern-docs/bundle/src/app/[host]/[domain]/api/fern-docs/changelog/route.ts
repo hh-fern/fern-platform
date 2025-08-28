@@ -142,7 +142,12 @@ async function createFeed(
   path: string,
   fernToken: string | undefined
 ): Promise<Feed> {
-  const loader = await createCachedDocsLoader(host, domain, fernToken);
+  const loader = await createCachedDocsLoader(
+    host,
+    domain,
+    "create-changelog-feed",
+    fernToken
+  );
   const root = await loader.getRoot();
 
   if (!root) {
@@ -286,7 +291,12 @@ async function checkRedirect(
     return undefined;
   }
 
-  const loader = await createCachedDocsLoader(host, domain, fernToken);
+  const loader = await createCachedDocsLoader(
+    host,
+    domain,
+    "changelog-redirects",
+    fernToken
+  );
   const redirects = (await loader.getConfig()).redirects;
   const { basePath } = await loader.getMetadata();
 

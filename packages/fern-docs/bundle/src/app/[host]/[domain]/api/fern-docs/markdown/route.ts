@@ -34,7 +34,12 @@ export async function GET(
   const slug = path.replace(MARKDOWN_PATTERN, "");
   const cleanSlug = removeLeadingSlash(slug);
 
-  const loader = await createCachedDocsLoader(host, domain, fernToken);
+  const loader = await createCachedDocsLoader(
+    host,
+    domain,
+    "markdown-route",
+    fernToken
+  );
   const node = getPageNodeForPath(await loader.getRoot(), cleanSlug);
 
   if (node == null) {
