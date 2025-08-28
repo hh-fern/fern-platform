@@ -24,7 +24,6 @@ export * from "./loadDynamicIRFromS3";
 export * from "./slack";
 export * from "./withRbac";
 export * from "./file-resolver";
-export * from "./dashboard-file-resolver";
 export * from "./processRequestSnippetComponents";
 export * from "./utils/clean-base-path";
 export * from "./utils/selectFirst";
