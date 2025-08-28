@@ -228,7 +228,22 @@ export function mdxToHtml(
     if (treatAsUnsupported.includes(nodeType)) {
       throw new Error(`Unsupported node type: ${nodeType}`);
     }
-    const { hash, content } = getNodeContent(node, rootContent);
+
+    // For MDX JSX elements, use hash based only on name and props
+    // For other custom elements, use the original content-based hash
+    let hash: NodeHash;
+    let content: string;
+
+    if (isMdxJsxElement(node)) {
+      hash = getNodeHashForMdxJsxElement(node);
+      const nodeContent = getNodeContent(node, rootContent);
+      content = nodeContent.content;
+    } else {
+      const nodeContent = getNodeContent(node, rootContent);
+      hash = nodeContent.hash;
+      content = nodeContent.content;
+    }
+
     originalElements[hash] = { content, type, name };
 
     if (isMdxJsxElement(node)) {
@@ -633,6 +648,22 @@ function getNodeContent(node: any, rootContent: string) {
   const hash: NodeHash = createHash("sha256").update(content).digest("hex");
 
   return { content, hash };
+}
+
+// Get hash for MDX JSX elements based only on name and props (excluding children)
+function getNodeHashForMdxJsxElement(node: MdxJsxElement): NodeHash {
+  // Create a hash input that only includes the name and attributes
+  const hashInput = {
+    type: node.type,
+    name: node.name,
+    attributes: node.attributes,
+  };
+
+  // Convert to a deterministic string representation for hashing
+  const hashString = JSON.stringify(hashInput, null, 0);
+  const hash: NodeHash = createHash("sha256").update(hashString).digest("hex");
+
+  return hash;
 }
 
 // TODO: we might be able to further optimize by refactoring this and htmlToMdx
