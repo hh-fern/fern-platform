@@ -98,18 +98,17 @@ export default async function Page({
 
   // Until sites are deployed with the version of FDR that supports rawMarkdown, we need to parse the markdown
   // from the server as a fallback.
-  const { html, frontmatter, originalElements, originalFrontmatter } =
-    rawMarkdown
-      ? mdxToHtml(rawMarkdown, {
+  const { html, frontmatter, originalFrontmatter } = rawMarkdown
+    ? mdxToHtml(rawMarkdown, {
+        treatAsCustomElement: ["code"],
+        treatAsUnsupported: ["math"],
+      })
+    : mdx
+      ? mdxToHtml(mdx, {
           treatAsCustomElement: ["code"],
           treatAsUnsupported: ["math"],
         })
-      : mdx
-        ? mdxToHtml(mdx, {
-            treatAsCustomElement: ["code"],
-            treatAsUnsupported: ["math"],
-          })
-        : {};
+      : {};
 
   console.log(html);
   return (
@@ -140,7 +139,6 @@ export default async function Page({
           initialFilename={filename}
           initialHtml={html}
           initialFrontmatter={frontmatter}
-          initialOriginalElements={originalElements}
           initialOriginalFrontmatter={originalFrontmatter}
           cssConfig={cssConfig}
         />

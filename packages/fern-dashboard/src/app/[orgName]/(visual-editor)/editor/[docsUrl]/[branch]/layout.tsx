@@ -3,15 +3,19 @@ import "server-only";
 import { ThemeProvider } from "next-themes";
 import type React from "react";
 
+import { MDXProvider } from "@mdx-js/react";
+
 import { ClientPageManager } from "@fern-docs/components/sidebar/nodes/ClientPageManager";
 import { SidebarClientNavigationProvider } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 
+import { ClientMDXProvider } from "@/app/[orgName]/context/ClientMDXProvider";
 import { OrgNameProvider } from "@/app/[orgName]/context/OrgNameContext";
 import getGithubSourceMetadata from "@/app/api/get-github-source-metadata/handler";
 import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { PreviewOnlyNotification } from "@/components/editor/PreviewOnlyNotification";
+import { MDX_COMPONENTS } from "@/docs/mdx/components";
 import { BranchProvider } from "@/providers/BranchContext";
 import { CurrentPageProvider } from "@/providers/CurrentPageContext";
 import { DevModeProvider } from "@/providers/DevModeProvider";
@@ -68,26 +72,31 @@ export default async function EditorLayout({
           <GitHubRepoProvider branch={branch} sourceRepo={sourceRepo}>
             <SidebarClientNavigationProvider branchName={branch}>
               <ClientPageManager branchName={branch} />
-              <DevModeProvider>
-                <MdxStateProvider docsUrl={docsUrl}>
-                  <CurrentPageProvider>
-                    <BranchProvider branch={branch}>
-                      <EditorProvider>
-                        <GitPRProvider
-                          owner={sourceRepo.owner}
-                          repo={sourceRepo.repo}
-                          baseBranch={sourceRepo.baseBranch}
-                          branch={branch}
-                        >
-                          <HeaderToolbar session={session} docsUrl={docsUrl} />
-                          <PreviewOnlyNotification />
-                          {children}
-                        </GitPRProvider>
-                      </EditorProvider>
-                    </BranchProvider>
-                  </CurrentPageProvider>
-                </MdxStateProvider>
-              </DevModeProvider>
+              <ClientMDXProvider>
+                <DevModeProvider>
+                  <MdxStateProvider docsUrl={docsUrl}>
+                    <CurrentPageProvider>
+                      <BranchProvider branch={branch}>
+                        <EditorProvider>
+                          <GitPRProvider
+                            owner={sourceRepo.owner}
+                            repo={sourceRepo.repo}
+                            baseBranch={sourceRepo.baseBranch}
+                            branch={branch}
+                          >
+                            <HeaderToolbar
+                              session={session}
+                              docsUrl={docsUrl}
+                            />
+                            <PreviewOnlyNotification />
+                            {children}
+                          </GitPRProvider>
+                        </EditorProvider>
+                      </BranchProvider>
+                    </CurrentPageProvider>
+                  </MdxStateProvider>
+                </DevModeProvider>
+              </ClientMDXProvider>
             </SidebarClientNavigationProvider>
           </GitHubRepoProvider>
         </OrgNameProvider>
