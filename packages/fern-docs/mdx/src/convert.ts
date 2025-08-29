@@ -120,16 +120,6 @@ type CustomElementsType = Exclude<AllElementsType, BaseElementsType>;
 // Hash of a node
 export type NodeHash = string;
 
-// Original element data
-export interface OriginalElement {
-  type: string;
-  name?: string;
-  content: string;
-}
-
-// Map of original elements by hash
-export type OriginalElements = Record<NodeHash, OriginalElement>;
-
 // Map of changed nodes by hash
 export type ChangedNodes = Record<NodeHash, boolean>;
 
@@ -140,7 +130,6 @@ export type Frontmatter = Record<string, unknown>;
 export interface MdxToHtmlResponse {
   html: string;
   frontmatter: Frontmatter;
-  originalElements: OriginalElements;
   originalFrontmatter?: string;
 }
 
@@ -184,10 +173,6 @@ export function mdxToHtml(
     ? parsedFrontmatter
     : {};
 
-  // Map of original elements by hash, including jsxElements, expressions, and esm
-  // Note: this will only include top-level elements, not nested ones
-  const originalElements: OriginalElements = {};
-
   // Default handler for base elements
   function baseElementHandler(
     state: ToHastState,
@@ -204,7 +189,6 @@ export function mdxToHtml(
       return getToHastDefaultHandler(nodeType)(state, node, parents);
     }
     const { hash, content } = getNodeContent(node, rootContent);
-    originalElements[hash] = { content, type, name };
     return mdxBaseElementNode(
       hash,
       content,
@@ -243,8 +227,6 @@ export function mdxToHtml(
       hash = nodeContent.hash;
       content = nodeContent.content;
     }
-
-    originalElements[hash] = { content, type, name };
 
     if (isMdxJsxElement(node)) {
       return mdxCustomElementNodev2(hash, nodeType, node, state);
@@ -305,7 +287,7 @@ export function mdxToHtml(
 
   console.log(html);
 
-  return { html, frontmatter, originalFrontmatter, originalElements };
+  return { html, frontmatter, originalFrontmatter };
 }
 
 // Response from htmlToMdx
@@ -317,8 +299,7 @@ export interface HtmlToMdxResponse {
 // TODO: we might be able to further optimize by refactoring this and getChangedNodesFromHtml
 export function htmlToMdx(
   html: string,
-  frontmatter: Frontmatter,
-  originalElements: OriginalElements,
+  frontmatter?: Frontmatter,
   originalFrontmatter?: string,
   changedNodes?: ChangedNodes,
   changedFrontmatter?: boolean
@@ -331,7 +312,6 @@ export function htmlToMdx(
     if (
       element.properties?.dataHash &&
       typeof element.properties.dataHash === "string" &&
-      typeof originalElements[element.properties.dataHash] !== "undefined" &&
       changedNodes?.[element.properties.dataHash] === false
     ) {
       // Use hash as placeholder, which will be replaced with actual content
@@ -573,24 +553,6 @@ export function htmlToMdx(
     const frontmatterYaml = yaml.dump(frontmatter, FRONTMATTER_YAML_OPTIONS);
     finalMdx = `---\n${frontmatterYaml}---\n\n${mdx}`;
   }
-
-  // Replace custom element placeholders with actual content
-  Object.entries(originalElements).forEach(([hash, customElement]) => {
-    const placeholder = getCustomElementPlaceholder(hash);
-    const content = customElement.content;
-
-    // Escape dollar signs in content to prevent them from being treated as replacement references
-    // In JavaScript string replacement, $ has special meaning:
-    // - $& inserts the matched substring
-    // - $` inserts the portion of the string that precedes the matched substring
-    // - $' inserts the portion of the string that follows the matched substring
-    // - $n inserts the nth parenthesized submatch string
-    // By doubling the $ ($$), we insert a literal $ character
-    const escapedContent = content.replace(/\$/g, "$$$$");
-
-    // Replace placeholder with escaped content, using replaceAll for cases where there are repeats
-    finalMdx = finalMdx.replaceAll(placeholder, escapedContent);
-  });
 
   return { mdx: finalMdx };
 }
