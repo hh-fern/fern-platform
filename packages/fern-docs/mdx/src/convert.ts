@@ -686,7 +686,7 @@ export function getChangedNodesFromHtml(
   // Compare nodes with the same hash
   for (const hash of Object.keys(originalMap)) {
     if (hash in latestMap) {
-      // Compare the node contents
+      // Compare the node contents and attributes
       const originalNode = originalMap[hash];
       const latestNode = latestMap[hash];
       const { content: originalContent } = getNodeContent(
@@ -694,7 +694,33 @@ export function getChangedNodesFromHtml(
         originalHtml
       );
       const { content: latestContent } = getNodeContent(latestNode, latestHtml);
-      changedNodes[hash] = originalContent !== latestContent;
+
+      // Note: the below attribute comparison logic was claude generated
+      // Compare attributes shallowly
+      const originalAttrs = originalNode.properties || {};
+      const latestAttrs = latestNode.properties || {};
+
+      // Compare attribute keys and values
+      const originalAttrKeys = Object.keys(originalAttrs).sort();
+      const latestAttrKeys = Object.keys(latestAttrs).sort();
+
+      let attributesChanged = false;
+      if (
+        originalAttrKeys.length !== latestAttrKeys.length ||
+        !originalAttrKeys.every((key, i) => key === latestAttrKeys[i])
+      ) {
+        attributesChanged = true;
+      } else {
+        for (const key of originalAttrKeys) {
+          if (originalAttrs[key] !== latestAttrs[key]) {
+            attributesChanged = true;
+            break;
+          }
+        }
+      }
+
+      changedNodes[hash] =
+        originalContent !== latestContent || attributesChanged;
     }
   }
   return changedNodes;
