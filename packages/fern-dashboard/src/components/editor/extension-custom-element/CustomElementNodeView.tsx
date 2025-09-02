@@ -250,8 +250,6 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
   const cssConfig = useCSS();
   const components = useMDXComponents();
 
-  const originalElement: any = undefined;
-
   // Extract CSS from config
   const inlineCss = useMemo(() => {
     return cssConfig?.inline && Array.isArray(cssConfig.inline)
@@ -261,25 +259,21 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
 
   // Process HTML content if available
   const htmlContent = useMemo(() => {
-    if (!originalElement?.content) {
-      return null;
-    }
-
-    let content = originalElement.content;
+    let content: string = textContent
     let extractedCSS: string[] = [];
 
     // Check if content has JSX syntax first
-    if (hasJSXSyntax(originalElement.content)) {
+    if (hasJSXSyntax(textContent)) {
       try {
         // TODO: investigate if we can use mdxToHtml function from convert.ts instead
-        const result = convertJSXToHTML(originalElement.content);
+        const result = convertJSXToHTML(textContent);
         content = result.html;
         extractedCSS = result.css;
         return { content, css: extractedCSS };
       } catch (error) {
         console.warn("Failed to convert JSX to HTML:", error);
         // Fall back to original content
-        content = originalElement.content;
+        content = textContent
       }
     }
 
@@ -289,7 +283,7 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
     }
 
     return null;
-  }, [originalElement?.content]);
+  }, [textContent]);
 
   return (
     <ErrorBoundary
