@@ -48,6 +48,10 @@ export const loadDynamicIRWithUrl = cache(
         }
 
         if (Object.keys(dynamicIRsByApi).length > 0) {
+          console.log(
+            "returning dynamic IR by API with keys:",
+            Object.keys(dynamicIRsByApi)
+          );
           return dynamicIRsByApi;
         }
 

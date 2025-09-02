@@ -33,6 +33,7 @@ export async function ExplorerContent({
     const edgeFlags = await loader.getEdgeFlags();
 
     if (edgeFlags.isDynamicSnippetsEnabled) {
+      console.log("getting dynamic IR for API:", node.apiDefinitionId);
       try {
         const dynamicIRsByApi = await loader.getDynamicIr([
           node.apiDefinitionId,

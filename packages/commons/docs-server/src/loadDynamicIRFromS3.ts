@@ -63,6 +63,10 @@ export const loadDynamicIRFromS3 = cache(
       }
 
       if (Object.keys(dynamicIRsByLanguage).length > 0) {
+        console.log(
+          "returning dynamic IR by language with keys:",
+          Object.keys(dynamicIRsByLanguage)
+        );
         return dynamicIRsByLanguage;
       }
 
