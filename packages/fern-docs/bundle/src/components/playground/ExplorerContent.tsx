@@ -39,6 +39,12 @@ export async function ExplorerContent({
           node.apiDefinitionId,
         ]);
         dynamicIRsByLanguage = dynamicIRsByApi?.[node.apiDefinitionId];
+        if (dynamicIRsByLanguage != null) {
+          console.log(
+            "[explorer-content] dynamic IR by language with keys:",
+            Object.keys(dynamicIRsByLanguage)
+          );
+        }
       } catch (error) {
         console.error(`[dynamic-ir] ${JSON.stringify(error)}`);
       }
