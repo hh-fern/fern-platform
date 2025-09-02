@@ -32,7 +32,7 @@ import {
 } from "./jsx-to-html-converter";
 
 // Separate components to avoid mount-remount cycles
-const LoadingComponent = React.memo(() => <Skeleton className="h-24 w-full" />);
+const LoadingComponent = React.memo(() => <Skeleton className="h-24 w-full m-2" />);
 LoadingComponent.displayName = "LoadingComponent";
 
 interface MDXWrapperProps {
@@ -43,7 +43,6 @@ interface MDXWrapperProps {
 
 const MDXWrapper = ({ code, hash, components }: MDXWrapperProps) => {
   const MDXComponent = useMemo(() => {
-    console.log("MDX COMPONENT REMEMO", code, hash);
     try {
       console.info(
         "[CustomElementNodeView] Rendering MDX component:",
@@ -229,40 +228,24 @@ type CustomElementState =
 export const CustomElementNodeView = (props: NodeViewProps) => {
   const [state, setState] = useState<CustomElementState>({ type: "BUNDLING" });
   const { node } = props;
-  const { attrs, textContent } = node;
-  // Get the HTML representation of this specific node (opening tag only, without children)
-  const getNodeHTML = useCallback(() => {
-    // Get the tag name from the node type
-    const tagName = node.type.name;
+  const { attrs } = node;
 
-    // Build attributes string from node attrs
-    const attributePairs = Object.entries(node.attrs || {})
-      .filter(([key, value]) => value != null && value !== "")
-      .map(
-        ([key, value]) => `${key}="${String(value).replace(/"/g, "&quot;")}"`
-      )
-      .join(" ");
-
-    // Construct self-closing tag with attributes
-    const attributesString = attributePairs ? ` ${attributePairs}` : "";
-    return `<${tagName}${attributesString} />`;
-  }, [node]);
-
-  const originalHTML = getNodeHTML();
-  console.log("Original HTML:", originalHTML);
-  const { mdx } = htmlToMdx(originalHTML);
-  console.log("Corresponding MDX: ", mdx);
+  const mdx = attrs["fve-mdx-content"];
+  const name = attrs["fve-data-name"];
+  const hash = attrs["fve-data-hash"];
+  const textContent = attrs["fve-mdx-content"]
 
   useEffect(() => {
     (async () => {
-      const result = await bundleMDX(mdx);
-      setState({ type: "BUNDLED", code: result.code });
-      console.log(result);
+      try {
+        const result = await bundleMDX(mdx);
+        setState({ type: "BUNDLED", code: result.code });
+      } catch (error) {
+        console.error("Error bundling MDX:", error);
+        setState({ type: "ERROR", message: String(error) });
+      }
     })();
   }, [mdx, setState]);
-
-  const name = attrs["fve-data-name"];
-  const hash = attrs["fve-data-hash"];
 
   const cssConfig = useCSS();
   const components = useMDXComponents();

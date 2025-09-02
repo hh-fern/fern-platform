@@ -27,15 +27,15 @@ export const CustomElement = Node.create<CustomElementOptions>({
 
   group: "block",
 
-  content: "block*",
+  content: "text*",
 
-  atom: false,
+  atom: true,
 
   draggable: true,
 
   selectable: false,
 
-  // code: true,
+  code: true,
 
   /**
    * The data attributes are used to store the original content of the custom element.
@@ -55,11 +55,17 @@ export const CustomElement = Node.create<CustomElementOptions>({
       "fve-data-props": {
         default: null,
       },
+      "fve-mdx-content": {
+        default: null,
+      },
+      "fve-unsupported": {
+        default: null
+      },
       /**
        * Set contenteditable to false to prevent the custom element from being edited.
        */
       contenteditable: {
-        default: true,
+        default: false,
       },
     };
   },

@@ -34,6 +34,7 @@ import { math } from "micromark-extension-math";
 import { mdxjs } from "micromark-extension-mdxjs";
 
 import { MdxJsxElement } from "./mdast";
+import { a } from "vitest/dist/chunks/suite.BJU7kdY9.js";
 
 // Options for how yaml is written to the frontmatter
 const FRONTMATTER_YAML_OPTIONS: yaml.DumpOptions = {
@@ -228,11 +229,11 @@ export function mdxToHtml(
       content = nodeContent.content;
     }
 
-    if (isMdxJsxElement(node)) {
-      return mdxCustomElementNodev2(hash, nodeType, node, state);
-    }
-
-    return mdxCustomElementNode(hash, content, nodeType, name);
+    // if (isMdxJsxElement(node)) {
+      // return mdxCustomElementNodev2(hash, content, nodeType, node, state);
+    // } else {
+    // }
+    return mdxUnsupportedCustomElementNodev2(hash, content, name)
   }
 
   // Get hast from mdast (and handle custom elements)
@@ -307,31 +308,11 @@ export function htmlToMdx(
   // Get hast from html
   const hast = fromHtml(html);
 
+  const unsupportedMdxContent: Record<string, string> = {}
+
   // Default handler for base elements
   const baseElementHandler: ToMdastHandle = (state, element) => {
-    if (
-      element.properties?.dataHash &&
-      typeof element.properties.dataHash === "string" &&
-      changedNodes?.[element.properties.dataHash] === false
-    ) {
-      // Use hash as placeholder, which will be replaced with actual content
-      const placeholder = getCustomElementPlaceholder(
-        String(element.properties.dataHash)
-      );
-
-      return { type: "html", value: placeholder } as any;
-    }
     return getToMdastDefaultHandler(element.tagName as any)(state, element);
-  };
-
-  // Default handler for custom elements
-  const customElementHandler: ToMdastHandle = (_, element) => {
-    // Use hash as placeholder, which will be replaced with actual content
-    const placeholder = getCustomElementPlaceholder(
-      String(element.properties.dataHash)
-    );
-
-    return { type: "html", value: placeholder } as any;
   };
 
   const customElementv2Handler: ToMdastHandle = (state, element) => {
@@ -339,6 +320,20 @@ export function htmlToMdx(
     const props = element.properties || {};
     let name: string | null = null;
     const attributes: MdxJsxAttribute[] = [];
+
+    // Handle unsupported elements first
+    if (typeof props["fve-data-hash"] === "string" && typeof props["fve-unsupported"] === "string" && props["fve-unsupported"] === "true") {
+      const content = props["fve-mdx-content"]
+      if (typeof content !== "string") {
+        throw new Error(`expected string content in fve-mdx-content, found: ${typeof content}`)
+      }
+
+      const placeholder = `PLACEHOLDERV2_${props["fve-data-hash"]}`
+      unsupportedMdxContent[placeholder] = content
+
+      return { type: "html", value: placeholder } as any;
+    }
+
 
     // Deserialize fve-data-props if present and add as attributes
     if (typeof props["fve-data-props"] === "string") {
@@ -527,7 +522,6 @@ export function htmlToMdx(
       tfoot: baseElementHandler,
 
       // Custom elements
-      ["custom-element"]: customElementHandler,
       ["custom-element-v2"]: customElementv2Handler,
     } as any,
     newlines: true,
@@ -553,6 +547,20 @@ export function htmlToMdx(
     const frontmatterYaml = yaml.dump(frontmatter, FRONTMATTER_YAML_OPTIONS);
     finalMdx = `---\n${frontmatterYaml}---\n\n${mdx}`;
   }
+
+  // Replace unsupported custom element placeholders with actual content
+  Object.entries(unsupportedMdxContent).forEach(([placeholder, content]) => {
+    // Escape dollar signs in content to prevent them from being treated as replacement references
+    // In JavaScript string replacement, $ has special meaning:
+    // - $& inserts the matched substring
+    // - $` inserts the portion of the string that precedes the matched substring
+    // - $' inserts the portion of the string that follows the matched substring
+    // - $n inserts the nth parenthesized submatch string
+    // By doubling the $ ($$), we insert a literal $ character
+    const escapedContent = content.replace(/\$/g, "$$$$");
+    // Replace all occurrences of the placeholder with the escaped content
+    finalMdx = finalMdx.replaceAll(placeholder, escapedContent);
+  });
 
   return { mdx: finalMdx };
 }
@@ -731,12 +739,6 @@ function getNodeMapFromHast(hast: HastRoot) {
   return map;
 }
 
-// Get a placeholder for a custom element
-// Note: be careful not to use any characters that the serializer will escape
-function getCustomElementPlaceholder(hash: NodeHash) {
-  return `PLACEHOLDER${hash}`;
-}
-
 // Get the toHast default handler in a type-safe way
 function getToHastDefaultHandler(type: ToHastDefaultHandlersType) {
   return toHastDefaultHandlers[type];
@@ -803,31 +805,6 @@ function mdxBaseElementNode(
   }
 }
 
-// Create node for a custom element
-function mdxCustomElementNode(
-  hash: NodeHash,
-  content: string,
-  type: CustomElementsType,
-  name: string | undefined
-) {
-  return {
-    type: "element" as const,
-    tagName: "custom-element",
-    // These data attributes help the client to handle the custom element
-    properties: {
-      "data-hash": hash,
-      "data-type": type,
-      ...(name ? { "data-name": name } : {}),
-    },
-    children: [
-      {
-        type: "text" as const,
-        value: content,
-      },
-    ],
-  };
-}
-
 function getAttributes(node: MdxJsxElement): { name: string; value: string }[] {
   // Extracts attributes from an MdxJsxElement node and returns them as an array of { name, value } objects.
   // Handles both string and expression attribute values.
@@ -848,6 +825,7 @@ function getAttributes(node: MdxJsxElement): { name: string; value: string }[] {
 // Create node for a custom element -- colton v2 test
 function mdxCustomElementNodev2(
   hash: NodeHash,
+  originalMdxContent: string,
   type: CustomElementsType,
   node: MdxJsxElement,
   state: ToHastState
@@ -874,7 +852,30 @@ function mdxCustomElementNodev2(
       "fve-data-type": type,
       "fve-data-name": node.name,
       "fve-data-props": serializedProps,
+      "fve-mdx-content": originalMdxContent,
     },
     children: processedChildren,
   };
 }
+
+// Create node for a custom element -- colton v2 test
+function mdxUnsupportedCustomElementNodev2(
+  hash: NodeHash,
+  originalMdxContent: string,
+  name: string | undefined
+) {
+  // Serialize all props to a JSON string for fve-data-props
+  return {
+    type: "element" as const,
+    tagName: "custom-element-v2",
+    // These data attributes help the client to handle the custom element
+    properties: {
+      "fve-data-hash": hash,
+      "fve-data-name": name,
+      "fve-mdx-content": originalMdxContent,
+      "fve-unsupported": "true",
+    },
+    children: [],
+  };
+}
+
