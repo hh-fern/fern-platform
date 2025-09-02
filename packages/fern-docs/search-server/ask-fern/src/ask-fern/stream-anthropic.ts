@@ -21,7 +21,7 @@ import {
   fernToken_admin,
   getFaiOrigin,
 } from "@fern-api/docs-server/env-variables";
-import { FernFaiClient } from "@fern-api/fai-sdk";
+import { FernAIClient } from "@fern-api/fai-sdk";
 import { FacetFilter } from "@fern-docs/search-keyword";
 
 import {
@@ -40,9 +40,11 @@ export async function runRouteForAnthropic({
   lastUserMessage,
   messages,
   filters,
+  explodedRoles,
   embeddingModel,
   turbopufferNamespace,
   languageModel,
+  documentUrls,
 }: {
   domain: string;
   chatSource: string;
@@ -51,9 +53,11 @@ export async function runRouteForAnthropic({
   lastUserMessage: string;
   messages: UIMessage[];
   filters: FacetFilter[];
+  explodedRoles: string[];
   embeddingModel: EmbeddingModel<string>;
   turbopufferNamespace: string;
   languageModel: LanguageModel;
+  documentUrls?: string[];
 }) {
   /*
     Anthropic's API has a bug (see: https://github.com/anthropics/claude-code/issues/473)
@@ -77,12 +81,16 @@ export async function runRouteForAnthropic({
 
   const searchResultURLs = new Set<string>();
   const searchResults: TurbopufferRecord[] = [];
+
   const turbopufferResults = await runQueryTurbopuffer(lastUserMessage, {
     embeddingModel,
     namespace: turbopufferNamespace,
     topK: 3,
     filters,
+    documentUrls,
+    explodedRoles,
   });
+
   for (const result of turbopufferResults) {
     if (result.attributes.url) {
       if (!searchResultURLs.has(result.attributes.url)) {
@@ -147,6 +155,7 @@ export async function runRouteForAnthropic({
                   documentIdsToIgnore: documentIdsToIgnore,
                   urlsToIgnore: urlsToIgnore,
                   filters,
+                  explodedRoles,
                 });
                 for (const hit of result) {
                   const url = hit.attributes.url;
@@ -213,12 +222,14 @@ export async function runRouteForAnthropic({
         onFinish: async (e) => {
           const end = Date.now();
           const queryId = crypto.randomUUID();
-          const faiClient = new FernFaiClient({
+          const faiClient = new FernAIClient({
             baseUrl: getFaiOrigin(),
-            token: fernToken_admin(),
+            headers: {
+              Authorization: `Bearer ${fernToken_admin()}`,
+            },
           });
           try {
-            await faiClient.queries.createQuery({
+            await faiClient.query.createQuery({
               query_id: queryId,
               conversation_id: conversationId,
               domain,

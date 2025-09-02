@@ -15,6 +15,8 @@ export async function runQueryTurbopuffer(
     filters?: FacetFilter[];
     documentIdsToIgnore?: string[];
     urlsToIgnore?: string[];
+    documentUrls?: string[];
+    explodedRoles: string[];
   }
 ) {
   return query == null || query.trimStart().length === 0
@@ -33,5 +35,7 @@ export async function runQueryTurbopuffer(
         filters: opts.filters,
         documentIdsToIgnore: opts.documentIdsToIgnore,
         urlsToIgnore: opts.urlsToIgnore,
+        documentUrls: opts.documentUrls,
+        explodedRoles: opts.explodedRoles,
       });
 }

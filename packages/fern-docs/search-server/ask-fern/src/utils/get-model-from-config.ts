@@ -1,13 +1,8 @@
 import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
-import { createAnthropic } from "@ai-sdk/anthropic";
 import { createCohere } from "@ai-sdk/cohere";
 import { LanguageModel } from "ai";
-import { createFallback } from "ai-fallback";
 
-import {
-  anthropicApiKey,
-  cohereApiKey,
-} from "@fern-api/docs-server/env-variables";
+import { cohereApiKey } from "@fern-api/docs-server/env-variables";
 
 type ModelId = string;
 
@@ -18,7 +13,7 @@ type ModelConfig = {
   region: string;
 };
 
-export const DEFAULT_MODEL_ID = "claude-3.5";
+const FALLBACK_MODEL_ID = "anthropic.claude-3-5-sonnet-20241022-v2:0";
 const DEFAULT_MODEL_CONFIG: ModelConfig = {
   modelId: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
   region: "us-west-2",
@@ -56,22 +51,33 @@ export function getLanguageModel(model: string | undefined): {
     };
   }
 
-  const modelConfig = getModelConfig(model ?? DEFAULT_MODEL_ID);
+  const modelConfig = getModelConfig(model ?? "claude-3.5");
   if (model === "claude-4") {
-    const anthropic = createAnthropic({ apiKey: anthropicApiKey() });
+    // TODO: Remove this once we restore Anthropic support.
+    // const anthropic = createAnthropic({ apiKey: anthropicApiKey() });
+    // const bedrock = createAmazonBedrock({
+    //   region: modelConfig.region,
+    //   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    //   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    // });
+    // return {
+    //   model: createFallback({
+    //     models: [
+    //       anthropic("claude-4-sonnet-20250514"),
+    //       bedrock(FALLBACK_MODEL_ID),
+    //     ],
+    //   }),
+    //   provider: "anthropic",
+    // };
     const bedrock = createAmazonBedrock({
       region: modelConfig.region,
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     });
+
     return {
-      model: createFallback({
-        models: [
-          anthropic("claude-4-sonnet-20250514"),
-          bedrock(DEFAULT_MODEL_ID),
-        ],
-      }),
-      provider: "anthropic",
+      model: bedrock(FALLBACK_MODEL_ID),
+      provider: "bedrock",
     };
   }
 
