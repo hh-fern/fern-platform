@@ -27,6 +27,8 @@ import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import { EncodedDocsUrl } from "@/utils/types";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page(props: {
   params: Promise<{ orgName: Auth0OrgName; docsUrl: EncodedDocsUrl }>;
 }) {
@@ -84,10 +86,14 @@ export default async function Page(props: {
     // If we have a GitHub URL, validate the auth state
     if (githubUrl) {
       try {
-        const validation = await validateGithubRepoAccess(orgName, {
-          type: "url",
-          githubUrl,
-        });
+        const validation = await validateGithubRepoAccess(
+          orgName,
+          {
+            type: "url",
+            githubUrl,
+          },
+          true // Skip cache so that we can force re-fetch on page load
+        );
 
         let sourceRepo = undefined;
 
@@ -97,7 +103,6 @@ export default async function Page(props: {
             sourceRepo = await getGithubSourceMetadataHandler({
               githubUrl,
               userId: session.user.sub,
-              skipCache: false,
             });
           } catch (error) {
             console.error("Failed to fetch source repo metadata:", error);
