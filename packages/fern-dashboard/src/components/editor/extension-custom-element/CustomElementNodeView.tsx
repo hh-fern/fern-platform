@@ -3,10 +3,12 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useMDXComponents } from "@mdx-js/react";
 import { DOMSerializer } from "@tiptap/pm/model";
 import {
+  NodeView,
   NodeViewContent,
   NodeViewProps,
   NodeViewWrapper,
   useCurrentEditor,
+  useReactNodeView,
 } from "@tiptap/react";
 import DOMPurify from "dompurify";
 import { getMDXComponent } from "mdx-bundler/client";
@@ -39,8 +41,9 @@ interface MDXWrapperProps {
   components: ReturnType<typeof useMDXComponents>;
 }
 
-const MDXWrapper = React.memo(({ code, hash, components }: MDXWrapperProps) => {
+const MDXWrapper = ({ code, hash, components }: MDXWrapperProps) => {
   const MDXComponent = useMemo(() => {
+    console.log("MDX COMPONENT REMEMO", code, hash);
     try {
       console.info(
         "[CustomElementNodeView] Rendering MDX component:",
@@ -58,10 +61,11 @@ const MDXWrapper = React.memo(({ code, hash, components }: MDXWrapperProps) => {
       );
       throw error;
     }
-  }, [code, name, hash]);
+  }, [code, hash]);
 
   return <MDXComponent components={components} />;
-});
+};
+
 MDXWrapper.displayName = "MDXWrapper";
 
 interface HTMLWrapperProps {
@@ -224,35 +228,25 @@ type CustomElementState =
 
 export const CustomElementNodeView = (props: NodeViewProps) => {
   const [state, setState] = useState<CustomElementState>({ type: "BUNDLING" });
-  const { node, getPos } = props;
+  const { node } = props;
   const { attrs, textContent } = node;
-
-  // Access the editor instance
-  const { editor } = useCurrentEditor();
-
-  // Get the HTML representation of this specific node
+  // Get the HTML representation of this specific node (opening tag only, without children)
   const getNodeHTML = useCallback(() => {
-    if (!editor || typeof getPos !== "function") return "";
+    // Get the tag name from the node type
+    const tagName = node.type.name;
 
-    const pos = getPos();
-    if (pos == null) {
-      return "<span />";
-    }
+    // Build attributes string from node attrs
+    const attributePairs = Object.entries(node.attrs || {})
+      .filter(([key, value]) => value != null && value !== "")
+      .map(
+        ([key, value]) => `${key}="${String(value).replace(/"/g, "&quot;")}"`
+      )
+      .join(" ");
 
-    const nodeSize = node.nodeSize;
-
-    // Create a slice containing just this node
-    const slice = editor.state.doc.slice(pos, pos + nodeSize);
-
-    // Convert the slice to HTML using the editor's serializer
-    const dom = DOMSerializer.fromSchema(editor.schema).serializeFragment(
-      slice.content
-    );
-    const tempDiv = document.createElement("div");
-    tempDiv.appendChild(dom);
-
-    return tempDiv.innerHTML;
-  }, [editor, node, getPos]);
+    // Construct self-closing tag with attributes
+    const attributesString = attributePairs ? ` ${attributePairs}` : "";
+    return `<${tagName}${attributesString} />`;
+  }, [node]);
 
   const originalHTML = getNodeHTML();
   console.log("Original HTML:", originalHTML);

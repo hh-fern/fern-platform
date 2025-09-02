@@ -1,6 +1,6 @@
 import React from "react";
 
-import { cn } from "@fern-docs/components";
+import { cn, useChildrenMiddleware } from "@fern-docs/components";
 
 export function CardGroup({
   children,
@@ -8,6 +8,7 @@ export function CardGroup({
 }: React.PropsWithChildren<{
   cols?: number;
 }>) {
+  const intercepted = useChildrenMiddleware(children);
   if (!cols) {
     cols = Math.min(React.Children.count(children), 2);
   }
@@ -23,7 +24,7 @@ export function CardGroup({
         "grid-cols-1 sm:grid-cols-2 xl:grid-cols-6": cols >= 6,
       })}
     >
-      {children}
+      {intercepted}
     </div>
   );
 }
