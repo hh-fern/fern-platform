@@ -33,7 +33,7 @@ export const CustomElement = Node.create<CustomElementOptions>({
 
   draggable: true,
 
-  selectable: false,
+  selectable: true,
 
   code: true,
 

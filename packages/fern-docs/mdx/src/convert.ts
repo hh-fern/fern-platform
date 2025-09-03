@@ -100,6 +100,8 @@ type BaseElementsType = Exclude<
   | "math"
   | "inlineMath"
   | "html"
+  | "image"
+  | "imageReference"
 >;
 
 // Non-custom nodes that can be hashed
@@ -180,6 +182,8 @@ export function mdxToHtml(
   ) {
     const { type, name } = getNodeInfo(node);
     const nodeType = type as BaseElementsType;
+
+    console.log("[1 - mdxToHtml] BASE ELEMENT NODE", node, nodeType, name);
     if (treatAsUnsupported.includes(nodeType)) {
       throw new Error(`Unsupported node type: ${nodeType}`);
     }
@@ -226,11 +230,11 @@ export function mdxToHtml(
       hash = nodeContent.hash;
       content = nodeContent.content;
     }
+    console.log("[2 - mdxToHtml] CUSTOM ELEMENT NODE", node, nodeType, name);
 
-    // if (isMdxJsxElement(node)) {
-    // return mdxCustomElementNodev2(hash, content, nodeType, node, state);
-    // } else {
-    // }
+    if (isMdxJsxElement(node)) {
+      return mdxCustomElementNodev2(hash, content, nodeType, node, state);
+    }
     return mdxUnsupportedCustomElementNodev2(hash, content, name);
   }
 
@@ -247,9 +251,6 @@ export function mdxToHtml(
         footnoteDefinition: baseElementHandler,
         footnoteReference: baseElementHandler,
         heading: baseElementHandler,
-        html: baseElementHandler,
-        image: baseElementHandler,
-        imageReference: baseElementHandler,
         inlineCode: baseElementHandler,
         link: baseElementHandler,
         linkReference: baseElementHandler,
@@ -274,6 +275,8 @@ export function mdxToHtml(
         math: customElementHandler,
         inlineMath: customElementHandler,
         html: customElementHandler,
+        image: customElementHandler,
+        imageReference: customElementHandler,
         ...Object.fromEntries(
           treatAsCustomElement.map((type) => [type, customElementHandler])
         ),

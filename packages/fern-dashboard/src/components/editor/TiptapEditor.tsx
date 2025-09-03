@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 
-import { Image } from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import UniqueID from "@tiptap/extension-unique-id";
 import {
@@ -42,11 +41,11 @@ const dataAttributeNodeTypes = [
 const extensions = [
   StarterKit,
   CustomElement,
-  Image.extend({
-    renderHTML({ HTMLAttributes }) {
-      return ["img", HTMLAttributes];
-    },
-  }),
+  // Image.extend({
+  //   renderHTML({ HTMLAttributes }) {
+  //     return ["img", HTMLAttributes];
+  //   },
+  // }),
   UniqueID.configure({
     types: dataAttributeNodeTypes,
   }),

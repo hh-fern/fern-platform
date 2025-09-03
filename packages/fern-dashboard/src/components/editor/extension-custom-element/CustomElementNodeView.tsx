@@ -1,21 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { useMDXComponents } from "@mdx-js/react";
-import { DOMSerializer } from "@tiptap/pm/model";
-import {
-  NodeView,
-  NodeViewContent,
-  NodeViewProps,
-  NodeViewWrapper,
-  useCurrentEditor,
-  useReactNodeView,
-} from "@tiptap/react";
+import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import DOMPurify from "dompurify";
 import { getMDXComponent } from "mdx-bundler/client";
-import { string } from "zod";
 
 import { ChildrenMiddlewareProvider } from "@fern-docs/components";
-import { htmlToMdx } from "@fern-docs/mdx";
 
 import { bundleMDX } from "@/app/[orgName]/(visual-editor)/editor/[docsUrl]/[branch]/[...slug]/bundleEditorMdx";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,7 +22,9 @@ import {
 } from "./jsx-to-html-converter";
 
 // Separate components to avoid mount-remount cycles
-const LoadingComponent = React.memo(() => <Skeleton className="h-24 w-full m-2" />);
+const LoadingComponent = React.memo(() => (
+  <Skeleton className="m-2 h-24 w-full" />
+));
 LoadingComponent.displayName = "LoadingComponent";
 
 interface MDXWrapperProps {
@@ -124,7 +116,11 @@ const FallbackWrapper = React.memo(
           console.warn("Failed to create fallback MDX component:", error);
         }
       }
-      return () => <UnsupportedContent>{textContent}</UnsupportedContent>;
+      const Component = () => (
+        <UnsupportedContent>{textContent}</UnsupportedContent>
+      );
+      Component.displayName = "UnsupportedContent";
+      return Component;
     }, [code, name, textContent]);
 
     return <Component />;
@@ -233,10 +229,10 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
   const mdx = attrs["fve-mdx-content"];
   const name = attrs["fve-data-name"];
   const hash = attrs["fve-data-hash"];
-  const textContent = attrs["fve-mdx-content"]
+  const textContent = attrs["fve-mdx-content"];
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         const result = await bundleMDX(mdx);
         setState({ type: "BUNDLED", code: result.code });
@@ -259,7 +255,7 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
 
   // Process HTML content if available
   const htmlContent = useMemo(() => {
-    let content: string = textContent
+    let content: string = textContent;
     let extractedCSS: string[] = [];
 
     // Check if content has JSX syntax first
@@ -273,7 +269,7 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
       } catch (error) {
         console.warn("Failed to convert JSX to HTML:", error);
         // Fall back to original content
-        content = textContent
+        content = textContent;
       }
     }
 

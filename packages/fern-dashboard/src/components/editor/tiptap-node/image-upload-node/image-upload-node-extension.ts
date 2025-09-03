@@ -104,7 +104,7 @@ export const ImageUploadNode = Node.create<ImageUploadNodeOptions>({
   },
 
   parseHTML() {
-    return [{ tag: 'div[data-type="image-upload"]' }];
+    return [{ tag: "div", attrs: { "data-type": "image-upload" } }];
   },
 
   renderHTML({ HTMLAttributes }) {

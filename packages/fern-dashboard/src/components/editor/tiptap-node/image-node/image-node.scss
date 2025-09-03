@@ -12,8 +12,16 @@
     border-radius: var(--radius);
   }
 
-  img:not([data-type="emoji"] img).ProseMirror-selectednode {
+  .node-custom-element-v2[fve-data-name="img"] img {
+    margin: 2rem 0;
+    outline: 0.125rem solid transparent;
+    outline-offset: 0.25rem;
+    border-radius: var(--radius);
+  }
+
+  .node-custom-element-v2[fve-data-name="img"].ProseMirror-selectednode img {
     outline-color: var(--primary);
+    outline-offset: 0.25rem;
   }
 
   // Thread image handling

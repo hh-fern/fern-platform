@@ -6,6 +6,8 @@ import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
 import type { NodeViewProps } from "@tiptap/react";
 import { NodeViewWrapper } from "@tiptap/react";
 
+import { mdxToHtml } from "@fern-docs/mdx";
+
 import "@/components/editor/tiptap-node/image-upload-node/image-upload-node.scss";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -366,6 +368,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   const { fileItems, uploadFiles } = useFileUpload(uploadOptions);
 
   const handleUpload = async (files: File[]) => {
+    console.log("handleUpload");
     const urls = await uploadFiles(files);
 
     if (urls.length > 0) {
@@ -375,12 +378,17 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
         const imageNodes = urls.map((url, index) => {
           const filename =
             files[index]?.name.replace(/\.[^/.]+$/, "") || "unknown";
+
           return {
-            type: "image" as const,
+            type: "custom-element-v2",
             attrs: {
-              src: url,
-              alt: filename,
-              title: filename,
+              "fve-data-name": "img",
+              "fve-data-props": JSON.stringify({
+                src: url,
+                alt: filename,
+                title: filename,
+              }),
+              "fve-mdx-content": `<img src="${url}" alt="${filename}" title="${filename}" />`,
             },
           };
         });
@@ -415,16 +423,20 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
       extension.options.onError?.(new Error("No position found"));
       return;
     }
+    const newImageNode = mdxToHtml(`<img src="${imageUrl}" />`);
+    console.log("newImageNode", newImageNode);
     props.editor
       .chain()
       .focus()
       .deleteRange({ from: pos, to: pos + props.node.nodeSize })
       .insertContentAt(pos, {
-        type: "image" as const,
+        type: "custom-element-v2",
         attrs: {
-          src: imageUrl,
-          alt: "image",
-          title: "image",
+          "fve-data-name": "img",
+          "fve-data-props": JSON.stringify({
+            src: imageUrl,
+          }),
+          "fve-mdx-content": `<img src="${imageUrl}" />`,
         },
       })
       .run();
