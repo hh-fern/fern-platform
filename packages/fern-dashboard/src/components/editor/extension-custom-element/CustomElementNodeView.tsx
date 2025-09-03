@@ -46,11 +46,6 @@ interface MDXWrapperProps {
 const MDXWrapper = ({ code, hash, components }: MDXWrapperProps) => {
   const MDXComponent = useMemo(() => {
     try {
-      console.info(
-        "[CustomElementNodeView] Rendering MDX component:",
-        "with hash:",
-        hash
-      );
       return getMDXComponent(code);
     } catch (error) {
       console.warn(
@@ -79,13 +74,6 @@ interface HTMLWrapperProps {
 
 const HTMLWrapper = React.memo(
   ({ content, css, inlineCss, hash, name }: HTMLWrapperProps) => {
-    console.info(
-      "[CustomElementNodeView] Rendering HTML content for element with hash:",
-      hash,
-      "name:",
-      name
-    );
-
     return (
       <>
         <StyleInjector

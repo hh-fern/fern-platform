@@ -125,7 +125,6 @@ function TipTapContentUpdateListener({
 }: {
   content: EditorProviderProps["content"];
 }) {
-  console.log("EDITOR_CONTENT", content);
   const { editor } = useCurrentEditor();
   const isEditingDisabled = useEditingDisabled();
   const lastSetContentRef = useRef<string | null>(null);
