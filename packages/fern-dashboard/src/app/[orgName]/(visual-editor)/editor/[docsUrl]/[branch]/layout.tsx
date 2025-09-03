@@ -45,7 +45,6 @@ export default async function EditorLayout({
 }>) {
   const { orgName, docsUrl: encodedDocsUrl, branch } = await params;
   const docsUrl = parseDocsUrlParam({ docsUrl: encodedDocsUrl });
-  console.log("visual editor docsUrl", docsUrl);
 
   const { githubUrl, session } = await assertAuthAndFetchGithubUrl({
     orgName,

@@ -32,6 +32,9 @@ export function OpenPRsComponent({
 
   // Pagination state
   const [visibleCount, setVisibleCount] = useState(3);
+  const [deletedBranches, setDeletedBranches] = useState<Set<string>>(
+    new Set()
+  );
   const BRANCHES_PER_PAGE = 3;
 
   const handleBranchClick = (branchName: string) => {
@@ -46,19 +49,27 @@ export function OpenPRsComponent({
 
   const handleBranchDelete = (branchName: string) => {
     deleteLocalBranch(branchName);
-    // TODO: Refresh the branches list or trigger a re-render
-    // This could be done by calling a callback prop or using a state update
+    setDeletedBranches((prev) => new Set(prev).add(branchName));
+    const remainingBranches = branches.filter(
+      (branch) => !deletedBranches.has(branch)
+    );
+    if (visibleCount > remainingBranches.length) {
+      setVisibleCount(remainingBranches.length);
+    }
   };
 
   const handleLoadMore = () => {
     setVisibleCount((prev) =>
-      Math.min(prev + BRANCHES_PER_PAGE, branches.length)
+      Math.min(prev + BRANCHES_PER_PAGE, availableBranches.length)
     );
   };
 
-  // Get the branches to display (first N branches)
-  const visibleBranches = branches.slice(0, visibleCount);
-  const hasMoreBranches = visibleCount < branches.length;
+  // Filter out deleted branches and get the branches to display (first N branches)
+  const availableBranches = branches.filter(
+    (branch) => !deletedBranches.has(branch)
+  );
+  const visibleBranches = availableBranches.slice(0, visibleCount);
+  const hasMoreBranches = visibleCount < availableBranches.length;
 
   return (
     <div className="border-border flex min-w-0 flex-1 gap-6 rounded-xl border bg-white p-3 transition-[padding] sm:p-4 md:p-5 lg:p-6">
@@ -74,7 +85,7 @@ export function OpenPRsComponent({
           />
         </div>
 
-        {branches.length > 0 && (
+        {availableBranches.length > 0 && (
           <div className="space-y-0">
             {visibleBranches.map((branch, index) => (
               <div key={branch}>
@@ -108,14 +119,15 @@ export function OpenPRsComponent({
                   onClick={handleLoadMore}
                   className="w-full border-gray-400 bg-white hover:border-gray-600 hover:bg-gray-50"
                 >
-                  Load More ({branches.length - visibleCount} remaining)
+                  Load More ({availableBranches.length - visibleCount}{" "}
+                  remaining)
                 </Button>
               </div>
             )}
           </div>
         )}
 
-        {branches.length === 0 && (
+        {availableBranches.length === 0 && (
           <div className="py-8 text-center">
             <p className="text-sm text-gray-500">No open sessions found</p>
           </div>

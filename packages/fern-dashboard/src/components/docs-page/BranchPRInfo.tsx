@@ -77,7 +77,6 @@ function BranchPRContent({
     } else if (hasUncommittedChanges) {
       return "This session has uncommitted local changes. You will lose your changes -  are you sure?";
     } else if (prStatus) {
-      console.log("prStatus", prStatus);
       return "This session has committed changes. Are you sure you want to remove it?";
     }
     return "Are you sure you want to remove this branch?";

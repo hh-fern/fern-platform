@@ -39,14 +39,12 @@ export default function PageEditor({
 
   function onTiptapEditorCreate(props: EditorEvents["create"]) {
     const latestTiptapHtml = props.editor.getHTML();
-    console.log("onTiptapEditorCreate");
     originalTiptapHtml.current = latestTiptapHtml;
   }
 
   function onTiptapEditorUpdate(props: EditorEvents["update"]) {
     const latestTiptapHtml = props.editor.getHTML();
 
-    console.log("lastchange from tiptap", lastChangeFromTiptap.current);
     if (originalTiptapHtml.current && isFirstUpdate.current === false) {
       // Mark that this change came from TipTap editing
       lastChangeFromTiptap.current = true;
@@ -55,7 +53,6 @@ export default function PageEditor({
         originalTiptapHtml.current,
         latestTiptapHtml
       );
-      console.log("changedNodes", changedNodes);
       stageChanges(filename, { html: latestTiptapHtml, changedNodes });
     } else {
       isFirstUpdate.current = false;

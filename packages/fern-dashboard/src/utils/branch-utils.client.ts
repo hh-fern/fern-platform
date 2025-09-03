@@ -98,8 +98,6 @@ export function deleteLocalBranch(branchName: string): void {
 
     // Clear all client pages for this branch
     ClientPageStorage.clearAllClientPages(branchName);
-
-    console.log(`Deleted all local storage data for branch: ${branchName}`);
   } catch (error) {
     console.error(
       `Failed to delete local storage data for branch ${branchName}:`,

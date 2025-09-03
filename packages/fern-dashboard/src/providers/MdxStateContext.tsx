@@ -140,7 +140,6 @@ export function MdxStateProvider({
   // Alias for updateDependencies that sets the changed flag to true by default
   const stageChanges = useCallback(
     (filename: Filename, state: MdxDependencies) => {
-      console.log("stageChanges marking as changed", filename, state);
       updateDependencies(filename, { ...state, changed: true });
       // Immediately mark file as staged when changes are made
       setMdxSyncedStatus((prev) => ({
