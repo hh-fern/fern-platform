@@ -1,5 +1,7 @@
 "use client";
 
+
+
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useCallback } from "react";
@@ -16,6 +18,7 @@ import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { GithubSourceRepo } from "@/app/services/github/types";
+import { shortSubHash } from "@/utils/branch-utils";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 
@@ -25,6 +28,8 @@ import {
   ErrorNoGithubSourceToast,
 } from "../editor/EditorToasts";
 import { Button } from "../ui/button";
+
+
 
 export function GoToEditorButton({
   docsUrl,
@@ -51,9 +56,11 @@ export function GoToEditorButton({
       "-" +
       sanitizeGitHubUsername(session.user.name ?? "") +
       "-" +
+      shortSubHash(session.user.sub) +
+      "-" +
       randomHexString
     );
-  }, [session.user.name]);
+  }, [session.user.name, session.user.sub]);
 
   const editorSlug = useMemo(() => {
     return constructEditorSlug({
