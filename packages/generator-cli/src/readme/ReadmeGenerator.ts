@@ -204,12 +204,12 @@ export class ReadmeGenerator {
     if (originalReadmeContent == null) {
       return blocks;
     }
-    const preprocessedContent = fernReplace(
-      originalReadmeContent,
-      this.readmeConfig.replacementArgs
-    );
+    const preprocessedContent = this.readmeConfig.version
+      ? fernReplace(originalReadmeContent, new Map([["version", this.readmeConfig.version]]))
+      : originalReadmeContent;
+
     const parsed = this.readmeParser.parse({
-      content: originalReadmeContent,
+      content: preprocessedContent,
     });
     const merger = new BlockMerger({
       original: parsed.blocks,
