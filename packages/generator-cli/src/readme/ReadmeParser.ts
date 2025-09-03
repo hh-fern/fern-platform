@@ -8,7 +8,7 @@ export interface ParseResult {
 }
 
 export class ReadmeParser {
-  public parse({ content }: { content: string }): ParseResult {
+  public parse({ content, args }: { content: string, args?: Map<string, string> }): ParseResult {
     let header = "";
     let currentBlock: Block | undefined;
     const blocks: Block[] = [];
