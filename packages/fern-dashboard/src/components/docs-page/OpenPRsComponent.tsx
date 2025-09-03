@@ -11,6 +11,8 @@ import { constructEditorSlug, ROOT_SLUG_ALIAS } from "@/utils/editor-routing";
 import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 import { Button } from "@/components/ui/button";
 import { GoToEditorButton } from "./GoToEditorButton";
+import { BranchPRInfo } from "./BranchPRInfo";
+import { ArrowRight } from "lucide-react";
 
 export function OpenPRsComponent({
   docsUrl,
@@ -56,22 +58,23 @@ export function OpenPRsComponent({
           <div className="space-y-0">
             {branches.map((branch, index) => (
               <div key={branch}>
-                <div className="flex items-center justify-between py-3">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {branch}
-                    </p>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <BranchPRInfo
+                    branch={branch}
+                    sourceRepo={sourceRepo}
+                    onBranchClick={handleBranchClick}
+                  />
                   <Button
                     size="sm"
                     onClick={() => handleBranchClick(branch)}
-                    className="ml-3 bg-white hover:bg-gray-50 text-green-1000 border border-gray-400 hover:border-gray-600"
+                    className="ml-3 bg-white hover:bg-gray-50 text-green-1100 border border-gray-400 hover:border-gray-600"
                   >
-                    Open
+                    Resume
+                    <ArrowRight className="size-4" />
                   </Button>
                 </div>
                 {index < branches.length - 1 && (
-                  <div className="border-b border-gray-200" />
+                  <div className="border-b border-gray-400" />
                 )}
               </div>
             ))}

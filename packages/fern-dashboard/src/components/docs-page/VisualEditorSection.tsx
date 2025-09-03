@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { getRelevantBranches } from "@/app/services/github/branch-utils";
+import { getRelevantBranches } from "@/utils/branch-utils";
 import {
   GithubRepoValidationError,
 } from "@/app/services/dal/github/validators";
 import { GithubLogo } from "@/components/auth/GithubLogo";
-import { GithubSourceRepo } from "@/app/services/github/types";
 import { DocsUrl } from "@/utils/types";
 import { Button } from "@/components/ui/button";
 import Card from "@/components/ui/card";
@@ -141,13 +140,12 @@ export function VisualEditorSection({
 }) {
   const [hasRelevantBranches, setHasRelevantBranches] = useState<boolean | null>(null);
 
-  // Check if user has relevant branches on client side
   useEffect(() => {
     const relevantBranches = getRelevantBranches(session.user.sub);
     setHasRelevantBranches(relevantBranches.length > 0);
   }, [session.user.sub]);
 
-  // Loading state
+  // Loading state, TODO show skeleton or some other loading indicator
   if (hasRelevantBranches === null) {
     return (
       <Card className="relative flex h-[300px] flex-col-reverse gap-0 !p-0 lg:flex-row">

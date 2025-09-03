@@ -1,7 +1,7 @@
 import { GithubPrStatus } from "@/app/services/github/types";
 import { cn } from "@/utils/utils";
 
-export type StatusBadgeType = "live" | "loading" | GithubPrStatus;
+export type StatusBadgeType = "live" | "loading" | "uncommitted" | GithubPrStatus;
 
 interface StatusBadgeProps {
   status: StatusBadgeType;
@@ -56,6 +56,12 @@ const statusConfig: Record<
     dotColor: "bg-gray-900",
     textColor: "text-gray-900",
     label: "Loading",
+  },
+  uncommitted: {
+    containerClass: "bg-red-200 border border-red-700",
+    dotColor: "bg-red-700",
+    textColor: "text-red-700",
+    label: "Uncommitted",
   },
 };
 
