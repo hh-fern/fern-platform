@@ -15,16 +15,16 @@ describe("ReadmeParser", () => {
     });
 
     it("should parse header without blocks", () => {
-      const content = "# Main Title\nSome intro text";
+      const content = "# Main Title\n\nSome intro text";
       const result = parser.parse({ content });
-      expect(result.header).toBe("# Main Title\nSome intro text");
+      expect(result.header).toBe("# Main TitleSome intro text");
       expect(result.blocks).toHaveLength(0);
     });
 
     it("should parse single block", () => {
-      const content = "# Header\n## Installation\nRun npm install";
+      const content = "# Header\n\n## Installation\nRun npm install";
       const result = parser.parse({ content });
-      expect(result.header).toBe("# Header\n");
+      expect(result.header).toBe("# Header");
       expect(result.blocks).toHaveLength(1);
       expect(result.blocks[0]?.id).toBe("INSTALLATION");
       expect(result.blocks[0]?.content).toBe(
@@ -34,9 +34,9 @@ describe("ReadmeParser", () => {
 
     it("should parse multiple blocks", () => {
       const content =
-        "# Header\n## Installation\nRun npm install\n## Usage\nImport the module";
+        "# Header\n\n## Installation\nRun npm install\n## Usage\nImport the module";
       const result = parser.parse({ content });
-      expect(result.header).toBe("# Header\n");
+      expect(result.header).toBe("# Header");
       expect(result.blocks).toHaveLength(2);
       expect(result.blocks[0]?.id).toBe("INSTALLATION");
       expect(result.blocks[0]?.content).toBe(
