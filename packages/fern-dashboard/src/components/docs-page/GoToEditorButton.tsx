@@ -16,7 +16,7 @@ import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { GithubSourceRepo } from "@/app/services/github/types";
-import { shortSubHash } from "@/utils/branch-utils";
+import { shortSubHash } from "@/utils/branch-utils.client";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 

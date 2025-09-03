@@ -9,7 +9,7 @@ import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { GithubSourceRepo } from "@/app/services/github/types";
 import { Button } from "@/components/ui/button";
-import { deleteLocalBranch } from "@/utils/branch-utils";
+import { deleteLocalBranch } from "@/utils/branch-utils.client";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 

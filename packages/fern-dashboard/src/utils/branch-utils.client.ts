@@ -6,7 +6,7 @@ import { Auth0UserID } from "@/app/services/auth0/types";
 
 /**
  * Generate a short 6-character hash from an Auth0 sub
- * This function is shared between client and server code for consistent branch naming
+ * Note: the crypto library may not be availalbe on certain client browsers. Can use crypto.subtle if that is an issue.
  * @param sub - Auth0 sub, e.g. "github|002033e4"
  */
 export function shortSubHash(sub: string): string {

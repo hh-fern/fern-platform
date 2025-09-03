@@ -8,7 +8,7 @@ import { GithubRepoValidationError } from "@/app/services/dal/github/validators"
 import { GithubLogo } from "@/components/auth/GithubLogo";
 import { Button } from "@/components/ui/button";
 import Card from "@/components/ui/card";
-import { getRelevantBranches } from "@/utils/branch-utils";
+import { getRelevantBranches } from "@/utils/branch-utils.client";
 import { DocsUrl } from "@/utils/types";
 
 import { GithubAuthState } from "./GithubSource";
