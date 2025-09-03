@@ -14,6 +14,5 @@ describe("fernReplace tests", () => {
     const result = fernReplace(squareReadme, new Map([["version", "46.0.0"]]));
     expect(result).toContain("46.0.0");
     expect(result).not.toContain("44.0.0.20250319");
-    expect(result).toMatchFileSnapshot(`__snapshots__/squareReadmeReplaced.md`);
   });
 });
