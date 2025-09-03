@@ -286,8 +286,6 @@ export function mdxToHtml(
   // Get html from hast
   const html = toHtml(hast);
 
-  console.log(html);
-
   return { html, frontmatter, originalFrontmatter };
 }
 

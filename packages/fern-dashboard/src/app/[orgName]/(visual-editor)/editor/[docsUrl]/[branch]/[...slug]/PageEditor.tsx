@@ -43,8 +43,6 @@ export default function PageEditor({
   function onTiptapEditorUpdate(props: EditorEvents["update"]) {
     const latestTiptapHtml = props.editor.getHTML();
 
-    console.log("updated", latestTiptapHtml);
-
     if (originalTiptapHtml.current && isFirstUpdate.current === false) {
       // Mark that this change came from TipTap editing
       lastChangeFromTiptap.current = true;
@@ -74,8 +72,6 @@ export default function PageEditor({
       }
     }
   }, [changedMdxFiles, filename]);
-
-  console.log(currentHtmlRef.current);
 
   // TODO: add a loading state, possibly as a Suspense boundary
   return (
