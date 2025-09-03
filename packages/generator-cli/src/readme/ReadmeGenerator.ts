@@ -205,7 +205,10 @@ export class ReadmeGenerator {
       return blocks;
     }
     const preprocessedContent = this.readmeConfig.version
-      ? fernReplace(originalReadmeContent, new Map([["version", this.readmeConfig.version]]))
+      ? fernReplace(
+          originalReadmeContent,
+          new Map([["version", this.readmeConfig.version]])
+        )
       : originalReadmeContent;
 
     const parsed = this.readmeParser.parse({
