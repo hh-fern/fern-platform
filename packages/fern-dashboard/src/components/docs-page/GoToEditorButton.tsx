@@ -1,7 +1,5 @@
 "use client";
 
-
-
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useCallback } from "react";
@@ -28,8 +26,6 @@ import {
   ErrorNoGithubSourceToast,
 } from "../editor/EditorToasts";
 import { Button } from "../ui/button";
-
-
 
 export function GoToEditorButton({
   docsUrl,

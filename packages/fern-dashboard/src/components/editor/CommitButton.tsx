@@ -31,6 +31,10 @@ import {
   parseYaml,
   removePageFromDocsYml,
 } from "@/utils/docsYmlUpdater";
+import {
+  clearUncommittedChangesState,
+  setUncommittedChangesState,
+} from "@/utils/uncommitted-changes-storage";
 
 import { GithubLogo } from "../auth/GithubLogo";
 import { Button } from "../ui/button";
@@ -103,7 +107,7 @@ function findSectionInChildren(
  * @param branch - Current branch name
  * @returns Object containing files to commit and files to delete
  */
-function collectAllChanges(
+export function collectAllChanges(
   changedMdxFiles: Record<string, string>,
   branch: string | null
 ): { filesToCommit: Record<string, string>; filesToDelete: string[] } {
@@ -332,15 +336,19 @@ export function CommitButton() {
     // 1. We have a stored committed hash
     // 2. Current changes hash matches the committed hash
     // 3. There are actually some changes (hash is not for empty state)
-    if (
+    const hasCommittedChanges = Boolean(
       lastCommittedHash &&
-      currentHash === lastCommittedHash &&
-      currentHash !== "0"
-    ) {
-      setChangesCommitted(true);
-    } else {
-      setChangesCommitted(false);
-    }
+        currentHash === lastCommittedHash &&
+        currentHash !== "0"
+    );
+
+    setChangesCommitted(hasCommittedChanges);
+
+    // Update localStorage state for uncommitted changes
+    // If we have changes but they're not committed, mark as uncommitted
+    const hasUncommittedChanges =
+      Object.keys(allCurrentChanges).length > 0 && !hasCommittedChanges;
+    setUncommittedChangesState(branch, hasUncommittedChanges);
   }, [changedMdxFiles, branch, mdxSyncedStatus]); // Added mdxSyncedStatus to ensure we wait for data to load
 
   const handleCommitPress = useCallback(async () => {
@@ -407,6 +415,9 @@ export function CommitButton() {
         // Use the exact same content that was committed to generate the hash
         const committedHash = generateSimpleHash(allFilesToCommit);
         localStorage.setItem(`lastCommittedHash-${branch}`, committedHash);
+
+        // Clear uncommitted changes state since we just committed
+        clearUncommittedChangesState(branch);
 
         // Clear docs.yml updates from localStorage since they've been committed
         if (allFilesToCommit["docs.yml"]) {

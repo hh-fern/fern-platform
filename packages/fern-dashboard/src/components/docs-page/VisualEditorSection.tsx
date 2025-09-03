@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 
+import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { getRelevantBranches } from "@/utils/branch-utils";
-import {
-  GithubRepoValidationError,
-} from "@/app/services/dal/github/validators";
+import { GithubRepoValidationError } from "@/app/services/dal/github/validators";
 import { GithubLogo } from "@/components/auth/GithubLogo";
-import { DocsUrl } from "@/utils/types";
 import { Button } from "@/components/ui/button";
 import Card from "@/components/ui/card";
-import { WarningNote } from "./WarningNote";
-import { VEPreviewImage } from "./VEPreviewImage";
+import { getRelevantBranches } from "@/utils/branch-utils";
+import { DocsUrl } from "@/utils/types";
+
+import { GithubAuthState } from "./GithubSource";
 import { GoToEditorButton } from "./GoToEditorButton";
 import { OpenPRsComponent } from "./OpenPRsComponent";
-import { GithubAuthState } from "./GithubSource";
+import { VEPreviewImage } from "./VEPreviewImage";
+import { WarningNote } from "./WarningNote";
 
 interface ValidationErrorHandlerProps {
   error: GithubRepoValidationError;
@@ -132,31 +132,41 @@ export function VisualEditorSection({
   session,
   githubAuthState,
   githubUrl,
+  isVEBranchPRsEnabled,
 }: {
   docsUrl: DocsUrl;
   session: Auth0SessionData;
   githubAuthState: GithubAuthState;
   githubUrl?: string;
+  isVEBranchPRsEnabled: boolean;
 }) {
-  const [hasRelevantBranches, setHasRelevantBranches] = useState<boolean | null>(null);
+  const [hasRelevantBranches, setHasRelevantBranches] = useState<
+    boolean | null
+  >(null);
+  const [relevantBranches, setRelevantBranches] = useState<string[]>([]);
+  const orgName = useOrgName();
 
   useEffect(() => {
+    if (!isVEBranchPRsEnabled) {
+      setHasRelevantBranches(false);
+      setRelevantBranches([]);
+      return;
+    }
+
     const relevantBranches = getRelevantBranches(session.user.sub);
+    setRelevantBranches(relevantBranches);
     setHasRelevantBranches(relevantBranches.length > 0);
-  }, [session.user.sub]);
+  }, [session.user.sub, orgName, isVEBranchPRsEnabled]);
 
   // Loading state, TODO show skeleton or some other loading indicator
-  if (hasRelevantBranches === null) {
+  if (isVEBranchPRsEnabled && hasRelevantBranches == null) {
     return (
       <Card className="relative flex h-[300px] flex-col-reverse gap-0 !p-0 lg:flex-row">
-        <div className="lg:max-w-1/2 h-full w-full">
-          <VEPreviewImage className="h-full w-full" />
-        </div>
         <div className="flex flex-col items-center justify-center gap-4 p-6 md:flex-1 lg:items-start">
           <div className="flex flex-col items-center lg:items-start">
             <p className="text-lg font-semibold">Fern Visual Editor</p>
             <p className="text-muted-foreground text-sm">
-              Modify your documentation without touching code.
+              Searching for open visual editor sessions...
             </p>
           </div>
         </div>
@@ -170,6 +180,7 @@ export function VisualEditorSection({
         docsUrl={docsUrl}
         session={session}
         sourceRepo={githubAuthState.sourceRepo}
+        branches={relevantBranches}
       />
     );
   }

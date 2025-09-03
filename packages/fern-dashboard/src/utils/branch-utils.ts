@@ -1,6 +1,8 @@
-import { createHash } from 'crypto';
+import { createHash } from "crypto";
 
 import { ClientPageStorage, PageStorage } from "@fern-docs/components";
+
+import { Auth0UserID } from "@/app/services/auth0/types";
 
 /**
  * Generate a short 6-character hash from an Auth0 sub
@@ -8,11 +10,11 @@ import { ClientPageStorage, PageStorage } from "@fern-docs/components";
  * @param sub - Auth0 sub, e.g. "github|002033e4"
  */
 export function shortSubHash(sub: string): string {
-  const [, idPart] = sub.split('|'); // grab part after |
-  if (!idPart) throw new Error('Invalid sub format');
+  const [, idPart] = sub.split("|"); // grab part after |
+  if (!idPart) throw new Error("Invalid sub format");
 
   // Use md5 hash since it's fast, we don't need to be secure here
-  const hash = createHash('md5').update(idPart).digest('hex');
+  const hash = createHash("md5").update(idPart).digest("hex");
   return hash.substring(0, 6);
 }
 
@@ -21,14 +23,17 @@ export function shortSubHash(sub: string): string {
  * @param branchName - The branch name to check
  * @param expectedShortSubHash - The expected short sub hash for the user
  */
-export function matchesBranchFormat(branchName: string, expectedShortSubHash: string): boolean {
-  const parts = branchName.split('-');
-  
+export function matchesBranchFormat(
+  branchName: string,
+  expectedShortSubHash: string
+): boolean {
+  const parts = branchName.split("-");
+
   // Should have at least 6 parts (date has 3 parts, plus username, shortSubHash, randomHash)
   if (parts.length < 6) {
     return false;
   }
-  
+
   const shortSubHashIndex = parts.length - 2;
   return parts[shortSubHashIndex] === expectedShortSubHash;
 }
@@ -38,53 +43,67 @@ export function matchesBranchFormat(branchName: string, expectedShortSubHash: st
  * This function filters branches that:
  * 1. Exist in localStorage (indicating user has worked on them)
  * 2. Match the user's branch naming format (date-username-shortSubHash-randomHash)
- * 
+ *
  * Merges branches from multiple storage sources:
  * - ClientPageStorage (client pages)
  * - PageStorage (regular pages)
- * 
+ *
  * @param userId - Auth0 user ID (sub) for branch filtering
- * @returns Array of branch names filtered from stored branches and sorted by relevance
+ * @returns Array of BranchInfo objects with branch names and unsaved changes status, sorted by relevance
  */
-export function getRelevantBranches(userId: string): string[] {
+export function getRelevantBranches(userId: Auth0UserID): string[] {
   try {
     const userShortSubHash = shortSubHash(userId);
-    
+
     const clientPageBranches = ClientPageStorage.getAllStoredBranches();
-    const pageBranches = PageStorage.getAllStoredBranches();
-    
+    const allPageBranches = PageStorage.getAllStoredBranches();
+
     const allStoredBranches = [
-      ...new Set([
-        ...clientPageBranches,
-        ...pageBranches,
-      ])
+      ...new Set([...clientPageBranches, ...allPageBranches]),
     ];
-    
-    console.log("clientPageBranches", clientPageBranches);
-    console.log("pageBranches", pageBranches);
-    console.log("allStoredBranches", allStoredBranches);
-    
-    const userBranches = allStoredBranches.filter((branchName: string) => 
+
+    const userBranches = allStoredBranches.filter((branchName: string) =>
       matchesBranchFormat(branchName, userShortSubHash)
     );
 
-
+    // Sort by date (newest first)
     const sortedBranches = userBranches.sort((a: string, b: string) => {
       // Extract the date part (first 10 characters: YYYY-MM-DD)
       const dateA = a.substring(0, 10);
       const dateB = b.substring(0, 10);
-      
+
       if (dateA !== dateB) {
         return dateB.localeCompare(dateA);
       }
-      
+
       return b.localeCompare(a);
     });
 
     return sortedBranches;
-
   } catch (error) {
     console.warn("Failed to get relevant branches from stored data:", error);
     return [];
+  }
+}
+
+/**
+ * Deletes all local storage data for a specific branch
+ * This includes both regular pages and client pages
+ * @param branchName - The branch name to delete from localStorage
+ */
+export function deleteLocalBranch(branchName: string): void {
+  try {
+    // Clear all regular pages for this branch
+    PageStorage.clearAllPages(branchName);
+
+    // Clear all client pages for this branch
+    ClientPageStorage.clearAllClientPages(branchName);
+
+    console.log(`Deleted all local storage data for branch: ${branchName}`);
+  } catch (error) {
+    console.error(
+      `Failed to delete local storage data for branch ${branchName}:`,
+      error
+    );
   }
 }

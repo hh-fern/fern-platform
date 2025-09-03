@@ -6,6 +6,8 @@ export interface StoredPageData extends PageData {
   pageType: "client" | "server";
   // For server pages, store the original server data for comparison
   serverData?: PageData;
+  // Track if this page has local changes compared to server data
+  hasChanges?: boolean;
 }
 
 export type StoredPages = Record<string, StoredPageData>; // keyed by filename

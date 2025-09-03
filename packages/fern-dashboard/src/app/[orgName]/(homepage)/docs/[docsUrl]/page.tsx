@@ -7,9 +7,7 @@ import getMyDocsSitesHandler from "@/app/api/get-my-docs-sites/handler";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
-import {
-  validateGithubRepoAccess,
-} from "@/app/services/dal/github/validators";
+import { validateGithubRepoAccess } from "@/app/services/dal/github/validators";
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
 import {
   GithubAuthState,
@@ -17,7 +15,10 @@ import {
 } from "@/components/docs-page/GithubSource";
 import { VisualEditorSection } from "@/components/docs-page/VisualEditorSection";
 import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
-import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
+import {
+  FeatureFlaggedServerSide,
+  isFeatureFlagEnabledForUser,
+} from "@/components/posthog/feature-flags/server-side";
 import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import { EncodedDocsUrl } from "@/utils/types";
@@ -113,6 +114,12 @@ export default async function Page(props: {
     console.error(error);
   }
 
+  const isVEBranchPRsEnabled = await isFeatureFlagEnabledForUser(
+    PosthogFeatureFlag.ENABLE_VE_BRANCH_PRS,
+    session.user.sub,
+    orgName
+  );
+
   return (
     <FeatureFlaggedServerSide
       flag={PosthogFeatureFlag.ENABLE_DOCS_PAGE}
@@ -135,6 +142,7 @@ export default async function Page(props: {
           session={session}
           githubAuthState={githubAuthState}
           githubUrl={githubUrl}
+          isVEBranchPRsEnabled={isVEBranchPRsEnabled ?? false}
         />
       </div>
     </FeatureFlaggedServerSide>
