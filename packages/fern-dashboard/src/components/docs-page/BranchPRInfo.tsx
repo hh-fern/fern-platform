@@ -52,14 +52,12 @@ function BranchPRContent({
   };
 
   const handleDeleteClick = () => {
-    // Check if branch has committed changes (PR) or uncommitted changes
     const hasCommittedChanges = prTitle || prStatus;
     const hasChanges = hasCommittedChanges || hasUncommittedChanges;
 
     if (hasChanges) {
       setShowDeleteDialog(true);
     } else {
-      // No changes, delete immediately
       onBranchDelete(branch);
     }
   };
@@ -73,15 +71,14 @@ function BranchPRContent({
     setShowDeleteDialog(false);
   };
 
-  // Determine the dialog message based on what type of changes exist
   const getDialogMessage = () => {
     if (hasUncommittedChanges && prStatus) {
-      return "This branch has both committed changes and uncommitted local changes. Are you sure you want to remove it?";
+      return "This session has both committed changes and uncommitted local changes. Are you sure you want to remove it?";
     } else if (hasUncommittedChanges) {
-      return "This branch has uncommitted local changes. Are you sure you want to remove it?";
+      return "This session has uncommitted local changes. You will lose your changes -  are you sure?";
     } else if (prStatus) {
       console.log("prStatus", prStatus);
-      return "This branch has committed changes. Are you sure you want to remove it?";
+      return "This session has committed changes. Are you sure you want to remove it?";
     }
     return "Are you sure you want to remove this branch?";
   };
@@ -127,21 +124,23 @@ function BranchPRContent({
         <Trash2 className="h-4 w-4" />
       </button>
 
-      {/* Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Branch</DialogTitle>
-            <DialogDescription>{getDialogMessage()}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCancelDelete}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete}>
-              Delete
-            </Button>
-          </DialogFooter>
+            <div className="flex flex-col gap-6">   {/* adds vertical spacing */}
+            <DialogHeader>
+              <DialogTitle>Delete Session</DialogTitle>
+              <DialogDescription>{getDialogMessage()}</DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={handleCancelDelete}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleConfirmDelete}>
+                Delete
+              </Button>
+            </DialogFooter>
+            </div>
         </DialogContent>
       </Dialog>
     </div>
