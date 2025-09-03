@@ -25,6 +25,7 @@ types:
       requirements: optional<list<string>>
       disabledFeatures: optional<list<feature.FeatureId>>
       whiteLabel: optional<boolean>
+      version: optional<string>
       features:
         docs: |
           Specifies the list of features supported by a specific generator.

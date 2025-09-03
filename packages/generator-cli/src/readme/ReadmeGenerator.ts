@@ -9,6 +9,7 @@ import { StreamWriter, StringWriter, type Writer } from "../utils/Writer";
 import { Block } from "./Block";
 import { BlockMerger } from "./BlockMerger";
 import type { ReadmeParser } from "./ReadmeParser";
+import { fernReplace } from "./fernReplace";
 
 export class ReadmeGenerator {
   private ADVANCED_FEATURE_ID = "ADVANCED";
@@ -203,6 +204,10 @@ export class ReadmeGenerator {
     if (originalReadmeContent == null) {
       return blocks;
     }
+    const preprocessedContent = fernReplace(
+      originalReadmeContent,
+      this.readmeConfig.replacementArgs
+    );
     const parsed = this.readmeParser.parse({
       content: originalReadmeContent,
     });

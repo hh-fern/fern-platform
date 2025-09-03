@@ -25,6 +25,7 @@ export const ReadmeConfig: core.serialization.ObjectSchema<
     requirements: core.serialization.list(core.serialization.string()).optional(),
     disabledFeatures: core.serialization.list(FeatureId).optional(),
     whiteLabel: core.serialization.boolean().optional(),
+    version: core.serialization.string().optional(),
     features: core.serialization.list(ReadmeFeature).optional(),
 });
 
@@ -41,6 +42,7 @@ export declare namespace ReadmeConfig {
         requirements?: string[] | null;
         disabledFeatures?: FeatureId.Raw[] | null;
         whiteLabel?: boolean | null;
+        version?: string | null;
         features?: ReadmeFeature.Raw[] | null;
     }
 }
