@@ -30,6 +30,7 @@ import {
   hasJSXSyntax,
   looksLikeHTML,
 } from "./jsx-to-html-converter";
+import TiptapEditor from "../TiptapEditor";
 
 // Separate components to avoid mount-remount cycles
 const LoadingComponent = React.memo(() => <Skeleton className="h-24 w-full m-2" />);
@@ -227,13 +228,28 @@ type CustomElementState =
 
 export const CustomElementNodeView = (props: NodeViewProps) => {
   const [state, setState] = useState<CustomElementState>({ type: "BUNDLING" });
-  const { node } = props;
+  const { node, updateAttributes } = props;
   const { attrs } = node;
 
   const mdx = attrs["fve-mdx-content"];
   const name = attrs["fve-data-name"];
   const hash = attrs["fve-data-hash"];
   const textContent = attrs["fve-mdx-content"]
+
+
+  // If the name is "Tip", after a delay, update fve-data-props to { intent: "error" }
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | undefined
+    if (name === "Tip") {
+      console.log("UPDATING_TIP")
+      timeout = setTimeout(() => {
+        updateAttributes({
+          "fve-data-props": JSON.stringify({ intent: "error" }),
+        });
+      }, 5000); // 500ms delay, adjust as needed
+    }
+    return () => { if (timeout != null) clearTimeout(timeout) };
+  }, [name, updateAttributes]);
 
   useEffect(() => {
     (async () => {
@@ -299,7 +315,23 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
         ) : state.type === "ERROR" ? (
           <UnsupportedContent>{textContent}</UnsupportedContent>
         ) : (
-          <ChildrenMiddlewareProvider value={(_) => <NodeViewContent />}>
+          <ChildrenMiddlewareProvider value={({ wrapper }) => {
+            const props = wrapper != null ? wrapper.props : {}
+            const hasWrapper = wrapper != null;
+            const nodeViewContentId = hasWrapper ? `nodeview-content-${hash}` : undefined;
+            
+            return (
+              <>
+                {hasWrapper && nodeViewContentId && (
+                  <StyleInjector
+                    styles={`#${nodeViewContentId} [data-node-view-content-react] { display: contents; }`}
+                    id={`${hash}-nodeview-content-styles`}
+                  />
+                )}
+                  <NodeViewContent {...props} as={wrapper?.as} id={nodeViewContentId}  />
+              </>
+            )
+          }}>
             <CustomElementRenderer
               name={name}
               code={state.code}

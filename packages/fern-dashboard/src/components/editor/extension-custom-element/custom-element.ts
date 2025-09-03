@@ -27,15 +27,15 @@ export const CustomElement = Node.create<CustomElementOptions>({
 
   group: "block",
 
-  content: "text*",
+  content: "block*",
 
-  atom: true,
+  atom: false,
 
   draggable: true,
 
   selectable: false,
 
-  code: true,
+  // code: true,
 
   /**
    * The data attributes are used to store the original content of the custom element.
@@ -65,7 +65,7 @@ export const CustomElement = Node.create<CustomElementOptions>({
        * Set contenteditable to false to prevent the custom element from being edited.
        */
       contenteditable: {
-        default: false,
+        default: true,
       },
     };
   },

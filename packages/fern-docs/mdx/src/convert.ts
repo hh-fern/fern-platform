@@ -229,11 +229,11 @@ export function mdxToHtml(
       content = nodeContent.content;
     }
 
-    // if (isMdxJsxElement(node)) {
-      // return mdxCustomElementNodev2(hash, content, nodeType, node, state);
-    // } else {
-    // }
-    return mdxUnsupportedCustomElementNodev2(hash, content, name)
+    if (isMdxJsxElement(node)) {
+      return mdxCustomElementNodev2(hash, content, nodeType, node, state);
+    } else {
+      return mdxUnsupportedCustomElementNodev2(hash, content, name)
+    }
   }
 
   // Get hast from mdast (and handle custom elements)
