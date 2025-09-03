@@ -9,6 +9,7 @@ import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { GithubSourceRepo } from "@/app/services/github/types";
 import { Button } from "@/components/ui/button";
+import Card from "@/components/ui/card";
 import { deleteLocalBranch } from "@/utils/branch-utils.client";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
@@ -72,10 +73,18 @@ export function OpenPRsComponent({
   const hasMoreBranches = visibleCount < availableBranches.length;
 
   return (
-    <div className="border-border flex min-w-0 flex-1 gap-6 rounded-xl border bg-white p-3 transition-[padding] sm:p-4 md:p-5 lg:p-6">
+    <Card>
       <div className="flex w-full flex-col gap-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-black">
+          <h3
+            className="dark:text-gray-1200 text-black"
+            style={{
+              fontFamily: "var(--font-gt-planar)",
+              fontWeight: 700,
+              fontSize: "16px",
+              lineHeight: "20px",
+            }}
+          >
             Fern Visual Editor
           </h3>
           <GoToEditorButton
@@ -99,14 +108,20 @@ export function OpenPRsComponent({
                   <Button
                     size="sm"
                     onClick={() => handleBranchClick(branch)}
-                    className="text-green-1100 ml-3 border border-gray-400 bg-white hover:border-gray-600 hover:bg-gray-50"
+                    className="text-green-1100 ml-3 border border-gray-400 bg-white hover:border-gray-600 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-300 dark:text-green-900 dark:hover:border-gray-500 dark:hover:bg-gray-400"
+                    style={{
+                      fontFamily: "var(--font-gt-planar)",
+                      fontWeight: 400,
+                      fontSize: "12px",
+                      lineHeight: "20px",
+                    }}
                   >
-                    Resume
+                    Open
                     <ArrowRight className="size-4" />
                   </Button>
                 </div>
                 {index < visibleBranches.length - 1 && (
-                  <div className="border-b border-gray-400" />
+                  <div className="border-b border-gray-400 dark:border-gray-600" />
                 )}
               </div>
             ))}
@@ -117,7 +132,12 @@ export function OpenPRsComponent({
                   variant="outline"
                   size="sm"
                   onClick={handleLoadMore}
-                  className="w-full border-gray-400 bg-white hover:border-gray-600 hover:bg-gray-50"
+                  style={{
+                    fontFamily: "var(--font-gt-planar)",
+                    fontWeight: 400,
+                    fontSize: "12px",
+                    lineHeight: "20px",
+                  }}
                 >
                   Load More ({availableBranches.length - visibleCount}{" "}
                   remaining)
@@ -129,10 +149,20 @@ export function OpenPRsComponent({
 
         {availableBranches.length === 0 && (
           <div className="py-8 text-center">
-            <p className="text-sm text-gray-500">No open sessions found</p>
+            <p
+              className="dark:text-gray-1200 text-gray-500"
+              style={{
+                fontFamily: "var(--font-gt-planar)",
+                fontWeight: 400,
+                fontSize: "14px",
+                lineHeight: "20px",
+              }}
+            >
+              No open sessions found
+            </p>
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }
