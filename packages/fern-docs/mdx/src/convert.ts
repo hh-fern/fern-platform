@@ -346,11 +346,24 @@ export function htmlToMdx(
           for (const [propName, propValue] of Object.entries(
             deserializedProps
           )) {
+            const coerced = propValue as FernMDXAttributeValue
+            if (coerced.type === "string") {
             attributes.push({
               type: "mdxJsxAttribute",
               name: propName,
-              value: propValue as string,
+              value: coerced.value
             });
+
+            } else if (coerced.type === "expression") {
+              attributes.push({
+                type: "mdxJsxAttribute",
+                name: propName,
+                value: {
+                  type: "mdxJsxAttributeValueExpression",
+                  value: coerced.value
+                }
+              })
+            }
           }
         }
       } catch (err) {
@@ -808,7 +821,25 @@ function mdxBaseElementNode(
   }
 }
 
-function getAttributes(node: MdxJsxElement): { name: string; value: string }[] {
+
+interface FernMDXAttributeStringValue {
+  type: "string";
+  value: string;
+}
+
+interface FernMDXAttributeExpressionValue {
+  type: "expression"
+  value: string;
+}
+
+type FernMDXAttributeValue = FernMDXAttributeStringValue | FernMDXAttributeExpressionValue
+
+interface FernMDXAttribute {
+  name: string;
+  value: FernMDXAttributeValue
+}
+
+function getAttributes(node: MdxJsxElement): FernMDXAttribute[] {
   // Extracts attributes from an MdxJsxElement node and returns them as an array of { name, value } objects.
   // Handles both string and expression attribute values.
   if (!node || !Array.isArray(node.attributes)) {
@@ -818,10 +849,24 @@ function getAttributes(node: MdxJsxElement): { name: string; value: string }[] {
     .filter((attr) => attr.type === "mdxJsxAttribute" && attr.value != null)
     .map((attr) => {
       const coerced = attr as MdxJsxAttribute;
+      const value = coerced.value!
+      if (typeof value === "object" && value.type === "mdxJsxAttributeValueExpression") {
+        return {
+          name: coerced.name,
+          value: {
+            type: "expression",
+            value: value.value
+          }
+        }
+      } else {
       return {
         name: coerced.name,
-        value: coerced.value!.toString(),
+        value: {
+          type: "string",
+          value: value as string
+        }
       };
+      }
     });
 }
 
@@ -840,7 +885,7 @@ function mdxCustomElementNodev2(
   }
 
   // Serialize all props to a JSON string for fve-data-props
-  const propsObject: Record<string, string> = {};
+  const propsObject: Record<string, FernMDXAttributeValue> = {};
   for (const { name, value } of attributes) {
     propsObject[name] = value;
   }
