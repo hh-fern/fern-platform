@@ -2,21 +2,10 @@
 
 import React, { ReactNode, createContext, useContext } from "react";
 
-interface Wrapper<T extends keyof React.JSX.IntrinsicElements = 'div'> {
-  as?: T
-  props: object
-}
-
-type ChildrenMiddleware = ({ children, wrapper }: { children: ReactNode, wrapper?: Wrapper }) => ReactNode;
+type ChildrenMiddleware = (children: ReactNode) => ReactNode;
 
 const ChildrenMiddlewareContext = createContext<ChildrenMiddleware>(
-  ({ children, wrapper }) => {
-    if (wrapper) {
-      const Component = wrapper.as || 'div';
-      return React.createElement(Component, wrapper.props, children);
-    }
-    return children;
-  }
+  (children) => children
 );
 
 export const ChildrenMiddlewareProvider: React.FC<{
@@ -30,7 +19,7 @@ export const ChildrenMiddlewareProvider: React.FC<{
   );
 };
 
-export const useChildrenMiddleware = ({ children, wrapper }: { children: ReactNode, wrapper?: Wrapper }): ReactNode => {
+export const useChildrenMiddleware = (children: ReactNode): ReactNode => {
   const middleware = useContext(ChildrenMiddlewareContext);
-  return middleware({ children, wrapper });
+  return middleware(children);
 };

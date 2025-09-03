@@ -59,7 +59,7 @@ export const CustomElement = Node.create<CustomElementOptions>({
         default: null,
       },
       "fve-unsupported": {
-        default: null
+        default: null,
       },
       /**
        * Set contenteditable to false to prevent the custom element from being edited.

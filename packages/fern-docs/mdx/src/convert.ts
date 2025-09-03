@@ -32,9 +32,9 @@ import { toMarkdown } from "mdast-util-to-markdown";
 import { frontmatter as fm } from "micromark-extension-frontmatter";
 import { math } from "micromark-extension-math";
 import { mdxjs } from "micromark-extension-mdxjs";
+import { a } from "vitest/dist/chunks/suite.BJU7kdY9.js";
 
 import { MdxJsxElement } from "./mdast";
-import { a } from "vitest/dist/chunks/suite.BJU7kdY9.js";
 
 // Options for how yaml is written to the frontmatter
 const FRONTMATTER_YAML_OPTIONS: yaml.DumpOptions = {
@@ -232,7 +232,7 @@ export function mdxToHtml(
     if (isMdxJsxElement(node)) {
       return mdxCustomElementNodev2(hash, content, nodeType, node, state);
     } else {
-      return mdxUnsupportedCustomElementNodev2(hash, content, name)
+      return mdxUnsupportedCustomElementNodev2(hash, content, name);
     }
   }
 
@@ -308,7 +308,7 @@ export function htmlToMdx(
   // Get hast from html
   const hast = fromHtml(html);
 
-  const unsupportedMdxContent: Record<string, string> = {}
+  const unsupportedMdxContent: Record<string, string> = {};
 
   // Default handler for base elements
   const baseElementHandler: ToMdastHandle = (state, element) => {
@@ -322,18 +322,23 @@ export function htmlToMdx(
     const attributes: MdxJsxAttribute[] = [];
 
     // Handle unsupported elements first
-    if (typeof props["fve-data-hash"] === "string" && typeof props["fve-unsupported"] === "string" && props["fve-unsupported"] === "true") {
-      const content = props["fve-mdx-content"]
+    if (
+      typeof props["fve-data-hash"] === "string" &&
+      typeof props["fve-unsupported"] === "string" &&
+      props["fve-unsupported"] === "true"
+    ) {
+      const content = props["fve-mdx-content"];
       if (typeof content !== "string") {
-        throw new Error(`expected string content in fve-mdx-content, found: ${typeof content}`)
+        throw new Error(
+          `expected string content in fve-mdx-content, found: ${typeof content}`
+        );
       }
 
-      const placeholder = `PLACEHOLDERV2_${props["fve-data-hash"]}`
-      unsupportedMdxContent[placeholder] = content
+      const placeholder = `PLACEHOLDERV2_${props["fve-data-hash"]}`;
+      unsupportedMdxContent[placeholder] = content;
 
       return { type: "html", value: placeholder } as any;
     }
-
 
     // Deserialize fve-data-props if present and add as attributes
     if (typeof props["fve-data-props"] === "string") {
@@ -878,4 +883,3 @@ function mdxUnsupportedCustomElementNodev2(
     children: [],
   };
 }
-

@@ -30,10 +30,11 @@ import {
   hasJSXSyntax,
   looksLikeHTML,
 } from "./jsx-to-html-converter";
-import TiptapEditor from "../TiptapEditor";
 
 // Separate components to avoid mount-remount cycles
-const LoadingComponent = React.memo(() => <Skeleton className="h-24 w-full m-2" />);
+const LoadingComponent = React.memo(() => (
+  <Skeleton className="my-2 h-24 w-full" />
+));
 LoadingComponent.displayName = "LoadingComponent";
 
 interface MDXWrapperProps {
@@ -234,22 +235,7 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
   const mdx = attrs["fve-mdx-content"];
   const name = attrs["fve-data-name"];
   const hash = attrs["fve-data-hash"];
-  const textContent = attrs["fve-mdx-content"]
-
-
-  // If the name is "Tip", after a delay, update fve-data-props to { intent: "error" }
-  useEffect(() => {
-    let timeout: NodeJS.Timeout | undefined
-    if (name === "Tip") {
-      console.log("UPDATING_TIP")
-      timeout = setTimeout(() => {
-        updateAttributes({
-          "fve-data-props": JSON.stringify({ intent: "error" }),
-        });
-      }, 5000); // 500ms delay, adjust as needed
-    }
-    return () => { if (timeout != null) clearTimeout(timeout) };
-  }, [name, updateAttributes]);
+  const textContent = attrs["fve-mdx-content"];
 
   useEffect(() => {
     (async () => {
@@ -275,7 +261,7 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
 
   // Process HTML content if available
   const htmlContent = useMemo(() => {
-    let content: string = textContent
+    let content: string = textContent;
     let extractedCSS: string[] = [];
 
     // Check if content has JSX syntax first
@@ -289,7 +275,7 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
       } catch (error) {
         console.warn("Failed to convert JSX to HTML:", error);
         // Fall back to original content
-        content = textContent
+        content = textContent;
       }
     }
 
@@ -315,23 +301,25 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
         ) : state.type === "ERROR" ? (
           <UnsupportedContent>{textContent}</UnsupportedContent>
         ) : (
-          <ChildrenMiddlewareProvider value={({ wrapper }) => {
-            const props = wrapper != null ? wrapper.props : {}
-            const hasWrapper = wrapper != null;
-            const nodeViewContentId = hasWrapper ? `nodeview-content-${hash}` : undefined;
-            
-            return (
-              <>
-                {hasWrapper && nodeViewContentId && (
+          <ChildrenMiddlewareProvider
+            value={(_) => {
+              const nodeViewContentId = `nodeview-content-${hash}`;
+
+              return (
+                <>
                   <StyleInjector
-                    styles={`#${nodeViewContentId} [data-node-view-content-react] { display: contents; }`}
+                    styles={`#${nodeViewContentId} { display: contents; }`}
                     id={`${hash}-nodeview-content-styles`}
                   />
-                )}
-                  <NodeViewContent {...props} as={wrapper?.as} id={nodeViewContentId}  />
-              </>
-            )
-          }}>
+                  <StyleInjector
+                    styles={`#${nodeViewContentId} [data-node-view-content-react] { display: contents; }`}
+                    id={`${hash}-nodeview-content-inner-styles`}
+                  />
+                  <NodeViewContent {...props} id={nodeViewContentId} />
+                </>
+              );
+            }}
+          >
             <CustomElementRenderer
               name={name}
               code={state.code}
