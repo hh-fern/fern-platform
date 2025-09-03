@@ -126,12 +126,13 @@ function BranchPRContent({
 
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
-            <div className="flex flex-col gap-6">   {/* adds vertical spacing */}
+          <div className="flex flex-col gap-6">
+            {" "}
+            {/* adds vertical spacing */}
             <DialogHeader>
               <DialogTitle>Delete Session</DialogTitle>
               <DialogDescription>{getDialogMessage()}</DialogDescription>
             </DialogHeader>
-
             <DialogFooter>
               <Button variant="outline" onClick={handleCancelDelete}>
                 Cancel
@@ -140,7 +141,7 @@ function BranchPRContent({
                 Delete
               </Button>
             </DialogFooter>
-            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
