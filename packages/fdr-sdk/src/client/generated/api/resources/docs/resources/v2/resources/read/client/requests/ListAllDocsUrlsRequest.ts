@@ -9,8 +9,6 @@
 export interface ListAllDocsUrlsRequest {
     page?: number;
     limit?: number;
-    /**
-     * If true, filters to only docs with a custom URL.
-     */
+    /** If true, filters to only docs with a custom URL. */
     custom?: boolean;
 }

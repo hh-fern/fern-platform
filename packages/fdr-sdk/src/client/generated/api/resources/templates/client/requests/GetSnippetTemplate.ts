@@ -11,7 +11,7 @@ import * as FernRegistry from "../../../../index.js";
  *         apiId: FernRegistry.ApiId("apiId"),
  *         sdk: {
  *             type: "typescript",
- *             package: "package",
+ *             "package": "package",
  *             version: undefined
  *         },
  *         endpointId: {

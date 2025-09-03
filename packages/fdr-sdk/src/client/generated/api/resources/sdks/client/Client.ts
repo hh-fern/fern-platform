@@ -12,13 +12,18 @@ export declare namespace Sdks {
         /** Specify a custom URL to connect the client to. */
         baseUrl?: core.Supplier<string>;
         token?: core.Supplier<core.BearerToken | undefined>;
+        /** Additional headers to include in requests. */
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 }
 
 export class Sdks {
+    protected readonly _options: Sdks.Options;
     protected _versions: Versions | undefined;
 
-    constructor(protected readonly _options: Sdks.Options = {}) {}
+    constructor(_options: Sdks.Options = {}) {
+        this._options = _options;
+    }
 
     public get versions(): Versions {
         return (this._versions ??= new Versions(this._options));

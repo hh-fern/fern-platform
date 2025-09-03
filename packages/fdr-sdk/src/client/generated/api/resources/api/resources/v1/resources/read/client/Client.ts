@@ -5,7 +5,7 @@
 import * as environments from "../../../../../../../../environments.js";
 import * as core from "../../../../../../../../core/index.js";
 import * as FernRegistry from "../../../../../../../index.js";
-import urlJoin from "url-join";
+import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../../../../../core/headers.js";
 
 export declare namespace Read {
     export interface Options {
@@ -13,6 +13,8 @@ export declare namespace Read {
         /** Specify a custom URL to connect the client to. */
         baseUrl?: core.Supplier<string>;
         token?: core.Supplier<core.BearerToken | undefined>;
+        /** Additional headers to include in requests. */
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 
     export interface RequestOptions {
@@ -22,13 +24,19 @@ export declare namespace Read {
         maxRetries?: number;
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
+        /** Additional query string parameters to include in the request. */
+        queryParams?: Record<string, unknown>;
         /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 }
 
 export class Read {
-    constructor(protected readonly _options: Read.Options = {}) {}
+    protected readonly _options: Read.Options;
+
+    constructor(_options: Read.Options = {}) {
+        this._options = _options;
+    }
 
     /**
      * @param {FernRegistry.ApiDefinitionId} apiDefinitionId
@@ -54,23 +62,21 @@ export class Read {
             core.APIResponse<FernRegistry.api.v1.read.ApiDefinition, FernRegistry.api.v1.read.getApi.Error>
         >
     > {
+        let _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({ Authorization: await this._getAuthorizationHeader() }),
+            requestOptions?.headers,
+        );
         const _response = await core.fetcher({
-            url: urlJoin(
+            url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.FernRegistryEnvironment.Prod,
                 `/registry/api/load/${encodeURIComponent(apiDefinitionId)}`,
             ),
             method: "GET",
-            headers: {
-                Authorization: await this._getAuthorizationHeader(),
-                "X-Fern-Language": "JavaScript",
-                "X-Fern-Runtime": core.RUNTIME.type,
-                "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
-            },
-            contentType: "application/json",
-            requestType: "json",
+            headers: _headers,
+            queryParameters: requestOptions?.queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : undefined,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,

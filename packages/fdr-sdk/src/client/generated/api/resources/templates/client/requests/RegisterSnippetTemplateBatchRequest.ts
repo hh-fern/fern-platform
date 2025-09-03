@@ -13,7 +13,7 @@ import * as FernRegistry from "../../../../index.js";
  *         snippets: [{
  *                 sdk: {
  *                     type: "typescript",
- *                     package: "package",
+ *                     "package": "package",
  *                     version: "version"
  *                 },
  *                 endpointId: {
@@ -37,7 +37,7 @@ import * as FernRegistry from "../../../../index.js";
  *             }, {
  *                 sdk: {
  *                     type: "typescript",
- *                     package: "package",
+ *                     "package": "package",
  *                     version: "version"
  *                 },
  *                 endpointId: {

@@ -7,12 +7,8 @@
  *     {}
  */
 export interface ListGeneratorReleasesRequest {
-    /**
-     * The page integer to retrieve. Defaults to 0.
-     */
+    /** The page integer to retrieve. Defaults to 0. */
     page?: number;
-    /**
-     * The integer of items to retrieve per page. Defaults to 20.
-     */
+    /** The integer of items to retrieve per page. Defaults to 20. */
     pageSize?: number;
 }

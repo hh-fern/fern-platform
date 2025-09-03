@@ -12,29 +12,29 @@ import * as FernRegistry from "../../../../index.js";
  *         snippets: {
  *             type: "typescript",
  *             sdk: {
- *                 package: "package",
+ *                 "package": "package",
  *                 version: "version"
  *             },
  *             snippets: [{
+ *                     snippet: {
+ *                         client: "client"
+ *                     },
  *                     endpoint: {
  *                         path: FernRegistry.EndpointPathLiteral("path"),
  *                         method: "GET",
  *                         identifierOverride: undefined
  *                     },
- *                     exampleIdentifier: undefined,
- *                     snippet: {
- *                         client: "client"
- *                     }
+ *                     exampleIdentifier: undefined
  *                 }, {
+ *                     snippet: {
+ *                         client: "client"
+ *                     },
  *                     endpoint: {
  *                         path: FernRegistry.EndpointPathLiteral("path"),
  *                         method: "GET",
  *                         identifierOverride: undefined
  *                     },
- *                     exampleIdentifier: undefined,
- *                     snippet: {
- *                         client: "client"
- *                     }
+ *                     exampleIdentifier: undefined
  *                 }]
  *         }
  *     }

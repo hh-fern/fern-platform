@@ -4,6 +4,7 @@
 
 import * as environments from "./environments.js";
 import * as core from "./core/index.js";
+import { mergeHeaders } from "./core/headers.js";
 import { Api } from "./api/resources/api/client/Client.js";
 import { Dashboard } from "./api/resources/dashboard/client/Client.js";
 import { Docs } from "./api/resources/docs/client/Client.js";
@@ -23,6 +24,8 @@ export declare namespace FernRegistryClient {
         /** Specify a custom URL to connect the client to. */
         baseUrl?: core.Supplier<string>;
         token?: core.Supplier<core.BearerToken | undefined>;
+        /** Additional headers to include in requests. */
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 
     export interface RequestOptions {
@@ -32,12 +35,15 @@ export declare namespace FernRegistryClient {
         maxRetries?: number;
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
+        /** Additional query string parameters to include in the request. */
+        queryParams?: Record<string, unknown>;
         /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 }
 
 export class FernRegistryClient {
+    protected readonly _options: FernRegistryClient.Options;
     protected _api: Api | undefined;
     protected _dashboard: Dashboard | undefined;
     protected _docs: Docs | undefined;
@@ -51,7 +57,19 @@ export class FernRegistryClient {
     protected _templates: Templates | undefined;
     protected _tokens: Tokens | undefined;
 
-    constructor(protected readonly _options: FernRegistryClient.Options = {}) {}
+    constructor(_options: FernRegistryClient.Options = {}) {
+        this._options = {
+            ..._options,
+            headers: mergeHeaders(
+                {
+                    "X-Fern-Language": "JavaScript",
+                    "X-Fern-Runtime": core.RUNTIME.type,
+                    "X-Fern-Runtime-Version": core.RUNTIME.version,
+                },
+                _options?.headers,
+            ),
+        };
+    }
 
     public get api(): Api {
         return (this._api ??= new Api(this._options));

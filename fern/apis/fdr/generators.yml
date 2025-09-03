@@ -1,7 +1,7 @@
 default-group: local
 
 groups:
-  local:
+  server:
     generators:
       - name: fernapi/fern-typescript-express
         version: 0.17.6
@@ -13,8 +13,10 @@ groups:
           noSerdeLayer: true
           noOptionalProperties: true
           useBrandedStringAliases: true
-      - name: fernapi/fern-typescript-node-sdk
-        version: 0.51.0
+  ts-sdk:
+    generators:
+      - name: fernapi/fern-typescript-sdk
+        version: 2.8.3
         output:
           location: local-file-system
           path: ../../../packages/fdr-sdk/src/client/generated
@@ -23,14 +25,13 @@ groups:
           noSerdeLayer: true
           noOptionalProperties: true
           useBrandedStringAliases: true
-          outputSourceFiles: true
           neverThrowErrors: true
           timeoutInSeconds: infinity
           useLegacyExports: false
 
   fdr-cjs-sdk:
     generators:
-      - name: fernapi/fern-typescript-node-sdk
+      - name: fernapi/fern-typescript-sdk
         version: 2.8.3
         output:
           location: npm

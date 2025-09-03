@@ -21,7 +21,7 @@
     "docs:start": "turbo docs:start",
     "fai:dev": "bash scripts/run-local-fai.sh",
     "fai:generate": "pnpm fern generate --api fai && pnpm turbo --filter=@fern-api/fai-sdk compile",
-    "fdr:generate": "pnpm fern generate --api fdr --local && pnpm turbo --filter=@fern-api/fdr-sdk compile",
+    "fdr:generate": "pnpm fern generate --api fdr --local --group server && pnpm fern generate --api fdr --local --group ts-sdk && pnpm turbo --filter=@fern-api/fdr-sdk compile",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "preinstall": "npx only-allow pnpm",

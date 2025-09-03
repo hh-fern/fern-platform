@@ -12,12 +12,8 @@ import * as FernRegistry from "../../../../index.js";
  *     }
  */
 export interface ApiDiffRequest {
-    /**
-     * The id of the previous version of the api definition
-     */
+    /** The id of the previous version of the api definition */
     previousApiDefinitionId: FernRegistry.ApiDefinitionId;
-    /**
-     * The id of the current version of the api definition
-     */
+    /** The id of the current version of the api definition */
     currentApiDefinitionId: FernRegistry.ApiDefinitionId;
 }

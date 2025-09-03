@@ -5,7 +5,7 @@
 import * as environments from "../../../../environments.js";
 import * as core from "../../../../core/index.js";
 import * as FernRegistry from "../../../index.js";
-import urlJoin from "url-join";
+import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers.js";
 
 export declare namespace DocsCache {
     export interface Options {
@@ -13,6 +13,8 @@ export declare namespace DocsCache {
         /** Specify a custom URL to connect the client to. */
         baseUrl?: core.Supplier<string>;
         token?: core.Supplier<core.BearerToken | undefined>;
+        /** Additional headers to include in requests. */
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 
     export interface RequestOptions {
@@ -22,13 +24,19 @@ export declare namespace DocsCache {
         maxRetries?: number;
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
+        /** Additional query string parameters to include in the request. */
+        queryParams?: Record<string, unknown>;
         /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 }
 
 export class DocsCache {
-    constructor(protected readonly _options: DocsCache.Options = {}) {}
+    protected readonly _options: DocsCache.Options;
+
+    constructor(_options: DocsCache.Options = {}) {
+        this._options = _options;
+    }
 
     /**
      * @param {FernRegistry.InvalidateCachedDocsRequest} request
@@ -50,22 +58,22 @@ export class DocsCache {
         request: FernRegistry.InvalidateCachedDocsRequest,
         requestOptions?: DocsCache.RequestOptions,
     ): Promise<core.WithRawResponse<core.APIResponse<void, FernRegistry.docsCache.invalidate.Error>>> {
+        let _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({ Authorization: await this._getAuthorizationHeader() }),
+            requestOptions?.headers,
+        );
         const _response = await core.fetcher({
-            url: urlJoin(
+            url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.FernRegistryEnvironment.Prod,
                 "/docs-cache/invalidate",
             ),
             method: "POST",
-            headers: {
-                Authorization: await this._getAuthorizationHeader(),
-                "X-Fern-Language": "JavaScript",
-                "X-Fern-Runtime": core.RUNTIME.type,
-                "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
-            },
+            headers: _headers,
             contentType: "application/json",
+            queryParameters: requestOptions?.queryParams,
             requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : undefined,

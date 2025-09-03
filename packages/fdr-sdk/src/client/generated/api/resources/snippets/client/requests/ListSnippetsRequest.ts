@@ -12,7 +12,7 @@ import * as FernRegistry from "../../../../index.js";
  *         apiId: FernRegistry.ApiId("vellum-ai"),
  *         sdks: [{
  *                 type: "python",
- *                 package: "vellum-ai"
+ *                 "package": "vellum-ai"
  *             }]
  *     }
  */

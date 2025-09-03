@@ -13,14 +13,19 @@ export declare namespace Api {
         /** Specify a custom URL to connect the client to. */
         baseUrl?: core.Supplier<string>;
         token?: core.Supplier<core.BearerToken | undefined>;
+        /** Additional headers to include in requests. */
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 }
 
 export class Api {
+    protected readonly _options: Api.Options;
     protected _latest: Latest | undefined;
     protected _v1: V1 | undefined;
 
-    constructor(protected readonly _options: Api.Options = {}) {}
+    constructor(_options: Api.Options = {}) {
+        this._options = _options;
+    }
 
     public get latest(): Latest {
         return (this._latest ??= new Latest(this._options));

@@ -7,7 +7,7 @@ import * as FernRegistry from "../../../../../../index.js";
 /**
  * @example
  *     {
- *         package: "package",
+ *         "package": "package",
  *         language: "Go",
  *         githubRepository: undefined
  *     }

@@ -13,14 +13,19 @@ export declare namespace V2 {
         /** Specify a custom URL to connect the client to. */
         baseUrl?: core.Supplier<string>;
         token?: core.Supplier<core.BearerToken | undefined>;
+        /** Additional headers to include in requests. */
+        headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
 }
 
 export class V2 {
+    protected readonly _options: V2.Options;
     protected _read: Read | undefined;
     protected _write: Write | undefined;
 
-    constructor(protected readonly _options: V2.Options = {}) {}
+    constructor(_options: V2.Options = {}) {
+        this._options = _options;
+    }
 
     public get read(): Read {
         return (this._read ??= new Read(this._options));
