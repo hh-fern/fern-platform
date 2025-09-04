@@ -5,7 +5,11 @@ import FileHandler from "@tiptap/extension-file-handler";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 
-import { ErrorUploadImageToast } from "../../EditorToasts";
+import {
+  ErrorUploadImageToast,
+  SuccessfulUploadImageToast,
+  UploadingImageToast,
+} from "../../EditorToasts";
 import { createCustomElementNode } from "../../extension-custom-element/create-custom-element-node";
 import ImageUploadNode from "./image-upload-node-extension";
 
@@ -108,6 +112,7 @@ export const ConfiguredFileHandler = () => {
         fileReader.readAsDataURL(file);
         fileReader.onload = async () => {
           try {
+            UploadingImageToast();
             const imageUrl = await private_handleImageUpload({
               file,
               docsUrl,
@@ -118,6 +123,7 @@ export const ConfiguredFileHandler = () => {
               `<img src="${imageUrl}" alt="${file.name}" title="${file.name}" />`
             );
             currentEditor.chain().focus().insertContentAt(pos, imageNode).run();
+            SuccessfulUploadImageToast();
           } catch (error) {
             ErrorUploadImageToast(
               error instanceof Error ? error : new Error("Upload failed")
@@ -139,6 +145,7 @@ export const ConfiguredFileHandler = () => {
         fileReader.readAsDataURL(file);
         fileReader.onload = async () => {
           try {
+            UploadingImageToast();
             const imageUrl = await private_handleImageUpload({
               file,
               docsUrl,
@@ -153,6 +160,7 @@ export const ConfiguredFileHandler = () => {
               .focus()
               .insertContentAt(currentEditor.state.selection.anchor, imageNode)
               .run();
+            SuccessfulUploadImageToast();
           } catch (error) {
             ErrorUploadImageToast(
               error instanceof Error ? error : new Error("Upload failed")
