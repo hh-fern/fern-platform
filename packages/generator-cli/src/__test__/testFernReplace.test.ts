@@ -13,12 +13,12 @@ describe("fernReplace tests", () => {
     );
   });
 
-  it("should replace the version", () => {
+  it("should replace the version", async () => {
     const result = fernReplace(
       fernReplaceExample,
       new Map([["version", "4.5.6"]])
     );
-    expect(result).toMatchFileSnapshot(
+    await expect(result).toMatchFileSnapshot(
       `__snapshots__/fern-replace-example-output.md`
     );
   });
