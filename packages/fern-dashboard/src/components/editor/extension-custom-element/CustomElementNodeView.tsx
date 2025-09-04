@@ -1,11 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import { useMDXComponents } from "@mdx-js/react";
-import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import DOMPurify from "dompurify";
 import { getMDXComponent } from "mdx-bundler/client";
-
-import { ChildrenMiddlewareProvider } from "@fern-docs/components";
 
 import { bundleMDX } from "@/app/[orgName]/(visual-editor)/editor/[docsUrl]/[branch]/[...slug]/bundleEditorMdx";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,11 +34,6 @@ interface MDXWrapperProps {
 const MDXWrapper = ({ code, hash, components }: MDXWrapperProps) => {
   const MDXComponent = useMemo(() => {
     try {
-      console.info(
-        "[CustomElementNodeView] Rendering MDX component:",
-        "with hash:",
-        hash
-      );
       return getMDXComponent(code);
     } catch (error) {
       console.warn(
@@ -288,17 +281,15 @@ export const CustomElementNodeView = (props: NodeViewProps) => {
         ) : state.type === "ERROR" ? (
           <UnsupportedContent>{textContent}</UnsupportedContent>
         ) : (
-          <ChildrenMiddlewareProvider value={(_) => <NodeViewContent />}>
-            <CustomElementRenderer
-              name={name}
-              code={state.code}
-              htmlContent={htmlContent}
-              inlineCss={inlineCss}
-              hash={hash}
-              components={components}
-              textContent={textContent}
-            />
-          </ChildrenMiddlewareProvider>
+          <CustomElementRenderer
+            name={name}
+            code={state.code}
+            htmlContent={htmlContent}
+            inlineCss={inlineCss}
+            hash={hash}
+            components={components}
+            textContent={textContent}
+          />
         )}
       </NodeViewWrapper>
     </ErrorBoundary>

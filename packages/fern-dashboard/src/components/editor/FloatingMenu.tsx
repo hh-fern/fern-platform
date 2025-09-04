@@ -1,4 +1,4 @@
-import { MouseEventHandler, useMemo } from "react";
+import { MouseEventHandler } from "react";
 
 import { useCurrentEditor } from "@tiptap/react";
 import { FloatingMenu as EditorFloatingMenu } from "@tiptap/react/menus";
@@ -9,35 +9,6 @@ import { FloatingMenuAction, menuItems } from "./floating-menu-options";
 
 export default function FloatingMenu() {
   const { editor } = useCurrentEditor();
-
-  // Get the search query from the current text after "/"
-  const searchQuery = useMemo(() => {
-    if (!editor) return "";
-
-    const { selection } = editor.state;
-    const { $from } = selection;
-
-    if (
-      $from.parent.type.name !== "paragraph" ||
-      !$from.parent.textContent.startsWith("/")
-    ) {
-      return "";
-    }
-
-    // Extract text after "/" for filtering
-    return $from.parent.textContent.slice(1).toLowerCase();
-  }, [editor]);
-
-  // Filter menu items based on search query
-  const filteredItems = useMemo(() => {
-    if (!searchQuery) return menuItems;
-
-    return menuItems.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchQuery) ||
-        item.keywords.some((keyword) => keyword.includes(searchQuery))
-    );
-  }, [searchQuery]);
 
   function menuItemClickHandler(action: FloatingMenuAction) {
     return () => {
@@ -120,20 +91,14 @@ export default function FloatingMenu() {
     >
       <div className="border-1 text-gray-1100 rounded-2 flex min-w-60 flex-col border-gray-500 bg-white p-1 pt-2 shadow-sm">
         <FloatingMenuHeading title="Basics" />
-        {filteredItems.length > 0 ? (
-          filteredItems.map((item) => (
-            <FloatingMenuItem
-              key={item.action}
-              title={item.title}
-              iconProps={item.iconProps}
-              onClick={menuItemClickHandler(item.action)}
-            />
-          ))
-        ) : (
-          <div className="px-3 py-2 text-sm text-gray-500">
-            No components found for &ldquo;{searchQuery}&rdquo;
-          </div>
-        )}
+        {menuItems.map((item) => (
+          <FloatingMenuItem
+            key={item.action}
+            title={item.title}
+            iconProps={item.iconProps}
+            onClick={menuItemClickHandler(item.action)}
+          />
+        ))}
         {/* 
         TODO: Add link
         <FloatingMenuItem

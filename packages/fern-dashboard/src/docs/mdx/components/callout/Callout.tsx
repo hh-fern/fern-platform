@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
-import { cn, useChildrenMiddleware } from "@fern-docs/components";
+import { cn } from "@fern-docs/components";
 import { FaIcon } from "@fern-docs/components";
 
 type Intent =
@@ -156,10 +156,9 @@ export function TipCallout({
   children,
   ...props
 }: PropsWithChildren<Omit<Callout.Props, "intent">>): ReactElement<any> {
-  const intercepted = useChildrenMiddleware(children);
   return (
     <Callout intent="tip" {...props}>
-      {intercepted}
+      {children}
     </Callout>
   );
 }

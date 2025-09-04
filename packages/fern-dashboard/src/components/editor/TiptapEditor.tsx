@@ -41,11 +41,6 @@ const dataAttributeNodeTypes = [
 const extensions = [
   StarterKit,
   CustomElement,
-  // Image.extend({
-  //   renderHTML({ HTMLAttributes }) {
-  //     return ["img", HTMLAttributes];
-  //   },
-  // }),
   UniqueID.configure({
     types: dataAttributeNodeTypes,
   }),
