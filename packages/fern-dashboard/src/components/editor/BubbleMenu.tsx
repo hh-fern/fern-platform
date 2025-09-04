@@ -68,7 +68,7 @@ export default function BubbleMenu() {
         // Don't show the bubble menu if the selection is an image or image upload
         if (
           // @ts-expect-error - type issue with tiptap
-          selection?.node?.type?.name === "image" ||
+          selection?.node?.type?.name === "custom-element-v2" ||
           // @ts-expect-error - type issue with tiptap
           selection?.node?.type?.name === "imageUpload"
         ) {
