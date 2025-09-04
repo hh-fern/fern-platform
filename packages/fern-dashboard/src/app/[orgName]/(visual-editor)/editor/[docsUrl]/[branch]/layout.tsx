@@ -3,8 +3,6 @@ import "server-only";
 import { ThemeProvider } from "next-themes";
 import type React from "react";
 
-import { MDXProvider } from "@mdx-js/react";
-
 import { ClientPageManager } from "@fern-docs/components/sidebar/nodes/ClientPageManager";
 import { SidebarClientNavigationProvider } from "@fern-docs/components/sidebar/nodes/SidebarClientNavigationProvider";
 
@@ -15,7 +13,6 @@ import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
 import { PreviewOnlyNotification } from "@/components/editor/PreviewOnlyNotification";
-import { MDX_COMPONENTS } from "@/docs/mdx/components";
 import { BranchProvider } from "@/providers/BranchContext";
 import { CurrentPageProvider } from "@/providers/CurrentPageContext";
 import { DevModeProvider } from "@/providers/DevModeProvider";

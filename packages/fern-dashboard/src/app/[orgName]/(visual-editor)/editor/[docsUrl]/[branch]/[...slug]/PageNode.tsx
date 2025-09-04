@@ -3,8 +3,6 @@
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
-import { MDXProvider } from "@mdx-js/react";
-
 import { FernNavigation } from "@fern-api/fdr-sdk";
 import { NodeId } from "@fern-api/fdr-sdk/navigation";
 import { ClientPageStorage, PageStorage } from "@fern-docs/components";
@@ -14,7 +12,6 @@ import { MdxToHtmlResponse, mdxToHtml } from "@fern-docs/mdx";
 
 import { UnsupportedContent } from "@/components/editor/UnsupportedContent";
 import { CSSProvider } from "@/components/editor/extension-custom-element/CSSContext";
-import { MDX_COMPONENTS } from "@/docs/mdx/components";
 import { createMdxFrontmatter } from "@/utils/createMdxFrontmatter";
 
 import PageContents from "./PageContents";
