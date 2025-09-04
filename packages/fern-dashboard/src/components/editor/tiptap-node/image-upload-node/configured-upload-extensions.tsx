@@ -45,11 +45,6 @@ const private_handleImageUpload = async ({
 
   if (!uploadResponse.ok) {
     const errorText = await uploadResponse.text();
-    console.error("S3 upload failed:", {
-      status: uploadResponse.status,
-      statusText: uploadResponse.statusText,
-      errorText,
-    });
     throw new Error(
       `Failed to upload file: ${uploadResponse.status} ${uploadResponse.statusText}. ${errorText}`
     );
@@ -112,16 +107,22 @@ export const ConfiguredFileHandler = () => {
 
         fileReader.readAsDataURL(file);
         fileReader.onload = async () => {
-          const imageUrl = await private_handleImageUpload({
-            file,
-            docsUrl,
-            slug,
-          });
-          const imageNode = createCustomElementNode(
-            "img",
-            `<img src="${imageUrl}" alt="${file.name}" title="${file.name}" />`
-          );
-          currentEditor.chain().focus().insertContentAt(pos, imageNode).run();
+          try {
+            const imageUrl = await private_handleImageUpload({
+              file,
+              docsUrl,
+              slug,
+            });
+            const imageNode = createCustomElementNode(
+              "img",
+              `<img src="${imageUrl}" alt="${file.name}" title="${file.name}" />`
+            );
+            currentEditor.chain().focus().insertContentAt(pos, imageNode).run();
+          } catch (error) {
+            ErrorUploadImageToast(
+              error instanceof Error ? error : new Error("Upload failed")
+            );
+          }
         };
       });
     },
@@ -137,20 +138,26 @@ export const ConfiguredFileHandler = () => {
 
         fileReader.readAsDataURL(file);
         fileReader.onload = async () => {
-          const imageUrl = await private_handleImageUpload({
-            file,
-            docsUrl,
-            slug,
-          });
-          const imageNode = createCustomElementNode(
-            "img",
-            `<img src="${imageUrl}" alt="${file.name}" title="${file.name}" />`
-          );
-          currentEditor
-            .chain()
-            .focus()
-            .insertContentAt(currentEditor.state.selection.anchor, imageNode)
-            .run();
+          try {
+            const imageUrl = await private_handleImageUpload({
+              file,
+              docsUrl,
+              slug,
+            });
+            const imageNode = createCustomElementNode(
+              "img",
+              `<img src="${imageUrl}" alt="${file.name}" title="${file.name}" />`
+            );
+            currentEditor
+              .chain()
+              .focus()
+              .insertContentAt(currentEditor.state.selection.anchor, imageNode)
+              .run();
+          } catch (error) {
+            ErrorUploadImageToast(
+              error instanceof Error ? error : new Error("Upload failed")
+            );
+          }
         };
       });
     },

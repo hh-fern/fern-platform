@@ -6,7 +6,7 @@ export function createCustomElementNode(tagName: string, mdxContent: string) {
     // These data attributes help the client to handle the custom element
     attrs: {
       "fve-data-hash": createHash("sha256")
-        .update(Math.random().toString())
+        .update(`${tagName}:${mdxContent}`)
         .digest("hex"),
       "fve-data-name": tagName,
       "fve-mdx-content": mdxContent,
