@@ -183,7 +183,6 @@ export function mdxToHtml(
     const { type, name } = getNodeInfo(node);
     const nodeType = type as BaseElementsType;
 
-    console.log("[1 - mdxToHtml] BASE ELEMENT NODE", node, nodeType, name);
     if (treatAsUnsupported.includes(nodeType)) {
       throw new Error(`Unsupported node type: ${nodeType}`);
     }
@@ -216,6 +215,22 @@ export function mdxToHtml(
       throw new Error(`Unsupported node type: ${nodeType}`);
     }
 
+    // Handle image-upload custom element
+    if (type === "mdxJsxFlowElement" && name === "div") {
+      const maybeDataType = node?.attributes?.find(
+        (attr: any) => attr.name === "data-type"
+      )?.value;
+      if (maybeDataType === "image-upload") {
+        return {
+          type: "element",
+          tagName: "div",
+          properties: {
+            dataType: "image-upload",
+          },
+        };
+      }
+    }
+
     // For MDX JSX elements, use hash based only on name and props
     // For other custom elements, use the original content-based hash
     let hash: NodeHash;
@@ -230,11 +245,7 @@ export function mdxToHtml(
       hash = nodeContent.hash;
       content = nodeContent.content;
     }
-    console.log("[2 - mdxToHtml] CUSTOM ELEMENT NODE", node, nodeType, name);
 
-    if (isMdxJsxElement(node)) {
-      return mdxCustomElementNodev2(hash, content, nodeType, node, state);
-    }
     return mdxUnsupportedCustomElementNodev2(hash, content, name);
   }
 
@@ -287,8 +298,6 @@ export function mdxToHtml(
   // Get html from hast
   const html = toHtml(hast);
 
-  console.log(html);
-
   return { html, frontmatter, originalFrontmatter };
 }
 
@@ -313,6 +322,10 @@ export function htmlToMdx(
 
   // Default handler for base elements
   const baseElementHandler: ToMdastHandle = (state, element) => {
+    // Handle image-upload custom element separately
+    if (element?.properties?.dataType === "image-upload") {
+      return { type: "html", value: `<div data-type="image-upload" />` } as any;
+    }
     return getToMdastDefaultHandler(element.tagName as any)(state, element);
   };
 
@@ -339,28 +352,6 @@ export function htmlToMdx(
       unsupportedMdxContent[placeholder] = content;
 
       return { type: "html", value: placeholder } as any;
-    }
-
-    // Deserialize fve-data-props if present and add as attributes
-    if (typeof props["fve-data-props"] === "string") {
-      try {
-        const deserializedProps = JSON.parse(props["fve-data-props"]);
-        if (deserializedProps && typeof deserializedProps === "object") {
-          for (const [propName, propValue] of Object.entries(
-            deserializedProps
-          )) {
-            attributes.push({
-              type: "mdxJsxAttribute",
-              name: propName,
-              value: propValue as string,
-            });
-          }
-        }
-      } catch (err) {
-        throw new Error(
-          `Failed to parse fve-data-props as JSON: ${(err as Error).message}`
-        );
-      }
     }
 
     // Also handle fve-data-name for the element name
@@ -811,66 +802,12 @@ function mdxBaseElementNode(
   }
 }
 
-function getAttributes(node: MdxJsxElement): { name: string; value: string }[] {
-  // Extracts attributes from an MdxJsxElement node and returns them as an array of { name, value } objects.
-  // Handles both string and expression attribute values.
-  if (!node || !Array.isArray(node.attributes)) {
-    return [];
-  }
-  return node.attributes
-    .filter((attr) => attr.type === "mdxJsxAttribute" && attr.value != null)
-    .map((attr) => {
-      const coerced = attr as MdxJsxAttribute;
-      return {
-        name: coerced.name,
-        value: coerced.value!.toString(),
-      };
-    });
-}
-
-// Create node for a custom element -- colton v2 test
-function mdxCustomElementNodev2(
-  hash: NodeHash,
-  originalMdxContent: string,
-  type: CustomElementsType,
-  node: MdxJsxElement,
-  state: ToHastState
-) {
-  const attributes = getAttributes(node);
-  let processedChildren: ReturnType<typeof state.all> = [];
-  if (node.children.length > 0) {
-    processedChildren = state.all(node);
-  }
-
-  // Serialize all props to a JSON string for fve-data-props
-  const propsObject: Record<string, string> = {};
-  for (const { name, value } of attributes) {
-    propsObject[name] = value;
-  }
-  const serializedProps = JSON.stringify(propsObject);
-
-  return {
-    type: "element" as const,
-    tagName: "custom-element-v2",
-    // These data attributes help the client to handle the custom element
-    properties: {
-      "fve-data-hash": hash,
-      "fve-data-type": type,
-      "fve-data-name": node.name,
-      "fve-data-props": serializedProps,
-      "fve-mdx-content": originalMdxContent,
-    },
-    children: processedChildren,
-  };
-}
-
 // Create node for a custom element -- colton v2 test
 function mdxUnsupportedCustomElementNodev2(
   hash: NodeHash,
   originalMdxContent: string,
   name: string | undefined
 ) {
-  // Serialize all props to a JSON string for fve-data-props
   return {
     type: "element" as const,
     tagName: "custom-element-v2",

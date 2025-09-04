@@ -84,8 +84,6 @@ export default function PageContents({
     }
   }, [changedMdxFile, filename, syncChanges]);
 
-  console.log(initialHtml);
-
   return (
     <div className="max-w-content-width-wide mx-auto w-full">
       <PageTitle

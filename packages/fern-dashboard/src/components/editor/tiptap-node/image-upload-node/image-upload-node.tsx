@@ -6,8 +6,6 @@ import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
 import type { NodeViewProps } from "@tiptap/react";
 import { NodeViewWrapper } from "@tiptap/react";
 
-import { mdxToHtml } from "@fern-docs/mdx";
-
 import "@/components/editor/tiptap-node/image-upload-node/image-upload-node.scss";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +15,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tab, TabGroup } from "@/docs/mdx/components/tabs";
+
+import { createCustomElementNode } from "../../extension-custom-element/create-custom-element-node";
 
 // import { focusNextNode, isValidPosition } from "@/utils/tiptap-utils";
 
@@ -368,7 +368,6 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   const { fileItems, uploadFiles } = useFileUpload(uploadOptions);
 
   const handleUpload = async (files: File[]) => {
-    console.log("handleUpload");
     const urls = await uploadFiles(files);
 
     if (urls.length > 0) {
@@ -379,18 +378,10 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
           const filename =
             files[index]?.name.replace(/\.[^/.]+$/, "") || "unknown";
 
-          return {
-            type: "custom-element-v2",
-            attrs: {
-              "fve-data-name": "img",
-              "fve-data-props": JSON.stringify({
-                src: url,
-                alt: filename,
-                title: filename,
-              }),
-              "fve-mdx-content": `<img src="${url}" alt="${filename}" title="${filename}" />`,
-            },
-          };
+          return createCustomElementNode(
+            "img",
+            `<img src="${url}" alt="${filename}" title="${filename}" />`
+          );
         });
 
         props.editor
@@ -423,22 +414,16 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
       extension.options.onError?.(new Error("No position found"));
       return;
     }
-    const newImageNode = mdxToHtml(`<img src="${imageUrl}" />`);
-    console.log("newImageNode", newImageNode);
+
+    const newImageNode = createCustomElementNode(
+      "img",
+      `<img src="${imageUrl}" />`
+    );
     props.editor
       .chain()
       .focus()
       .deleteRange({ from: pos, to: pos + props.node.nodeSize })
-      .insertContentAt(pos, {
-        type: "custom-element-v2",
-        attrs: {
-          "fve-data-name": "img",
-          "fve-data-props": JSON.stringify({
-            src: imageUrl,
-          }),
-          "fve-mdx-content": `<img src="${imageUrl}" />`,
-        },
-      })
+      .insertContentAt(pos, newImageNode)
       .run();
   };
 

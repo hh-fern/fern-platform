@@ -68,14 +68,7 @@ interface HTMLWrapperProps {
 }
 
 const HTMLWrapper = React.memo(
-  ({ content, css, inlineCss, hash, name }: HTMLWrapperProps) => {
-    console.info(
-      "[CustomElementNodeView] Rendering HTML content for element with hash:",
-      hash,
-      "name:",
-      name
-    );
-
+  ({ content, css, inlineCss, hash }: HTMLWrapperProps) => {
     return (
       <>
         <StyleInjector

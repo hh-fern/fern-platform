@@ -1,6 +1,4 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import { Plugin, PluginKey } from "@tiptap/pm/state";
-import { ReplaceStep } from "@tiptap/pm/transform";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 
 import { CustomElementNodeView } from "./CustomElementNodeView";
@@ -52,14 +50,11 @@ export const CustomElement = Node.create<CustomElementOptions>({
       "fve-data-name": {
         default: null,
       },
-      "fve-data-props": {
-        default: null,
-      },
       "fve-mdx-content": {
         default: null,
       },
       "fve-unsupported": {
-        default: null
+        default: null,
       },
       /**
        * Set contenteditable to false to prevent the custom element from being edited.
