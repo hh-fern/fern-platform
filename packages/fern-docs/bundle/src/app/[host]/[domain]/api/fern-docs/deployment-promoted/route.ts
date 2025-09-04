@@ -18,6 +18,8 @@ import {
 
 import { batchQueue } from "@/server/queue";
 
+export const runtime = "nodejs";
+
 export async function POST(request: NextRequest) {
   if (isLocal() || isSelfHosted()) {
     throw new Error("production deployment is only available in production");
@@ -26,7 +28,7 @@ export async function POST(request: NextRequest) {
   const cdnUri = process.env.NEXT_PUBLIC_CDN_URI;
 
   if (!cdnUri) {
-    console.error(`[deployment-promoted:${request.url}] Undefined CND URI`);
+    console.error(`[deployment-promoted:${request.url}] Undefined CDN URI`);
     notFound();
   }
 
@@ -64,7 +66,11 @@ export async function POST(request: NextRequest) {
       .map(withoutStaging)
   );
 
-  const settledMetadata = await Promise.allSettled(domains.map(getMetadata));
+  const settledMetadata = await Promise.allSettled(
+    domains.map(
+      getMetadata({ kvTtl: 0, forceRevalidate: false, cacheKeySuffix: "" })
+    )
+  );
 
   const rejectedMetadata = settledMetadata.filter(
     (result) => result.status === "rejected"
