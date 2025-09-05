@@ -318,7 +318,7 @@ export function htmlToMdx(
   // Get hast from html
   const hast = fromHtml(html);
 
-  const unsupportedMdxContent: Record<string, string> = {};
+  const placeholders: Record<string, string> = {};
 
   // Default handler for base elements
   const baseElementHandler: ToMdastHandle = (state, element) => {
@@ -326,6 +326,33 @@ export function htmlToMdx(
     if (element?.properties?.dataType === "image-upload") {
       return { type: "html", value: `<div data-type="image-upload" />` } as any;
     }
+
+    // Check for fve-html-children-b64 property
+    if (
+      typeof element.properties?.["fve-html-children-b64"] === "string" &&
+      typeof element.properties?.["fve-mdx-b64"] === "string"
+    ) {
+      const originalChildrenB64 = element.properties["fve-html-children-b64"];
+
+      const childrenHtml = toHtml(element.children);
+      const newChildrenB64 = Buffer.from(childrenHtml, "utf-8").toString(
+        "base64"
+      );
+
+      if (originalChildrenB64 === newChildrenB64) {
+        const originalMdx = Buffer.from(
+          element.properties["fve-mdx-b64"],
+          "base64"
+        ).toString("utf-8");
+
+        const id = Math.random().toString().slice(2, 14);
+        const placeholder = `PLACEHOLDERV2_${id}`;
+        placeholders[placeholder] = originalMdx;
+
+        return { type: "html", value: placeholder } as any;
+      }
+    }
+
     return getToMdastDefaultHandler(element.tagName as any)(state, element);
   };
 
@@ -349,7 +376,7 @@ export function htmlToMdx(
       }
 
       const placeholder = `PLACEHOLDERV2_${props["fve-data-hash"]}`;
-      unsupportedMdxContent[placeholder] = content;
+      placeholders[placeholder] = content;
 
       return { type: "html", value: placeholder } as any;
     }
@@ -545,8 +572,8 @@ export function htmlToMdx(
     finalMdx = `---\n${frontmatterYaml}---\n\n${mdx}`;
   }
 
-  // Replace unsupported custom element placeholders with actual content
-  Object.entries(unsupportedMdxContent).forEach(([placeholder, content]) => {
+  // Replace placeholders with actual content
+  Object.entries(placeholders).forEach(([placeholder, content]) => {
     // Escape dollar signs in content to prevent them from being treated as replacement references
     // In JavaScript string replacement, $ has special meaning:
     // - $& inserts the matched substring
@@ -749,7 +776,7 @@ function getToMdastDefaultHandler(type: ToMdastDefaultHandlersType) {
 // Create node for a base element
 function mdxBaseElementNode(
   hash: NodeHash,
-  _: string,
+  content: string,
   type: HashableBaseElementsType,
   __: string | undefined,
   state: ToHastState,
@@ -765,11 +792,19 @@ function mdxBaseElementNode(
       } else if (defaultNode.type === "element") {
         // Expects defaultNode: Element
         // Note: we add a data-hash property to the element for the client's reference
+
+        const childrenHtml = toHtml(defaultNode.children);
+
         return {
           ...defaultNode,
           properties: {
             ...defaultNode.properties,
             "data-hash": hash,
+            "fve-mdx-b64": Buffer.from(content, "utf-8").toString("base64"),
+            "fve-html-children-b64": Buffer.from(
+              childrenHtml,
+              "utf-8"
+            ).toString("base64"),
           },
         };
       } else if (

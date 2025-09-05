@@ -38,6 +38,20 @@ export const GlobalDataHashAttribute = Node.create({
               });
             },
           },
+          "fve-mdx-b64": {
+            default: null,
+            keepOnSplit: false,
+            renderHTML: (attributes) => {
+              return mergeAttributes(this.options.HTMLAttributes, attributes);
+            },
+          },
+          "fve-html-children-b64": {
+            default: null,
+            keepOnSplit: false,
+            renderHTML: (attributes) => {
+              return mergeAttributes(this.options.HTMLAttributes, attributes);
+            },
+          },
         },
       },
     ];
