@@ -315,6 +315,8 @@ export function htmlToMdx(
   changedNodes?: ChangedNodes,
   changedFrontmatter?: boolean
 ): HtmlToMdxResponse {
+  console.log(JSON.stringify(changedNodes, null, 2));
+
   // Get hast from html
   const hast = fromHtml(html);
 
@@ -327,30 +329,22 @@ export function htmlToMdx(
       return { type: "html", value: `<div data-type="image-upload" />` } as any;
     }
 
-    // Check for fve-html-children-b64 property
+    // If a node has not been changed, we use the original MDX content
     if (
-      typeof element.properties?.["fve-html-children-b64"] === "string" &&
-      typeof element.properties?.["fve-mdx-b64"] === "string"
+      typeof element.properties?.["data-hash"] === "string" &&
+      typeof element.properties?.["fve-mdx-b64"] === "string" &&
+      !changedNodes?.[element.properties["data-hash"]]
     ) {
-      const originalChildrenB64 = element.properties["fve-html-children-b64"];
-
-      const childrenHtml = toHtml(element.children);
-      const newChildrenB64 = Buffer.from(childrenHtml, "utf-8").toString(
+      const originalMdx = Buffer.from(
+        element.properties["fve-mdx-b64"],
         "base64"
-      );
+      ).toString("utf-8");
 
-      if (originalChildrenB64 === newChildrenB64) {
-        const originalMdx = Buffer.from(
-          element.properties["fve-mdx-b64"],
-          "base64"
-        ).toString("utf-8");
+      const id = Math.random().toString().slice(2, 14);
+      const placeholder = `PLACEHOLDERV2_${id}`;
+      placeholders[placeholder] = originalMdx;
 
-        const id = Math.random().toString().slice(2, 14);
-        const placeholder = `PLACEHOLDERV2_${id}`;
-        placeholders[placeholder] = originalMdx;
-
-        return { type: "html", value: placeholder } as any;
-      }
+      return { type: "html", value: placeholder } as any;
     }
 
     return getToMdastDefaultHandler(element.tagName as any)(state, element);
@@ -665,6 +659,10 @@ export function getChangedNodesFromHtml(
   originalHtml: string,
   latestHtml: string
 ): ChangedNodes {
+  console.log(originalHtml);
+  console.log("---");
+  console.log(latestHtml);
+
   const originalHast = fromHtml(originalHtml);
   const latestHast = fromHtml(latestHtml);
 
@@ -792,19 +790,12 @@ function mdxBaseElementNode(
       } else if (defaultNode.type === "element") {
         // Expects defaultNode: Element
         // Note: we add a data-hash property to the element for the client's reference
-
-        const childrenHtml = toHtml(defaultNode.children);
-
         return {
           ...defaultNode,
           properties: {
             ...defaultNode.properties,
             "data-hash": hash,
             "fve-mdx-b64": Buffer.from(content, "utf-8").toString("base64"),
-            "fve-html-children-b64": Buffer.from(
-              childrenHtml,
-              "utf-8"
-            ).toString("base64"),
           },
         };
       } else if (
