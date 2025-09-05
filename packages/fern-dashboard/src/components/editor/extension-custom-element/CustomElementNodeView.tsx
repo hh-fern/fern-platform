@@ -34,7 +34,9 @@ interface MDXWrapperProps {
 const MDXWrapper = ({ code, hash, components }: MDXWrapperProps) => {
   const MDXComponent = useMemo(() => {
     try {
-      return getMDXComponent(code);
+      const MDXComponent = getMDXComponent(code);
+      console.log("[MDXWrapper] MDXComponent:", MDXComponent);
+      return MDXComponent;
     } catch (error) {
       console.warn(
         "[CustomElementNodeView] Failed to create MDX component:",
@@ -137,6 +139,11 @@ const CustomElementRenderer = React.memo(
   }: CustomElementRendererProps) => {
     // Step 1: Try MDX rendering if we have code AND a valid MDX component name
     if (code != null && typeof MDX_COMPONENTS[name] !== "undefined") {
+      console.log(
+        "[1 - CustomElementRenderer] Rendering MDX component:",
+        name,
+        components
+      );
       try {
         return <MDXWrapper code={code} hash={hash} components={components} />;
       } catch (error) {
@@ -151,6 +158,7 @@ const CustomElementRenderer = React.memo(
         // Fall through to HTML rendering if MDX fails
       }
     } else if (code != null && typeof MDX_COMPONENTS[name] === "undefined") {
+      console.log("[2 - CustomElementRenderer] Rendering MDX component:", name);
       console.warn(
         "[CustomElementNodeView] MDX component name not found in MDX_COMPONENTS:",
         name,
@@ -161,6 +169,10 @@ const CustomElementRenderer = React.memo(
 
     // Step 2: Try HTML rendering if content looks like HTML
     if (htmlContent) {
+      console.log(
+        "[3 - CustomElementRenderer] Rendering HTML component:",
+        name
+      );
       return (
         <HTMLWrapper
           content={htmlContent.content}

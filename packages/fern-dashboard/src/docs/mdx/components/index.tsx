@@ -37,8 +37,9 @@ import { Template } from "./code/Template";
 import { Column, ColumnGroup } from "./columns";
 import { Feature } from "./feature";
 import { Frame } from "./frame";
-import { A, HeadingRenderer, Image, Li, Ol, Strong, Ul } from "./html";
+import { A, HeadingRenderer, Li, Ol, Strong, Ul } from "./html";
 import { Table } from "./html-table";
+import { SelfResolvingImage } from "./html/SelfResolvingImage";
 import { Icon } from "./icon/Icon";
 import { If } from "./if";
 import { Json } from "./json";
@@ -126,7 +127,7 @@ const HTML_COMPONENTS = {
   h4: (props: ComponentProps<"h4">) => HeadingRenderer(4, props),
   h5: (props: ComponentProps<"h5">) => HeadingRenderer(5, props),
   h6: (props: ComponentProps<"h6">) => HeadingRenderer(6, props),
-  img: Image,
+  img: SelfResolvingImage,
   li: Li,
   ol: Ol,
   strong: Strong,
@@ -147,7 +148,7 @@ const ALIASED_HTML_COMPONENTS = {
   H4: (props: ComponentProps<"h4">) => HeadingRenderer(4, props),
   H5: (props: ComponentProps<"h5">) => HeadingRenderer(5, props),
   H6: (props: ComponentProps<"h6">) => HeadingRenderer(6, props),
-  Image,
+  Image: SelfResolvingImage,
   Li,
   Ol,
   Strong,
