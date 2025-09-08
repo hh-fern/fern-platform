@@ -45,10 +45,15 @@ jobs:
           username: fernapi
           password: ${{ secrets.FERN_API_DOCKERHUB_PASSWORD }}
 
-      - name: Build Docker image
-        run: pnpm --filter=@fern-platform/self-hosted docker:build
-
-      - name: Push to Docker Hub
-        run: |
-          docker tag fern-self-hosted:latest fernapi/fern-self-hosted:${{ github.event.inputs.version || 'latest' }}
-          docker push fernapi/fern-self-hosted:${{ github.event.inputs.version || 'latest' }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./servers/self-hosted
+          file: ./servers/self-hosted/Dockerfile.self_hosted
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            fernapi/fern-self-hosted:${{ github.event.inputs.version || 'latest' }}
+            fernapi/fern-self-hosted:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
