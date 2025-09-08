@@ -31,14 +31,14 @@ DATABASE_URL=${DATABASE_URL} prisma migrate deploy --schema /prisma/schema.prism
 # -----------  End Postgres setup  -----------
 
 # -----------  Start MeiliSearch setup  -----------
-export MEILI_HTTP_ADDR=0.0.0.0:7700
+# export MEILI_HTTP_ADDR=0.0.0.0:7700
 
-echo "Starting MeiliSearch..."
-./meilisearch --master-key="fern123!" > /var/log/meilisearch.log 2>&1 &
-meili_pid=$!
-echo "MeiliSearch PID: $meili_pid"
+# echo "Starting MeiliSearch..."
+# ./meilisearch --master-key="fern123!" > /var/log/meilisearch.log 2>&1 &
+# meili_pid=$!
+# echo "MeiliSearch PID: $meili_pid"
 
-export MEILISEARCH_URL="http://localhost:7700"
+# export MEILISEARCH_URL="http://localhost:7700"
 # -----------  End MeiliSearch setup  -----------
 
 
@@ -235,6 +235,10 @@ echo "Docs server logs will be written to /var/log/docs-server.log"
 echo "Immediate check - is process running?"
 if kill -0 $docs_pid 2>/dev/null; then
     echo "✓ Process is running immediately after start"
+    echo "Initial process details:"
+    ps -p $docs_pid -o pid,ppid,cmd,etime,pcpu,pmem 2>/dev/null || echo "Process details not available"
+    echo "Checking if any ports are being used:"
+    netstat -tlnp 2>/dev/null | grep -E ":(3000|7700)" || echo "No relevant ports found"
 else
     echo "✗ Process died immediately - checking logs:"
     cat /var/log/docs-server.log
@@ -263,9 +267,26 @@ while [ $counter -lt $timeout ]; do
         exit 1
     fi
     
+    # Enhanced debugging: check what's happening
+    echo "=== Debug Info (attempt $((counter/2 + 1))/$((timeout/2))) ==="
+    echo "Process status:"
+    ps -p $docs_pid -o pid,ppid,cmd,etime,pcpu,pmem 2>/dev/null || echo "Process not found"
+    
+    echo "Port 3000 status:"
+    netstat -tlnp 2>/dev/null | grep :3000 || echo "Port 3000 not listening"
+    
+    echo "Recent logs (last 5 lines):"
+    tail -5 /var/log/docs-server.log 2>/dev/null || echo "No logs available"
+    
+    echo "Testing health endpoint:"
     if curl -f http://localhost:3000/health 2>/dev/null; then
         echo "✓ Docs server ready"
         break
+    else
+        echo "✗ Health check failed"
+        # Try to get more details about the failure
+        echo "Curl error details:"
+        curl -v http://localhost:3000/health 2>&1 | head -10 || echo "Curl failed completely"
     fi
     
     echo "Waiting... ($((counter/2 + 1))/$((timeout/2)))"
