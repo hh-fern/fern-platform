@@ -298,35 +298,35 @@ fi
 
 # --------------  Finish nextapp --------------
 
-echo "Reindexing search..."
+# echo "Reindexing search..."
 
-timeout=120
-counter=0
-while [ $counter -lt $timeout ]; do
-    if curl -f -X GET http://localhost:3000/api/fern-docs/search/v2/reindex/meilisearch 2>/dev/null; then
-        echo "✓ Search reindexed"
-        break
-    fi
+# timeout=120
+# counter=0
+# while [ $counter -lt $timeout ]; do
+#     if curl -f -X GET http://localhost:3000/api/fern-docs/search/v2/reindex/meilisearch 2>/dev/null; then
+#         echo "✓ Search reindexed"
+#         break
+#     fi
     
-    if ! kill -0 $docs_pid 2>/dev/null; then
-        echo "✗ Docs server died during reindex"
-        exit 1
-    fi
+#     if ! kill -0 $docs_pid 2>/dev/null; then
+#         echo "✗ Docs server died during reindex"
+#         exit 1
+#     fi
     
-    sleep 2
-    counter=$((counter + 2))
-done
+#     sleep 2
+#     counter=$((counter + 2))
+# done
 
-if [ $counter -ge $timeout ]; then
-    echo "ERROR: Reindex route failed to respond within $timeout seconds"
-    echo "Checking available routes on port 3000:"
-    curl -s http://localhost:3000/api/ 2>/dev/null || echo "No response from /api/"
-    echo "Checking docs server logs for errors:"
-    tail -20 /var/log/docs-server.log
-    echo "Checking if port 3000 is accessible:"
-    netstat -tlnp | grep :3000
-    exit 1
-fi
+# if [ $counter -ge $timeout ]; then
+#     echo "ERROR: Reindex route failed to respond within $timeout seconds"
+#     echo "Checking available routes on port 3000:"
+#     curl -s http://localhost:3000/api/ 2>/dev/null || echo "No response from /api/"
+#     echo "Checking docs server logs for errors:"
+#     tail -20 /var/log/docs-server.log
+#     echo "Checking if port 3000 is accessible:"
+#     netstat -tlnp | grep :3000
+#     exit 1
+# fi
 
 echo "All services started. Tailing logs to keep the container running."
 tail -f /dev/null
