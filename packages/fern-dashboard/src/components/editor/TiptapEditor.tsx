@@ -2,6 +2,9 @@
 
 import { useEffect } from "react";
 
+import AIExtension from "@tiptap-pro/extension-ai";
+import EmojiExtension from "@tiptap/extension-emoji";
+import MentionExtension from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   EditorProvider,
@@ -59,6 +62,9 @@ const extensions = [
     emptyEditorClass: "is-empty",
     emptyNodeClass: "is-empty",
   }),
+  AIExtension,
+  MentionExtension,
+  EmojiExtension,
 ] as Extension[];
 export declare namespace TiptapEditor {
   export interface Props {
