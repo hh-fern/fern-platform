@@ -1,2 +1,6 @@
 .vercel
 .env*.local
+
+
+# Authentication tokens
+.npmrc
