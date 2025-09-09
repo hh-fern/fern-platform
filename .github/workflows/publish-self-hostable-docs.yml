@@ -45,8 +45,8 @@ jobs:
           username: fernapi
           password: ${{ secrets.FERN_API_DOCKERHUB_PASSWORD }}
           
-      - name: Build docs bundle
-        run: pnpm docs:self-hosted-bundle:build
+      - name: Build Docker image
+        run: pnpm --filter=@fern-platform/self-hosted docker:build
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
