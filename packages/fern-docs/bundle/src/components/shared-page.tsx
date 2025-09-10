@@ -39,6 +39,11 @@ export default async function SharedPage({
   loader: DocsLoader;
   slug: Slug;
 }) {
+  if (slug.endsWith(".js")) {
+    console.debug(`[SharedPage] returning early not found for ${slug}`);
+    return notFound();
+  }
+
   console.debug("/app/[domain]/_page.tsx: starting...");
 
   // start loading the root node early
@@ -48,11 +53,13 @@ export default async function SharedPage({
   const authStatePromise = loader.getAuthState(slugToHref(slug));
   const edgeFlagsPromise = loader.getEdgeFlags();
 
+  const config = await configPromise;
+
   // check for redirects
   const configuredRedirect = getRedirectForPath(
     slugToHref(slug),
     await baseUrlPromise,
-    (await configPromise).redirects
+    config.redirects
   );
 
   if (configuredRedirect != null) {
@@ -173,6 +180,8 @@ export default async function SharedPage({
       })
     : undefined;
 
+  // even if nav-links are globally disabled, we should calculate the neighbors
+  // in case the page overrides this global setting
   const neighborsPromise = getNeighbors(
     loader,
     serializeNextMdx ?? serialize,
@@ -249,6 +258,7 @@ export default async function SharedPage({
         parents={found.parents}
         neighbors={await neighborsPromise}
         breadcrumb={found.breadcrumb}
+        globalLayout={config.layout}
       />
     </FeedbackPopoverProvider>
   );

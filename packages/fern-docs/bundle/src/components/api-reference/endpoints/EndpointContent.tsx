@@ -20,6 +20,16 @@ import { EndpointContentLeft } from "./EndpointContentLeft";
 import { EndpointContextProvider } from "./EndpointContext";
 import { EndpointUrlWithPlaygroundBaseUrl } from "./EndpointUrlWithPlaygroundBaseUrl";
 
+function getAvailabilityBadge(
+  endpoint: EndpointContext["endpoint"],
+  node: EndpointContext["node"]
+) {
+  const availability = endpoint.availability ?? node.availability;
+  return availability ? (
+    <AvailabilityBadge availability={availability} rounded />
+  ) : null;
+}
+
 export async function EndpointContent({
   serialize,
   showErrors,
@@ -28,6 +38,7 @@ export async function EndpointContent({
   breadcrumb,
   action,
   bottomNavigation,
+  hideFeedback,
 }: {
   serialize: MdxSerializer;
   showErrors: boolean;
@@ -36,6 +47,7 @@ export async function EndpointContent({
   breadcrumb: readonly FernNavigation.BreadcrumbItem[];
   action?: React.ReactNode;
   bottomNavigation?: React.ReactNode;
+  hideFeedback: boolean;
 }) {
   const { node, endpoint, types } = context;
 
@@ -48,14 +60,7 @@ export async function EndpointContent({
             breadcrumb={breadcrumb}
             title={node.title}
             action={action}
-            tags={
-              endpoint.availability != null && (
-                <AvailabilityBadge
-                  availability={endpoint.availability}
-                  rounded
-                />
-              )
-            }
+            tags={getAvailabilityBadge(endpoint, node)}
             slug={node.slug}
           >
             <EndpointUrlWithPlaygroundBaseUrl
@@ -84,7 +89,12 @@ export async function EndpointContent({
             </TypeDefinitionSlotsServer>
           </TypeDefinitionRoot>
         }
-        footer={<FooterLayout bottomNavigation={bottomNavigation} />}
+        footer={
+          <FooterLayout
+            bottomNavigation={bottomNavigation}
+            hideFeedback={hideFeedback}
+          />
+        }
       >
         <PlaygroundKeyboardTrigger />
         <MdxServerComponentProseSuspense mdx={endpoint.description} />

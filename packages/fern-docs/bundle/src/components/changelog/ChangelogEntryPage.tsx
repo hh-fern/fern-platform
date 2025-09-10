@@ -14,6 +14,7 @@ import { HideBuiltWithFern } from "@/components/built-with-fern";
 import { FooterLayout } from "@/components/layouts/FooterLayout";
 import { MdxSerializer } from "@/server/mdx-serializer";
 
+import { PageFilters } from "../PageFilters";
 import { ChangelogContentLayout } from "./ChangelogContentLayout";
 
 // sidebar is always hidden on changelog entry pages
@@ -44,11 +45,16 @@ export default function ChangelogEntryPage({
             as="article"
             id={node.date}
             stickyContent={
-              <Badge asChild>
-                <FernLink href={slugToHref(node.slug)} scroll={true}>
-                  {node.title}
-                </FernLink>
-              </Badge>
+              <div className="fern-changelog-label">
+                <Badge asChild>
+                  <FernLink href={slugToHref(node.slug)} scroll={true}>
+                    {node.title}
+                  </FernLink>
+                </Badge>
+                <div className="flex flex-row gap-2 pt-2">
+                  <PageFilters filters={node.tags ?? []} forcePillDisplay />
+                </div>
+              </div>
             }
           >
             {children}
@@ -87,8 +93,17 @@ async function FooterLayoutWithEditThisPageUrl({
   });
   const editThisPageUrl =
     mdx?.frontmatter?.["edit-this-page-url"] ?? page.editThisPageUrl;
+
+  const configLayout = await loader.getLayout();
+
   return (
     <FooterLayout
+      hideFeedback={
+        mdx?.frontmatter?.["hide-feedback"] ?? configLayout.hideFeedback
+      }
+      hideNavLinks={
+        mdx?.frontmatter?.["hide-nav-links"] ?? configLayout.hideNavLinks
+      }
       bottomNavigation={bottomNavigation}
       editThisPageUrl={editThisPageUrl}
     />

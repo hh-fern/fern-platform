@@ -17,7 +17,7 @@ import { postToSlack } from "@fern-api/docs-server/slack";
 import { Gate, withBasicTokenAnonymous } from "@fern-api/docs-server/withRbac";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { slugToHref, withoutStaging } from "@fern-api/docs-utils";
-import { FernFaiClient } from "@fern-api/fai-sdk";
+import { FernAIClient } from "@fern-api/fai-sdk";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
   getFernDocsIndexName,
@@ -98,14 +98,33 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       },
       deleteExisting,
     });
-    const faiClient = new FernFaiClient({
+    const faiClient = new FernAIClient({
       baseUrl: getFaiOrigin(),
-      token: fernToken_admin(),
     });
 
-    await faiClient.index.syncToQueryIndex(domain, {
+    const syncResponse = await faiClient.index.syncIndexToQueryIndex(domain, {
       index_name: fernDocsIndexName,
     });
+
+    const pollJobStatus = async (jobId: string): Promise<void> => {
+      while (true) {
+        const statusResponse = await faiClient.index.getJobStatus(jobId);
+        const { status, success, error } = statusResponse;
+
+        if (status === "completed") {
+          if (success === false) {
+            throw new Error(`Sync job failed: ${error || "Unknown error"}`);
+          }
+          break;
+        } else if (status === "failed") {
+          throw new Error(`Sync job failed: ${error || "Unknown error"}`);
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 15000));
+      }
+    };
+
+    await pollJobStatus(syncResponse.job_id);
 
     const end = Date.now();
 
@@ -115,6 +134,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       domain,
       namespace,
       added: numInserted,
+      job_id: syncResponse.job_id,
     });
 
     return NextResponse.json(

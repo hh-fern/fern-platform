@@ -11,7 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { FernFai } from "@fern-api/fai-sdk";
+import { FernAI } from "@fern-api/fai-sdk";
 
 import { getConversation } from "@/app/actions/getConversation";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
@@ -23,8 +23,8 @@ interface QueriesDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   baseDocsUrl: string;
-  onSelectConversation: (conversation: FernFai.Conversation) => void;
-  selectedConversation: FernFai.Conversation | null;
+  onSelectConversation: (conversation: FernAI.Conversation) => void;
+  selectedConversation: FernAI.Conversation | null;
   queryTimeRange: TimeRange;
   setQueryTimeRange: (range: TimeRange) => void;
   onExport: () => void;
@@ -54,7 +54,7 @@ export function QueriesDataTable<TData, TValue>({
     return async () => {
       const conversation = await getConversation({
         domain: baseDocsUrl,
-        conversationId: (row.original as FernFai.Query).conversation_id,
+        conversationId: (row.original as FernAI.Query).conversation_id,
       });
       onSelectConversation(conversation);
     };
@@ -78,7 +78,7 @@ export function QueriesDataTable<TData, TValue>({
   }
 
   return (
-    <div className="flex flex-row gap-6 rounded-md p-4">
+    <div className="flex w-full flex-row gap-6 rounded-md">
       <div className="grow">
         <QueriesDataTableHeader
           table={table}
@@ -90,13 +90,13 @@ export function QueriesDataTable<TData, TValue>({
         <div className="max-h-[400px] min-h-[400px] overflow-y-auto">
           <Table className="table-fixed">
             <TableBody>
-              {table?.getRowModel()?.rows?.length ? (
+              {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
                     data-state={
                       selectedConversation?.conversation_id ===
-                        (row.original as FernFai.Query).conversation_id &&
+                        (row.original as FernAI.Query).conversation_id &&
                       "selected"
                     }
                     className="data-[state=selected]:bg-accent cursor-pointer border-none"

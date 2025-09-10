@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 
+import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { GithubPrStatus } from "@/app/services/github/types";
 
@@ -22,6 +23,7 @@ export const GitPRContext = createContext<{
   prStatus: GithubPrStatus | undefined;
   setPrStatus: (status: GithubPrStatus) => void;
   prNumber: number | undefined;
+  site: string;
 }>({
   gitPrUrl: undefined,
   setPrUrl: (_url: string) => {
@@ -40,12 +42,14 @@ export const GitPRContext = createContext<{
     return;
   },
   prNumber: undefined,
+  site: "",
 });
 
 export function GitPRProvider({
   children,
   owner,
   repo,
+  site,
   branch,
   baseBranch,
 }: {
@@ -53,6 +57,7 @@ export function GitPRProvider({
   owner?: string;
   repo?: string;
   branch: string;
+  site: string;
   baseBranch?: string;
 }) {
   const [gitPrUrl, setGitPrUrl] = useState<string | undefined>(undefined);
@@ -62,6 +67,7 @@ export function GitPRProvider({
     undefined
   );
   const [prNumber, setPrNumber] = useState<number | undefined>(undefined);
+  const orgName = useOrgName();
 
   const fetchPrFromBranch = useCallback(async () => {
     if (!owner || !repo || !branch) {
@@ -72,8 +78,10 @@ export function GitPRProvider({
 
     try {
       const data = await DashboardApiClient.getPrForBranch({
+        orgName,
         owner,
         repo,
+        site,
         branch,
         baseBranch,
       });
@@ -127,7 +135,17 @@ export function GitPRProvider({
     } finally {
       setIsLoading(false);
     }
-  }, [owner, repo, branch, baseBranch, prNumber, prTitle, gitPrUrl]);
+  }, [
+    owner,
+    repo,
+    site,
+    branch,
+    baseBranch,
+    prNumber,
+    prTitle,
+    gitPrUrl,
+    orgName,
+  ]);
 
   // Fetch PR information when component mounts or dependencies change
   useEffect(() => {
@@ -154,6 +172,7 @@ export function GitPRProvider({
         refetchPrData,
         prStatus,
         setPrStatus,
+        site,
       }}
     >
       {children}

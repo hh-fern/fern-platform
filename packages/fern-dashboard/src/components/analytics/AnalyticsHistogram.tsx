@@ -1,6 +1,6 @@
 "use client";
 
-import { FernFai } from "@fern-api/fai-sdk";
+import { FernAI } from "@fern-api/fai-sdk";
 
 import { cn } from "@/utils/utils";
 
@@ -28,7 +28,7 @@ export function AnalyticsHistogram({
   setRenderType: (type: RenderType) => void;
   histogramTimeRange: TimeRange;
   setHistogramTimeRange: (range: TimeRange) => void;
-  histogramData: FernFai.HistogramAnalytics;
+  histogramData: FernAI.GetHistogramAnalyticsResponse;
 }) {
   const chartData = histogramData.bars.map((bar) => ({
     displayLabel: parseLabel(bar.label),
@@ -37,7 +37,7 @@ export function AnalyticsHistogram({
 
   return (
     <div className={cn(BORDER_STYLES, "border-gray-0 w-full border")}>
-      <div className="mb-4 flex w-full justify-between gap-4">
+      <div className="mb-4 flex w-full flex-wrap justify-between gap-4">
         <AnalyticsHistogramTabBar
           renderType={renderType}
           onChangeRenderType={setRenderType}
@@ -48,7 +48,12 @@ export function AnalyticsHistogram({
           options={ANALYTICS_TIME_RANGE_OPTIONS}
         />
       </div>
-      <AnalyticsHistogramChart chartData={chartData} renderType={renderType} />
+      <div className="w-full overflow-x-auto">
+        <AnalyticsHistogramChart
+          chartData={chartData}
+          renderType={renderType}
+        />
+      </div>
     </div>
   );
 }

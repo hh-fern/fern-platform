@@ -14,6 +14,7 @@ import {
   pageDataToMdx,
 } from "@fern-docs/components";
 
+import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import {
   DEFAULT_COMMIT_MESSAGE,
@@ -296,10 +297,11 @@ function generateSimpleHash(content: Record<string, string>): string {
 
 export function CommitButton() {
   const { changedMdxFiles, mdxSyncedStatus } = useMdxState();
-  const { gitPrUrl, setPrUrl, prTitle, refetchPrData } = useGitPrInfo();
+  const { gitPrUrl, setPrUrl, prTitle, refetchPrData, site } = useGitPrInfo();
   const { branch } = useBranch();
   const isEditingDisabled = useEditingDisabled();
   const { owner, repo, baseBranch } = useGitHubRepo();
+  const orgName = useOrgName();
 
   useEffect(() => {
     // NOTE: This is a temporary solution to persist the PR URL across route changes/refreshes.
@@ -390,8 +392,10 @@ export function CommitButton() {
       ];
 
       const response = await DashboardApiClient.postGitCommit({
+        orgName,
         owner,
         repo,
+        site,
         branch,
         message: DEFAULT_COMMIT_MESSAGE,
         files: gitFiles,
@@ -435,8 +439,10 @@ export function CommitButton() {
           return;
         }
         const newPrUrl = await handleCreatePr({
+          orgName,
           branch,
           owner,
+          site,
           repo,
           baseBranch,
           title: prTitle,
@@ -463,8 +469,10 @@ export function CommitButton() {
     prTitle,
     refetchPrData,
     owner,
+    site,
     repo,
     baseBranch,
+    orgName,
   ]);
 
   const commitDisabledReason = useMemo(() => {

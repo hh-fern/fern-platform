@@ -24,23 +24,24 @@ export const TextArea = forwardRef<
       onValueChange,
       minLines,
       maxLines,
-      lineHeight = 20,
+      lineHeight = 24,
       padding = 0,
+      value,
       ...props
     },
     forwardedRef
   ) => {
     const inputRef = useRef<HTMLTextAreaElement>(null);
-    useAutosizeTextArea(inputRef, minLines, lineHeight);
+    useAutosizeTextArea(inputRef, minLines, lineHeight, padding, value);
     return (
       <textarea
         ref={composeRefs(inputRef, forwardedRef)}
+        value={value}
         {...props}
         onChange={composeEventHandlers(props.onChange, (e) => {
           onValueChange?.(e.target.value);
         })}
         style={{
-          padding: `${padding}px`,
           maxHeight: maxLines
             ? `${maxLines * lineHeight + padding * 2}px`
             : undefined,
@@ -57,8 +58,9 @@ TextArea.displayName = "TextArea";
 function useAutosizeTextArea(
   textAreaRef: RefObject<HTMLTextAreaElement | null>,
   minLines: number = 1,
-  lineHeight: number = 20,
-  padding: number = 0
+  lineHeight: number = 24,
+  padding: number = 0,
+  value: string | number | readonly string[] | undefined
 ): void {
   const minHeight =
     Math.max(minLines, 1) * Math.max(lineHeight, 10) + padding * 2;
@@ -69,6 +71,12 @@ function useAutosizeTextArea(
     }
 
     const handleInput = () => {
+      const value = textArea.value;
+      if (!value || value.trim() === "") {
+        textArea.style.height = minHeight + "px";
+        return;
+      }
+
       // We need to reset the height momentarily to get the correct scrollHeight for the textarea
       textArea.style.height = "0px";
       const scrollHeight = textArea.scrollHeight;
@@ -84,5 +92,5 @@ function useAutosizeTextArea(
     return () => {
       textArea.removeEventListener("input", handleInput);
     };
-  }, [minHeight, textAreaRef]);
+  }, [minHeight, textAreaRef, value]);
 }

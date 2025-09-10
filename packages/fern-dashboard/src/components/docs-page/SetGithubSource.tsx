@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,6 +11,7 @@ import { DocsUrl } from "@/utils/types";
 
 import {
   ErrorEditSourceToast,
+  ErrorInvalidGithubUrlToast,
   SuccessfulEditSourceToast,
 } from "../editor/EditorToasts";
 import { Button } from "../ui/button";
@@ -28,10 +30,16 @@ export function SetGithubSourcePopover({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [inputUrl, setInputUrl] = useState("");
 
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const handleConnectRepo = useCallback(
     async (repoUrl: string) => {
+      if (!validateUrlIsGithubUrl(repoUrl)) {
+        ErrorInvalidGithubUrlToast();
+        return;
+      }
+
       try {
         setIsSaving(true);
         setIsPopoverOpen(false);
@@ -40,10 +48,12 @@ export function SetGithubSourcePopover({
           githubUrl: repoUrl,
         });
 
-        // Invalidate the github source repo query so that we can see the new repo
+        // Invalidate the github source repo query so that we can see the new repo client side
         await queryClient.invalidateQueries({
           queryKey: ReactQueryKey.githubSourceRepo(docsUrl),
         });
+        // Invalidate data cache so that we can see the new repo server side
+        router.refresh();
 
         SuccessfulEditSourceToast();
 
@@ -55,15 +65,10 @@ export function SetGithubSourcePopover({
         setIsSaving(false);
       }
     },
-    [docsUrl, queryClient, setIsSaving]
+    [docsUrl, queryClient, setIsSaving, router]
   );
 
-  const inputUrlIsGithubUrl = useMemo(() => {
-    if (inputUrl === "") {
-      return true; // Don't validate empty input
-    }
-    return validateUrlIsGithubUrl(inputUrl);
-  }, [inputUrl]);
+  const urlIsValid = validateUrlIsGithubUrl(inputUrl);
 
   return (
     <Popover
@@ -94,11 +99,14 @@ export function SetGithubSourcePopover({
                 }}
                 className="border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent"
               />
-              {!inputUrlIsGithubUrl && (
-                <ExclamationCircleIcon className="size-4" />
+              {inputUrl !== "" && !urlIsValid && (
+                <ExclamationCircleIcon className="mr-1.5 size-4 text-red-500" />
               )}
             </div>
-            <Button onClick={() => void handleConnectRepo(inputUrl)}>
+            <Button
+              onClick={() => void handleConnectRepo(inputUrl)}
+              disabled={!urlIsValid}
+            >
               Save
             </Button>
           </div>

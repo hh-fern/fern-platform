@@ -1,10 +1,18 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 
-from src.settings import LOGGER
-from src.settings import VARIABLES
+from src.fai.scheduler import (
+    start_scheduler,
+    stop_scheduler,
+)
+from src.settings import (
+    LOGGER,
+    VARIABLES,
+)
 from src.utils.init_db import init
 
 
@@ -19,14 +27,54 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             raise e
     else:
         LOGGER.info("Setup: Production mode. Database not initialized.")
+
+    try:
+        start_scheduler()
+        LOGGER.info("Setup: Scheduler started.")
+    except Exception as e:
+        LOGGER.error(f"Setup: Error starting scheduler: {e}")
+
     yield
-    LOGGER.info("Setup: Database not initialized.")
+
+    try:
+        stop_scheduler()
+        LOGGER.info("Shutdown: Scheduler stopped.")
+    except Exception as e:
+        LOGGER.error(f"Shutdown: Error stopping scheduler: {e}")
 
 
-fai_app = FastAPI(lifespan=lifespan)
+class FAIApp(FastAPI):
+    openapi_schema: dict[str, Any] | None
+
+    def custom_openapi(self) -> Any:
+        if self.openapi_schema:
+            return self.openapi_schema
+        openapi_schema: dict[str, Any] = get_openapi(
+            title="FAI",
+            version="0.0.0",
+            summary="The FAI API.",
+            routes=self.routes,
+        )
+
+        openapi_schema["servers"] = [
+            {"url": "https://fai.buildwithfern.com", "x-fern-server-name": "Production"},
+            {"url": "https://fai-dev.buildwithfern.com", "x-fern-server-name": "Development"},
+            {"url": "http://localhost:8080", "x-fern-server-name": "Local"},
+        ]
+
+        self.openapi_schema = openapi_schema
+        return self.openapi_schema
+
+    def openapi(self) -> Any:
+        return self.custom_openapi()
+
+
+fai_app = FAIApp(lifespan=lifespan)
 
 origins = [
-    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
     "https://www.app.buildwithfern.com",
     "https://app.buildwithfern.com",
     "https://www.app-dev.buildwithfern.com",

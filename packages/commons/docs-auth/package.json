@@ -11,7 +11,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.js",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "clean": "rm -rf ./lib && tsc --build --clean",
+    "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "tsc --build",
     "depcheck": "depcheck",
     "dev": "tsc --watch",

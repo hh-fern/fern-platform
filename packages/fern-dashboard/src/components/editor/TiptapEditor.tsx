@@ -12,14 +12,20 @@ import {
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
+import "@/components/editor/tiptap-node/node-focus/node-focus.scss";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useEditor } from "@/providers/EditorContext";
+import { cn } from "@/utils/utils";
 
 import BubbleMenu from "./BubbleMenu";
 import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
 import CustomElement from "./extension-custom-element";
 import GlobalDataHashAttribute from "./extension-global-data-hash-attribute";
+import {
+  ConfiguredFileHandler,
+  ConfiguredImageUploadNode,
+} from "./tiptap-node/image-upload-node/configured-upload-extensions";
 
 // These node types are the ones that will have data attributes set on them
 const dataAttributeNodeTypes = [
@@ -37,7 +43,12 @@ const dataAttributeNodeTypes = [
 
 // Configure Tiptap extensions
 const extensions = [
-  StarterKit,
+  StarterKit.configure({
+    dropcursor: {
+      color: "var(--grayscale-a11)",
+    },
+    gapcursor: false,
+  }),
   CustomElement,
   UniqueID.configure({
     types: dataAttributeNodeTypes,
@@ -78,7 +89,11 @@ export default function TiptapEditor({
   return (
     <EditorProvider
       autofocus={autofocus}
-      extensions={extensions}
+      extensions={[
+        ...extensions,
+        ConfiguredImageUploadNode(),
+        ConfiguredFileHandler(),
+      ]}
       content={content}
       editorProps={{
         attributes: {
@@ -89,7 +104,9 @@ export default function TiptapEditor({
         // Required to preserve formatting in custom element previews
         preserveWhitespace: true,
       }}
-      editorContainerProps={{ className }}
+      editorContainerProps={{
+        className: cn(className, "relative"),
+      }}
       immediatelyRender={false}
       onCreate={onCreate}
       onUpdate={onUpdate}

@@ -12,29 +12,26 @@ import {
   FernTooltipProvider,
 } from "@fern-docs/components/FernTooltip";
 
+import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { GithubSourceRepo } from "@/app/services/github/types";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 
 import {
-  ErrorCreateBranchToast,
   ErrorNoBaseBranchToast,
   ErrorNoGithubSourceToast,
 } from "../editor/EditorToasts";
 import { Button } from "../ui/button";
 
 export function GoToEditorButton({
-  orgName,
   docsUrl,
   session,
   sourceRepo,
   disabled = false,
   isValidatingSource,
 }: {
-  orgName: Auth0OrgName;
   docsUrl: DocsUrl;
   session: Auth0SessionData;
   sourceRepo?: GithubSourceRepo;
@@ -42,6 +39,7 @@ export function GoToEditorButton({
   disabledReason?: string;
   isValidatingSource?: boolean;
 }) {
+  const orgName = useOrgName();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -76,7 +74,7 @@ export function GoToEditorButton({
     }
   }, [docsUrl, disabled, router, editorSlug]);
 
-  const createBranch = useCallback(() => {
+  const goToEditor = useCallback(() => {
     if (sourceRepo?.owner == null || sourceRepo.repo == null) {
       ErrorNoGithubSourceToast();
       return;
@@ -86,27 +84,8 @@ export function GoToEditorButton({
       return;
     }
 
-    // Very important - the branch creation needs to be finished before navigation
-    // TODO: Move the branch creation logic into the editor page
-    DashboardApiClient.postCreateBranch({
-      owner: sourceRepo.owner,
-      repo: sourceRepo.repo,
-      branch: newBranchName,
-      baseBranch: sourceRepo.baseBranch,
-    })
-      .then((response) => {
-        if (response.success) {
-          // TODO: client-side nav results in infinite loop, just use browser nav for now
-          window.location.href = editorSlug;
-          // router.push(editorSlug);
-        } else {
-          throw new Error();
-        }
-      })
-      .catch(() => {
-        ErrorCreateBranchToast();
-      });
-  }, [sourceRepo, newBranchName, editorSlug]);
+    router.push(editorSlug);
+  }, [sourceRepo, editorSlug, router]);
 
   return (
     <div className="flex w-fit flex-row items-center gap-2">
@@ -122,7 +101,7 @@ export function GoToEditorButton({
             <Button
               onClick={() => {
                 setIsLoading(true);
-                createBranch();
+                goToEditor();
               }}
               disabled={isLoading || disabled || isValidatingSource}
               asChild={!disabled}

@@ -1,2 +1,3 @@
-export { type GetHistogramAnalyticsRequest } from "./GetHistogramAnalyticsRequest.js";
-export { type GetInsightsRequest } from "./GetInsightsRequest.js";
+export { type GetAnalyticsHistogramRequest } from "./GetAnalyticsHistogramRequest.js";
+export { type GetAnalyticsInsightsRequest } from "./GetAnalyticsInsightsRequest.js";
+export { type GenerateAllInsightsRequest } from "./GenerateAllInsightsRequest.js";

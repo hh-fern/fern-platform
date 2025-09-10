@@ -4,7 +4,7 @@ import { after } from "next/server";
 import { cache } from "react";
 
 import { kv } from "@vercel/kv";
-import { Semaphore } from "es-toolkit/compat";
+import { Semaphore } from "es-toolkit";
 import { mapValues } from "es-toolkit/object";
 import { type AsyncOrSync, UnreachableCaseError } from "ts-essentials";
 
@@ -35,9 +35,9 @@ import {
 } from "@fern-api/docs-server/docs-loader";
 import {
   DEFAULT_CONTENT_WIDTH,
-  DEFAULT_EDGE_FLAGS,
   DEFAULT_GUTTER_WIDTH,
   DEFAULT_HEADER_HEIGHT,
+  DEFAULT_LOCAL_EDGE_FLAGS,
   DEFAULT_LOGO_HEIGHT,
   DEFAULT_PAGE_WIDTH,
   DEFAULT_SELF_HOSTED_EDGE_FLAGS,
@@ -201,7 +201,7 @@ async function clearKvCache(domain: string) {
 
 const cachedGetEdgeFlags = cache(async (domain: string) => {
   if (isLocal()) {
-    return DEFAULT_EDGE_FLAGS;
+    return DEFAULT_LOCAL_EDGE_FLAGS;
   } else if (isSelfHosted()) {
     return DEFAULT_SELF_HOSTED_EDGE_FLAGS;
   }
@@ -714,50 +714,58 @@ const getConfig = (cacheConfig: Required<CacheConfig>) =>
   });
 
 const getPage = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domain: string, pageId: string) => {
-    try {
-      const page = await kvGet<DocsV1Read.PageContent>(
+  cache(
+    async (
+      domain: string,
+      pageId: string,
+      returnRawMarkdown: boolean = false
+    ) => {
+      try {
+        const page = await kvGet<DocsV1Read.PageContent>(
+          domain,
+          `page:${pageId}`,
+          cacheConfig.cacheKeySuffix
+        );
+        if (page != null && isPlainObject(page) && "markdown" in page) {
+          const config = await getConfig(cacheConfig)(domain);
+          return {
+            filename: pageId,
+            markdown: page.markdown,
+            editThisPageUrl: page.editThisPageUrl,
+            css: config.css,
+            rawMarkdown: returnRawMarkdown ? page.rawMarkdown : undefined,
+          };
+        }
+      } catch (error) {
+        console.warn(
+          `Failed to get page for ${domain}:${pageId}, fallback to uncached`,
+          error
+        );
+      }
+
+      const response = await loadWithUrl(domain);
+      const page = response.definition.pages[pageId as PageId];
+      if (page == null) {
+        console.error(`Could not find page with ID ${pageId}`);
+        notFound();
+      }
+
+      kvSet(
         domain,
         `page:${pageId}`,
+        page,
+        cacheConfig.kvTtl,
         cacheConfig.cacheKeySuffix
       );
-      if (page != null && isPlainObject(page) && "markdown" in page) {
-        const config = await getConfig(cacheConfig)(domain);
-        return {
-          filename: pageId,
-          markdown: page.markdown,
-          editThisPageUrl: page.editThisPageUrl,
-          css: config.css,
-        };
-      }
-    } catch (error) {
-      console.warn(
-        `Failed to get page for ${domain}:${pageId}, fallback to uncached`,
-        error
-      );
+      return {
+        filename: pageId,
+        markdown: page.markdown,
+        editThisPageUrl: page.editThisPageUrl,
+        css: response.definition.config.css,
+        rawMarkdown: returnRawMarkdown ? page.rawMarkdown : undefined,
+      };
     }
-
-    const response = await loadWithUrl(domain);
-    const page = response.definition.pages[pageId as PageId];
-    if (page == null) {
-      console.error(`Could not find page with ID ${pageId}`);
-      notFound();
-    }
-
-    kvSet(
-      domain,
-      `page:${pageId}`,
-      page,
-      cacheConfig.kvTtl,
-      cacheConfig.cacheKeySuffix
-    );
-    return {
-      filename: pageId,
-      markdown: page.markdown,
-      editThisPageUrl: page.editThisPageUrl,
-      css: response.definition.config.css,
-    };
-  });
+  );
 
 const getMdxBundlerFiles = (cacheConfig: Required<CacheConfig>) =>
   cache(async (domain: string) => {
@@ -964,6 +972,8 @@ const getLayout = (cacheConfig: Required<CacheConfig>) =>
       tabsPlacement,
       searchbarPlacement,
       isHeaderDisabled: config.layout?.disableHeader ?? false,
+      hideNavLinks: config.layout?.hideNavLinks ?? false,
+      hideFeedback: config.layout?.hideFeedback ?? false,
     };
   });
 
@@ -1020,6 +1030,12 @@ function calcDefaultPageWidth(sidebarWidth: number, contentWidth: number) {
 
 const getAuthConfig = getAuthEdgeConfig;
 
+export type DocsLoaderOptions = {
+  cacheConfig?: CacheConfig;
+  skipAuth?: boolean;
+  returnRawMarkdown?: boolean;
+};
+
 /**
  * The "use cache" tags help us speed up rendering specific parts of the page that are static.
  * It has a hard-limit of 2MB which is why we cannot use it to cache the entire response.
@@ -1030,24 +1046,23 @@ export const createCachedDocsLoader = async (
   host: string,
   domain: string,
   fern_token?: string,
-  cacheConfig?: CacheConfig,
-  skipAuth?: boolean
+  options?: DocsLoaderOptions
 ): Promise<DocsLoader & { clearKvCache: () => Promise<void> }> => {
   assertDocsDomain(domain);
 
-  const config = { ...DEFAULT_CACHE_CONFIG, ...cacheConfig };
+  const config = { ...DEFAULT_CACHE_CONFIG, ...options?.cacheConfig };
 
   // Force revalidation if requested - only clear KV cache here
   if (config.forceRevalidate) {
     await clearKvCache(domain);
   }
 
-  const authConfig = skipAuth
+  const authConfig = options?.skipAuth
     ? Promise.resolve(undefined)
     : getAuthConfig(domain);
   const metadata = getMetadata(config)(withoutStaging(domain));
 
-  const getAuthState = skipAuth
+  const getAuthState = options?.skipAuth
     ? async (_pathname?: string) => ({
         authed: true as const,
         ok: true as const,
@@ -1100,7 +1115,8 @@ export const createCachedDocsLoader = async (
       ),
     unsafe_getFullRoot: () => unsafe_getRootCached(config)(domain),
     getConfig: () => getConfig(config)(domain),
-    getPage: (pageId) => getPage(config)(domain, pageId),
+    getPage: (pageId) =>
+      getPage(config)(domain, pageId, options?.returnRawMarkdown),
     getColors: () => getColors(config)(domain),
     getLayout: () => getLayout(config)(domain),
     getFonts: () => getFonts(config)(domain),

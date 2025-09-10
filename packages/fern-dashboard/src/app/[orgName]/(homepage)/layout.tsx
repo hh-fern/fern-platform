@@ -6,6 +6,7 @@ import { SidepanelProvider } from "@/components/layout/SidepanelContext";
 import { ServerSidePylonSetup } from "@/components/pylon/ServerSidePylonSetup";
 
 import { Auth0OrgName } from "../../services/auth0/types";
+import { OrgNameProvider } from "../context/OrgNameContext";
 
 export default async function AuthedLayout({
   params,
@@ -14,7 +15,7 @@ export default async function AuthedLayout({
 }: Readonly<{
   params: Promise<{ orgName: Auth0OrgName }>;
   children: React.JSX.Element;
-  sidepanel?: React.ReactNode;
+  sidepanel: React.ReactNode;
 }>) {
   const { orgName } = await params;
 
@@ -28,11 +29,13 @@ export default async function AuthedLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidepanelProvider>
-            <AppLayout sidepanel={sidepanel} orgName={orgName}>
-              {children}
-            </AppLayout>
-          </SidepanelProvider>
+          <OrgNameProvider orgName={orgName}>
+            <SidepanelProvider>
+              <AppLayout sidepanel={sidepanel} orgName={orgName}>
+                {children}
+              </AppLayout>
+            </SidepanelProvider>
+          </OrgNameProvider>
         </ThemeProvider>
       </>
     </ProtectedRoute>

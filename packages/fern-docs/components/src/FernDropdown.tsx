@@ -25,6 +25,13 @@ import { FernTooltip, FernTooltipProvider } from "./FernTooltip";
 import { cn } from "./cn";
 
 export declare namespace FernDropdown {
+  export interface AuthOption {
+    type: "auth";
+    key: string;
+    value: string;
+    selected: boolean;
+  }
+
   export interface ProductOption {
     type: "product";
     id: string;
@@ -43,7 +50,7 @@ export declare namespace FernDropdown {
   export interface ValueOption {
     type: "value";
     label?: ReactNode;
-    helperText?: ReactNode;
+    helperText?: ReactNode; // not used in multi-select
     children?: ReactNode | ((active: boolean) => ReactNode);
     value: string;
     icon?: ReactNode;
@@ -57,13 +64,17 @@ export declare namespace FernDropdown {
     type: "separator";
   }
 
-  export type Option = ProductOption | ValueOption | SeparatorOption;
+  export type Option =
+    | ProductOption
+    | ValueOption
+    | SeparatorOption
+    | AuthOption;
 
   export interface Props {
     className?: string;
     options: readonly Option[];
     onValueChange?: (value: string) => void;
-    value?: string;
+    value?: string | string[]; // value must be an array to set as multi-select
     onOpen?: () => void;
     usePortal?: boolean;
     side?: "top" | "right" | "bottom" | "left";
@@ -115,6 +126,15 @@ export const FernDropdown = forwardRef<
       },
       [onOpen]
     );
+
+    const isValueSelected = useCallback(
+      (optionValue: string) => {
+        return Array.isArray(value)
+          ? (value?.includes(optionValue) ?? false)
+          : value === optionValue;
+      },
+      [value]
+    );
     const renderDropdownContent = () => (
       <DropdownMenu.Content
         sideOffset={4}
@@ -134,35 +154,69 @@ export const FernDropdown = forwardRef<
             className="p-1"
             scrollbars="vertical"
           >
-            <DropdownMenu.RadioGroup
-              value={value}
-              onValueChange={onValueChange}
-              onClick={onClick}
-              {...radioGroupProps}
-            >
-              {options.map((option, idx) =>
-                option.type === "value" ? (
-                  <FernDropdownItemValue
-                    key={option.value}
-                    option={option}
-                    value={value}
-                    dropdownMenuElement={dropdownMenuElement}
-                    container={container}
-                  />
-                ) : option.type === "product" ? (
-                  <FernProductItem
-                    key={option.id}
-                    option={option}
-                    dense={option.dense}
-                  />
-                ) : (
-                  <DropdownMenu.Separator
-                    key={idx}
-                    className="bg-border-default mx-2 my-1 h-px"
-                  />
-                )
-              )}
-            </DropdownMenu.RadioGroup>
+            {Array.isArray(value) ? (
+              <div onClick={onClick}>
+                {options.map((option, idx) =>
+                  option.type === "value" ? (
+                    <FernDropdownItemMultiSelect
+                      key={option.value}
+                      option={option}
+                      isSelected={isValueSelected(option.value)}
+                      onToggle={
+                        onValueChange ??
+                        (() => {
+                          void 0;
+                        })
+                      }
+                      dropdownMenuElement={dropdownMenuElement}
+                      container={container}
+                    />
+                  ) : option.type === "separator" ? (
+                    <DropdownMenu.Separator
+                      key={idx}
+                      className="bg-border-default mx-2 my-1 h-px"
+                    />
+                  ) : null
+                )}
+              </div>
+            ) : (
+              <DropdownMenu.RadioGroup
+                value={value}
+                onValueChange={onValueChange}
+                onClick={onClick}
+                {...radioGroupProps}
+              >
+                {options.map((option, idx) =>
+                  option.type === "value" ? (
+                    <FernDropdownItemValue
+                      key={option.value}
+                      option={option}
+                      value={value}
+                      dropdownMenuElement={dropdownMenuElement}
+                      container={container}
+                    />
+                  ) : option.type === "product" ? (
+                    <FernProductItem
+                      key={option.id}
+                      option={option}
+                      dense={option.dense}
+                    />
+                  ) : option.type === "auth" ? (
+                    <FernDropdownItemAuth key={option.key} option={option} />
+                  ) : option.type === "separator" ? (
+                    <DropdownMenu.Separator
+                      key={idx}
+                      className="bg-border-default mx-2 my-1 h-px"
+                    />
+                  ) : (
+                    <DropdownMenu.Separator
+                      key={idx}
+                      className="bg-border-default mx-2 my-1 h-px"
+                    />
+                  )
+                )}
+              </DropdownMenu.RadioGroup>
+            )}
           </FernScrollArea>
         </FernTooltipProvider>
       </DropdownMenu.Content>
@@ -297,6 +351,102 @@ function FernDropdownItemValue({
           </button>
         )}
       </DropdownMenu.RadioItem>
+    </FernTooltip>
+  );
+}
+
+function FernDropdownItemAuth({ option }: { option: FernDropdown.AuthOption }) {
+  return (
+    <DropdownMenu.RadioItem asChild={true} value={option.key}>
+      <div className="flex cursor-pointer items-center justify-between gap-2 px-2 py-1">
+        <div className="text-sm">{option.key}</div>
+
+        <DropdownMenu.ItemIndicator asChild>
+          <Check />
+        </DropdownMenu.ItemIndicator>
+      </div>
+    </DropdownMenu.RadioItem>
+  );
+}
+
+function FernDropdownItemMultiSelect({
+  option,
+  isSelected,
+  onToggle,
+  dropdownMenuElement,
+  container,
+}: {
+  option: FernDropdown.ValueOption;
+  isSelected: boolean;
+  onToggle: (value: string) => void;
+  dropdownMenuElement: ReactElement | undefined;
+  container?: HTMLElement;
+}) {
+  const helperTextRef = useRef<HTMLDivElement>(null);
+  const [isEllipsisActive, setIsEllipsisActive] = useState(false);
+
+  useResizeObserver(helperTextRef, (entries) => {
+    for (const entry of entries) {
+      setIsEllipsisActive(entry.target.scrollWidth > entry.target.clientWidth);
+    }
+  });
+
+  function renderButtonContent() {
+    return (
+      <div className="w-full">
+        <div className="flex items-center gap-2">
+          {option.icon}
+
+          <div ref={helperTextRef} className={option.labelClassName}>
+            {option.label ?? option.value}
+          </div>
+          <span className="ml-auto space-x-1">
+            {option.rightElement && <span>{option.rightElement}</span>}
+          </span>
+
+          {isSelected && <Check className="size-icon" />}
+        </div>
+      </div>
+    );
+  }
+
+  const handleClick = () => {
+    onToggle(option.value);
+  };
+
+  return (
+    <FernTooltip
+      content={isEllipsisActive ? option.value : ""}
+      side="right"
+      sideOffset={8}
+      container={container}
+    >
+      {dropdownMenuElement != null ? (
+        cloneElement(
+          dropdownMenuElement,
+          {
+            href: option.href,
+            className: cn(
+              "fern-dropdown-item cursor-pointer",
+              isSelected && "bg-accent-subtle",
+              option.className
+            ),
+            onClick: handleClick,
+          } as any,
+          renderButtonContent()
+        )
+      ) : (
+        <button
+          className={cn(
+            "fern-dropdown-item cursor-pointer",
+            isSelected && "bg-accent-subtle",
+            option.className
+          )}
+          onClick={handleClick}
+        >
+          {renderButtonContent()}
+        </button>
+      )}
     </FernTooltip>
   );
 }

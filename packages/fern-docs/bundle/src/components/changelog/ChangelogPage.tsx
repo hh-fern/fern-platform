@@ -32,6 +32,7 @@ export default async function ChangelogPage({
   isFullPage: boolean;
 }) {
   const node = await loader.getNavigationNode(nodeId);
+  const configLayout = await loader.getLayout();
   if (node.type !== "changelog") {
     console.error(
       `[${loader.domain}] Found non-changelog node for nodeId: ${nodeId}`
@@ -58,6 +59,9 @@ export default async function ChangelogPage({
     )
   ).filter(isNonNullish);
 
+  const tags = new Set(entries.flatMap((e) => e.tags ?? []));
+  const allTags = tags.size > 0 ? ["All", ...tags] : undefined;
+
   /**
    * if there are duplicate anchor tags, the anchor from the first page where it appears will be used
    */
@@ -80,6 +84,7 @@ export default async function ChangelogPage({
           serialize={serialize}
           node={node}
           breadcrumb={breadcrumb}
+          tags={allTags}
         />
       }
       entries={Object.fromEntries(
@@ -96,6 +101,7 @@ export default async function ChangelogPage({
         })
       )}
       isFullPage={isFullPage}
+      configLayout={configLayout}
     />
   );
 }
@@ -106,12 +112,14 @@ export async function ChangelogPageOverview({
   node,
   breadcrumb,
   showRssFeedButton = true,
+  tags,
 }: {
   loader: DocsLoader;
   serialize: MdxSerializer;
   node: FernNavigation.ChangelogNode;
   breadcrumb: readonly FernNavigation.BreadcrumbItem[];
   showRssFeedButton?: boolean;
+  tags: string[] | undefined;
 }) {
   const page =
     node.overviewPageId != null
@@ -132,6 +140,7 @@ export async function ChangelogPageOverview({
         breadcrumb={breadcrumb}
         slug={node.slug}
         showRssFeedButton={showRssFeedButton}
+        filters={tags}
       />
       <Markdown
         mdx={mdx}

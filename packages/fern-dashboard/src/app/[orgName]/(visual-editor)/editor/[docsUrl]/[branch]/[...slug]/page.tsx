@@ -18,7 +18,7 @@ import { EncodedDocsUrl } from "@/utils/types";
 
 import PageNode from "./PageNode";
 
-export const experimental_ppr = false;
+export const experimental_ppr = true;
 
 export default async function Page({
   params,
@@ -39,8 +39,11 @@ export default async function Page({
     docsUrl: parseDocsUrlParam({ docsUrl }),
   });
 
-  const resolvedSearchParams = await searchParams;
-  const host = await getHostFromHeaders();
+  const [resolvedSearchParams, host] = await Promise.all([
+    searchParams,
+    getHostFromHeaders(),
+  ]);
+
   const slugAlias = slugArray.join("/");
 
   const loader = await createEditableDocsLoader(
@@ -94,13 +97,22 @@ export default async function Page({
   const filename = page?.filename;
   const mdx = page?.markdown;
   const cssConfig = page?.css; // Extract CSS configuration
+  const rawMarkdown = page?.rawMarkdown;
 
-  const { html, frontmatter, originalElements, originalFrontmatter } = mdx
-    ? mdxToHtml(mdx, {
+  // Until sites are deployed with the version of FDR that supports rawMarkdown, we need to parse the markdown
+  // from the server as a fallback.
+  const { html, frontmatter, originalFrontmatter } = rawMarkdown
+    ? mdxToHtml(rawMarkdown, {
         treatAsCustomElement: ["code"],
         treatAsUnsupported: ["math"],
       })
-    : {};
+    : mdx
+      ? mdxToHtml(mdx, {
+          treatAsCustomElement: ["code"],
+          treatAsUnsupported: ["math"],
+        })
+      : {};
+
   return (
     // TODO: Currently, we are force-hiding the table of contents is within Visual Editor.
     // This is a temporary solution, as I anticipate we will want the TOC to be dynamic based
@@ -129,7 +141,6 @@ export default async function Page({
           initialFilename={filename}
           initialHtml={html}
           initialFrontmatter={frontmatter}
-          initialOriginalElements={originalElements}
           initialOriginalFrontmatter={originalFrontmatter}
           cssConfig={cssConfig}
         />

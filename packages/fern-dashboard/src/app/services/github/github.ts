@@ -1,18 +1,23 @@
+import { Auth0OrgName } from "../auth0/types";
 import { DashboardApiClient } from "../dashboard-api/client";
 
 export const DEFAULT_PR_TITLE = "Visual Editor: Update";
 export const DEFAULT_COMMIT_MESSAGE = "Visual Editor: Update";
 
 export async function handleCreatePr({
+  orgName,
   branch,
   owner,
+  site,
   repo,
   baseBranch,
   title,
   onAiGenerationComplete,
 }: {
+  orgName: Auth0OrgName;
   branch: string;
   owner: string;
+  site: string;
   repo: string;
   baseBranch: string;
   title?: string;
@@ -20,8 +25,10 @@ export async function handleCreatePr({
 }): Promise<string | undefined> {
   try {
     const response = await DashboardApiClient.postCreatePr({
+      orgName,
       owner,
       repo,
+      site,
       head: branch,
       base: baseBranch,
       title: title || DEFAULT_PR_TITLE,
@@ -31,8 +38,10 @@ export async function handleCreatePr({
       try {
         // No need to await this, we just want to try to generate a PR description.
         void handleGeneratePrDescription({
+          orgName,
           branch,
           owner,
+          site,
           repo,
           baseBranch,
         }).then((result) => {
@@ -55,13 +64,17 @@ export async function handleCreatePr({
 }
 
 export async function handleGeneratePrDescription({
+  orgName,
   branch,
   owner,
+  site,
   repo,
   baseBranch,
 }: {
+  orgName: Auth0OrgName;
   branch: string;
   owner: string;
+  site: string;
   repo: string;
   baseBranch: string;
 }): Promise<{
@@ -70,7 +83,9 @@ export async function handleGeneratePrDescription({
   newTitle?: string;
 }> {
   return await DashboardApiClient.generatePrDescription({
+    orgName,
     owner,
+    site,
     repo,
     branch,
     baseBranch,
@@ -78,16 +93,26 @@ export async function handleGeneratePrDescription({
 }
 
 export function getOwnerAndRepoFromGithubUrl(githubUrl: string) {
-  const [owner, repo] = githubUrl.split("/").slice(-2);
+  const piecesAfterGithubCom = githubUrl.split("github.com/")[1];
+  if (piecesAfterGithubCom == null) {
+    return { owner: null, repo: null };
+  }
+  const [owner, repo] = piecesAfterGithubCom.split("/").slice(0, 2);
   return { owner, repo };
 }
 
 export function getRepoDisplayNameFromUrl(githubUrl: string) {
   const { owner, repo } = getOwnerAndRepoFromGithubUrl(githubUrl);
+  if (owner == null || repo == null) {
+    return githubUrl;
+  }
   return `${owner}/${repo}`;
 }
 
 export function validateUrlIsGithubUrl(inputUrl: string): boolean {
+  if (inputUrl === "") {
+    return false;
+  }
   // Check if URL starts with http/https
   if (!inputUrl.startsWith("https://") && !inputUrl.startsWith("http://")) {
     return false;

@@ -4,9 +4,11 @@ import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
+import { NoiseOverlay } from "@/components/NoiseOverlay";
 import { PylonScript } from "@/components/pylon/PylonScript";
 import { HIDE_PYLON_CLASS_NAME } from "@/components/pylon/constants";
 import { Toaster } from "@/components/ui/sonner";
+import { AnimatedNoiseProvider } from "@/providers/AnimatedNoiseProvider";
 import { PostHogProvider } from "@/providers/PosthogProvider";
 import { ProgressProvider } from "@/providers/ProgressProvider";
 import { ReactQueryProvider } from "@/providers/ReactQueryProvider";
@@ -34,18 +36,22 @@ export default async function RootLayout({
         // id is used to remove the hidePylon class programatically
         id="body"
         className={cn(
-          "noise flex h-[calc(100dvh)] antialiased",
+          "flex h-[calc(100dvh)] antialiased",
           HIDE_PYLON_CLASS_NAME
         )}
       >
-        <Analytics />
-        <SpeedInsights />
+        <AnimatedNoiseProvider>
+          <NoiseOverlay />
 
-        <ReactQueryProvider>
-          <PostHogProvider session={session}>
-            <ProgressProvider>{children}</ProgressProvider>
-          </PostHogProvider>
-        </ReactQueryProvider>
+          <Analytics />
+          <SpeedInsights />
+
+          <ReactQueryProvider>
+            <PostHogProvider session={session}>
+              <ProgressProvider>{children}</ProgressProvider>
+            </PostHogProvider>
+          </ReactQueryProvider>
+        </AnimatedNoiseProvider>
         <Toaster
           position="top-center"
           richColors

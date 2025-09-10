@@ -1,5 +1,11 @@
-import { FilterCondition, Filters } from "@turbopuffer/turbopuffer";
+import {
+  FilterCondition,
+  FilterConnective,
+  FilterOperator,
+  Filters,
+} from "@turbopuffer/turbopuffer";
 
+import { EVERYONE_ROLE } from "@fern-api/docs-utils";
 import { FacetFilter } from "@fern-docs/search-keyword";
 
 export function buildNegationFilters(
@@ -9,14 +15,25 @@ export function buildNegationFilters(
   return values.map((v) => [field, "NotEq", v]);
 }
 
+export function buildInclusionFilters(
+  field: string,
+  values: string[] = []
+): FilterCondition[] {
+  return values.map((v) => [field, "Eq", v]);
+}
+
 export const buildQueryFilters = ({
   filters,
+  explodedRoles,
   documentIdsToIgnore,
   urlsToIgnore,
+  documentUrls,
 }: {
   filters: FacetFilter[];
+  explodedRoles: string[];
   documentIdsToIgnore: string[];
   urlsToIgnore: string[];
+  documentUrls?: string[];
 }): Filters | undefined => {
   const versionFacetFilters = filters.filter(
     (f) => f.facet === "version.title"
@@ -25,14 +42,18 @@ export const buildQueryFilters = ({
     (f) => f.facet === "product.title"
   );
 
-  const documentIdFilters: FilterCondition[] = buildNegationFilters(
+  const documentIdNegationFilters: FilterCondition[] = buildNegationFilters(
     "id",
     documentIdsToIgnore
   );
-  const urlFilters: FilterCondition[] = buildNegationFilters(
+  const urlNegationFilters: FilterCondition[] = buildNegationFilters(
     "url",
     urlsToIgnore
   );
+
+  const urlInclusionFilters: FilterCondition[] = documentUrls?.length
+    ? buildInclusionFilters("url", documentUrls)
+    : [];
 
   const versionFilters = versionFacetFilters.map((f) => {
     const filter: Filters = [
@@ -49,33 +70,56 @@ export const buildQueryFilters = ({
     return filter;
   });
 
-  const productFilters = productFacetFilters.map((f) => {
-    const filter: Filters = [
-      "Or",
-      [
-        ["product", "Eq", f.value],
-        ["product", "Eq", null],
-      ],
-    ];
-    return filter;
-  });
+  const productFilters: [FilterConnective, Filters[]][] =
+    productFacetFilters.map((f) => {
+      const filter: Filters = [
+        "Or",
+        [
+          ["product", "Eq", f.value],
+          ["product", "Eq", null],
+        ],
+      ];
+      return filter;
+    });
+
+  const hasDocumentConstraints = urlInclusionFilters.length > 0;
+
+  const rolesToFilter = explodedRoles.includes(EVERYONE_ROLE)
+    ? explodedRoles
+    : [...explodedRoles, EVERYONE_ROLE];
+  const roleFilters: [FilterConnective, Filters[]] = [
+    "Or",
+    [
+      ...rolesToFilter.map((role) => [
+        "roles",
+        "Contains" as unknown as FilterOperator,
+        role,
+      ]),
+      ["roles", "Eq", null],
+    ] as Filters[],
+  ];
 
   const queryFilters: Filters | undefined =
-    versionFacetFilters.length > 0 || productFacetFilters.length > 0
+    hasDocumentConstraints && urlInclusionFilters.length > 0
       ? [
+          "And",
+          [
+            ["Or", [...urlInclusionFilters]],
+            ...versionFilters,
+            ...productFilters,
+            roleFilters,
+          ],
+        ]
+      : [
           "And",
           [
             ...versionFilters,
             ...productFilters,
-            ...documentIdFilters,
-            ...urlFilters,
+            roleFilters,
+            ...documentIdNegationFilters,
+            ...urlNegationFilters,
           ],
-        ]
-      : documentIdFilters.length > 0
-        ? documentIdFilters.length === 1
-          ? documentIdFilters[0]
-          : ["And", documentIdFilters]
-        : undefined;
+        ];
 
   return queryFilters;
 };

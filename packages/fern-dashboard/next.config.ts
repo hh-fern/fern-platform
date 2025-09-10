@@ -5,7 +5,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const CSP_HEADER = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usepylon.com *.posthog.com *.pusher.com d3vl36l12sfx26.cloudfront.net cdn.jsdelivr.net;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usepylon.com *.posthog.com *.pusher.com d3vl36l12sfx26.cloudfront.net cdn.jsdelivr.net va.vercel-scripts.com;
   connect-src 'self' * ws:;
   style-src 'self' 'unsafe-inline' *.usepylon.com *.posthog.com cdn.jsdelivr.net;
   font-src 'self' pylon-avatars.s3.us-west-1.amazonaws.com *.usepylon.com *.buildwithfern.com;
@@ -46,6 +46,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "files.buildwithfern.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
         port: "",
         pathname: "/**",
       },

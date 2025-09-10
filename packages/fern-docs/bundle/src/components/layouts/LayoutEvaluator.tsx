@@ -5,6 +5,10 @@ import React from "react";
 import { DocsLoader } from "@fern-api/docs-server/docs-loader";
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import {
+  Availability,
+  AvailabilityBadge,
+} from "@fern-docs/components/badges/availability-badge";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 
 import { MdxAside } from "@/mdx/bundler/component";
@@ -24,6 +28,7 @@ export async function LayoutEvaluator({
   breadcrumb,
   bottomNavigation,
   slug,
+  availability,
 }: {
   loader: DocsLoader;
   serialize: MdxSerializer;
@@ -32,6 +37,7 @@ export async function LayoutEvaluator({
   breadcrumb: readonly FernNavigation.BreadcrumbItem[];
   bottomNavigation?: React.ReactNode;
   slug: string;
+  availability?: Availability;
 }) {
   const { filename, markdown, editThisPageUrl } = await loader.getPage(pageId);
   const mdx = await serialize(markdown, {
@@ -52,11 +58,13 @@ export async function LayoutEvaluator({
   const title = frontmatter?.title ?? fallbackTitle;
   const subtitle = frontmatter?.subtitle ?? frontmatter?.excerpt;
 
-  let layout = frontmatter?.layout ?? "guide";
+  let frontmatterLayout = frontmatter?.layout ?? "guide";
   const hasAside = mdx && exports?.Aside;
   if (hasAside) {
-    layout = "reference";
+    frontmatterLayout = "reference";
   }
+
+  const configLayout = await loader.getLayout();
 
   const pageHeader = (
     <PageHeader
@@ -66,14 +74,22 @@ export async function LayoutEvaluator({
       breadcrumb={breadcrumb}
       slug={slug}
       markdown={markdown}
-      includeDropdown={layout !== "reference"}
+      includeDropdown={frontmatterLayout !== "reference"}
+      tags={
+        availability && (
+          <AvailabilityBadge availability={availability} rounded />
+        )
+      }
     />
   );
 
+  // prefer frontmatter values over global config
   const footer = (
     <FooterLayout
-      hideFeedback={frontmatter?.["hide-feedback"]}
-      hideNavLinks={frontmatter?.["hide-nav-links"]}
+      hideFeedback={frontmatter?.["hide-feedback"] ?? configLayout.hideFeedback}
+      hideNavLinks={
+        frontmatter?.["hide-nav-links"] ?? configLayout.hideNavLinks
+      }
       editThisPageUrl={frontmatter?.["edit-this-page-url"]}
       bottomNavigation={bottomNavigation}
     />

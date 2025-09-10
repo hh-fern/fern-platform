@@ -6,6 +6,7 @@ import { chunk } from "es-toolkit/array";
 import { useAtomValue } from "jotai";
 
 import { slugToHref } from "@fern-api/docs-utils";
+import { FernLayoutConfig } from "@fern-api/docs-utils/types/layout-config";
 import type { FernNavigation } from "@fern-api/fdr-sdk";
 import { EMPTY_ARRAY } from "@fern-api/ui-core-utils";
 import { Badge } from "@fern-docs/components";
@@ -19,15 +20,27 @@ import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 
 import { HideBuiltWithFern } from "@/components/built-with-fern";
 import { FooterLayout } from "@/components/layouts/FooterLayout";
+import { useSelectedFilters } from "@/state/search";
 
+import { PageFilters } from "../PageFilters";
 import { BottomNavigationClient } from "../bottom-nav-client";
 import { ChangelogContentLayout } from "./ChangelogContentLayout";
 
-function flattenChangelogEntries(
-  node: FernNavigation.ChangelogNode
-): FernNavigation.ChangelogEntryNode[] {
+function flattenChangelogEntries({
+  node,
+  selectedFilters,
+}: {
+  node: FernNavigation.ChangelogNode;
+  selectedFilters: string[];
+}): FernNavigation.ChangelogEntryNode[] {
   return node.children.flatMap((year) =>
-    year.children.flatMap((month) => month.children)
+    year.children
+      .flatMap((month) => month.children)
+      .filter(
+        (entry) =>
+          selectedFilters.length === 0 ||
+          entry.tags?.some((tag) => selectedFilters.includes(tag))
+      )
   );
 }
 
@@ -39,14 +52,20 @@ export default function ChangelogPageClient({
   overview,
   entries,
   isFullPage,
+  configLayout,
 }: {
   node: FernNavigation.ChangelogNode;
   anchorIds: Record<string, FernNavigation.PageId>;
   overview: React.ReactNode;
   entries: Record<string, React.ReactNode>;
   isFullPage: boolean;
+  configLayout: FernLayoutConfig;
 }): ReactElement<any> {
-  const flattenedEntries = useMemo(() => flattenChangelogEntries(node), [node]);
+  const selectedFilters = useSelectedFilters();
+  const flattenedEntries = useMemo(
+    () => flattenChangelogEntries({ node, selectedFilters }),
+    [node, selectedFilters]
+  );
   const chunkedEntries = useMemo(
     () => chunk(flattenedEntries, CHANGELOG_PAGE_SIZE),
     [flattenedEntries]
@@ -163,11 +182,19 @@ export default function ChangelogPageClient({
                     as="article"
                     id={entry.date}
                     stickyContent={
-                      <Badge asChild>
-                        <FernLink href={slugToHref(entry.slug)} scroll={true}>
-                          {entry.title}
-                        </FernLink>
-                      </Badge>
+                      <div className="fern-changelog-label">
+                        <Badge asChild>
+                          <FernLink href={slugToHref(entry.slug)} scroll={true}>
+                            {entry.title}
+                          </FernLink>
+                        </Badge>
+                        <div className="filter-row">
+                          <PageFilters
+                            filters={entry.tags ?? []}
+                            forcePillDisplay
+                          />
+                        </div>
+                      </div>
                     }
                   >
                     {entries[entry.pageId]}
@@ -179,7 +206,9 @@ export default function ChangelogPageClient({
           <FooterLayout
             hideFeedback
             bottomNavigation={
-              <BottomNavigationClient prev={prev} next={next} />
+              configLayout.hideNavLinks ? undefined : (
+                <BottomNavigationClient prev={prev} next={next} />
+              )
             }
           />
         </article>

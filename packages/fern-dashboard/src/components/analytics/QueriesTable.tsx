@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { FernFai } from "@fern-api/fai-sdk";
+import { FernAI } from "@fern-api/fai-sdk";
 
 import { getAllQueries } from "@/app/actions/getAllQueries";
 import { cn } from "@/utils/utils";
@@ -27,10 +27,10 @@ export function QueriesTable({
   setQueryTimeRange,
   cutoffTime,
 }: {
-  queries: FernFai.Query[];
+  queries: FernAI.Query[];
   baseDocsUrl: string;
-  onSelectConversation: (conversation: FernFai.Conversation) => void;
-  selectedConversation: FernFai.Conversation | null;
+  onSelectConversation: (conversation: FernAI.Conversation) => void;
+  selectedConversation: FernAI.Conversation | null;
   totalPages: number;
   currentPage: number;
   setCurrentPage: (page: number) => void;
@@ -63,7 +63,12 @@ export function QueriesTable({
   };
 
   return (
-    <div className={cn(BORDER_STYLES, "border-gray-0 w-full border")}>
+    <div
+      className={cn(
+        BORDER_STYLES,
+        "border-gray-0 w-full overflow-hidden border"
+      )}
+    >
       <QueriesDataTable
         columns={columns}
         data={queries}

@@ -183,7 +183,8 @@ types:
       - WithPage
     properties:
       type: literal<"page">
-
+      availability: optional<commons.Availability>
+      
   LandingPageNode:
     extends:
       - WithNodeMetadata
@@ -200,6 +201,7 @@ types:
       type: literal<"section">
       collapsed: optional<boolean>
       children: list<NavigationChild>
+      availability: optional<commons.Availability>
 
   ChangelogNode:
     extends:
@@ -230,6 +232,7 @@ types:
     properties:
       type: literal<"changelogEntry">
       date: date
+      tags: optional<list<string>>
 
   ApiReferenceNode:
     extends:

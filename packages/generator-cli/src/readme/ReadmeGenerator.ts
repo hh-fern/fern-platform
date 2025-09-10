@@ -1,3 +1,4 @@
+import { template } from "es-toolkit/compat";
 import { camelCase, upperFirst } from "es-toolkit/string";
 import type fs from "fs";
 
@@ -23,6 +24,7 @@ export class ReadmeGenerator {
   private originalReadme: string | undefined;
   private languageTitle: string;
   private organizationPascalCase: string;
+  private apiName: string;
 
   constructor({
     readmeParser,
@@ -38,6 +40,7 @@ export class ReadmeGenerator {
     this.originalReadme = originalReadme;
     this.languageTitle = languageToTitle(this.readmeConfig.language);
     this.organizationPascalCase = pascalCase(this.readmeConfig.organization);
+    this.apiName = this.readmeConfig.apiName ?? this.organizationPascalCase;
   }
 
   public async generateReadme({
@@ -88,6 +91,22 @@ export class ReadmeGenerator {
       );
     }
 
+    if (this.readmeConfig.customSections != null) {
+      const templateOptions = this.getCustomSectionTemplateOptions();
+      for (const customSection of this.readmeConfig.customSections.filter(
+        (section) =>
+          section.language.toLowerCase() ===
+          this.readmeConfig.language.type.toLowerCase()
+      )) {
+        blocks.push(
+          await this.generateCustomSection({
+            customSection,
+            templateOptions,
+          })
+        );
+      }
+    }
+
     const coreFeatures =
       this.readmeConfig.features?.filter((feat) => !this.isAdvanced(feat)) ??
       [];
@@ -113,9 +132,17 @@ export class ReadmeGenerator {
       blocks.push(advancedFeatureBlock);
     }
 
-    blocks.push(this.generateContributing());
+    if (
+      !this.featureDisabled(FernGeneratorCli.StructuredFeatureId.Contributing)
+    ) {
+      blocks.push(this.generateContributing());
+    }
 
     return blocks;
+  }
+
+  private featureDisabled(featureId: FernGeneratorCli.FeatureId): boolean {
+    return this.readmeConfig.disabledFeatures?.includes(featureId) ?? false;
   }
 
   private isAdvanced(feat: ReadmeFeature): boolean {
@@ -230,9 +257,7 @@ export class ReadmeGenerator {
   }
 
   private async writeHeader({ writer }: { writer: Writer }): Promise<void> {
-    await writer.writeLine(
-      `# ${this.organizationPascalCase} ${this.languageTitle} Library`
-    );
+    await writer.writeLine(`# ${this.apiName} ${this.languageTitle} Library`);
     await writer.writeLine();
     if (this.readmeConfig.bannerLink != null) {
       await this.writeBanner({
@@ -240,7 +265,9 @@ export class ReadmeGenerator {
         bannerLink: this.readmeConfig.bannerLink,
       });
     }
-    await this.writeFernShield({ writer });
+    if (!this.isWhiteLabel()) {
+      await this.writeFernShield({ writer });
+    }
     if (this.readmeConfig.language != null) {
       await this.writeShield({
         writer,
@@ -249,6 +276,10 @@ export class ReadmeGenerator {
     }
     await writer.writeLine();
     await this.writeIntro({ writer });
+  }
+
+  private isWhiteLabel(): boolean {
+    return this.readmeConfig.whiteLabel ?? false;
   }
 
   private async writeBanner({
@@ -275,7 +306,7 @@ export class ReadmeGenerator {
     await writer.writeLine(
       this.readmeConfig.introduction != null
         ? this.readmeConfig.introduction
-        : `The ${this.organizationPascalCase} ${this.languageTitle} library provides convenient access to the ${this.organizationPascalCase} API from ${this.languageTitle}.`
+        : `The ${this.apiName} ${this.languageTitle} library provides convenient access to the ${this.apiName} APIs from ${this.languageTitle}.`
     );
     await writer.writeLine();
   }
@@ -316,6 +347,51 @@ export class ReadmeGenerator {
     await writer.writeLine();
     return new Block({
       id: "REFERENCE",
+      content: writer.toString(),
+    });
+  }
+
+  private getCustomSectionTemplateOptions(): Record<string, string> {
+    let options: Record<string, string> = {
+      apiName: this.apiName,
+    };
+    if (this.readmeConfig.language.publishInfo != null) {
+      options = {
+        ...options,
+        ...this.readmeConfig.language.publishInfo,
+      };
+    }
+    return options;
+  }
+
+  private applyTemplateOptions(
+    content: string,
+    options: Record<string, string>
+  ): string {
+    try {
+      return template(content, { interpolate: /{{([^}]+)}}/g })(options);
+    } catch (error) {
+      console.error(`[templates] ${JSON.stringify(error)}`);
+      return content;
+    }
+  }
+
+  private async generateCustomSection({
+    customSection,
+    templateOptions,
+  }: {
+    customSection: FernGeneratorCli.CustomSection;
+    templateOptions: Record<string, string>;
+  }): Promise<Block> {
+    const writer = new StringWriter();
+    await writer.writeLine(`## ${customSection.name}`);
+    await writer.writeLine();
+    await writer.writeLine(
+      this.applyTemplateOptions(customSection.content, templateOptions)
+    );
+    await writer.writeLine();
+    return new Block({
+      id: toScreamingSnakeCase(customSection.name),
       content: writer.toString(),
     });
   }
@@ -826,9 +902,9 @@ export class ReadmeGenerator {
     writer: Writer;
     spm: FernGeneratorCli.SwiftPackageManagerPublishInfo;
   }): Promise<void> {
-    await writer.write("[![SwiftPM compatible]");
-    await writer.write(
-      "(https://img.shields.io/badge/SwiftPM-compatible-orange.svg)]"
+    await writer.write("![SwiftPM compatible]");
+    await writer.writeLine(
+      "(https://img.shields.io/badge/SwiftPM-compatible-orange.svg)"
     );
   }
 
@@ -854,8 +930,9 @@ On the other hand, contributions to the README are always very welcome!
     feature: FernGeneratorCli.ReadmeFeature;
   }): boolean {
     return (
-      !feature.snippetsAreOptional &&
-      (feature.snippets == null || feature.snippets.length === 0)
+      this.featureDisabled(feature.id) ||
+      (!feature.snippetsAreOptional &&
+        (feature.snippets == null || feature.snippets.length === 0))
     );
   }
 
@@ -910,4 +987,8 @@ function getMajorVersion(version: string): string {
 
 function assertNever(x: never): never {
   throw new Error(`unexpected value: ${JSON.stringify(x)}`);
+}
+
+function toScreamingSnakeCase(s: string): string {
+  return s.toUpperCase().replace(/ /g, "_");
 }
