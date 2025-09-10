@@ -70,7 +70,7 @@ export default function BubbleMenu() {
           // @ts-expect-error - type issue with tiptap
           selection?.node?.type?.name === "custom-element-v2" ||
           // @ts-expect-error - type issue with tiptap
-          selection?.node?.type?.name === "imageUpload"
+          selection?.node?.type?.name === "mediaUpload"
         ) {
           return false;
         }
@@ -141,6 +141,7 @@ function BubbleMenuItem({ iconProps, onClick }: BubbleMenuItem.Props) {
     <button
       className="rounded-1 cursor-pointer p-1 transition-colors hover:bg-gray-300 hover:transition-none"
       onClick={onClick}
+      onMouseDown={(e) => e.preventDefault()}
     >
       <div className="flex size-6 items-center justify-center">
         <Icon size={size} {...restIconProps} />

@@ -13,21 +13,22 @@ import { Button } from "@/components/ui/button";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useCurrentPage } from "@/providers/CurrentPageContext";
 import { useDevMode } from "@/providers/DevModeProvider";
-import { useMdxState } from "@/providers/MdxStateContext";
+import { usePages } from "@/providers/PagesStoreContext";
 import { cn } from "@/utils/utils";
 
 export default function DevPanel() {
   const { panelOpen } = useDevMode();
   const { currentFilename } = useCurrentPage();
-  const { allMdxFiles, stageChanges, frontmatterData } = useMdxState();
+  const { allMdxFiles, updatePage, frontmatterData, emitSaveEvent } =
+    usePages();
   const isEditingDisabled = useEditingDisabled();
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
 
+  const LoadingIndicator = "// Loading content...";
   // Get the current file's markdown content
   const activeFilename = currentFilename || Object.keys(allMdxFiles)[0] || "";
-  const currentMarkdown =
-    allMdxFiles[activeFilename] || "// Loading content...";
+  const currentMarkdown = allMdxFiles[activeFilename] || LoadingIndicator;
 
   useEffect(() => {
     // Update Monaco editor content when markdown changes
@@ -77,10 +78,16 @@ export default function DevPanel() {
         }
       });
 
-      // Then update the tiptap editor by staging changes with new HTML and originalElements
-      stageChanges(activeFilename, {
+      updatePage(activeFilename, {
         html,
         frontmatter: mergedFrontmatter,
+        changedNodes: {},
+      });
+
+      // Emit save event
+      emitSaveEvent({
+        fileName: activeFilename,
+        html,
       });
     } catch (conversionError: any) {
       WarningValidationToast(conversionError.message);

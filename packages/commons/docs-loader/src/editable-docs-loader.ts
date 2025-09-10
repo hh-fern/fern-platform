@@ -80,8 +80,8 @@ class EditableDocsLoader implements DocsLoader {
 
   getBaseUrl = () => this.readOnlyDocsLoader.getBaseUrl();
 
-  getDynamicIr = (apiNames: string[]) =>
-    this.readOnlyDocsLoader.getDynamicIr(apiNames);
+  getDynamicIr = (apiName: string) =>
+    this.readOnlyDocsLoader.getDynamicIr(apiName);
 }
 
 interface GetFernProjectSuccess {
@@ -132,11 +132,14 @@ export type FernConfigJsonErrors =
 
 interface FernConfigJsonStructure {
   organization: string;
+  version: string;
 }
 
 interface FernConfigJsonSuccess {
   type: "ok";
-  result: FernConfigJsonStructure;
+  result: FernConfigJsonStructure & {
+    pathToFernConfigJson: string;
+  };
 }
 
 interface FernConfigJsonError {
