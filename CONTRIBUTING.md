@@ -106,9 +106,4 @@ pnpm docs:local-bundle:deploy  # Unzips the bundle into ~/.fern/app-preview-loca
 
 # You can then use the local bundle by running
 fern docs dev --bundle-path ~/.fern/app-preview-local/.next
-
-# On subsequent runs, it's safer to use
-pnpm docs:local-bundle:redeploy  # Runs pnpm docs:local-bundle:rebuild && pnpm pnpm docs:local-bundle:deploy
-
-# This command deletes the old bundle and rebuilds it, ensuring the result includes the latest changes.
 ```
