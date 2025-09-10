@@ -90,3 +90,25 @@ https://vellum.docs.buildwithfern.com -> https://vellum.docs.staging.buildwithfe
 https://docs.buildwithfern.com -> https://fern.docs.staging.buildwithfern.com
 https://documentation.sayari.com -> https://sayari.docs.staging.buildwithfern.com
 ```
+
+## Docs Local Testing
+
+To test the docs bundle locally, you'll need to
+
+- Build the bundle locally
+- Point the fern cli to your local bundle
+
+To simplify this process, use the following scripts:
+
+```bash
+pnpm docs:local-bundle:build  # Builds the bundle locally and puts it in a zip file at the repo root called docs_bundle.tar.gz
+pnpm docs:local-bundle:deploy  # Unzips the bundle into ~/.fern/app-preview-local/.next, and runs setup steps
+
+# You can then use the local bundle by running
+fern docs dev --bundle-path ~/.fern/app-preview-local/.next
+
+# On subsequent runs, it's safer to use
+pnpm docs:local-bundle:redeploy  # Runs pnpm docs:local-bundle:rebuild && pnpm pnpm docs:local-bundle:deploy
+
+# This command deletes the old bundle and rebuilds it, ensuring the result includes the latest changes.
+```
