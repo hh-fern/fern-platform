@@ -1,11 +1,4 @@
-import {
-  ComponentProps,
-  ReactNode,
-  RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ComponentProps, ReactNode, RefObject, useEffect, useRef } from "react";
 
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import {
@@ -81,9 +74,6 @@ export function CodeBlock(props: {
   const template = { ...useTemplate().template, ...templateProp };
   const tooltips = { ...useTemplate().tooltips, ...tooltipsProp };
 
-  if (!code) {
-    return null;
-  }
   const viewportRef = useRef<ScrollToHandle>(null);
 
   useEffect(() => {
@@ -95,6 +85,10 @@ export function CodeBlock(props: {
       });
     }
   }, [props.firstLineOnLoad, viewportRef]);
+
+  if (!code) {
+    return null;
+  }
 
   if (title || filename) {
     return (
