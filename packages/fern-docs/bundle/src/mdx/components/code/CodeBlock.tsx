@@ -52,9 +52,9 @@ export function CodeBlock(props: {
    */
   tooltips?: Record<string, ReactNode>;
   /**
-   * automatically scrolls to the specified line number when the component mounts
+   * automatically scrolls to the specified line number (1-based) when the component mounts
    */
-  firstLineOnLoad?: number;
+  startLine?: number;
 }) {
   const {
     className,
@@ -78,10 +78,10 @@ export function CodeBlock(props: {
 
   useEffect(() => {
     const { current } = viewportRef;
-    if (current && props.firstLineOnLoad != null) {
-      current.scrollToLine(props.firstLineOnLoad);
+    if (current && props.startLine != null) {
+      current.scrollToLine(props.startLine);
     }
-  }, [props.firstLineOnLoad, viewportRef]);
+  }, [props.startLine, viewportRef]);
 
   if (!code) {
     return null;

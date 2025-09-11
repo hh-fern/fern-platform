@@ -94,12 +94,12 @@ export const FernSyntaxHighlighterTokens = memo(
         scrollToLine(lineNumber) {
           if (scrollAreaRef.current) {
             const targetLineElement = scrollAreaRef.current.querySelector(
-              `tbody tr.code-block-line:nth-child(${lineNumber + 1})`
+              `tbody tr.code-block-line:nth-child(${lineNumber})`
             );
             if (targetLineElement) {
               targetLineElement.scrollIntoView({
                 behavior: "smooth",
-                block: "center",
+                block: "start",
               });
             }
           }
