@@ -30,21 +30,15 @@ export interface FernSyntaxHighlighterProps {
   wordWrap?: boolean;
   template?: Record<string, string>;
   tooltips?: Record<string, React.ReactNode>;
-  initialScrollToLine?: number;
+  firstLineOnLoad?: number;
 }
 
 export const FernSyntaxHighlighter = forwardRef<
   HTMLPreElement,
   FernSyntaxHighlighterProps
 >((props, ref) => {
-  const {
-    code,
-    language,
-    tooltips,
-    template,
-    initialScrollToLine,
-    ...innerProps
-  } = props;
+  const { code, language, tooltips, template, firstLineOnLoad, ...innerProps } =
+    props;
   const highlighter = useHighlighter(language);
 
   const variableNames = useDeepCompareMemoize(
@@ -70,11 +64,11 @@ export const FernSyntaxHighlighter = forwardRef<
 
   // Handle initial scroll to specified line
   useEffect(() => {
-    if (initialScrollToLine == null || !innerProps.viewportRef?.current) {
+    if (firstLineOnLoad == null || !innerProps.viewportRef?.current) {
       return;
     }
 
-    const scrollToLine = Math.max(0, initialScrollToLine - 1); // Convert to 0-based index
+    const scrollToLine = Math.max(0, firstLineOnLoad - 1); // Convert to 0-based index
 
     // Use a small delay to ensure the component is fully rendered
     const timeoutId = setTimeout(() => {
@@ -91,7 +85,7 @@ export const FernSyntaxHighlighter = forwardRef<
     }, 100);
 
     return () => clearTimeout(timeoutId);
-  }, [initialScrollToLine, innerProps.viewportRef]);
+  }, [firstLineOnLoad, innerProps.viewportRef]);
 
   const { maxLines } = innerProps;
 
@@ -110,7 +104,7 @@ export const FernSyntaxHighlighter = forwardRef<
         ref={ref}
         tokens={tokens}
         template={template}
-        initialScrollToLine={initialScrollToLine}
+        firstLineOnLoad={firstLineOnLoad}
         {...innerProps}
       />
     </TemplateTooltip.Provider>

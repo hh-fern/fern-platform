@@ -54,7 +54,7 @@ export function CodeBlock(props: {
   /**
    * automatically scrolls to the specified line number when the component mounts
    */
-  initialScrollToLine?: number;
+  firstLineOnLoad?: number;
 }) {
   const {
     className,
@@ -134,7 +134,7 @@ export function toSyntaxHighlighterProps(
   props: React.ComponentProps<typeof CodeBlock>
 ): React.ComponentProps<typeof FernSyntaxHighlighter> {
   const highlight = props.highlight ?? props.focus ?? [];
-  console.log("props.initialScrollToLine", props.initialScrollToLine);
+  console.log("props.firstLineOnLoad", props.firstLineOnLoad);
   return {
     language: cleanLanguage(props.language ?? "plaintext"),
     highlightLines: typeof highlight === "number" ? [highlight] : highlight,
@@ -144,6 +144,6 @@ export function toSyntaxHighlighterProps(
     wordWrap: props.wordWrap,
     template: props.template,
     tooltips: props.tooltips,
-    initialScrollToLine: 70,
+    firstLineOnLoad: 70,
   };
 }
