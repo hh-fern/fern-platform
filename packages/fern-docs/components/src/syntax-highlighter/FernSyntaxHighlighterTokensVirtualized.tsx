@@ -4,6 +4,7 @@ import {
   forwardRef,
   memo,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -17,6 +18,7 @@ import { parseStringStyle, visit } from "@fern-docs/mdx";
 
 import { FernScrollArea } from "../FernScrollArea";
 import { cn } from "../cn";
+import { Measurements } from "./FernSyntaxHighlighter";
 import {
   FernSyntaxHighlighterTokensProps,
   ScrollToHandle,
@@ -104,13 +106,41 @@ export const FernSyntaxHighlighterTokensVirtualized = memo(
       maxLines,
       wordWrap,
       template,
-      initialScrollPosition,
+      onMeasurementsReady,
     } = props;
 
     const virtuosoRef = useRef<TableVirtuosoHandle>(null);
     const [scrollerRef, setScrollerRef] = useState<HTMLElement | Window | null>(
       null
     );
+
+    // Measure line height and content offset after render
+    useEffect(() => {
+      console.log("Measuring line height in virtualized");
+      if (!scrollerRef || !onMeasurementsReady) return;
+
+      // Skip if scrollerRef is window (can't measure DOM elements)
+      if (scrollerRef === window) return;
+
+      // Type guard: check if scrollerRef is HTMLElement
+      if (!(scrollerRef instanceof HTMLElement)) return;
+
+      const codeLine = scrollerRef.querySelector(".code-block-line");
+      if (!codeLine) return;
+
+      const lineHeight = codeLine.getBoundingClientRect().height;
+
+      // Calculate offset from top of scroll area to first line
+      const scrollAreaRect = scrollerRef.getBoundingClientRect();
+      const codeLineRect = codeLine.getBoundingClientRect();
+      const contentTopOffset = codeLineRect.top - scrollAreaRect.top;
+
+      onMeasurementsReady({
+        lineHeight,
+        scrollAreaRef: { current: scrollerRef },
+        contentTopOffset,
+      });
+    }, [tokens, fontSize, onMeasurementsReady, scrollerRef]);
 
     useImperativeHandle<ScrollToHandle, ScrollToHandle>(
       viewportRef,
@@ -214,12 +244,7 @@ export const FernSyntaxHighlighterTokensVirtualized = memo(
         <TableVirtuoso<Element, CodeBlockContext>
           context={context}
           components={{
-            Scroller: (props) => (
-              <FernScrollArea
-                {...props}
-                initialScrollPosition={initialScrollPosition}
-              />
-            ),
+            Scroller: FernScrollArea,
             Table: CodeBlockTable,
             TableRow: CodeBlockTableRow,
           }}

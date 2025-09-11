@@ -1,17 +1,12 @@
 "use client";
 
-import { PropsWithChildren, RefObject, forwardRef, useEffect } from "react";
+import { PropsWithChildren, RefObject, forwardRef } from "react";
 
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 
 import { cn } from "./cn";
 
 export declare namespace FernScrollArea {
-  interface InitialScrollPosition {
-    top?: number;
-    left?: number;
-  }
-
   interface FernScrollAreaProps
     extends ScrollArea.ScrollAreaProps,
       Omit<ScrollArea.ScrollAreaViewportProps, "dir"> {
@@ -19,7 +14,6 @@ export declare namespace FernScrollArea {
     rootClassName?: string;
     rootRef?: RefObject<HTMLDivElement>;
     scrollbars?: "both" | "vertical" | "horizontal";
-    initialScrollPosition?: InitialScrollPosition;
   }
 
   export type Props = PropsWithChildren<FernScrollAreaProps>;
@@ -36,41 +30,8 @@ export const FernScrollArea = forwardRef<HTMLDivElement, FernScrollArea.Props>(
       type,
       dir,
       scrollHideDelay = type !== "scroll" ? 0 : undefined,
-      initialScrollPosition,
       ...viewportProps
     } = props;
-
-    // Handle initial scroll position
-    useEffect(() => {
-      if (
-        !initialScrollPosition ||
-        !ref ||
-        typeof ref !== "object" ||
-        !ref.current
-      ) {
-        return;
-      }
-
-      console.log(
-        "FernScrollArea: Attempting to scroll to:",
-        initialScrollPosition
-      );
-
-      const timeoutId = setTimeout(() => {
-        if (ref && typeof ref === "object" && ref.current) {
-          const scrollOptions: ScrollToOptions = {
-            top: initialScrollPosition.top ?? 0,
-            left: initialScrollPosition.left ?? 0,
-            behavior: "smooth",
-          };
-
-          console.log("FernScrollArea: Scrolling with options:", scrollOptions);
-          ref.current.scrollTo(scrollOptions);
-        }
-      }, 100);
-
-      return () => clearTimeout(timeoutId);
-    }, [initialScrollPosition, ref]);
 
     return (
       <ScrollArea.Root

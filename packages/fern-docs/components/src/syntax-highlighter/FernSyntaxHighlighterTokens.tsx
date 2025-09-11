@@ -17,6 +17,7 @@ import { parseStringStyle, visit } from "@fern-docs/mdx";
 
 import { FernScrollArea } from "../FernScrollArea";
 import { cn } from "../cn";
+import { Measurements } from "./FernSyntaxHighlighter";
 import { HastToJSX } from "./HastToJsx";
 import { HighlightedTokens } from "./fernShiki";
 import {
@@ -45,7 +46,7 @@ export interface FernSyntaxHighlighterTokensProps {
   maxLines?: number;
   wordWrap?: boolean;
   template?: Record<string, string>;
-  initialScrollPosition?: FernScrollArea.InitialScrollPosition;
+  onMeasurementsReady?: (measurements: Measurements) => void;
 }
 
 export function fernSyntaxHighlighterTokenPropsAreEqual(
@@ -78,9 +79,31 @@ export const FernSyntaxHighlighterTokens = memo(
       wordWrap,
       template,
       id,
-      initialScrollPosition,
+      onMeasurementsReady,
     } = props;
     const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+    // Measure line height and content offset after render
+    useEffect(() => {
+      console.log("Measuring line height in non-virtualized");
+      if (!scrollAreaRef.current || !onMeasurementsReady) return;
+
+      const codeLine = scrollAreaRef.current.querySelector(".code-block-line");
+      if (!codeLine) return;
+
+      const lineHeight = codeLine.getBoundingClientRect().height;
+
+      // Calculate offset from top of scroll area to first line
+      const scrollAreaRect = scrollAreaRef.current.getBoundingClientRect();
+      const codeLineRect = codeLine.getBoundingClientRect();
+      const contentTopOffset = codeLineRect.top - scrollAreaRect.top;
+
+      onMeasurementsReady({
+        lineHeight,
+        scrollAreaRef,
+        contentTopOffset,
+      });
+    }, [tokens, fontSize, onMeasurementsReady]);
 
     useImperativeHandle<ScrollToHandle, ScrollToHandle>(
       viewportRef,
@@ -158,7 +181,6 @@ export const FernSyntaxHighlighterTokens = memo(
         <FernScrollArea
           ref={scrollAreaRef}
           style={{ maxHeight: getMaxHeight(fontSize, maxLines) }}
-          initialScrollPosition={initialScrollPosition}
         >
           <code
             className={cn("code-block", {

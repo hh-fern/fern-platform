@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useMemo } from "react";
+import { forwardRef, useEffect, useMemo, useState } from "react";
 
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
 import { useDeepCompareMemoize } from "@fern-ui/react-commons";
@@ -15,6 +15,12 @@ import { TemplateTooltip } from "./template-tooltip";
 
 // [number, number] is a range of lines to highlight
 type HighlightLine = number | [number, number];
+
+export interface Measurements {
+  lineHeight: number;
+  scrollAreaRef: React.RefObject<HTMLElement | null>;
+  contentTopOffset: number; // Offset from top of scroll area to first line
+}
 
 export interface FernSyntaxHighlighterProps {
   className?: string;
@@ -40,6 +46,7 @@ export const FernSyntaxHighlighter = forwardRef<
   const { code, language, tooltips, template, firstLineOnLoad, ...innerProps } =
     props;
   const highlighter = useHighlighter(language);
+  const [measurements, setMeasurements] = useState<Measurements | null>(null);
 
   const variableNames = useDeepCompareMemoize(
     new Set([
@@ -62,21 +69,35 @@ export const FernSyntaxHighlighter = forwardRef<
     }
   }, [code, highlighter, language, variableNames]);
 
-  // Calculate initial scroll position based on line number
-  const initialScrollPosition = useMemo(() => {
-    if (firstLineOnLoad == null) {
-      return undefined;
+  // Calculate and perform initial scroll
+  useEffect(() => {
+    if (firstLineOnLoad == null || !measurements?.scrollAreaRef.current) {
+      return;
     }
 
-    const scrollToLine = Math.max(0, firstLineOnLoad - 1); // Convert to 0-based index
-    const lineHeight = 23; // Approximate line height, will be refined
-    const padSize = 10; // Approximate padding size, will be refined
+    const scrollToLine = Math.max(0, firstLineOnLoad - 1);
+    const scrollTop =
+      scrollToLine * measurements.lineHeight + measurements.contentTopOffset;
 
-    return {
-      top: scrollToLine * lineHeight - padSize / 2,
-      left: 0,
-    };
-  }, [firstLineOnLoad]);
+    console.log("FernSyntaxHighlighter: Scrolling to line", {
+      firstLineOnLoad,
+      scrollToLine,
+      lineHeight: measurements.lineHeight,
+      contentTopOffset: measurements.contentTopOffset,
+      scrollTop,
+    });
+
+    const timeoutId = setTimeout(() => {
+      if (measurements.scrollAreaRef.current) {
+        measurements.scrollAreaRef.current.scrollTo({
+          top: scrollTop,
+          behavior: "smooth",
+        });
+      }
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [firstLineOnLoad, measurements]);
 
   const { maxLines } = innerProps;
 
@@ -95,7 +116,7 @@ export const FernSyntaxHighlighter = forwardRef<
         ref={ref}
         tokens={tokens}
         template={template}
-        initialScrollPosition={initialScrollPosition}
+        onMeasurementsReady={setMeasurements}
         {...innerProps}
       />
     </TemplateTooltip.Provider>
