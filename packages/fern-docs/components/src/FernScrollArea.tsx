@@ -32,7 +32,6 @@ export const FernScrollArea = forwardRef<HTMLDivElement, FernScrollArea.Props>(
       scrollHideDelay = type !== "scroll" ? 0 : undefined,
       ...viewportProps
     } = props;
-
     return (
       <ScrollArea.Root
         className={cn("fern-scroll-area", rootClassName)}
