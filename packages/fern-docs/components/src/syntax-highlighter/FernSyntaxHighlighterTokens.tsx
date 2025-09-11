@@ -17,9 +17,13 @@ import {
   getMaxHeight,
 } from "./utils";
 
+const FALLBACK_LINE_HEIGHT = 22.75;
+const FALLBACK_TOP_OFFSET = 12;
+
 export interface ScrollToHandle {
   scrollTo: (options: ScrollToOptions) => void;
   scrollToLast: (options?: ScrollOptions) => void;
+  scrollToLine: (line: number) => void;
   clientHeight: number;
   scrollHeight: number;
 }
@@ -87,6 +91,20 @@ export const FernSyntaxHighlighterTokens = memo(
                 scrollAreaRef.current.scrollHeight -
                 scrollAreaRef.current.clientHeight,
               ...options,
+            });
+          }
+        },
+        scrollToLine(lineNumber) {
+          if (scrollAreaRef.current) {
+            const firstLineRect = scrollAreaRef.current
+              .querySelector(".code-block-line")
+              ?.getBoundingClientRect();
+            const lineHeight = firstLineRect?.height ?? FALLBACK_LINE_HEIGHT;
+            const topOffset = firstLineRect?.top
+              ? firstLineRect.top - this.clientHeight
+              : FALLBACK_TOP_OFFSET;
+            scrollAreaRef.current?.scrollTo({
+              top: topOffset + lineHeight * lineNumber,
             });
           }
         },
