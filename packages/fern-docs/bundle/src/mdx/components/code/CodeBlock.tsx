@@ -133,7 +133,6 @@ export function toSyntaxHighlighterProps(
   props: React.ComponentProps<typeof CodeBlock>
 ): React.ComponentProps<typeof FernSyntaxHighlighter> {
   const highlight = props.highlight ?? props.focus ?? [];
-  console.log("props.firstLineOnLoad", props.firstLineOnLoad);
   return {
     language: cleanLanguage(props.language ?? "plaintext"),
     highlightLines: typeof highlight === "number" ? [highlight] : highlight,
