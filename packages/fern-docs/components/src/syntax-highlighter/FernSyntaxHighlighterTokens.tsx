@@ -1,6 +1,14 @@
 "use client";
 
-import { forwardRef, memo, useImperativeHandle, useMemo, useRef } from "react";
+import {
+  forwardRef,
+  memo,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { isEqual } from "es-toolkit/predicate";
 import type { Element } from "hast";
@@ -37,7 +45,6 @@ export interface FernSyntaxHighlighterTokensProps {
   maxLines?: number;
   wordWrap?: boolean;
   template?: Record<string, string>;
-  firstLineOnLoad?: number;
   initialScrollPosition?: FernScrollArea.InitialScrollPosition;
 }
 

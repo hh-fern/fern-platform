@@ -69,10 +69,11 @@ export const FernSyntaxHighlighter = forwardRef<
     }
 
     const scrollToLine = Math.max(0, firstLineOnLoad - 1); // Convert to 0-based index
-    const lineHeight = 20; // Approximate line height, will be refined
+    const lineHeight = 23; // Approximate line height, will be refined
+    const padSize = 10; // Approximate padding size, will be refined
 
     return {
-      top: scrollToLine * lineHeight,
+      top: scrollToLine * lineHeight - padSize / 2,
       left: 0,
     };
   }, [firstLineOnLoad]);
@@ -94,7 +95,6 @@ export const FernSyntaxHighlighter = forwardRef<
         ref={ref}
         tokens={tokens}
         template={template}
-        firstLineOnLoad={firstLineOnLoad}
         initialScrollPosition={initialScrollPosition}
         {...innerProps}
       />

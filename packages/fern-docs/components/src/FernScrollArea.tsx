@@ -51,6 +51,11 @@ export const FernScrollArea = forwardRef<HTMLDivElement, FernScrollArea.Props>(
         return;
       }
 
+      console.log(
+        "FernScrollArea: Attempting to scroll to:",
+        initialScrollPosition
+      );
+
       const timeoutId = setTimeout(() => {
         if (ref && typeof ref === "object" && ref.current) {
           const scrollOptions: ScrollToOptions = {
@@ -58,6 +63,8 @@ export const FernScrollArea = forwardRef<HTMLDivElement, FernScrollArea.Props>(
             left: initialScrollPosition.left ?? 0,
             behavior: "smooth",
           };
+
+          console.log("FernScrollArea: Scrolling with options:", scrollOptions);
           ref.current.scrollTo(scrollOptions);
         }
       }, 100);
