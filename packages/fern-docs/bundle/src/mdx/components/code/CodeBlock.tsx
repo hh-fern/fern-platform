@@ -79,10 +79,7 @@ export function CodeBlock(props: {
   useEffect(() => {
     const { current } = viewportRef;
     if (current && props.firstLineOnLoad != null) {
-      current.scrollTo({
-        top: (props.firstLineOnLoad - 1) * 22.75 + 12,
-        behavior: "smooth",
-      });
+      current.scrollToLine(props.firstLineOnLoad);
     }
   }, [props.firstLineOnLoad, viewportRef]);
 
