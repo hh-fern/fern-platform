@@ -38,6 +38,7 @@ export interface FernSyntaxHighlighterTokensProps {
   wordWrap?: boolean;
   template?: Record<string, string>;
   firstLineOnLoad?: number;
+  initialScrollPosition?: FernScrollArea.InitialScrollPosition;
 }
 
 export function fernSyntaxHighlighterTokenPropsAreEqual(
@@ -70,6 +71,7 @@ export const FernSyntaxHighlighterTokens = memo(
       wordWrap,
       template,
       id,
+      initialScrollPosition,
     } = props;
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -149,6 +151,7 @@ export const FernSyntaxHighlighterTokens = memo(
         <FernScrollArea
           ref={scrollAreaRef}
           style={{ maxHeight: getMaxHeight(fontSize, maxLines) }}
+          initialScrollPosition={initialScrollPosition}
         >
           <code
             className={cn("code-block", {

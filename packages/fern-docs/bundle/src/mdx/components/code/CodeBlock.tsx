@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React from "react";
 
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import {
@@ -9,7 +9,6 @@ import {
 import {
   CodeBlockWithClipboardButton,
   FernSyntaxHighlighter,
-  ScrollToHandle,
 } from "@fern-docs/components/syntax-highlighter";
 
 import { useIsDarkCode } from "@/state/dark-code";
@@ -144,6 +143,6 @@ export function toSyntaxHighlighterProps(
     wordWrap: props.wordWrap,
     template: props.template,
     tooltips: props.tooltips,
-    firstLineOnLoad: 70,
+    firstLineOnLoad: props.firstLineOnLoad,
   };
 }

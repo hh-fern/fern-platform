@@ -104,6 +104,7 @@ export const FernSyntaxHighlighterTokensVirtualized = memo(
       maxLines,
       wordWrap,
       template,
+      initialScrollPosition,
     } = props;
 
     const virtuosoRef = useRef<TableVirtuosoHandle>(null);
@@ -213,7 +214,12 @@ export const FernSyntaxHighlighterTokensVirtualized = memo(
         <TableVirtuoso<Element, CodeBlockContext>
           context={context}
           components={{
-            Scroller: FernScrollArea,
+            Scroller: (props) => (
+              <FernScrollArea
+                {...props}
+                initialScrollPosition={initialScrollPosition}
+              />
+            ),
             Table: CodeBlockTable,
             TableRow: CodeBlockTableRow,
           }}

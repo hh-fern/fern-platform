@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
 import { useDeepCompareMemoize } from "@fern-ui/react-commons";
@@ -62,30 +62,20 @@ export const FernSyntaxHighlighter = forwardRef<
     }
   }, [code, highlighter, language, variableNames]);
 
-  // Handle initial scroll to specified line
-  useEffect(() => {
-    if (firstLineOnLoad == null || !innerProps.viewportRef?.current) {
-      return;
+  // Calculate initial scroll position based on line number
+  const initialScrollPosition = useMemo(() => {
+    if (firstLineOnLoad == null) {
+      return undefined;
     }
 
     const scrollToLine = Math.max(0, firstLineOnLoad - 1); // Convert to 0-based index
+    const lineHeight = 20; // Approximate line height, will be refined
 
-    // Use a small delay to ensure the component is fully rendered
-    const timeoutId = setTimeout(() => {
-      if (innerProps.viewportRef?.current) {
-        // For virtualized components, we can scroll to a specific index
-        // For non-virtualized components, we calculate the scroll position
-        const scrollOptions: ScrollToOptions = {
-          top: scrollToLine * 20, // Approximate line height, will be refined
-          behavior: "smooth",
-        };
-
-        innerProps.viewportRef.current.scrollTo(scrollOptions);
-      }
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
-  }, [firstLineOnLoad, innerProps.viewportRef]);
+    return {
+      top: scrollToLine * lineHeight,
+      left: 0,
+    };
+  }, [firstLineOnLoad]);
 
   const { maxLines } = innerProps;
 
@@ -105,6 +95,7 @@ export const FernSyntaxHighlighter = forwardRef<
         tokens={tokens}
         template={template}
         firstLineOnLoad={firstLineOnLoad}
+        initialScrollPosition={initialScrollPosition}
         {...innerProps}
       />
     </TemplateTooltip.Provider>
