@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef } from "react";
 
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import {
@@ -9,6 +9,7 @@ import {
 import {
   CodeBlockWithClipboardButton,
   FernSyntaxHighlighter,
+  ScrollToHandle,
 } from "@fern-docs/components/syntax-highlighter";
 
 import { useIsDarkCode } from "@/state/dark-code";
@@ -50,6 +51,10 @@ export function CodeBlock(props: {
    * enables rendering tooltips on handlebars in the code
    */
   tooltips?: Record<string, React.ReactNode>;
+  /**
+   * automatically scrolls to the specified line number when the component mounts
+   */
+  initialScrollToLine?: number;
 }) {
   const {
     className,
@@ -129,6 +134,7 @@ export function toSyntaxHighlighterProps(
   props: React.ComponentProps<typeof CodeBlock>
 ): React.ComponentProps<typeof FernSyntaxHighlighter> {
   const highlight = props.highlight ?? props.focus ?? [];
+  console.log("props.initialScrollToLine", props.initialScrollToLine);
   return {
     language: cleanLanguage(props.language ?? "plaintext"),
     highlightLines: typeof highlight === "number" ? [highlight] : highlight,
@@ -138,5 +144,6 @@ export function toSyntaxHighlighterProps(
     wordWrap: props.wordWrap,
     template: props.template,
     tooltips: props.tooltips,
+    initialScrollToLine: 70,
   };
 }

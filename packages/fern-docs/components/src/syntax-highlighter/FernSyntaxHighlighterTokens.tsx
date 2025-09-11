@@ -37,6 +37,7 @@ export interface FernSyntaxHighlighterTokensProps {
   maxLines?: number;
   wordWrap?: boolean;
   template?: Record<string, string>;
+  initialScrollToLine?: number;
 }
 
 export function fernSyntaxHighlighterTokenPropsAreEqual(
