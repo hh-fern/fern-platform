@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useMemo } from "react";
+import { forwardRef, useEffect, useMemo } from "react";
 
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
 import { useDeepCompareMemoize } from "@fern-ui/react-commons";
@@ -30,13 +30,21 @@ export interface FernSyntaxHighlighterProps {
   wordWrap?: boolean;
   template?: Record<string, string>;
   tooltips?: Record<string, React.ReactNode>;
+  initialScrollToLine?: number;
 }
 
 export const FernSyntaxHighlighter = forwardRef<
   HTMLPreElement,
   FernSyntaxHighlighterProps
 >((props, ref) => {
-  const { code, language, tooltips, template, ...innerProps } = props;
+  const {
+    code,
+    language,
+    tooltips,
+    template,
+    initialScrollToLine,
+    ...innerProps
+  } = props;
   const highlighter = useHighlighter(language);
 
   const variableNames = useDeepCompareMemoize(
@@ -60,6 +68,31 @@ export const FernSyntaxHighlighter = forwardRef<
     }
   }, [code, highlighter, language, variableNames]);
 
+  // Handle initial scroll to specified line
+  useEffect(() => {
+    if (initialScrollToLine == null || !innerProps.viewportRef?.current) {
+      return;
+    }
+
+    const scrollToLine = Math.max(0, initialScrollToLine - 1); // Convert to 0-based index
+
+    // Use a small delay to ensure the component is fully rendered
+    const timeoutId = setTimeout(() => {
+      if (innerProps.viewportRef?.current) {
+        // For virtualized components, we can scroll to a specific index
+        // For non-virtualized components, we calculate the scroll position
+        const scrollOptions: ScrollToOptions = {
+          top: scrollToLine * 20, // Approximate line height, will be refined
+          behavior: "smooth",
+        };
+
+        innerProps.viewportRef.current.scrollTo(scrollOptions);
+      }
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [initialScrollToLine, innerProps.viewportRef]);
+
   const { maxLines } = innerProps;
 
   const lines = code.split("\n").length;
@@ -77,6 +110,7 @@ export const FernSyntaxHighlighter = forwardRef<
         ref={ref}
         tokens={tokens}
         template={template}
+        initialScrollToLine={initialScrollToLine}
         {...innerProps}
       />
     </TemplateTooltip.Provider>
