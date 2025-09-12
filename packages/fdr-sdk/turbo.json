@@ -4,12 +4,7 @@
   "tasks": {
     "compile": {
       "outputs": ["dist/**"],
-      "dependsOn": [
-        "^build",
-        "^compile",
-        "codegen",
-        "@fern-api/snippets#compile"
-      ]
+      "dependsOn": ["^build", "^compile", "codegen"]
     }
   }
 }
