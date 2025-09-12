@@ -2606,6 +2606,9 @@ importers:
         specifier: ^12.1.3
         version: 12.1.3
     devDependencies:
+      '@fern-platform/configs':
+        specifier: workspace:*
+        version: link:../configs
       '@types/jest':
         specifier: ^29.0.3
         version: 29.5.14
