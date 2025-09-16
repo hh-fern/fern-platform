@@ -7,7 +7,10 @@
     ".": "./src/index.ts",
     "./styles": "./src/index.css",
     "./components": "./src/components/index.ts",
-    "./*": ["./src/*.tsx", "./src/*.ts"]
+    "./*": [
+      "./src/*.tsx",
+      "./src/*.ts"
+    ]
   },
   "scripts": {
     "demo:build": "next build",

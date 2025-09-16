@@ -29,12 +29,12 @@ This widget connects directly to the existing FDR chat endpoint, so no API keys 
 #### As a React Component
 
 ```tsx
-import { SearchWidget } from '@fern-platform/search-widget';
+import { SearchWidget } from "@fern-platform/search-widget";
 
 function MyApp() {
   return (
     <SearchWidget
-      domain="docs.buildwithfern.com"  // Your Fern docs domain
+      domain="docs.buildwithfern.com" // Your Fern docs domain
       buttonProps={{
         variant: "default",
         size: "default",
@@ -49,16 +49,16 @@ function MyApp() {
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <script src="https://your-deployed-widget.com/widget.js"></script>
-</head>
-<body>
-  <script>
-    FernSearchWidget.init({
-      domain: "docs.buildwithfern.com"  // Your Fern docs domain
-    });
-  </script>
-</body>
+  <head>
+    <script src="https://your-deployed-widget.com/widget.js"></script>
+  </head>
+  <body>
+    <script>
+      FernSearchWidget.init({
+        domain: "docs.buildwithfern.com", // Your Fern docs domain
+      });
+    </script>
+  </body>
 </html>
 ```
 
@@ -66,10 +66,10 @@ function MyApp() {
 
 ### SearchWidget Props
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `domain` | `string` | ✅ | Your Fern docs domain (e.g., "docs.buildwithfern.com") |
-| `buttonProps` | `SearchButtonProps` | | Search button customization |
+| Prop          | Type                | Required | Description                                            |
+| ------------- | ------------------- | -------- | ------------------------------------------------------ |
+| `domain`      | `string`            | ✅       | Your Fern docs domain (e.g., "docs.buildwithfern.com") |
+| `buttonProps` | `SearchButtonProps` |          | Search button customization                            |
 
 ### Button Variants
 
@@ -78,7 +78,7 @@ function MyApp() {
   domain="your-domain.com"
   buttonProps={{
     variant: "default" | "dark" | "minimal",
-    size: "sm" | "default" | "lg"
+    size: "sm" | "default" | "lg",
   }}
 />
 ```

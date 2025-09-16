@@ -1,10 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@radix-ui/react-dialog";
-import { Search, MessageSquare, X } from "lucide-react";
-import { AlgoliaSearchClientRoot } from "@fern-docs/search-ui/src/components/search/algolia-search-client";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@radix-ui/react-dialog";
+import { MessageSquare, Search, X } from "lucide-react";
+
 import { FacetFilter } from "@fern-docs/search-keyword";
+import { AlgoliaSearchClientRoot } from "@fern-docs/search-ui/src/components/search/algolia-search-client";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -38,12 +45,14 @@ export function SearchModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 sm:p-6">
-        <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl max-h-[80vh] overflow-hidden">
-          <DialogHeader className="flex items-center justify-between p-4 border-b">
-            <DialogTitle className="text-lg font-semibold">Search Documentation</DialogTitle>
+        <div className="max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-lg bg-white shadow-xl">
+          <DialogHeader className="flex items-center justify-between border-b p-4">
+            <DialogTitle className="text-lg font-semibold">
+              Search Documentation
+            </DialogTitle>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="rounded-full p-2 hover:bg-gray-100"
             >
               <X className="h-4 w-4" />
             </button>
@@ -58,7 +67,7 @@ export function SearchModal({
                 placeholder="Search documentation..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 autoFocus
               />
             </div>
@@ -67,7 +76,7 @@ export function SearchModal({
             <div className="mb-4">
               <button
                 onClick={handleOpenChat}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
               >
                 <MessageSquare className="h-4 w-4" />
                 Ask AI
@@ -88,7 +97,7 @@ export function SearchModal({
                   <SearchResults query={query} />
                 </AlgoliaSearchClientRoot>
               ) : (
-                <div className="text-center text-gray-500 py-8">
+                <div className="py-8 text-center text-gray-500">
                   Configure search to see results
                 </div>
               )}
@@ -110,9 +119,7 @@ function SearchResults({ query }: { query: string }) {
           Search results for "{query}" would appear here
         </div>
       ) : (
-        <div className="text-gray-500">
-          Start typing to search...
-        </div>
+        <div className="text-gray-500">Start typing to search...</div>
       )}
     </div>
   );

@@ -37,10 +37,10 @@ import { useIsomorphicLayoutEffect } from "swr/_internal";
 import { FernTooltip, cn } from "@fern-docs/components";
 import { Button } from "@fern-docs/components/button";
 import { FacetFilter } from "@fern-docs/search-keyword";
-import { tunnel, useEventCallback, useIsMobile } from "@fern-ui/react-commons";
-
-import { MAX_AI_CHAT_MESSAGE_LENGTH } from "../utils/constants";
-import { FootnoteSup, FootnotesSection } from "@fern-docs/search-ui/components/chatbot/footnote";
+import {
+  FootnoteSup,
+  FootnotesSection,
+} from "@fern-docs/search-ui/components/chatbot/footnote";
 import { ChatbotTurnContextProvider } from "@fern-docs/search-ui/components/chatbot/turn-context";
 import {
   SqueezedMessage,
@@ -50,17 +50,27 @@ import {
 } from "@fern-docs/search-ui/components/chatbot/utils";
 import * as Command from "@fern-docs/search-ui/components/cmdk";
 import { CodeBlock } from "@fern-docs/search-ui/components/code-block";
-import { MarkdownContent } from "@fern-docs/search-ui/components/md-content";
-import { useFacetFilters } from "@fern-docs/search-ui/components/search/useFacetFilters";
-import { CommandAskAIGroup } from "@fern-docs/search-ui/components/shared/command-ask-ai";
-import { TextArea } from "@fern-docs/search-ui/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@fern-docs/search-ui/components/ui/tooltip";
-import { DesktopCommandContent, afterInput } from "@fern-docs/search-ui/components/desktop/desktop-command";
+import {
+  DesktopCommandContent,
+  afterInput,
+} from "@fern-docs/search-ui/components/desktop/desktop-command";
 import { DesktopCommandInput } from "@fern-docs/search-ui/components/desktop/desktop-command-input";
 import { DesktopCommandRoot } from "@fern-docs/search-ui/components/desktop/desktop-command-root";
 import { FootnoteCommands } from "@fern-docs/search-ui/components/desktop/footnote-commands";
 import { HideHeadersInUserMessage } from "@fern-docs/search-ui/components/desktop/hide-headers-in-user-messages";
 import { Suggestions } from "@fern-docs/search-ui/components/desktop/suggestions";
+import { MarkdownContent } from "@fern-docs/search-ui/components/md-content";
+import { useFacetFilters } from "@fern-docs/search-ui/components/search/useFacetFilters";
+import { CommandAskAIGroup } from "@fern-docs/search-ui/components/shared/command-ask-ai";
+import { TextArea } from "@fern-docs/search-ui/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@fern-docs/search-ui/components/ui/tooltip";
+import { tunnel, useEventCallback, useIsMobile } from "@fern-ui/react-commons";
+
+import { MAX_AI_CHAT_MESSAGE_LENGTH } from "../utils/constants";
 
 type PropsWithElement<T> = T & { node: HastElement };
 

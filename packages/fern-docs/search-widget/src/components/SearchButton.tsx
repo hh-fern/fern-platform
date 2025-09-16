@@ -1,8 +1,9 @@
 "use client";
 
-import { Search } from "lucide-react";
 import { forwardRef } from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+
+import { type VariantProps, cva } from "class-variance-authority";
+import { Search } from "lucide-react";
 
 const searchButtonVariants = cva(
   "fixed bottom-6 right-6 z-50 rounded-full p-4 shadow-lg transition-all duration-200 hover:scale-105 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2",
@@ -11,7 +12,8 @@ const searchButtonVariants = cva(
       variant: {
         default: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
         dark: "bg-gray-800 text-white hover:bg-gray-700 focus:ring-gray-500",
-        minimal: "bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-300 border border-gray-200",
+        minimal:
+          "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-300",
       },
       size: {
         default: "h-14 w-14",

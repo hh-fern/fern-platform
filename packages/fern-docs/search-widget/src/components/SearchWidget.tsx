@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+
+import { ChatModal } from "./ChatModal";
 import { SearchButton, type SearchButtonProps } from "./SearchButton";
 import { SearchModal } from "./SearchModal";
-import { ChatModal } from "./ChatModal";
 
 export interface SearchWidgetConfig {
   domain: string;
