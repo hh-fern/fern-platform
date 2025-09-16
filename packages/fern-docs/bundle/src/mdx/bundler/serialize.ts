@@ -96,8 +96,11 @@ async function serializeMdxImpl(
   content = sanitizeBreaks(content);
   content = sanitizeMdxExpression(content)[0];
 
+  console.log("Started processing twoslash...");
   // Process twoslash blocks if present
   content = await processTwoslashBlocks(content);
+  console.log("Finished processing twoslash...");
+  console.log("returned content: ", content.substring(0, 100), "...");
 
   let cwd: string | undefined;
   if (filename != null) {
