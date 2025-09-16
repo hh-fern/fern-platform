@@ -20,7 +20,6 @@ export default async function preloadEditorData(request: {
       host: request.host, // Use the host from the request parameter instead of trying to get it from headers
       encodedDocsUrl: request.docsUrl,
       fernToken: session.accessToken,
-      forceRevalidate: true, // force revalidate when preloading
     });
 
     // Preload root and config in parallel
