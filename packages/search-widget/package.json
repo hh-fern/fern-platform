@@ -8,7 +8,7 @@
     "./widget": "./dist/widget.js"
   },
   "scripts": {
-    "build": "next build",
+    "build": "tsup src/components/SearchWidget.tsx --format esm,cjs --dts --external react --external react-dom",
     "build:widget": "tsup src/components/SearchWidget.tsx --format esm,cjs --dts --external react --external react-dom",
     "clean": "rm -rf .next dist .turbo",
     "dev": "next dev --port 3001",

@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ["@fern-docs/search-ask-fern"],
-  },
+  serverExternalPackages: ["@fern-docs/search-ask-fern"],
   transpilePackages: [
     "@fern-docs/search-ui",
     "@fern-docs/search-ask-fern",
@@ -15,4 +13,4 @@ const nextConfig = {
   ],
 };
 
-module.exports = nextConfig;
+export default nextConfig;
