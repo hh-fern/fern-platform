@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useCallback } from "react";
-import { preload } from "react-dom";
 
 import { Loader2, Plus } from "lucide-react";
 
@@ -56,14 +55,6 @@ export function GoToEditorButton({
       slug: ROOT_SLUG_ALIAS,
     });
   }, [orgName, docsUrl, newBranchName]);
-
-  // Preload the editor data and URL in the background
-  useEffect(() => {
-    if (!disabled) {
-      router.prefetch(editorSlug);
-      preload(editorSlug, { as: "fetch", crossOrigin: "anonymous" });
-    }
-  }, [docsUrl, disabled, router, editorSlug]);
 
   const goToEditor = useCallback(() => {
     if (sourceRepo?.owner == null || sourceRepo.repo == null) {
