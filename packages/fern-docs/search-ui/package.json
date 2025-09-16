@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./styles": "./src/index.css",
-    "./*": "./src/*.tsx"
+    "./components": "./src/components/index.ts",
+    "./*": ["./src/*.tsx", "./src/*.ts"]
   },
   "scripts": {
     "demo:build": "next build",
