@@ -249,7 +249,7 @@ async function serializeMdxImpl(
     esbuildOptions: (o: any) => {
       o.minify = process.env.NODE_ENV === "production";
       o.sourcemap = false;
-      o.logLevel = "error";
+      o.logLevel = "verbose";
       o.logLimit = 0;
       o.metafile = false;
       o.write = false;
@@ -472,7 +472,6 @@ export async function processTwoslashBlocks(content: string): Promise<string> {
             content = content.replace(block.fullMatch, twoSlashContent);
           } catch (error) {
             console.error("Error processing twoslash block:", error);
-            return originalContent;
           }
         })
       ),
