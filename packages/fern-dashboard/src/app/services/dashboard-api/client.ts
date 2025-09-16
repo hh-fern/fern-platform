@@ -11,7 +11,6 @@ import { getHomepageImageUrl } from "@/app/api/homepage-images/get/route";
 import { postDocsGithubSource } from "@/app/api/post-docs-github-source/route";
 import { postGitCommit } from "@/app/api/post-git-commit/route";
 import { postCreatePr } from "@/app/api/post-git-create-pr/route";
-import { preloadEditorData } from "@/app/api/preload-editor-data/route";
 import { generateSignedUploadUrl } from "@/app/api/signed-image-url/generate/route";
 import { getSignedImageUrl } from "@/app/api/signed-image-url/get/route";
 import { updatePrStatus } from "@/app/api/update-pr-status/route";
@@ -61,8 +60,6 @@ export const DashboardApiClient = {
       "/api/get-validate-github-branch",
       request
     ),
-  preloadEditorData: (request: preloadEditorData.Request) =>
-    typedFetch<preloadEditorData.Response>("/api/preload-editor-data", request),
   getPrForBranch: (request: getPrForBranch.Request) =>
     typedFetch<getPrForBranch.Response>("/api/get-pr-for-branch", request),
   updatePrTitle: (request: updatePrTitle.Request) =>

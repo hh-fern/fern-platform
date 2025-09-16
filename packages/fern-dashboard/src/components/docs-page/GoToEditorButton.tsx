@@ -15,7 +15,6 @@ import { generateBranchName } from "@fern-docs/components/navigation/local-stora
 
 import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { GithubSourceRepo } from "@/app/services/github/types";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
@@ -61,9 +60,6 @@ export function GoToEditorButton({
   // Preload the editor data and URL in the background
   useEffect(() => {
     if (!disabled) {
-      DashboardApiClient.preloadEditorData({
-        docsUrl,
-      });
       router.prefetch(editorSlug);
       preload(editorSlug, { as: "fetch", crossOrigin: "anonymous" });
     }

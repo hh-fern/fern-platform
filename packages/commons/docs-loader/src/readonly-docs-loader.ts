@@ -277,7 +277,7 @@ export const getMetadataFromResponse = async (
 export const getMetadata =
   (cacheConfig: Required<CacheConfig>) =>
   async (domainKey: string): Promise<DocsMetadata> => {
-    // "use cache";
+    "use cache";
     unstable_cacheTag(domainKey, "getMetadata");
     assertDocsDomain(domainKey);
 
@@ -318,7 +318,7 @@ export const getMetadata =
 const getFiles =
   (cacheConfig: Required<CacheConfig>) =>
   async (domain: string): Promise<Record<string, FileData>> => {
-    // "use cache";
+    "use cache";
     unstable_cacheTag(domain, "getFiles");
 
     try {
@@ -378,7 +378,7 @@ const getFiles =
 
 // the api reference may be too large to cache, so we don't cache it in the KV store
 const getApi = async (domainKey: string, id: string) => {
-  // "use cache";
+  "use cache";
   unstable_cacheTag(domainKey, "getApi", id);
   const response = await loadWithUrl(domainKey);
   const latest = response.definition.apisV2[ApiDefinitionId(id)];
@@ -519,7 +519,7 @@ const getEndpointById = async ({
   authSchemes: AuthScheme[];
   types: Record<TypeId, TypeDefinition>;
 }> => {
-  // "use cache";
+  "use cache";
   unstable_cacheTag(domainKey, "getEndpointById", apiDefinitionId, endpointId);
 
   const api = await createGetPrunedApiCached(domainKey, cacheConfig)(
@@ -825,7 +825,7 @@ const getPage =
 
 const getMdxBundlerFiles =
   (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
-    // "use cache";
+    "use cache";
     unstable_cacheTag(domainKey, "getMdxBundlerFiles");
 
     try {
@@ -858,7 +858,7 @@ const getMdxBundlerFiles =
 
 const getColors =
   (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
-    // "use cache";
+    "use cache";
     unstable_cacheTag(domainKey, "getColors");
 
     try {
@@ -954,7 +954,7 @@ const getColors =
 
 const getFonts =
   (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
-    // "use cache";
+    "use cache";
     unstable_cacheTag(domainKey, "getFonts");
 
     try {
@@ -990,7 +990,7 @@ const getFonts =
 
 const getLayout =
   (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
-    // "use cache";
+    "use cache";
     unstable_cacheTag(domainKey, "getLayout");
 
     const config = await getConfig(cacheConfig)(domainKey);
@@ -1034,7 +1034,7 @@ const getLayout =
   };
 
 const getDynamicIr = (apiName: string) => async (orgId: string) => {
-  // "use cache";
+  "use cache";
   unstable_cacheTag(orgId, "getDynamicIr");
 
   const response = await loadDynamicIRWithUrl({
@@ -1089,7 +1089,7 @@ const getAuthConfig = getAuthEdgeConfig;
 
 const getAskAiEnabled =
   (cacheConfig: Required<CacheConfig>) => async (domain: string) => {
-    // "use cache";
+    "use cache";
     unstable_cacheTag(`${domain}_askAiEnabled`);
 
     if (isLocal() || isSelfHosted()) {
@@ -1167,7 +1167,7 @@ export const createCachedDocsLoader = async (
 
   // Force revalidation if requested - only clear KV cache here
   if (config.forceRevalidate) {
-    await clearKvCache(domainKey);
+    await clearKvCache(deriveDomainFromDomainKey(domainKey));
   }
 
   const authConfig = options?.skipAuth
