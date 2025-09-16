@@ -209,6 +209,7 @@ export const createEditableDocsLoader = async ({
       cacheConfig: {
         kvTtl: 0, // store indefinitely
         cacheKeySuffix: "editable",
+        forceRevalidate: true,
       },
       skipAuth: true,
     }
