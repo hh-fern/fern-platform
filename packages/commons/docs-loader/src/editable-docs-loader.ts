@@ -208,7 +208,7 @@ export const createEditableDocsLoader = async ({
       returnRawMarkdown: true,
       cacheConfig: {
         // For editable docs, we want shorter TTL so that cache stays fresh
-        kvTtl: 30, // 30 seconds
+        kvTtl: 1, // do not cache
         cacheKeySuffix: "editable",
         forceRevalidate: true,
       },
