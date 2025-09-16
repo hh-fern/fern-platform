@@ -274,8 +274,9 @@ export const getMetadataFromResponse = async (
   };
 };
 
-export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domainKey: string): Promise<DocsMetadata> => {
+export const getMetadata =
+  (cacheConfig: Required<CacheConfig>) =>
+  async (domainKey: string): Promise<DocsMetadata> => {
     "use cache";
     unstable_cacheTag(domainKey, "getMetadata");
     assertDocsDomain(domainKey);
@@ -312,10 +313,11 @@ export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
     );
     console.log("[getMetadata] cache miss:", metadata);
     return metadata;
-  });
+  };
 
-const getFiles = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domain: string): Promise<Record<string, FileData>> => {
+const getFiles =
+  (cacheConfig: Required<CacheConfig>) =>
+  async (domain: string): Promise<Record<string, FileData>> => {
     "use cache";
     unstable_cacheTag(domain, "getFiles");
 
@@ -372,7 +374,7 @@ const getFiles = (cacheConfig: Required<CacheConfig>) =>
       cacheConfig.cacheKeySuffix
     );
     return files;
-  });
+  };
 
 // the api reference may be too large to cache, so we don't cache it in the KV store
 const getApi = async (domainKey: string, id: string) => {
@@ -648,8 +650,8 @@ const unsafe_getFullRoot = async (domainKey: string) => {
   return root;
 };
 
-const unsafe_getRootCached = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domainKey: string) => {
+const unsafe_getRootCached =
+  (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
     return await unstable_cache(
       async (domainKey: string) => {
         try {
@@ -685,7 +687,7 @@ const unsafe_getRootCached = (cacheConfig: Required<CacheConfig>) =>
       ["unsafe_getRoot", cacheSeed(), cacheConfig.cacheKeySuffix],
       { tags: [domainKey, "unsafe_getRoot"] }
     )(domainKey);
-  });
+  };
 
 const getRoot = async (
   domainKey: string,
@@ -701,50 +703,48 @@ const getRoot = async (
   return root;
 };
 
-const getRootCached = (cacheConfig: Required<CacheConfig>) =>
-  cache(
-    async (
-      domainKey: string,
-      authState: AuthState,
-      authConfig: AuthEdgeConfig | undefined
-    ) => {
-      return await unstable_cache(
-        (
-          domainKey: string,
-          authState: AuthState,
-          authConfig: AuthEdgeConfig | undefined
-        ) => getRoot(domainKey, authState, authConfig, cacheConfig),
-        [domainKey, cacheSeed(), cacheConfig.cacheKeySuffix],
-        { tags: [domainKey, "getRoot"] }
-      )(domainKey, authState, authConfig);
-    }
-  );
+const getRootCached =
+  (cacheConfig: Required<CacheConfig>) =>
+  async (
+    domainKey: string,
+    authState: AuthState,
+    authConfig: AuthEdgeConfig | undefined
+  ) => {
+    return await unstable_cache(
+      (
+        domainKey: string,
+        authState: AuthState,
+        authConfig: AuthEdgeConfig | undefined
+      ) => getRoot(domainKey, authState, authConfig, cacheConfig),
+      [domainKey, cacheSeed(), cacheConfig.cacheKeySuffix],
+      { tags: [domainKey, "getRoot"] }
+    )(domainKey, authState, authConfig);
+  };
 
-const getNavigationNode = (cacheConfig: Required<CacheConfig>) =>
-  cache(
-    async (
-      domainKey: string,
-      id: string,
-      authState: AuthState,
-      authConfig: AuthEdgeConfig | undefined
-    ) => {
-      const root = await getRootCached(cacheConfig)(
-        domainKey,
-        authState,
-        authConfig
-      );
-      const collector = FernNavigation.NodeCollector.collect(root);
-      const node = collector.get(FernNavigation.NodeId(id));
-      if (node == null) {
-        console.error(`Could not find node ${id} for domainKey ${domainKey}`);
-        notFound();
-      }
-      return node;
+const getNavigationNode =
+  (cacheConfig: Required<CacheConfig>) =>
+  async (
+    domainKey: string,
+    id: string,
+    authState: AuthState,
+    authConfig: AuthEdgeConfig | undefined
+  ) => {
+    const root = await getRootCached(cacheConfig)(
+      domainKey,
+      authState,
+      authConfig
+    );
+    const collector = FernNavigation.NodeCollector.collect(root);
+    const node = collector.get(FernNavigation.NodeId(id));
+    if (node == null) {
+      console.error(`Could not find node ${id} for domainKey ${domainKey}`);
+      notFound();
     }
-  );
+    return node;
+  };
 
-const getConfig = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domainKey: string) => {
+const getConfig =
+  (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
     try {
       const cached = await kvGet<
         Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">
@@ -769,64 +769,63 @@ const getConfig = (cacheConfig: Required<CacheConfig>) =>
       cacheConfig.cacheKeySuffix
     );
     return config;
-  });
+  };
 
-const getPage = (cacheConfig: Required<CacheConfig>) =>
-  cache(
-    async (
-      domainKey: string,
-      pageId: string,
-      returnRawMarkdown: boolean = false
-    ) => {
-      try {
-        const page = await kvGet<DocsV1Read.PageContent>(
-          domainKey,
-          `page:${pageId}`,
-          cacheConfig.cacheKeySuffix
-        );
-        if (page != null && isPlainObject(page) && "markdown" in page) {
-          const config = await getConfig(cacheConfig)(domainKey);
-          return {
-            filename: pageId,
-            markdown: page.markdown,
-            editThisPageUrl: page.editThisPageUrl,
-            css: config.css,
-            rawMarkdown: returnRawMarkdown ? page.rawMarkdown : undefined,
-          };
-        }
-      } catch (error) {
-        console.warn(
-          `Failed to get page for ${domainKey}:${pageId}, fallback to uncached`,
-          error
-        );
-      }
-
-      const response = await loadWithUrl(domainKey);
-      const page = response.definition.pages[pageId as PageId];
-      if (page == null) {
-        console.error(`Could not find page with ID ${pageId}`);
-        notFound();
-      }
-
-      kvSet(
+const getPage =
+  (cacheConfig: Required<CacheConfig>) =>
+  async (
+    domainKey: string,
+    pageId: string,
+    returnRawMarkdown: boolean = false
+  ) => {
+    try {
+      const page = await kvGet<DocsV1Read.PageContent>(
         domainKey,
         `page:${pageId}`,
-        page,
-        cacheConfig.kvTtl,
         cacheConfig.cacheKeySuffix
       );
-      return {
-        filename: pageId,
-        markdown: page.markdown,
-        editThisPageUrl: page.editThisPageUrl,
-        css: response.definition.config.css,
-        rawMarkdown: returnRawMarkdown ? page.rawMarkdown : undefined,
-      };
+      if (page != null && isPlainObject(page) && "markdown" in page) {
+        const config = await getConfig(cacheConfig)(domainKey);
+        return {
+          filename: pageId,
+          markdown: page.markdown,
+          editThisPageUrl: page.editThisPageUrl,
+          css: config.css,
+          rawMarkdown: returnRawMarkdown ? page.rawMarkdown : undefined,
+        };
+      }
+    } catch (error) {
+      console.warn(
+        `Failed to get page for ${domainKey}:${pageId}, fallback to uncached`,
+        error
+      );
     }
-  );
 
-const getMdxBundlerFiles = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domainKey: string) => {
+    const response = await loadWithUrl(domainKey);
+    const page = response.definition.pages[pageId as PageId];
+    if (page == null) {
+      console.error(`Could not find page with ID ${pageId}`);
+      notFound();
+    }
+
+    kvSet(
+      domainKey,
+      `page:${pageId}`,
+      page,
+      cacheConfig.kvTtl,
+      cacheConfig.cacheKeySuffix
+    );
+    return {
+      filename: pageId,
+      markdown: page.markdown,
+      editThisPageUrl: page.editThisPageUrl,
+      css: response.definition.config.css,
+      rawMarkdown: returnRawMarkdown ? page.rawMarkdown : undefined,
+    };
+  };
+
+const getMdxBundlerFiles =
+  (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
     "use cache";
     unstable_cacheTag(domainKey, "getMdxBundlerFiles");
 
@@ -856,10 +855,10 @@ const getMdxBundlerFiles = (cacheConfig: Required<CacheConfig>) =>
       cacheConfig.cacheKeySuffix
     );
     return files;
-  });
+  };
 
-const getColors = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domainKey: string) => {
+const getColors =
+  (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
     "use cache";
     unstable_cacheTag(domainKey, "getColors");
 
@@ -952,10 +951,10 @@ const getColors = (cacheConfig: Required<CacheConfig>) =>
       cacheConfig.cacheKeySuffix
     );
     return colors;
-  });
+  };
 
-const getFonts = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domainKey: string) => {
+const getFonts =
+  (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
     "use cache";
     unstable_cacheTag(domainKey, "getFonts");
 
@@ -988,10 +987,10 @@ const getFonts = (cacheConfig: Required<CacheConfig>) =>
       cacheConfig.cacheKeySuffix
     );
     return fonts;
-  });
+  };
 
-const getLayout = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domainKey: string) => {
+const getLayout =
+  (cacheConfig: Required<CacheConfig>) => async (domainKey: string) => {
     "use cache";
     unstable_cacheTag(domainKey, "getLayout");
 
@@ -1033,24 +1032,23 @@ const getLayout = (cacheConfig: Required<CacheConfig>) =>
       hideNavLinks: config.layout?.hideNavLinks ?? false,
       hideFeedback: config.layout?.hideFeedback ?? false,
     };
+  };
+
+const getDynamicIr = (apiName: string) => async (orgId: string) => {
+  "use cache";
+  unstable_cacheTag(orgId, "getDynamicIr");
+
+  const response = await loadDynamicIRWithUrl({
+    orgId,
+    apiName,
   });
 
-const getDynamicIr = (apiName: string) =>
-  cache(async (orgId: string) => {
-    "use cache";
-    unstable_cacheTag(orgId, "getDynamicIr");
+  if (response) {
+    return response;
+  }
 
-    const response = await loadDynamicIRWithUrl({
-      orgId,
-      apiName,
-    });
-
-    if (response) {
-      return response;
-    }
-
-    return undefined;
-  });
+  return undefined;
+};
 
 function defaultTabsPlacement(domainKey: string) {
   const domain = deriveDomainFromDomainKey(domainKey);
@@ -1090,8 +1088,8 @@ function calcDefaultPageWidth(sidebarWidth: number, contentWidth: number) {
 
 const getAuthConfig = getAuthEdgeConfig;
 
-const getAskAiEnabled = (cacheConfig: Required<CacheConfig>) =>
-  cache(async (domain: string) => {
+const getAskAiEnabled =
+  (cacheConfig: Required<CacheConfig>) => async (domain: string) => {
     "use cache";
     unstable_cacheTag(`${domain}_askAiEnabled`);
 
@@ -1139,7 +1137,7 @@ const getAskAiEnabled = (cacheConfig: Required<CacheConfig>) =>
       console.warn(`Failed to fetch askAiEnabled for ${domain}`, error);
     }
     return result;
-  });
+  };
 
 export type DocsLoaderOptions = {
   cacheConfig?: CacheConfig;
@@ -1203,7 +1201,7 @@ export const createCachedDocsLoader = async (
     getMetadata: () => metadata,
     getFiles: () => getFiles(config)(domainKey),
     getMdxBundlerFiles: () => getMdxBundlerFiles(config)(domainKey),
-    getPrunedApi: cache(createGetPrunedApiCached(domainKey, config)),
+    getPrunedApi: createGetPrunedApiCached(domainKey, config),
     getEndpointById: cache((apiDefinitionId: string, endpointId: EndpointId) =>
       getEndpointById({
         domainKey,
@@ -1212,13 +1210,11 @@ export const createCachedDocsLoader = async (
         cacheConfig: config,
       })
     ),
-    getEndpointByLocator: cache(
-      unstable_cache(
-        (method: HttpMethod, path: string, example?: string) =>
-          getEndpointByLocator(domainKey, method, path, example),
-        [domainKey, cacheSeed(), config.cacheKeySuffix],
-        { tags: [domainKey, "endpointByLocator"] }
-      )
+    getEndpointByLocator: unstable_cache(
+      (method: HttpMethod, path: string, example?: string) =>
+        getEndpointByLocator(domainKey, method, path, example),
+      [domainKey, cacheSeed(), config.cacheKeySuffix],
+      { tags: [domainKey, "endpointByLocator"] }
     ),
     getRoot: async () =>
       getRootCached(config)(domainKey, await getAuthState(), await authConfig),
