@@ -39,6 +39,8 @@ export default async function SharedPage({
   loader: DocsLoader;
   slug: Slug;
 }) {
+  console.log(`[SharedPage] Starting render for slug: ${slug}`);
+
   if (slug.endsWith(".js")) {
     console.debug(`[SharedPage] returning early not found for ${slug}`);
     return notFound();
@@ -47,6 +49,7 @@ export default async function SharedPage({
   console.debug("/app/[domain]/_page.tsx: starting...");
 
   // start loading the root node early
+  console.log("[SharedPage] Starting to load root node, metadata, config, auth state, and edge flags in parallel");
   const rootPromise = loader.getRoot();
   const baseUrlPromise = loader.getMetadata();
   const configPromise = loader.getConfig();
@@ -56,6 +59,7 @@ export default async function SharedPage({
   // Await configPromise with timing
   let config;
   {
+    console.log("[SharedPage] Awaiting configPromise...");
     const start = Date.now();
     config = await configPromise;
     const end = Date.now();
@@ -65,6 +69,7 @@ export default async function SharedPage({
   // Await baseUrlPromise with timing for getRedirectForPath
   let baseUrl;
   {
+    console.log("[SharedPage] Awaiting baseUrlPromise...");
     const start = Date.now();
     baseUrl = await baseUrlPromise;
     const end = Date.now();
@@ -72,6 +77,7 @@ export default async function SharedPage({
   }
 
   // check for redirects
+  console.log("[SharedPage] Checking for configured redirects...");
   const configuredRedirect = getRedirectForPath(
     slugToHref(slug),
     baseUrl,
@@ -79,6 +85,7 @@ export default async function SharedPage({
   );
 
   if (configuredRedirect != null) {
+    console.log(`[SharedPage] Found configured redirect for slug: ${slug} -> ${configuredRedirect.destination} (permanent: ${configuredRedirect.permanent})`);
     const redirectFn = configuredRedirect.permanent
       ? permanentRedirect
       : redirect;
@@ -88,6 +95,7 @@ export default async function SharedPage({
   // get the root node with timing
   let root: FernNavigation.RootNode | undefined;
   {
+    console.log("[SharedPage] Awaiting rootPromise...");
     const start = Date.now();
     root = await rootPromise;
     const end = Date.now();
@@ -95,11 +103,14 @@ export default async function SharedPage({
   }
 
   // always match the basepath of the root node
+  console.log("[SharedPage] Checking if slug matches root basepath...");
   if (!slug.startsWith(root.slug)) {
+    console.log(`[SharedPage] Slug does not start with root slug (${root.slug}), redirecting...`);
     redirect(prepareRedirect(root.slug));
   }
 
   // naively find the current node id to prune the navigation tree
+  console.log("[SharedPage] Collecting current node and parents for navigation pruning...");
   const currentNode = FernNavigation.NodeCollector.collect(root)
     .getSlugMapWithParents()
     .get(slug);
@@ -107,6 +118,7 @@ export default async function SharedPage({
   // Await authStatePromise with timing
   let authState;
   {
+    console.log("[SharedPage] Awaiting authStatePromise...");
     const start = Date.now();
     authState = await authStatePromise;
     const end = Date.now();
@@ -120,6 +132,7 @@ export default async function SharedPage({
     !authState.authed &&
     authState.authorizationUrl != null
   ) {
+    console.log("[SharedPage] User is not authenticated for authed node, redirecting to authorizationUrl...");
     redirect(prepareRedirect(authState.authorizationUrl));
   }
 
@@ -130,6 +143,7 @@ export default async function SharedPage({
 
   // prune the tree so that neighbors don't include authed nodes or hidden nodes
   {
+    console.log("[SharedPage] Pruning navigation tree for visible nodes...");
     const start = Date.now();
     root = await withPrunedNavigationLoader(root, loader, visibleNodeIds);
     const end = Date.now();
@@ -144,11 +158,13 @@ export default async function SharedPage({
   }
 
   // find the node that is currently being viewed
+  console.log("[SharedPage] Finding the node currently being viewed...");
   const found = FernNavigation.utils.findNode(root, slug);
 
   // Await edgeFlagsPromise with timing
   let edgeFlags;
   {
+    console.log("[SharedPage] Awaiting edgeFlagsPromise...");
     const start = Date.now();
     edgeFlags = await edgeFlagsPromise;
     const end = Date.now();
@@ -160,6 +176,7 @@ export default async function SharedPage({
 
     // returning "notFound: true" here renders our custom 404 page (not-found.tsx)
     if (edgeFlags.is404PageHidden && found.redirect != null) {
+      console.log("[SharedPage] Not found, but edgeFlags.is404PageHidden is true and found.redirect is set. Redirecting...");
       redirect(prepareRedirect(found.redirect));
     }
 
@@ -168,6 +185,7 @@ export default async function SharedPage({
   }
 
   if (found.type === "redirect") {
+    console.log(`[SharedPage] Node is a redirect, redirecting to: ${found.redirect}`);
     redirect(prepareRedirect(found.redirect));
   }
 
@@ -199,6 +217,7 @@ export default async function SharedPage({
     return;
   }
 
+  console.log("[SharedPage] Creating MDX serializers...");
   const serialize = createCachedMdxSerializer(loader, {
     scope: {
       product: found?.currentProduct?.productId,
@@ -225,6 +244,7 @@ export default async function SharedPage({
 
   // even if nav-links are globally disabled, we should calculate the neighbors
   // in case the page overrides this global setting
+  console.log("[SharedPage] Starting to load neighbors (prev/next navigation)...");
   const neighborsPromise = (async () => {
     const start = Date.now();
     const result = await getNeighbors(
@@ -243,13 +263,16 @@ export default async function SharedPage({
 
     // if the page can be considered an edge node when it's unauthed, then we'll follow the redirect
     if (FernNavigation.hasRedirect(found.node)) {
+      console.log("[SharedPage] Node requires auth and has redirect, redirecting to pointsTo...");
       redirect(prepareRedirect(found.node.pointsTo));
     }
 
     if (authState.authorizationUrl == null) {
+      console.log("[SharedPage] Node requires auth, but no authorizationUrl found. Returning unauthorized.");
       unauthorized();
     }
 
+    console.log("[SharedPage] Node requires auth, redirecting to authorizationUrl...");
     redirect(prepareRedirect(authState.authorizationUrl));
   }
 
@@ -258,6 +281,7 @@ export default async function SharedPage({
 
   // handle authed preview pages
   if (!authState.authed && edgeFlags.isAuthedPreview && isPreview) {
+    console.log("[SharedPage] Authed preview page detected, user not authed. Redirecting to authorizationUrl...");
     if (authState.authorizationUrl == null) {
       unauthorized();
     }
@@ -268,6 +292,7 @@ export default async function SharedPage({
   // TODO: parallelize this with the other edge config calls:
   let flagPredicate;
   {
+    console.log("[SharedPage] Loading feature flags with LaunchDarkly...");
     const start = Date.now();
     const launchDarklyResult = await withLaunchDarkly(loader, found);
     flagPredicate = launchDarklyResult[1];
@@ -275,6 +300,7 @@ export default async function SharedPage({
     console.log(`[SharedPage] withLaunchDarkly() took ${end - start}ms`);
   }
 
+  console.log("[SharedPage] Checking feature flag predicates for all relevant nodes...");
   if (
     ![...found.parents, found.node]
       .filter(FernNavigation.hasMetadata)
@@ -297,6 +323,7 @@ export default async function SharedPage({
   // Await neighborsPromise with timing
   let neighbors;
   {
+    console.log("[SharedPage] Awaiting neighborsPromise...");
     const start = Date.now();
     neighbors = await neighborsPromise;
     const end = Date.now();
@@ -305,6 +332,7 @@ export default async function SharedPage({
     );
   }
 
+  console.log("[SharedPage] Rendering main content...");
   return (
     <FeedbackPopoverProvider>
       <SetCurrentNavigationNode
