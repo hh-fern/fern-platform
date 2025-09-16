@@ -7,8 +7,8 @@
     ".": "./src/components/SearchButton.tsx"
   },
   "scripts": {
-    "build": "tsup src/components/SearchButton.tsx --format esm,cjs --dts --external react --external react-dom",
-    "build:widget": "tsup src/components/SearchButton.tsx --format esm,cjs --dts --external react --external react-dom",
+    "build": "tsup",
+    "build:widget": "tsup",
     "clean": "rm -rf .next dist .turbo",
     "dev": "next dev --port 3001",
     "lint": "next lint",
