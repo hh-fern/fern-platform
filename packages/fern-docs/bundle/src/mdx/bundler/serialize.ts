@@ -389,7 +389,7 @@ export async function processTwoslashBlocks(content: string): Promise<string> {
   }
 
   // Process all blocks within TwoSlash timeout limit (leave time for serialization fallback)
-  const timeoutPromise = new Promise((_, reject) =>
+  const timeoutPromise = new Promise<never>((_, reject) =>
     setTimeout(
       () =>
         reject(new Error("TwoSlash processing timed out after 200 seconds")),
@@ -398,8 +398,8 @@ export async function processTwoslashBlocks(content: string): Promise<string> {
   );
 
   try {
-    await Promise.race([
-      Promise.all(
+    const results = await Promise.race([
+      Promise.allSettled(
         twoslashBlocks.map(async (block) => {
           const ignoreErrors = block.codeContent.includes("noErrors")
             ? ""
@@ -443,15 +443,35 @@ export async function processTwoslashBlocks(content: string): Promise<string> {
             // Replace only this specific block
             const twoSlashContent = `<TwoSlash content={${JSON.stringify({ ...result, value: block.codeContent })}} />`;
             content = content.replace(block.fullMatch, twoSlashContent);
+            return { success: true, block: block.codeContent };
           } catch (error) {
             console.error("Error processing twoslash block:", error);
+            // Don't replace the block if processing failed - leave original content
+            return { success: false, block: block.codeContent, error };
           }
         })
       ),
       timeoutPromise,
     ]);
+
+    // Log summary of processing results
+    if (Array.isArray(results)) {
+      const successful = results.filter(
+        (r) => r.status === "fulfilled" && r.value?.success
+      ).length;
+      const failed = results.filter(
+        (r) =>
+          r.status === "rejected" ||
+          (r.status === "fulfilled" && !r.value?.success)
+      ).length;
+      console.log(
+        `TwoSlash processing completed: ${successful} successful, ${failed} failed`
+      );
+    }
   } catch (error) {
     console.error("TwoSlash processing timed out:", error);
+    // Return original content when timeout occurs
+    return originalContent;
   }
 
   if (content.includes("<CodeBlocks>") && content.includes("<TwoSlash")) {

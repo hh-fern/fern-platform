@@ -86,6 +86,7 @@ export function createCachedMdxSerializer(
         try {
           if (useNextMdx && !content.includes("twoslash")) {
             try {
+              const start = Date.now();
               const result = await internalSerializeNextMdxRemote(content, {
                 loader,
                 scope: {
@@ -95,6 +96,10 @@ export function createCachedMdxSerializer(
                 },
                 replaceHref,
               });
+              const end = Date.now();
+              console.log(
+                `[mdx-serializer] internalSerializeNextMdxRemote for ${filename ?? "unknown"} took ${end - start}ms`
+              );
 
               if (result && containsInvalidAwait(result.code)) {
                 throw new Error(
@@ -105,6 +110,7 @@ export function createCachedMdxSerializer(
               return result;
             } catch (_nextMdxError) {
               try {
+                const start = Date.now();
                 const result = await internalSerializeMdx(content, {
                   filename,
                   loader,
@@ -116,6 +122,10 @@ export function createCachedMdxSerializer(
                   },
                   replaceHref,
                 });
+                const end = Date.now();
+                console.log(
+                  `[mdx-serializer] fallback internalSerializeMdx for ${filename ?? "unknown"} took ${end - start}ms`
+                );
                 return result;
               } catch (fallbackError) {
                 console.error(
@@ -127,6 +137,7 @@ export function createCachedMdxSerializer(
               }
             }
           } else {
+            const start = Date.now();
             const result = await internalSerializeMdx(content, {
               filename,
               loader,
@@ -138,6 +149,10 @@ export function createCachedMdxSerializer(
               },
               replaceHref,
             });
+            const end = Date.now();
+            console.log(
+              `[mdx-serializer] internalSerializeMdx for ${filename ?? "unknown"} took ${end - start}ms`
+            );
             return result;
           }
         } catch (error) {
@@ -152,11 +167,16 @@ export function createCachedMdxSerializer(
     );
 
     try {
+      const start = Date.now();
       // merge the scope from the page with the scope from the serializer
       const result = await cachedSerializer({
         ...options,
         scope: { ...options.scope, ...scope },
       });
+      const end = Date.now();
+      console.log(
+        `[mdx-serializer] cachedSerializer for ${options.filename ?? "unknown"} took ${end - start}ms`
+      );
 
       // if the result is undefined, we need to revalidate the cache
       // NOTE: you cannot do this because you cant revalidate the cache in a render function
