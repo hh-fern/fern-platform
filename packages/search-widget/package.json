@@ -40,6 +40,8 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
     "@radix-ui/react-use-controllable-state": "^1.1.0",
+    "instantsearch.js": "^4.78.1",
+    "react-instantsearch": "^7.15.5",
     "ai": "5.0.0-beta.2",
     "algoliasearch": "^5.20.3",
     "class-variance-authority": "^0.7.1",
@@ -49,6 +51,7 @@
     "react-dom": "19.0.0",
     "react-markdown": "^9.0.1",
     "swr": "^2.2.5",
+    "ts-essentials": "^10.0.4",
     "jotai": "^2.12.1",
     "tailwindcss": "^4.0.9",
     "zod": "^3.25.49"
