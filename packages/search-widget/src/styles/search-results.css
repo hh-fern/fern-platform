@@ -1,0 +1,112 @@
+/* Step 2: Search Hit Options Styling to match desktop search results */
+
+/* Command items - matches [data-cmdk-item] styling */
+[data-cmdk-item] {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border-radius: calc(0.5rem - 2px);
+  padding: 0.5rem;
+  text-align: left;
+  cursor: default;
+}
+
+/* Items that are not conversation messages get flex layout */
+[data-cmdk-item]:not([data-conversation-id]) {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* First SVG icon in items */
+[data-cmdk-item] svg:first-child {
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.6;
+  pointer-events: none;
+  flex-shrink: 0;
+  margin: 0.25rem 0;
+}
+
+/* Highlighted text within search results */
+[data-cmdk-item] mark {
+  background: var(--accent-a3);
+  color: var(--accent-a11);
+}
+
+/* Selected item styling (hover/keyboard selection) */
+@media (hover: hover) and (pointer: fine) {
+  [data-cmdk-item][data-selected="true"]:not([data-conversation-id]) {
+    background-color: var(--accent-a3);
+    color: var(--accent-a12);
+  }
+
+  [data-cmdk-item][data-selected="true"] .fern-docs-badge {
+    background-color: var(--accent-a9);
+    color: var(--grayscale-1, white);
+  }
+
+  [data-cmdk-item][data-selected="true"] .fern-search-hit-breadcrumb,
+  [data-cmdk-item][data-selected="true"] .fern-search-hit-snippet,
+  [data-cmdk-item][data-selected="true"] .fern-search-hit-endpoint-path {
+    color: var(--accent-a11);
+    opacity: 0.8;
+  }
+}
+
+/* Search hit content styling */
+.fern-search-hit-title {
+  overflow: hidden;
+  display: block;
+  text-overflow: ellipsis;
+}
+
+.fern-search-hit-title.deprecated {
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+
+.fern-search-hit-breadcrumb,
+.fern-search-hit-snippet,
+.fern-search-hit-endpoint-path {
+  overflow: hidden;
+  overflow-wrap: break-word;
+  color: var(--grayscale-a11);
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fern-search-hit-highlighted {
+  font-weight: 600;
+}
+
+.fern-search-hit-snippet {
+  font-size: 0.875rem;
+  line-height: 1.375;
+}
+
+.fern-search-hit-breadcrumb,
+.fern-search-hit-endpoint-path {
+  font-size: 0.75rem;
+}
+
+.fern-search-hit-endpoint-path {
+  font-family: var(--font-mono, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace);
+}
+
+/* Group heading styling */
+[data-cmdk-group-heading] {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--grayscale-a11);
+  margin-bottom: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+/* Empty state styling */
+[data-cmdk-empty] {
+  color: var(--grayscale-a11);
+  padding: 2rem;
+  text-align: center;
+  overflow-wrap: break-word;
+}

@@ -1,0 +1,179 @@
+/* Step 1: Modal Container Styling to match desktop-ask-ai-panel.tsx */
+
+@import "./radix-colors/gray.css";
+@import "./radix-colors/gray-alpha.css";
+@import "./radix-colors/blue.css";
+@import "./radix-colors/blue-alpha.css";
+
+/* CSS Custom Properties for consistent theming */
+:root {
+  --grayscale-surface: var(--gray-1);
+  --color-border-default: var(--gray-6);
+  --color-background-a9: var(--gray-a9);
+  --accent: var(--blue-9);
+  --accent-a3: var(--blue-a3);
+  --accent-a11: var(--blue-a11);
+  --accent-a12: var(--blue-a12);
+  --grayscale-a11: var(--gray-a11);
+  --radius-3: 12px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --grayscale-surface: var(--gray-dark-2);
+    --color-border-default: var(--gray-dark-6);
+    --color-background-a9: var(--gray-dark-a9);
+    --accent: var(--blue-dark-9);
+    --accent-a3: var(--blue-dark-a3);
+    --accent-a11: var(--blue-dark-a11);
+    --accent-a12: var(--blue-dark-a12);
+    --grayscale-a11: var(--gray-dark-a11);
+  }
+}
+
+/* Main Dialog Container - matches #fern-search-dialog */
+#fern-search-dialog {
+  position: fixed;
+  inset: 0;
+  bottom: auto;
+  z-index: 50;
+  height: fit-content;
+  width: 100vw;
+  transform-origin: center;
+  outline: none;
+}
+
+@media (min-width: 640px) {
+  #fern-search-dialog {
+    left: 50%;
+    top: 15%;
+    width: 640px;
+    transform: translateX(-50%);
+    height: calc(100dvh - 20%);
+  }
+
+  #fern-search-dialog:has(> [data-mode="ask-ai"]) {
+    height: calc(100dvh - 10%);
+    top: 5%;
+  }
+}
+
+/* Dialog Overlay - matches #fern-search-dialog-overlay */
+#fern-search-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background-color: var(--color-background-a9);
+  backdrop-filter: blur(12px);
+}
+
+/* Command Root - matches [data-fern-search="desktop-command"][data-cmdk-root] */
+[data-fern-search="desktop-command"][data-cmdk-root],
+[data-cmdk-root] {
+  display: flex;
+  flex-direction: column;
+  max-height: 100dvh;
+  overflow: hidden;
+  background-color: var(--grayscale-surface);
+  transition: transform 100ms ease;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+[data-fern-search="desktop-command"][data-cmdk-root]::before,
+[data-cmdk-root]::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: -50;
+  background: var(--color-background-a9);
+  backdrop-filter: blur(40px);
+}
+
+@media (min-width: 640px) {
+  [data-fern-search="desktop-command"][data-cmdk-root]:not([data-mode="ask-ai"]),
+  [data-cmdk-root]:not([data-mode="ask-ai"]) {
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-3);
+  }
+
+  [data-fern-search="desktop-command"][data-cmdk-root][data-mode="ask-ai"],
+  [data-cmdk-root][data-mode="ask-ai"] {
+    height: 100%;
+  }
+}
+
+/* Command List basic structure */
+[data-cmdk-list] {
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  transition: height 100ms ease;
+}
+
+[data-cmdk-list]:focus {
+  outline: none;
+}
+
+@media (min-width: 640px) {
+  [data-cmdk-list] {
+    min-height: 0;
+    height: min(400px, var(--cmdk-list-height, 400px));
+    max-height: 400px;
+  }
+
+  [data-fern-search="desktop-command"][data-cmdk-root][data-mode="ask-ai"] [data-cmdk-list],
+  [data-cmdk-root][data-mode="ask-ai"] [data-cmdk-list] {
+    max-height: 100%;
+  }
+}
+
+/* Command List Sizer - provides padding and layout */
+[data-cmdk-list-sizer] {
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Empty list state */
+[data-cmdk-list][data-empty="true"] {
+  height: 0;
+}
+
+/* Basic input styling */
+[data-cmdk-input] {
+  padding: 0.25rem 0.5rem;
+  width: 100%;
+  background: transparent;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  border: none;
+  color: var(--color-body, inherit);
+}
+
+[data-cmdk-input]:focus,
+[data-cmdk-input]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+[data-cmdk-input]::placeholder {
+  color: var(--grayscale-a11);
+}
+
+/* Command header styling */
+[data-cmdk-fern-header] {
+  border-bottom: 1px solid var(--color-border-default);
+  padding: 0.5rem;
+  gap: 0;
+  display: flex;
+  align-items: center;
+  cursor: text;
+}
+
+[data-cmdk-fern-header]:has(+ [data-cmdk-list][data-empty="true"]) {
+  border-bottom: none;
+}

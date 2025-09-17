@@ -1,0 +1,4 @@
+/* Main CSS entry point for Ask AI Panel styling */
+@import "./shared/reset.css";
+@import "./shared/common.scss";
+@import "./desktop/desktop.scss";

@@ -1,0 +1,51 @@
+/* ESC Button Styling - consistent across all devices */
+
+/* Remove the X button completely */
+[data-lucide="x"] {
+  display: none !important;
+}
+
+/* ESC button styling to make it consistent and always visible */
+button:has(kbd) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0;
+
+  /* Consistent button styling */
+  border: 1px solid var(--color-border-default) !important;
+  background: var(--grayscale-surface) !important;
+  border-radius: 6px !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  color: var(--grayscale-a11) !important;
+  transition: all 150ms ease !important;
+  cursor: pointer !important;
+}
+
+button:has(kbd):hover {
+  background: var(--grayscale-a3) !important;
+  color: var(--color-body) !important;
+}
+
+/* KBD element styling */
+kbd {
+  font-family: var(--font-mono, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace) !important;
+  font-size: 0.625rem !important;
+  font-weight: 600 !important;
+  color: inherit !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure button is always visible on all devices */
+button[aria-label="Close search"]:has(kbd) {
+  display: inline-flex !important;
+}
+
+/* Hide any X buttons specifically */
+button[aria-label="Close search"]:has(svg[data-lucide="x"]) {
+  display: none !important;
+}

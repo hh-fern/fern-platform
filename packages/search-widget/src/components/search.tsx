@@ -1,14 +1,25 @@
 "use client";
 
+import "../styles/modal-container.css";
+import "../styles/search-results.css";
+import "../styles/esc-button.css";
+
 import { forwardRef } from "react";
 
-import { type VariantProps, cva } from "class-variance-authority";
 import { useAtom, useAtomValue } from "jotai";
-import { Search } from "lucide-react";
 
 import { AlgoliaSearchClientRoot } from "@fern-docs/search-ui/components/search/algolia-search-client";
 import { DesktopSearchDialog } from "@fern-docs/search-ui";
 import { useLazyRef } from "@fern-ui/react-commons";
+import * as Dialog from "@radix-ui/react-dialog";
+import { TooltipPortal } from "@radix-ui/react-tooltip";
+import { Button } from "@fern-docs/components/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@fern-docs/search-ui/components/ui/tooltip";
 
 import { useApiRouteSWRImmutable } from "@/hooks/useApiRouteSWR";
 import { atomWithStorageString } from "../utils/atomWithStorageString";
@@ -26,33 +37,8 @@ const ApiKeySchema = z.object({
   apiKey: z.string(),
 });
 
-
-const searchButtonVariants = cva(
-  "fixed bottom-6 right-6 z-50 rounded-full p-4 shadow-lg transition-all duration-200 hover:scale-105 focus:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
-        dark: "bg-gray-800 text-white hover:bg-gray-700 focus:ring-gray-500",
-        minimal:
-          "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-300",
-      },
-      size: {
-        default: "h-14 w-14",
-        sm: "h-12 w-12 p-3",
-        lg: "h-16 w-16 p-5",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-);
-
 export interface SearchButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof searchButtonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode;
 }
 
@@ -69,8 +55,34 @@ export function useAlgoliaUserToken() {
   return useAtomValue(userTokenRef.current);
 }
 
+function EscButton({ className }: { className?: string }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Dialog.DialogClose asChild>
+            <Button
+              size="xs"
+              variant="outline"
+              className={className}
+              aria-label="Close search"
+            >
+              <kbd>Esc</kbd>
+            </Button>
+          </Dialog.DialogClose>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>
+            <p>Close search</p>
+          </TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
-  ({ className, variant, size, icon, ...props }, ref) => {
+  ({ className, icon, ...props }, ref) => {
 
     const userToken = useAlgoliaUserToken();
     const conversationIdHook = useConversationId();
@@ -122,27 +134,15 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
         initialFilters={undefined}
         analyticsTags={["search-v2-dialog"]}
       >
-        <DesktopSearchDialog open={open} onOpenChange={setOpen}>
-
+        <DesktopSearchDialog
+          open={open}
+          onOpenChange={setOpen}
+          afterInput={<EscButton />}
+        >
           <DesktopCommandWithAskAI
             askAI={false}
-            defaultAskAI={false}
             setAskAI={() => false}
             domain={domain}
-            // api?: string;
-            // suggestionsApi?: string;
-            // body?: object;
-            // headers?: Record<string, string>;
-            // initialInput?: string;
-            // chatId?: string;
-            // onSelectHit?: (path: string) => void;
-            // prefetch?: (path: string) => Promise<void>;
-            // composerActions?: ReactNode;
-            // domain: string;
-            // renderActions?: (message: SqueezedMessage) => ReactNode;
-            // setInitialInput?: (initialInput: string) => void;
-            // children?: ReactNode;
-            // darkCodeEnabled?: boolean;
             useConversationId={() => conversationIdHook}
           />
         </DesktopSearchDialog>
