@@ -25,10 +25,12 @@ export const CommandSearchHits = ({
   domain,
   onSelect,
   prefetch,
+  forceWindowOpen,
 }: {
   domain: string;
   onSelect: (path: string) => void;
   prefetch?: (path: string) => void | Promise<void>;
+  forceWindowOpen?: boolean;
 }): ReactNode => {
   const isQueryEmpty = Command.useCommandState(
     (state) => state.search.trimStart().length === 0
@@ -70,6 +72,7 @@ export const CommandSearchHits = ({
       prefetch={prefetch}
       domain={domain}
       sentinelRef={sentinelRef}
+      forceWindowOpen={forceWindowOpen}
     />
   );
 };
@@ -80,13 +83,15 @@ const MemoizedCommandSearchHits = memo(
     items,
     onSelect,
     prefetch,
-    sentinelRef,
+    sentinelRef,  
+    forceWindowOpen,
   }: {
     domain: string;
     items: AlgoliaRecordHit[];
     onSelect: (path: string) => void;
     prefetch?: (path: string) => void | Promise<void>;
     sentinelRef: React.RefObject<HTMLLIElement | null>;
+    forceWindowOpen?: boolean;
   }) => {
     const groups = generateHits(items);
 
@@ -105,6 +110,7 @@ const MemoizedCommandSearchHits = memo(
                 onSelect={onSelect}
                 prefetch={prefetch}
                 domain={domain}
+                forceWindowOpen={forceWindowOpen}
               />
             ))}
           </Command.Group>
@@ -120,6 +126,7 @@ function CommandHit({
   domain,
   onSelect,
   prefetch,
+  forceWindowOpen,
 }: {
   hit: GroupedHit;
   domain: string;
@@ -128,6 +135,7 @@ function CommandHit({
    */
   onSelect: (path: string) => void;
   prefetch?: (path: string) => void | Promise<void>;
+  forceWindowOpen?: boolean;
 }) {
   const sendEvent = useSendEvent();
   if (!hit.record) {
@@ -152,6 +160,7 @@ function CommandHit({
           onSelect(value);
         }}
         domain={domain}
+        forceWindowOpen={forceWindowOpen}
       >
         <PageIcon
           icon={hit.icon}

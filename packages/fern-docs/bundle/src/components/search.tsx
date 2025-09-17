@@ -19,7 +19,7 @@ import {
   CommandSearchHits,
   DefaultDesktopBackButton,
   DesktopCommand,
-  DesktopCommandWithAskAI,
+  AskAiStandaloneModal,
   DesktopSearchDialog,
   MeiliSearchClientRoot,
   SEARCH_INDEX,
@@ -144,8 +144,6 @@ export const SearchV2 = React.memo(function SearchV2({
   }
 
   const { appId, apiKey } = data;
-  console.log("appId", appId);
-  console.log("apiKey", apiKey);
 
   const children = (
     <>
@@ -212,7 +210,7 @@ export const SearchV2 = React.memo(function SearchV2({
     >
       <DesktopSearchDialog open={open} onOpenChange={setOpen}>
         {isAskAiEnabled ? (
-          <DesktopCommandWithAskAI
+          <AskAiStandaloneModal
             useConversationId={() => conversationIdHook}
             domain={domain}
             headers={{
@@ -247,7 +245,7 @@ export const SearchV2 = React.memo(function SearchV2({
             openSearchPanel={openSearchPanel}
           >
             {children}
-          </DesktopCommandWithAskAI>
+          </AskAiStandaloneModal>
         ) : (
           <DesktopCommand
             onEscapeKeyDown={() => setOpen(false)}

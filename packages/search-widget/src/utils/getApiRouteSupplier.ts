@@ -4,17 +4,16 @@ export type FernDocsApiRoute = `${string}/api/fern-docs/${string}`;
 
 export function getApiRouteSupplier({
   includeTrailingSlash,
-  basepath,
+  domain,
 }: {
   includeTrailingSlash?: boolean;
-  basepath?: string;
+  domain?: string;
 }): (route: FernDocsApiRoute) => string {
   return (route) => {
-    // note: if the first argument of urjoin is "", it will strip the leading slash. `|| "/"` ensures "" -> "/"
     if (includeTrailingSlash) {
-      return urlJoin(basepath || "/", route, "/");
+      return urlJoin(domain || "/", route, "/");
     } else {
-      return urlJoin(basepath || "/", route);
+      return urlJoin(domain || "/", route);
     }
   };
 }

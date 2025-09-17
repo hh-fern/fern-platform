@@ -37,47 +37,36 @@ import { useIsomorphicLayoutEffect } from "swr/_internal";
 import { FernTooltip, cn } from "@fern-docs/components";
 import { Button } from "@fern-docs/components/button";
 import { FacetFilter } from "@fern-docs/search-keyword";
-import {
-  FootnoteSup,
-  FootnotesSection,
-} from "@fern-docs/search-ui/components/chatbot/footnote";
-import { ChatbotTurnContextProvider } from "@fern-docs/search-ui/components/chatbot/turn-context";
-import * as Command from "@fern-docs/search-ui/components/cmdk";
-import { CodeBlock } from "@fern-docs/search-ui/components/code-block";
-import {
-  DesktopCommandContent,
-  afterInput,
-} from "@fern-docs/search-ui/components/desktop/desktop-command";
-import { DesktopCommandInput } from "@fern-docs/search-ui/components/desktop/desktop-command-input";
-import { DesktopCommandRoot } from "@fern-docs/search-ui/components/desktop/desktop-command-root";
-import { FootnoteCommands } from "@fern-docs/search-ui/components/desktop/footnote-commands";
-import { HideHeadersInUserMessage } from "@fern-docs/search-ui/components/desktop/hide-headers-in-user-messages";
-import { Suggestions } from "@fern-docs/search-ui/components/desktop/suggestions";
-import { MarkdownContent } from "@fern-docs/search-ui/components/md-content";
-import { CommandAskAIGroup } from "@fern-docs/search-ui/components/shared/command-ask-ai";
-import { TextArea } from "@fern-docs/search-ui/components/ui/textarea";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@fern-docs/search-ui/components/ui/tooltip";
 import { tunnel, useEventCallback, useIsMobile } from "@fern-ui/react-commons";
 
-//problematic imports
-import { useFacetFilters } from "../hooks/useFacetFilters";
+import { MAX_AI_CHAT_MESSAGE_LENGTH } from "../../constants";
+import { FootnoteSup, FootnotesSection } from "../chatbot/footnote";
+import { ChatbotTurnContextProvider } from "../chatbot/turn-context";
 import {
   SqueezedMessage,
   combineSearchResults,
   ensureMessagePartsHaveNewLines,
   squeezeMessages,
-} from "../utils/chatbot";
-import { MAX_AI_CHAT_MESSAGE_LENGTH } from "../utils/constants";
+} from "../chatbot/utils";
+import * as Command from "../cmdk";
+import { CodeBlock } from "../code-block";
+import { MarkdownContent } from "../md-content";
+import { useFacetFilters } from "../search/useFacetFilters";
+import { CommandAskAIGroup } from "../shared";
+import { TextArea } from "../ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { DesktopCommandContent, afterInput } from "./desktop-command";
+import { DesktopCommandInput } from "./desktop-command-input";
+import { DesktopCommandRoot } from "./desktop-command-root";
+import { FootnoteCommands } from "./footnote-commands";
+import { HideHeadersInUserMessage } from "./hide-headers-in-user-messages";
+import { Suggestions } from "./suggestions";
 
 type PropsWithElement<T> = T & { node: HastElement };
 
 const headerActions = tunnel();
 
-export const DesktopCommandWithAskAI = forwardRef<
+export const AskAiStandaloneModal = forwardRef<
   HTMLDivElement,
   Omit<ComponentPropsWithoutRef<typeof DesktopCommandRoot>, "children"> & {
     askAI?: boolean;
@@ -185,17 +174,14 @@ export const DesktopCommandWithAskAI = forwardRef<
         label={askAI ? "Ask AI" : "Search"}
         {...props}
         ref={composeRefs(forwardedRef, ref)}
-        shouldFilter={!askAI}
-        disableAutoSelection={askAI}
-        onPopState={
-          askAI
-            ? props.onPopState
-            : composeEventHandlers(props.onPopState, handlePopFilters, {
-                checkForDefaultPrevented: false,
-              })
-        }
+        shouldFilter={true}
+        disableAutoSelection={false}
+        onPopState={composeEventHandlers(props.onPopState, handlePopFilters, {
+          checkForDefaultPrevented: false,
+        })}
         onEscapeKeyDown={props.onEscapeKeyDown}
-        escapeKeyShouldPopState={!askAI && filters.length > 0}
+        escapeKeyShouldPopState={filters.length > 0}
+        data-fern-search="desktop-command"
         data-mode={askAI ? "ask-ai" : "search"}
       >
         {askAI ? (
@@ -239,7 +225,7 @@ export const DesktopCommandWithAskAI = forwardRef<
   }
 );
 
-DesktopCommandWithAskAI.displayName = "DesktopCommandWithAskAI";
+AskAiStandaloneModal.displayName = "DesktopCommandWithAskAI";
 
 const DesktopAskAIContent = (props: {
   onReturnToSearch?: () => void;
@@ -269,14 +255,14 @@ const DesktopAskAIContent = (props: {
         <div>
           {props.onReturnToSearch && (
             <Button
-              size="iconSm"
+              size="xs"
               variant="outline"
-              className="shrink-0"
               onClick={props.onReturnToSearch}
             >
               <ArrowLeft />
+              Back to search
             </Button>
-        )}
+          )}
         </div>
         <div className="flex gap-2">
           <headerActions.Out />

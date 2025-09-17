@@ -7,6 +7,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { SearchModal } from "../components/search";
 import { generateConversationId } from "../utils/generate-conversation-id";
+import { FernButton } from "@fern-docs/components/FernButton";
 
 export const searchDialogOpenAtom = atom(false);
 export const searchInitializedAtom = atom(false);
@@ -26,12 +27,12 @@ export const SearchWidgetTrigger = React.memo(function SearchWidgetTrigger(
 ) {
   const toggleSearchDialog = useToggleSearchDialog();
   return (
-    <button
+    <FernButton
+      variant="outlined"
+      text="Open"
       {...props}
       onClick={composeEventHandlers(props.onClick, toggleSearchDialog)}
-    >
-      Open Search Dialog
-    </button>
+    />
   );
 });
 

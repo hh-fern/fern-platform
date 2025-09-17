@@ -56,6 +56,7 @@ export function useApiRouteSWR<T>(
 
 export function useApiRouteSWRImmutable<T>(
   route: FernDocsApiRoute,
+  domain?: string,
   {
     disabled,
     request,
@@ -64,7 +65,7 @@ export function useApiRouteSWRImmutable<T>(
     ...options
   }: Options<T> = {}
 ): SWRResponse<T> {
-  const key = useApiRoute(route);
+  const key = useApiRoute(route, domain);
   if (
     !disabled &&
     shouldPreload &&

@@ -1,16 +1,11 @@
 "use client";
 
-import "../styles/modal-container.css";
-import "../styles/search-results.css";
-import "../styles/esc-button.css";
-import "../styles/ask-ai-panel.css";
-
 import { forwardRef } from "react";
 
 import { atom, useAtom, useAtomValue } from "jotai";
 
 import { AlgoliaSearchClientRoot } from "@fern-docs/search-ui/components/search/algolia-search-client";
-import { DesktopSearchDialog } from "@fern-docs/search-ui";
+import { CommandSearchHits, CommandEmpty, DefaultDesktopBackButton, CommandGroupFilters, DesktopSearchDialog, CommandActions, CommandGroupTheme  } from "@fern-docs/search-ui";
 import { useLazyRef } from "@fern-ui/react-commons";
 import * as Dialog from "@radix-ui/react-dialog";
 import { TooltipPortal } from "@radix-ui/react-tooltip";
@@ -27,11 +22,12 @@ import { atomWithStorageString } from "../utils/atomWithStorageString";
 import { useApiRoute } from "@/hooks/useApiRoute";
 import React from "react";
 import z from "zod";
-import { DesktopCommandWithAskAI } from "./search-modal";
+import { AskAiStandaloneModal } from "@fern-docs/search-ui/components/desktop/ask-ai-modal";
 import { useConversationId, searchDialogOpenAtom } from "@/state/search";
+import "../styles/desktop.scss"
 
 export const SEARCH_INDEX = "fern_docs_search";
-export const domain = "buildwithfern.com/learn";
+export const DOMAIN = "http://localhost:3001";
 
 const ApiKeySchema = z.object({
   appId: z.string(),
@@ -92,23 +88,17 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
     const [open, setOpen] = useAtom(searchDialogOpenAtom);
     const [askAI, setAskAI] = useAtom(askAIAtom);
 
-    // const { data } = useApiRouteSWRImmutable(`${domain}/api/fern-docs/search/v2/key`, {
-    //   request: { headers: { "X-User-Token": userToken } },
-    //   validate: ApiKeySchema,
-    //   // api key expires 24 hours, so we refresh it every hour
-    //   refreshInterval: 60 * 60 * 1000,
-    //   preload: true,
-    // });
+    const { data } = useApiRouteSWRImmutable(`/api/fern-docs/search/v2/key`, DOMAIN, {
+      request: { headers: { "X-User-Token": userToken } },
+      validate: ApiKeySchema,
+      // api key expires 24 hours, so we refresh it every hour
+      refreshInterval: 60 * 60 * 1000,
+      preload: true,
+    });
 
-    // if (!data) {
-    //   return null;
-    // }
-
-    const { apiKey, appId } = data;
-
-    let chatEndpoint = useApiRoute(`${domain}/api/fern-docs/search/v2/chat`);
-    let suggestEndpoint = useApiRoute(`${domain}/api/fern-docs/search/v2/suggest`);
-    const facetApiEndpoint = useApiRoute(`${domain}/api/fern-docs/search/v2/facet`);
+    let chatEndpoint = useApiRoute(`/api/fern-docs/search/v2/chat`, DOMAIN);
+    let suggestEndpoint = useApiRoute(`/api/fern-docs/search/v2/suggest`, DOMAIN);
+    const facetApiEndpoint = useApiRoute(`/api/fern-docs/search/v2/facet`, DOMAIN);
 
     const facetFetcher = React.useCallback(
       async (filters: readonly string[]) => {
@@ -127,11 +117,38 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
       [data, facetApiEndpoint]
     );
 
+    if (!data) {
+      return null;
+    }
+
+    const { apiKey, appId } = data;
+
+    const children = (
+      <>
+        <DefaultDesktopBackButton />
+        <CommandGroupFilters />
+        <CommandEmpty />
+        <CommandSearchHits
+          onSelect={() => {}}
+          prefetch={(path) => {}}
+          domain={DOMAIN}
+          forceWindowOpen={true}
+        />
+        <CommandActions>
+          <CommandGroupTheme
+            setTheme={(theme) => {
+              setOpen(false);
+            }}
+          />
+        </CommandActions>
+      </>
+    );
+  
     return (
       <AlgoliaSearchClientRoot
         appId={appId}
         apiKey={apiKey}
-        domain={domain}
+        domain={DOMAIN}
         indexName={SEARCH_INDEX}
         fetchFacets={facetFetcher}
         initialFilters={undefined}
@@ -142,12 +159,14 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
           onOpenChange={setOpen}
           afterInput={<EscButton />}
         >
-          <DesktopCommandWithAskAI
+          <AskAiStandaloneModal
             askAI={askAI}
             setAskAI={setAskAI}
-            domain={domain}
+            domain={DOMAIN}
             useConversationId={() => conversationIdHook}
-          />
+          >
+            {children}
+          </AskAiStandaloneModal>
         </DesktopSearchDialog>
       </AlgoliaSearchClientRoot>
     );

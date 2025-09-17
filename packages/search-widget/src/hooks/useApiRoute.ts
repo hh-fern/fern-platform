@@ -6,13 +6,13 @@ export type FernDocsApiRoute = `${string}/api/fern-docs/${string}`;
 
 interface Options {
   includeTrailingSlash?: boolean;
-  basepath?: string;
+  domain?: string;
 }
 
 export function useApiRoute(
   route: FernDocsApiRoute,
+  domain?: string,
   options?: Options
 ): string {
-  const basepath = useBasePath();
-  return getApiRouteSupplier({ basepath, ...options })(route);
+  return getApiRouteSupplier({ domain: domain || "", ...options })(route);
 }

@@ -4,3 +4,4 @@ export * from "./desktop-command-badges";
 export * from "./desktop-search-button";
 export * from "./desktop-search-dialog";
 export * from "./desktop-ask-ai-panel";
+export * from "./ask-ai-modal";
