@@ -144,6 +144,8 @@ export const SearchV2 = React.memo(function SearchV2({
   }
 
   const { appId, apiKey } = data;
+  console.log("appId", appId);
+  console.log("apiKey", apiKey);
 
   const children = (
     <>

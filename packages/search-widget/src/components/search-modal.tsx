@@ -42,12 +42,6 @@ import {
   FootnotesSection,
 } from "@fern-docs/search-ui/components/chatbot/footnote";
 import { ChatbotTurnContextProvider } from "@fern-docs/search-ui/components/chatbot/turn-context";
-import {
-  SqueezedMessage,
-  combineSearchResults,
-  ensureMessagePartsHaveNewLines,
-  squeezeMessages,
-} from "@fern-docs/search-ui/components/chatbot/utils";
 import * as Command from "@fern-docs/search-ui/components/cmdk";
 import { CodeBlock } from "@fern-docs/search-ui/components/code-block";
 import {
@@ -60,7 +54,6 @@ import { FootnoteCommands } from "@fern-docs/search-ui/components/desktop/footno
 import { HideHeadersInUserMessage } from "@fern-docs/search-ui/components/desktop/hide-headers-in-user-messages";
 import { Suggestions } from "@fern-docs/search-ui/components/desktop/suggestions";
 import { MarkdownContent } from "@fern-docs/search-ui/components/md-content";
-import { useFacetFilters } from "@fern-docs/search-ui/components/search/useFacetFilters";
 import { CommandAskAIGroup } from "@fern-docs/search-ui/components/shared/command-ask-ai";
 import { TextArea } from "@fern-docs/search-ui/components/ui/textarea";
 import {
@@ -70,6 +63,14 @@ import {
 } from "@fern-docs/search-ui/components/ui/tooltip";
 import { tunnel, useEventCallback, useIsMobile } from "@fern-ui/react-commons";
 
+//problematic imports
+import { useFacetFilters } from "../hooks/useFacetFilters";
+import {
+  SqueezedMessage,
+  combineSearchResults,
+  ensureMessagePartsHaveNewLines,
+  squeezeMessages,
+} from "../utils/chatbot";
 import { MAX_AI_CHAT_MESSAGE_LENGTH } from "../utils/constants";
 
 type PropsWithElement<T> = T & { node: HastElement };

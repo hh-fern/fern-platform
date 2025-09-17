@@ -15,7 +15,6 @@
     "depcheck": "turbo depcheck",
     "docs:build": "turbo docs:build",
     "docs:dev": "turbo docs:dev",
-    "widget:dev": "turbo widget:dev",
     "docs:local-bundle:build": "NODE_ENV=production bash scripts/build-local-bundle.sh",
     "docs:local-bundle:deploy": "pnpm docs:local-bundle:resetDir && pnpm docs:local-bundle:unzip && pnpm docs:local-bundle:setup && echo 'Use local bundle by running: fern docs dev --bundle-path ~/.fern/app-preview-local/.next'",
     "docs:local-bundle:resetDir": "rm -rf ~/.fern/app-preview-local && mkdir -p ~/.fern/app-preview-local && mkdir -p ~/.fern/app-preview-local/.next",
@@ -46,7 +45,8 @@
     "test": "CI=true turbo test",
     "test:update": "CI=true turbo test -- -u",
     "vercel-scripts": "pnpm --filter=@fern-platform/vercel-scripts vercel-scripts",
-    "vercel:up": "pnpm up -r \"@vercel/*\""
+    "vercel:up": "pnpm up -r \"@vercel/*\"",
+    "widget:dev": "turbo widget:dev"
   },
   "resolutions": {
     "@aa-sdk/core": "^4.31.2",

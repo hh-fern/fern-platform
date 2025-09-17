@@ -1,5 +1,6 @@
-import path from "path";
 import type { NextConfig } from "next";
+
+import path from "path";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@fern-docs/search-ask-fern"],
@@ -12,23 +13,23 @@ const nextConfig: NextConfig = {
     "@fern-ui/react-commons",
   ],
   webpack: (config) => {
-      const webpack = require("webpack");
-      
-      config.plugins = config.plugins || [];
-      config.plugins.push(
-        new webpack.NormalModuleReplacementPlugin(
-          /search\/useSearchBox$/,
-          path.resolve(__dirname, "./src/hooks/useSearchBox.ts")
-        ),
-        new webpack.NormalModuleReplacementPlugin(
-          /hooks\/use-search-hits$/,
-          path.resolve(__dirname, "./src/hooks/useSearchHits.ts")
-        ),
-        new webpack.NormalModuleReplacementPlugin(
-          /@fern-docs\/search-ask-fern$/,
-          path.resolve(__dirname, "./src/utils/suggestions-schema.ts")
-        )
-      );
+    const webpack = require("webpack");
+
+    config.plugins = config.plugins || [];
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /search\/useSearchBox$/,
+        path.resolve(__dirname, "./src/hooks/useSearchBox.ts")
+      ),
+      new webpack.NormalModuleReplacementPlugin(
+        /hooks\/use-search-hits$/,
+        path.resolve(__dirname, "./src/hooks/useSearchHits.ts")
+      ),
+      new webpack.NormalModuleReplacementPlugin(
+        /@fern-docs\/search-ask-fern$/,
+        path.resolve(__dirname, "./src/utils/suggestions-schema.ts")
+      )
+    );
     return config;
   },
 };

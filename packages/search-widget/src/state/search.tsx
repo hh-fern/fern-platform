@@ -5,11 +5,11 @@ import React from "react";
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 
-import { SearchButton } from "../components/search";
+import { SearchModal } from "../components/search";
 import { generateConversationId } from "../utils/generate-conversation-id";
 
-export const searchDialogOpenAtom = atom(true);
-export const searchInitializedAtom = atom(false); 
+export const searchDialogOpenAtom = atom(false);
+export const searchInitializedAtom = atom(false);
 
 export const conversationIdAtom = atom<string>(generateConversationId());
 export function useConversationId() {
@@ -22,15 +22,16 @@ export function useConversationId() {
 }
 
 export const SearchWidgetTrigger = React.memo(function SearchWidgetTrigger(
-  props: React.ComponentProps<typeof SearchButton>
+  props: React.ComponentProps<typeof SearchModal>
 ) {
   const toggleSearchDialog = useToggleSearchDialog();
-
   return (
-    <SearchButton
+    <button
       {...props}
       onClick={composeEventHandlers(props.onClick, toggleSearchDialog)}
-    />
+    >
+      Open Search Dialog
+    </button>
   );
 });
 

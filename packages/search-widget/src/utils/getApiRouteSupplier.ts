@@ -1,6 +1,6 @@
 import urlJoin from "url-join";
 
-export type FernDocsApiRoute = `/api/fern-docs/${string}`;
+export type FernDocsApiRoute = `${string}/api/fern-docs/${string}`;
 
 export function getApiRouteSupplier({
   includeTrailingSlash,
