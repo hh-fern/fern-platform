@@ -60,7 +60,7 @@ import { DesktopCommandInput } from "./desktop-command-input";
 import { DesktopCommandRoot } from "./desktop-command-root";
 import { FootnoteCommands } from "./footnote-commands";
 import { HideHeadersInUserMessage } from "./hide-headers-in-user-messages";
-import { Suggestions } from "./suggestions";
+// import { Suggestions } from "./suggestions";
 
 type PropsWithElement<T> = T & { node: HastElement };
 
@@ -91,6 +91,11 @@ export const AskAiStandaloneModal = forwardRef<
       setConversationId: (conversationId: string) => void;
       resetConversationId: () => void;
     };
+    useQueryId: () => {
+      queryId: string;
+      setQueryId: (queryId: string) => void;
+      resetQueryId: () => void;
+    };
   }
 >(
   (
@@ -114,6 +119,7 @@ export const AskAiStandaloneModal = forwardRef<
       asChild,
       darkCodeEnabled,
       useConversationId,
+      useQueryId,
       ...props
     },
     forwardedRef
@@ -163,7 +169,7 @@ export const AskAiStandaloneModal = forwardRef<
     function bounce() {
       if (ref.current && !isMobile) {
         ref.current.animate(
-          { transform: ["scale(1)", "scale(0.96)", "scale(1)"] },
+          { transform: ["scale(1)", "scale(0.99)", "scale(1)"] },
           { duration: 200, easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)" }
         );
       }
@@ -183,10 +189,12 @@ export const AskAiStandaloneModal = forwardRef<
         escapeKeyShouldPopState={filters.length > 0}
         data-fern-search="desktop-command"
         data-mode={askAI ? "ask-ai" : "search"}
+        className=""
       >
         {askAI ? (
           <DesktopAskAIContent
             useConversationId={useConversationId}
+            useQueryId={useQueryId}
             api={api}
             suggestionsApi={suggestionsApi}
             body={body}
@@ -201,8 +209,8 @@ export const AskAiStandaloneModal = forwardRef<
             chatId={chatId}
             onSelectHit={onSelectHit}
             prefetch={prefetch}
+            domain={domain}            
             composerActions={composerActions}
-            domain={domain}
             renderActions={renderActions}
             darkCodeEnabled={darkCodeEnabled}
           />
@@ -236,6 +244,11 @@ const DesktopAskAIContent = (props: {
     conversationId: string;
     setConversationId: (conversationId: string) => void;
     resetConversationId: () => void;
+  };
+  useQueryId: () => {
+    queryId: string;
+    setQueryId: (queryId: string) => void;
+    resetQueryId: () => void;
   };
   api?: string;
   suggestionsApi?: string;
@@ -280,6 +293,7 @@ const DesktopAskAIChat = ({
   setInitialInput,
   chatId,
   useConversationId,
+  useQueryId,
   api,
   suggestionsApi,
   body,
@@ -301,6 +315,11 @@ const DesktopAskAIChat = ({
     setConversationId: (conversationId: string) => void;
     resetConversationId: () => void;
   };
+  useQueryId: () => {
+    queryId: string;
+    setQueryId: (queryId: string) => void;
+    resetQueryId: () => void;
+  };
   api?: string;
   suggestionsApi?: string;
   body?: object;
@@ -317,20 +336,38 @@ const DesktopAskAIChat = ({
   const [userScrolled, setUserScrolled] = useState(false);
   const [initialInputSent, setInitialInputSent] = useState(false);
   const { conversationId, resetConversationId } = useConversationId();
+  const { queryId, setQueryId } = useQueryId();
+
+  useEffect(() => {
+    if (!queryId) {
+      setQueryId(crypto.randomUUID());
+    }
+  }, [queryId, setQueryId]);
+
+  const defaultTransportBody = useMemo(() => {
+    return {
+      ...body,
+      url: window.location.href,
+      conversationId,
+      queryId,
+      filters,
+    };
+  }, [body, conversationId, queryId, filters, window.location.href]);
+
+  const transport = new DefaultChatTransport({
+    api: api || "/api/chat",
+    headers: headers,
+    body: defaultTransportBody,
+  });
+
   const chat = useChat({
     id: chatId,
-    transport: new DefaultChatTransport({
-      api: api || "/api/chat",
-      credentials: "include",
-      headers: headers,
-      body: {
-        ...body,
-        url: document.location.href,
-        filters,
-        conversationId: conversationId,
-      },
-    }),
+    transport,
   });
+
+  useEffect(() => {
+    console.log("chat.messages", chat.messages);
+  }, [chat.messages]);
 
   // Reset userScrolled when the chat is loading
   useIsomorphicLayoutEffect(() => {
@@ -342,8 +379,6 @@ const DesktopAskAIChat = ({
   const [input, setInput] = useState("");
 
   const askAI = (message?: string): void => {
-    // message is set when clicking suggestions
-    // otherwise we use internal state (input, setInput)
     void chat.sendMessage({
       role: "user",
       parts: [{ type: "text", text: message ?? input }],
@@ -493,14 +528,14 @@ const DesktopAskAIChat = ({
           domain={domain}
           renderActions={renderActions}
         >
-          {suggestionsApi && (
+          {/* {suggestionsApi && (
             <Suggestions
               api={suggestionsApi}
               body={body}
               headers={headers}
               askAI={askAI}
             />
-          )}
+          )} */}
         </AskAICommandItems>
       </Command.List>
       <AskAIComposer

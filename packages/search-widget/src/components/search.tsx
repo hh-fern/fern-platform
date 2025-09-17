@@ -25,6 +25,7 @@ import z from "zod";
 import { AskAiStandaloneModal } from "@fern-docs/search-ui/components/desktop/ask-ai-modal";
 import { useConversationId, searchDialogOpenAtom } from "@/state/search";
 import "../styles/desktop.scss"
+import { generateQueryId } from "@/utils/generateQueryId";
 
 export const SEARCH_INDEX = "fern_docs_search";
 export const DOMAIN = "http://localhost:3001";
@@ -54,30 +55,14 @@ export function useAlgoliaUserToken() {
   return useAtomValue(userTokenRef.current);
 }
 
-function EscButton({ className }: { className?: string }) {
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Dialog.DialogClose asChild>
-            <Button
-              size="xs"
-              variant="outline"
-              className={className}
-              aria-label="Close search"
-            >
-              <kbd>Esc</kbd>
-            </Button>
-          </Dialog.DialogClose>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>
-            <p>Close search</p>
-          </TooltipContent>
-        </TooltipPortal>
-      </Tooltip>
-    </TooltipProvider>
-  );
+export const queryIdAtom = atom<string>(generateQueryId());
+export function useQueryId() {
+  const [queryId, setQueryId] = useAtom(queryIdAtom);
+  return {
+    queryId,
+    setQueryId,
+    resetQueryId: () => setQueryId(generateQueryId()),
+  };
 }
 
 export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
@@ -88,6 +73,8 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
     const [open, setOpen] = useAtom(searchDialogOpenAtom);
     const [askAI, setAskAI] = useAtom(askAIAtom);
 
+    const queryIdHook = useQueryId();
+
     const { data } = useApiRouteSWRImmutable(`/api/fern-docs/search/v2/key`, DOMAIN, {
       request: { headers: { "X-User-Token": userToken } },
       validate: ApiKeySchema,
@@ -97,7 +84,6 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
     });
 
     let chatEndpoint = useApiRoute(`/api/fern-docs/search/v2/chat`, DOMAIN);
-    let suggestEndpoint = useApiRoute(`/api/fern-docs/search/v2/suggest`, DOMAIN);
     const facetApiEndpoint = useApiRoute(`/api/fern-docs/search/v2/facet`, DOMAIN);
 
     const facetFetcher = React.useCallback(
@@ -134,13 +120,6 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
           domain={DOMAIN}
           forceWindowOpen={true}
         />
-        <CommandActions>
-          <CommandGroupTheme
-            setTheme={(theme) => {
-              setOpen(false);
-            }}
-          />
-        </CommandActions>
       </>
     );
   
@@ -157,16 +136,20 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
         <DesktopSearchDialog
           open={open}
           onOpenChange={setOpen}
-          afterInput={<EscButton />}
         >
-          <AskAiStandaloneModal
-            askAI={askAI}
-            setAskAI={setAskAI}
-            domain={DOMAIN}
-            useConversationId={() => conversationIdHook}
-          >
-            {children}
-          </AskAiStandaloneModal>
+          <TooltipProvider>
+            <AskAiStandaloneModal
+              useConversationId={() => conversationIdHook}
+              useQueryId={() => queryIdHook}
+              domain={DOMAIN}
+              askAI={askAI}
+              setAskAI={setAskAI}
+              api={chatEndpoint}
+              body={{ algoliaSearchKey: apiKey }}
+            >
+              {children}
+            </AskAiStandaloneModal>
+          </TooltipProvider>
         </DesktopSearchDialog>
       </AlgoliaSearchClientRoot>
     );
