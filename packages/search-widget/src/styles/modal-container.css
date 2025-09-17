@@ -16,6 +16,13 @@
   --accent-a12: var(--blue-a12);
   --grayscale-a11: var(--gray-a11);
   --radius-3: 12px;
+
+  /* Additional variables for FernButton compatibility */
+  --border-default: var(--gray-6);
+  --grayscale-11: var(--gray-11);
+  --grayscale-12: var(--gray-12);
+  --grayscale-a4: var(--gray-a4);
+  --color-body: var(--gray-12);
 }
 
 /* Dark mode support */
@@ -29,6 +36,13 @@
     --accent-a11: var(--blue-dark-a11);
     --accent-a12: var(--blue-dark-a12);
     --grayscale-a11: var(--gray-dark-a11);
+
+    /* Dark mode versions of additional variables */
+    --border-default: var(--gray-dark-6);
+    --grayscale-11: var(--gray-dark-11);
+    --grayscale-12: var(--gray-dark-12);
+    --grayscale-a4: var(--gray-dark-a4);
+    --color-body: var(--gray-dark-12);
   }
 }
 
@@ -102,6 +116,8 @@
   [data-fern-search="desktop-command"][data-cmdk-root][data-mode="ask-ai"],
   [data-cmdk-root][data-mode="ask-ai"] {
     height: 100%;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-3);
   }
 }
 

@@ -269,14 +269,14 @@ const DesktopAskAIContent = (props: {
         <div>
           {props.onReturnToSearch && (
             <Button
-              size="xs"
+              size="iconSm"
               variant="outline"
+              className="shrink-0"
               onClick={props.onReturnToSearch}
             >
               <ArrowLeft />
-              Back to search
             </Button>
-          )}
+        )}
         </div>
         <div className="flex gap-2">
           <headerActions.Out />

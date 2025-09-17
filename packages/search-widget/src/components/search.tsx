@@ -3,10 +3,11 @@
 import "../styles/modal-container.css";
 import "../styles/search-results.css";
 import "../styles/esc-button.css";
+import "../styles/ask-ai-panel.css";
 
 import { forwardRef } from "react";
 
-import { useAtom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 
 import { AlgoliaSearchClientRoot } from "@fern-docs/search-ui/components/search/algolia-search-client";
 import { DesktopSearchDialog } from "@fern-docs/search-ui";
@@ -36,6 +37,8 @@ const ApiKeySchema = z.object({
   appId: z.string(),
   apiKey: z.string(),
 });
+
+export const askAIAtom = atom(false);
 
 export interface SearchButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -87,7 +90,7 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
     const userToken = useAlgoliaUserToken();
     const conversationIdHook = useConversationId();
     const [open, setOpen] = useAtom(searchDialogOpenAtom);
-  
+    const [askAI, setAskAI] = useAtom(askAIAtom);
 
     // const { data } = useApiRouteSWRImmutable(`${domain}/api/fern-docs/search/v2/key`, {
     //   request: { headers: { "X-User-Token": userToken } },
@@ -140,8 +143,8 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
           afterInput={<EscButton />}
         >
           <DesktopCommandWithAskAI
-            askAI={false}
-            setAskAI={() => false}
+            askAI={askAI}
+            setAskAI={setAskAI}
             domain={domain}
             useConversationId={() => conversationIdHook}
           />

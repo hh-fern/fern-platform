@@ -1,4 +1,269 @@
-/* Main CSS entry point for Ask AI Panel styling */
-@import "./shared/reset.css";
-@import "./shared/common.scss";
-@import "./desktop/desktop.scss";
+/* Ask AI Panel Styling to match desktop-ask-ai-panel.tsx */
+
+/* Header section with controls */
+[data-mode="ask-ai"] > div:first-child {
+  display: flex ;
+  align-items: center ;
+  justify-content: space-between ;
+  padding: 0.5rem ;
+  padding-bottom: 0 ;
+}
+
+/* Back to search button - match ESC button style */
+button:has(svg[data-lucide="arrow-left"]) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: 6px !important;
+  background: var(--grayscale-surface) !important;
+  color: var(--grayscale-a11) !important;
+  transition: all 150ms ease !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+}
+
+button:has(svg[data-lucide="arrow-left"]):hover {
+  background: var(--grayscale-a3) !important;
+  color: var(--color-body) !important;
+}
+
+button:has(svg[data-lucide="arrow-left"]) svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* New chat button - match ESC button style */
+button:has(svg[data-lucide="square-pen"]) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: 6px !important;
+  background: var(--grayscale-surface) !important;
+  color: var(--grayscale-a11) !important;
+  transition: all 150ms ease !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  min-width: 32px !important;
+  height: auto !important;
+}
+
+button:has(svg[data-lucide="square-pen"]):hover {
+  background: var(--grayscale-a3) !important;
+  color: var(--color-body) !important;
+}
+
+button:has(svg[data-lucide="square-pen"]) svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* Text input container styling - shaped like reference with rounded top, no bottom border */
+[data-mode="ask-ai"] div:has(textarea) {
+  border: 1px solid var(--color-border-default) ;
+  border-bottom: 0 ;
+  border-left: 0;
+  border-right: 0;
+  cursor: text ;
+  position: relative ;
+  padding: 0.75rem ;
+  padding-top: 0.75rem ;
+}
+
+/* Text input styling - no border radius, straight edges */
+[data-mode="ask-ai"] textarea {
+  display: block ;
+  width: 100% ;
+  resize: none ;
+  outline: none ;
+  font-size: 15px ;
+  line-height: 18px ;
+  max-height: 192px ;
+  border: none ;
+  padding: 0 ;
+  padding-right: 11px ;
+  background-color: transparent ;
+  color: var(--color-body) ;
+  font-family: inherit ;
+}
+
+[data-mode="ask-ai"] textarea::placeholder {
+  color: var(--grayscale-a11) ;
+}
+
+/* Bottom control section - matches the container bottom with rounded bottom corners */
+[data-mode="ask-ai"] div:has(button[aria-label*="Send"]),
+[data-mode="ask-ai"] div:has(button):has(svg[data-lucide="arrow-up"]) {
+  pointer-events: none;
+  display: flex ;
+  align-items: center ;
+  justify-content: space-between ;
+  border: 1px solid var(--color-border-default) ;
+  padding: 0.25rem 0.75rem 0.75rem 0.75rem ;
+  border-radius: 0 0 16px 16px ;
+}
+
+[data-mode="ask-ai"] div:has(button[aria-label*="Send"]) > *,
+[data-mode="ask-ai"] div:has(button):has(svg[data-lucide="arrow-up"]) > * {
+  pointer-events: auto;
+}
+
+/* Send button styling - circular blue button */
+button:has(svg[data-lucide="arrow-up"]),
+button[aria-label*="Send"] {
+  height: 32px ;
+  width: 32px ;
+  border-radius: 8px ;
+  background: var(--accent) ;
+  color: white ;
+  border: none ;
+  cursor: pointer ;
+  display: inline-flex ;
+  align-items: center ;
+  justify-content: center ;
+  transition: all 150ms ease ;
+  padding: 0 ;
+}
+
+button:has(svg[data-lucide="arrow-up"]):hover:not(:disabled),
+button[aria-label*="Send"]:hover:not(:disabled) {
+  background: var(--accent-a10) ;
+}
+
+button:has(svg[data-lucide="arrow-up"]):disabled,
+button[aria-label*="Send"]:disabled {
+  background: var(--grayscale-a6) ;
+  color: var(--grayscale-a9) ;
+  cursor: not-allowed ;
+}
+
+button:has(svg[data-lucide="arrow-up"]) svg,
+button[aria-label*="Send"] svg {
+  width: 16px ;
+  height: 16px ;
+}
+
+/* Stop button styling */
+button:has(svg[data-lucide="stop-circle"]) {
+  height: 32px ;
+  width: 32px ;
+  border-radius: 50% ;
+  background: var(--accent) ;
+  color: white ;
+  border: none ;
+  cursor: pointer ;
+  display: inline-flex ;
+  align-items: center ;
+  justify-content: center ;
+  transition: all 150ms ease ;
+}
+
+/* Error/alert button styling */
+button:has(svg[data-lucide="circle-alert"]) {
+  height: 32px ;
+  width: 32px ;
+  border-radius: 50% ;
+  background: var(--red-9, #e5484d) ;
+  color: white ;
+  border: none ;
+  cursor: pointer ;
+  display: inline-flex ;
+  align-items: center ;
+  justify-content: center ;
+  transition: all 150ms ease ;
+}
+
+/* Message styling */
+div[data-conversation-id] {
+  padding: 0.5rem;
+}
+
+/* User message bubble */
+div[data-conversation-id] div:has(.bg-\\(color\\:--grayscale-a3\\)),
+div[data-conversation-id] .user-message {
+  background: var(--grayscale-a3) ;
+  border-radius: 6px ;
+  position: relative ;
+  margin-bottom: 0.5rem ;
+  margin-left: auto ;
+  width: fit-content ;
+  max-width: 70% ;
+  white-space: pre-wrap ;
+  padding: 0.5rem 1.25rem ;
+}
+
+/* Thinking dots animation */
+.thinking-dots::after {
+  content: ".";
+  animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+  0% {
+    content: ".";
+  }
+  33% {
+    content: "..";
+  }
+  66% {
+    content: "...";
+  }
+}
+
+/* Sparkles icon styling and text alignment */
+[data-mode="ask-ai"] div:has(svg[data-lucide="sparkles"]) {
+  display: flex ;
+  align-items: flex-start ;
+  gap: 1rem ;
+  padding: 0.5rem ;
+}
+
+svg[data-lucide="sparkles"],
+.sparkles {
+  width: 1rem ;
+  height: 1rem ;
+  flex-shrink: 0 ;
+  margin: 0.25rem 0 ;
+}
+
+/* Text content should be inline with sparkles */
+[data-mode="ask-ai"] div:has(svg[data-lucide="sparkles"]) > div {
+  flex: 1 ;
+  min-width: 0 ;
+}
+
+/* Empty state text alignment */
+[data-mode="ask-ai"] p {
+  margin: 0 ;
+  display: inline ;
+}
+
+/* Ask mode specific layouts */
+[data-cmdk-root][data-mode="ask-ai"] {
+  height: 100%;
+}
+
+[data-cmdk-root][data-mode="ask-ai"] [data-cmdk-list] {
+  max-height: 100%;
+}
+
+/* Header controls styling for ask AI mode */
+[data-mode="ask-ai"] .flex:has(button) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  padding-bottom: 0;
+}
+
+/* Bottom input area layout */
+[data-mode="ask-ai"] div:has(textarea) + div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
