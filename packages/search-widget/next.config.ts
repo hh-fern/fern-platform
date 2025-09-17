@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
           path.resolve(__dirname, "./src/hooks/useSearchHits.ts")
         ),
         new webpack.NormalModuleReplacementPlugin(
-          /@fern-docs\/search-ask-fern/,
+          /@fern-docs\/search-ask-fern$/,
           path.resolve(__dirname, "./src/utils/suggestions-schema.ts")
         )
       );

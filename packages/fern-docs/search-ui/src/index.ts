@@ -1,6 +1,5 @@
 export { SEARCH_INDEX } from "@fern-docs/search-keyword";
 export * from "./components/desktop";
-export * from "./components/mobile";
 export * from "./components/search";
 export * from "./components/shared";
 export * from "./components/chatbot";
