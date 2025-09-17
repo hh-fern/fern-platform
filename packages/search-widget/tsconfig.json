@@ -44,15 +44,6 @@
     },
     {
       "path": "../fern-docs/search-server/ask-fern"
-    },
-    {
-      "path": "../commons/docs-utils"
-    },
-    {
-      "path": "../commons/docs-server"
-    },
-    {
-      "path": "../commons/docs-loader"
     }
   ]
 }

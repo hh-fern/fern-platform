@@ -2594,18 +2594,27 @@ importers:
       '@ai-sdk/react':
         specifier: 2.0.0-beta.2
         version: 2.0.0-beta.2(react@19.0.0)(zod@3.25.49)
-      '@fern-api/docs-server':
+      '@fern-api/docs-auth':
         specifier: workspace:*
-        version: link:../commons/docs-server
+        version: link:../commons/docs-auth
       '@fern-api/fai-sdk':
         specifier: workspace:*
         version: link:../fai-sdk
+      '@fern-api/fdr-sdk':
+        specifier: workspace:*
+        version: link:../fdr-sdk
       '@fern-api/ui-core-utils':
         specifier: workspace:*
         version: link:../commons/core-utils
       '@fern-docs/components':
         specifier: workspace:*
         version: link:../fern-docs/components
+      '@fern-docs/edge-config':
+        specifier: workspace:*
+        version: link:../fern-docs/edge-config
+      '@fern-docs/mdx':
+        specifier: workspace:*
+        version: link:../fern-docs/mdx
       '@fern-docs/search-ask-fern':
         specifier: workspace:*
         version: link:../fern-docs/search-server/ask-fern
@@ -2618,6 +2627,12 @@ importers:
       '@fern-docs/search-utils':
         specifier: workspace:*
         version: link:../fern-docs/search-server/utils
+      '@fern-platform/fdr-utils':
+        specifier: workspace:*
+        version: link:../commons/fdr-utils
+      '@fern-ui/loadable':
+        specifier: workspace:*
+        version: link:../commons/loadable
       '@fern-ui/react-commons':
         specifier: workspace:*
         version: link:../commons/react-commons
@@ -2648,6 +2663,9 @@ importers:
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
+      jotai:
+        specifier: ^2.12.1
+        version: 2.12.1(@types/react@19.0.10)(react@19.0.0)
       lucide-react:
         specifier: ^0.460.0
         version: 0.460.0(react@19.0.0)

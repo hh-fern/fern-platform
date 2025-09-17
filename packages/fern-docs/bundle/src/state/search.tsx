@@ -13,14 +13,14 @@ import { DesktopSearchButton } from "@fern-docs/search-ui";
 
 export const searchDialogOpenAtom = atom(false);
 export const searchInitializedAtom = atom(false);
-export const isAskAiEnabledAtom = atom(false);
+export const isAskAiEnabledAtom = atom(true);
 
 export const SetIsAskAiEnabled = ({
   isAskAiEnabled,
 }: {
   isAskAiEnabled: boolean;
 }) => {
-  useHydrateAtoms([[isAskAiEnabledAtom, isAskAiEnabled]], {
+  useHydrateAtoms([[isAskAiEnabledAtom, true]], {
     dangerouslyForceHydrate: true,
   });
   return null;

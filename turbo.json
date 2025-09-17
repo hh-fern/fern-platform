@@ -51,6 +51,16 @@
         ".env"
       ]
     },
+    "widget:dev": {
+      "persistent": true,
+      "dependsOn": ["^build", "^compile"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env.local",
+        ".env.production",
+        ".env"
+      ]
+    },
     "docs:build": {
       "dependsOn": ["^build", "^compile", "^docs:build"],
       "env": [

@@ -100,7 +100,7 @@ async def toggle_ask_ai(
             LOGGER.info(f"Enabling Ask AI and starting reindex for domain {stripped_domain}")
             try:
                 async with httpx.AsyncClient(follow_redirects=True) as client:
-                    response = await client.get(f"https://{domain}/api/fern-docs/search/v2/reindex/turbopuffer/start")
+                    response = await client.get(f"http://localhost:3001/api/fern-docs/search/v2/reindex/turbopuffer/start")
                     if response.status_code == 200:
                         job_id = response.json().get("job_id", None)  # Job ID for upsert task
                         LOGGER.info(
@@ -190,7 +190,7 @@ async def reindex_ask_ai(
         job_id = None
         try:
             async with httpx.AsyncClient(follow_redirects=True) as client:
-                response = await client.get(f"https://{domain}/api/fern-docs/search/v2/reindex/turbopuffer/start")
+                response = await client.get(f"http://localhost:3001/api/fern-docs/search/v2/reindex/turbopuffer/start")
                 if response.status_code == 200:
                     job_id = response.json().get("job_id", None)
                     LOGGER.info(
@@ -268,7 +268,7 @@ async def get_toggle_status(
         # Check job status using the turbopuffer status endpoint
         async with httpx.AsyncClient(follow_redirects=True) as client:
             response = await client.get(
-                f"https://{domain}/api/fern-docs/search/v2/reindex/turbopuffer/status?job_id={existing_record.job_id}"
+                f"http://localhost:3001/api/fern-docs/search/v2/reindex/turbopuffer/status?job_id={existing_record.job_id}"
             )
             if response.status_code == 200:
                 status_data = response.json()

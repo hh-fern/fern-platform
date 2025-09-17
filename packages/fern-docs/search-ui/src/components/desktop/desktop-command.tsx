@@ -13,7 +13,6 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 import { TooltipPortal } from "@radix-ui/react-tooltip";
 import { ArrowLeft } from "lucide-react";
 
-import { isSelfHosted } from "@fern-api/docs-server";
 import { Button } from "@fern-docs/components/button";
 import { Kbd } from "@fern-docs/components/kbd";
 import { tunnel, usePlatformKbdShortcut } from "@fern-ui/react-commons";

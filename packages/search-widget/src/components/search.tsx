@@ -34,7 +34,7 @@ export interface SearchButtonProps
   icon?: React.ReactNode;
 }
 
-const SearchButton = forwardRef<HTMLButtonElement, SearchButtonProps>(
+export const SearchButton = forwardRef<HTMLButtonElement, SearchButtonProps>(
   ({ className, variant, size, icon, ...props }, ref) => {
     return (
       <button
@@ -48,5 +48,3 @@ const SearchButton = forwardRef<HTMLButtonElement, SearchButtonProps>(
   }
 );
 SearchButton.displayName = "SearchButton";
-
-export { SearchButton, searchButtonVariants };

@@ -4,13 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/components/SearchButton.tsx"
+    ".": "./src/components/search.tsx"
   },
   "scripts": {
     "build": "tsup",
     "build:widget": "tsup",
     "clean": "rm -rf .next dist .turbo",
     "dev": "next dev --port 3001",
+    "widget:dev": "next dev --port 3001",
     "lint": "next lint",
     "start": "next start",
     "typecheck": "tsc --noEmit"
@@ -19,14 +20,19 @@
     "@ai-sdk/anthropic": "2.0.0-beta.2",
     "@ai-sdk/openai": "2.0.0-beta.2",
     "@ai-sdk/react": "2.0.0-beta.2",
-    "@fern-api/docs-server": "workspace:*",
+    "@fern-api/docs-auth": "workspace:*",
     "@fern-api/fai-sdk": "workspace:*",
+    "@fern-api/fdr-sdk": "workspace:*",
     "@fern-api/ui-core-utils": "workspace:*",
     "@fern-docs/components": "workspace:*",
+    "@fern-docs/edge-config": "workspace:*",
+    "@fern-docs/mdx": "workspace:*",
     "@fern-docs/search-ask-fern": "workspace:*",
     "@fern-docs/search-keyword": "workspace:*",
     "@fern-docs/search-ui": "workspace:*",
     "@fern-docs/search-utils": "workspace:*",
+    "@fern-platform/fdr-utils": "workspace:*",
+    "@fern-ui/loadable": "workspace:*",
     "@fern-ui/react-commons": "workspace:*",
     "@radix-ui/primitive": "^1.1.1",
     "@radix-ui/react-compose-refs": "^1.1.1",
@@ -43,6 +49,7 @@
     "react-dom": "19.0.0",
     "react-markdown": "^9.0.1",
     "swr": "^2.2.5",
+    "jotai": "^2.12.1",
     "tailwindcss": "^4.0.9",
     "zod": "^3.25.49"
   },
