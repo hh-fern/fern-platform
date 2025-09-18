@@ -84,7 +84,7 @@ const DesktopCommand = forwardRef<
 DesktopCommand.displayName = "DesktopCommand";
 
 export const DesktopCommandContent = memo(
-  ({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) => {
+  ({ children, asChild, modal }: { children: React.ReactNode; asChild?: boolean; modal?: boolean }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     return (
@@ -95,7 +95,7 @@ export const DesktopCommandContent = memo(
             inputRef.current?.focus();
           }}
         >
-          <DesktopCommandBadges />
+          <DesktopCommandBadges modal={modal} />
 
           <div data-cmdk-fern-header="">
             <beforeInput.Out />

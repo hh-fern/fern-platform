@@ -8,8 +8,6 @@ import { AlgoliaSearchClientRoot } from "@fern-docs/search-ui/components/search/
 import { CommandSearchHits, CommandEmpty, DefaultDesktopBackButton, CommandGroupFilters, DesktopSearchDialog, CommandActions, CommandGroupTheme  } from "@fern-docs/search-ui";
 import { useLazyRef } from "@fern-ui/react-commons";
 import * as Dialog from "@radix-ui/react-dialog";
-import { TooltipPortal } from "@radix-ui/react-tooltip";
-import { Button } from "@fern-docs/components/button";
 import {
   Tooltip,
   TooltipContent,
@@ -137,7 +135,6 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
           open={open}
           onOpenChange={setOpen}
         >
-          <TooltipProvider>
             <AskAiStandaloneModal
               useConversationId={() => conversationIdHook}
               useQueryId={() => queryIdHook}
@@ -149,7 +146,6 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
             >
               {children}
             </AskAiStandaloneModal>
-          </TooltipProvider>
         </DesktopSearchDialog>
       </AlgoliaSearchClientRoot>
     );

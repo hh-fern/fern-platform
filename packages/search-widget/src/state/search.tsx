@@ -27,12 +27,15 @@ export const SearchWidgetTrigger = React.memo(function SearchWidgetTrigger(
 ) {
   const toggleSearchDialog = useToggleSearchDialog();
   return (
-    <FernButton
-      variant="outlined"
-      text="Open"
+    <button
+      type="button"
+      aria-label="Open search"
+      className="hover:cursor-pointer rounded-full ring-1 ring-inset ring-border-default ring-shadow-xl w-20 h-20 flex items-center justify-center hover:ring-shadow-2xl bg:color(--accent)"
       {...props}
       onClick={composeEventHandlers(props.onClick, toggleSearchDialog)}
-    />
+    >
+      Open
+    </button>
   );
 });
 
