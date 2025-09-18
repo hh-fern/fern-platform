@@ -5,7 +5,7 @@ import { RESET, atomWithDefault } from "jotai/utils";
 
 import { FacetFilter, FacetsResponse } from "@fern-docs/search-keyword";
 
-import { filtersAtom } from "../components/FilterProvider";
+import { filtersAtom } from "../providers/FilterProvider";
 
 export const FacetFiltersContext = createContext({
   preloadFacets: (_: readonly FacetFilter[]): Promise<FacetsResponse> =>

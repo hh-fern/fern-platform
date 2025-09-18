@@ -4,11 +4,12 @@ import React from "react";
 
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { SearchIcon } from "lucide-react";
+
+import { Button } from "@fern-docs/components";
 
 import { SearchModal } from "../components/search";
 import { generateConversationId } from "../utils/generate-conversation-id";
-import { Button } from "@fern-docs/components";
-import { SearchIcon } from "lucide-react";
 
 export const searchDialogOpenAtom = atom(false);
 export const searchInitializedAtom = atom(false);
@@ -31,11 +32,11 @@ export const SearchWidgetTrigger = React.memo(function SearchWidgetTrigger(
     <Button
       variant="default"
       aria-label="Open search"
-      className="h-12 w-12 rounded-full bg-(color:--accent-a9)"
+      className="bg-(color:--accent-a9) h-12 w-12 rounded-full"
       {...props}
       onClick={composeEventHandlers(props.onClick, toggleSearchDialog)}
     >
-      <SearchIcon size={12}/>
+      <SearchIcon size={12} />
     </Button>
   );
 });

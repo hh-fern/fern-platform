@@ -15,6 +15,7 @@ import {
 } from "@fern-docs/search-ui";
 import { AskAiStandaloneModal } from "@fern-docs/search-ui/components/desktop/ask-ai-modal";
 import { AlgoliaSearchClientRoot } from "@fern-docs/search-ui/components/search/algolia-search-client";
+import { TooltipProvider } from "@fern-docs/search-ui/components/ui/tooltip";
 import { useLazyRef } from "@fern-ui/react-commons";
 
 import { useApiRoute } from "@/hooks/useApiRoute";
@@ -141,20 +142,22 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
         initialFilters={undefined}
         analyticsTags={["search-v2-dialog"]}
       >
-        <DesktopSearchDialog open={open} onOpenChange={setOpen}>
-          <AskAiStandaloneModal
-            useConversationId={() => conversationIdHook}
-            useQueryId={() => queryIdHook}
-            domain={DOMAIN}
-            askAI={askAI}
-            setAskAI={setAskAI}
-            api={chatEndpoint}
-            body={{ algoliaSearchKey: apiKey }}
-            suggestionsApi={suggestionsEndpoint}
-          >
-            {children}
-          </AskAiStandaloneModal>
-        </DesktopSearchDialog>
+        <TooltipProvider>
+          <DesktopSearchDialog open={open} onOpenChange={setOpen}>
+            <AskAiStandaloneModal
+              useConversationId={() => conversationIdHook}
+              useQueryId={() => queryIdHook}
+              domain={DOMAIN}
+              askAI={askAI}
+              setAskAI={setAskAI}
+              api={chatEndpoint}
+              body={{ algoliaSearchKey: apiKey }}
+              suggestionsApi={suggestionsEndpoint}
+            >
+              {children}
+            </AskAiStandaloneModal>
+          </DesktopSearchDialog>
+        </TooltipProvider>
       </AlgoliaSearchClientRoot>
     );
   }
