@@ -7,10 +7,8 @@ import { atom, useAtom, useAtomValue } from "jotai";
 import z from "zod";
 
 import {
-  CommandActions,
   CommandEmpty,
   CommandGroupFilters,
-  CommandGroupTheme,
   CommandSearchHits,
   DefaultDesktopBackButton,
   DesktopSearchDialog,

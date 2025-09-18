@@ -7,6 +7,8 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { SearchModal } from "../components/search";
 import { generateConversationId } from "../utils/generate-conversation-id";
+import { Button } from "@fern-docs/components";
+import { SearchIcon } from "lucide-react";
 
 export const searchDialogOpenAtom = atom(false);
 export const searchInitializedAtom = atom(false);
@@ -26,15 +28,15 @@ export const SearchWidgetTrigger = React.memo(function SearchWidgetTrigger(
 ) {
   const toggleSearchDialog = useToggleSearchDialog();
   return (
-    <button
-      type="button"
+    <Button
+      variant="default"
       aria-label="Open search"
-      className="ring-border-default ring-shadow-xl hover:ring-shadow-2xl bg:color(--accent) flex h-20 w-20 items-center justify-center rounded-full ring-1 ring-inset hover:cursor-pointer"
+      className="h-12 w-12 rounded-full bg-(color:--accent-a9)"
       {...props}
       onClick={composeEventHandlers(props.onClick, toggleSearchDialog)}
     >
-      Open
-    </button>
+      <SearchIcon size={12}/>
+    </Button>
   );
 });
 
