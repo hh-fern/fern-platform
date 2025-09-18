@@ -253,6 +253,7 @@ export class S3ServiceImpl implements S3Service {
     const input: PutObjectCommandInput = {
       Bucket: bucketName,
       Key: key,
+      CacheControl: "public, max-age=31536000, immutable",
     };
     if (filepath.endsWith(".svg")) {
       input.ContentType = "image/svg+xml";
