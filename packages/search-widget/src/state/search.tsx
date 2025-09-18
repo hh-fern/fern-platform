@@ -29,7 +29,7 @@ export const SearchWidgetTrigger = React.memo(function SearchWidgetTrigger(
     <button
       type="button"
       aria-label="Open search"
-      className="hover:cursor-pointer rounded-full ring-1 ring-inset ring-border-default ring-shadow-xl w-20 h-20 flex items-center justify-center hover:ring-shadow-2xl bg:color(--accent)"
+      className="ring-border-default ring-shadow-xl hover:ring-shadow-2xl bg:color(--accent) flex h-20 w-20 items-center justify-center rounded-full ring-1 ring-inset hover:cursor-pointer"
       {...props}
       onClick={composeEventHandlers(props.onClick, toggleSearchDialog)}
     >

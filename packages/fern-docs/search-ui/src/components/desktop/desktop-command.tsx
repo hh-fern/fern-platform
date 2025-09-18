@@ -84,7 +84,15 @@ const DesktopCommand = forwardRef<
 DesktopCommand.displayName = "DesktopCommand";
 
 export const DesktopCommandContent = memo(
-  ({ children, asChild, modal }: { children: React.ReactNode; asChild?: boolean; modal?: boolean }) => {
+  ({
+    children,
+    asChild,
+    modal,
+  }: {
+    children: React.ReactNode;
+    asChild?: boolean;
+    modal?: boolean;
+  }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     return (

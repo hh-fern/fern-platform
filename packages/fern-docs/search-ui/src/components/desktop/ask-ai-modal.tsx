@@ -30,10 +30,6 @@ import {
   RotateCcw,
   SquarePen,
 } from "lucide-react";
-
-import { SparklesIconHollow } from "../icons/sparkles";
-import { CircleStopIcon as StopCircle } from "../icons/circle-stop";
-
 import { useIsomorphicLayoutEffect } from "swr/_internal";
 
 import { FernTooltip, cn } from "@fern-docs/components";
@@ -52,6 +48,8 @@ import {
 } from "../chatbot/utils";
 import * as Command from "../cmdk";
 import { CodeBlock } from "../code-block";
+import { CircleStopIcon as StopCircle } from "../icons/circle-stop";
+import { SparklesIconHollow } from "../icons/sparkles";
 import { MarkdownContent } from "../md-content";
 import { useFacetFilters } from "../search/useFacetFilters";
 import { CommandAskAIGroup } from "../shared";
@@ -60,9 +58,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { DesktopCommandContent, afterInput } from "./desktop-command";
 import { DesktopCommandInput } from "./desktop-command-input";
 import { DesktopCommandRoot } from "./desktop-command-root";
+import { FilterDropdownMenu, FilterManager } from "./filter-components";
 import { FootnoteCommands } from "./footnote-commands";
 import { HideHeadersInUserMessage } from "./hide-headers-in-user-messages";
-import { FilterDropdownMenu, FilterManager } from "./filter-components";
 import { Suggestions } from "./suggestions";
 
 type PropsWithElement<T> = T & { node: HastElement };
@@ -213,7 +211,7 @@ export const AskAiStandaloneModal = forwardRef<
             chatId={chatId}
             onSelectHit={onSelectHit}
             prefetch={prefetch}
-            domain={domain}            
+            domain={domain}
             composerActions={composerActions}
             renderActions={renderActions}
             darkCodeEnabled={darkCodeEnabled}
@@ -333,7 +331,7 @@ const DesktopAskAIChat = ({
   composerActions?: ReactNode;
   domain: string;
   renderActions?: (message: SqueezedMessage) => ReactNode;
-  darkCodeEnabled?: boolean;  
+  darkCodeEnabled?: boolean;
   filters?: readonly FacetFilter[];
 }) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -582,7 +580,17 @@ const AskAIComposer = forwardRef<
   }
 >(
   (
-    { error, onError, isLoading, stop, onSend, onPopState, actions, filters = [], ...props },
+    {
+      error,
+      onError,
+      isLoading,
+      stop,
+      onSend,
+      onPopState,
+      actions,
+      filters = [],
+      ...props
+    },
     forwardedRef
   ) => {
     const value = typeof props.value === "string" ? props.value : "";
@@ -653,7 +661,7 @@ const AskAIComposer = forwardRef<
           />
         </DesktopCommandInput>
         <div className="flex items-center justify-between">
-        <div className="pointer-events-auto flex min-w-0 flex-1 items-center">
+          <div className="pointer-events-auto flex min-w-0 flex-1 items-center">
             {filters.length === 0 ? (
               <FilterDropdownMenu filters={filters} />
             ) : (
@@ -673,7 +681,7 @@ const AskAIComposer = forwardRef<
             <div className="pointer-events-auto cursor-pointer">
               <Button
                 size="icon"
-                className="rounded-full bg-(color:--accent-a11)"
+                className="bg-(color:--accent-a11) rounded-full"
                 variant="default"
                 onClick={
                   error
@@ -797,86 +805,86 @@ const AskAICommandItems = memo<{
             <ChatbotTurnContextProvider
               key={message.user?.id ?? message.assistant?.id ?? idx}
             >
-                  <article>
-                    <div className="bg-(color:--grayscale-a3) rounded-6 relative mb-2 ml-auto w-fit max-w-[70%] whitespace-pre-wrap px-5 py-2">
-                      <section className="prose cursor-auto text-sm">
-                        <MarkdownContent
-                          components={{
-                            ...components,
-                            ...HideHeadersInUserMessage(),
-                          }}
-                        >
-                          {message.user?.content ?? "_No user message_"}
-                        </MarkdownContent>
-                      </section>
-                    </div>
-                    <div className="flex items-start justify-start gap-4">
-                      <SparklesIconHollow className="my-1 size-4 shrink-0" />
-                      <section className="prose min-w-0 flex-1 shrink cursor-text text-sm">
-                        {message.assistant?.content && (
-                          <MarkdownContent
-                            components={{
-                              ...components,
-                              sup: FootnoteSup,
-                              section: ({
-                                children,
-                                node,
-                                ...props
-                              }: PropsWithElement<
-                                React.ComponentProps<"section">
-                              >) => {
-                                if (node?.properties.dataFootnotes) {
-                                  return (
-                                    <FootnotesSection
-                                      node={node}
-                                      searchResults={searchResults}
-                                      className="hidden"
-                                    />
-                                  );
-                                }
+              <article>
+                <div className="bg-(color:--grayscale-a3) rounded-6 relative mb-2 ml-auto w-fit max-w-[70%] whitespace-pre-wrap px-5 py-2">
+                  <section className="prose cursor-auto text-sm">
+                    <MarkdownContent
+                      components={{
+                        ...components,
+                        ...HideHeadersInUserMessage(),
+                      }}
+                    >
+                      {message.user?.content ?? "_No user message_"}
+                    </MarkdownContent>
+                  </section>
+                </div>
+                <div className="flex items-start justify-start gap-4">
+                  <SparklesIconHollow className="my-1 size-4 shrink-0" />
+                  <section className="prose min-w-0 flex-1 shrink cursor-text text-sm">
+                    {message.assistant?.content && (
+                      <MarkdownContent
+                        components={{
+                          ...components,
+                          sup: FootnoteSup,
+                          section: ({
+                            children,
+                            node,
+                            ...props
+                          }: PropsWithElement<
+                            React.ComponentProps<"section">
+                          >) => {
+                            if (node?.properties.dataFootnotes) {
+                              return (
+                                <FootnotesSection
+                                  node={node}
+                                  searchResults={searchResults}
+                                  className="hidden"
+                                />
+                              );
+                            }
 
-                                if ("section" in components) {
-                                  return createElement(
-                                    components.section as React.ComponentType<
-                                      PropsWithElement<
-                                        React.ComponentProps<"section">
-                                      >
-                                    >,
-                                    {
-                                      ...props,
-                                      node,
-                                    },
-                                    children
-                                  );
-                                }
+                            if ("section" in components) {
+                              return createElement(
+                                components.section as React.ComponentType<
+                                  PropsWithElement<
+                                    React.ComponentProps<"section">
+                                  >
+                                >,
+                                {
+                                  ...props,
+                                  node,
+                                },
+                                children
+                              );
+                            }
 
-                                return <section {...props}>{children}</section>;
-                              },
-                            }}
-                            citations={message.assistant.citations ?? []}
-                            plugins={["remarkGfm", "remarkTest"]}
-                          >
-                            {message.assistant.content}
-                          </MarkdownContent>
-                        )}
-                        {isLastMessage && isLoading && (
-                          <p className="text-(color:--grayscale-a10) thinking-dots">
-                            Thinking
-                          </p>
-                        )}
-                        {(!isLastMessage || !isLoading) &&
-                          renderActions?.(
-                            message,
-                            messageQueryIds[message.assistant?.id || ""]
-                          )}
-                      </section>
-                    </div>
-                  </article>
-                <FootnoteCommands
-                  onSelect={onSelectHit}
-                  prefetch={prefetch}
-                  domain={domain}
-                />
+                            return <section {...props}>{children}</section>;
+                          },
+                        }}
+                        citations={message.assistant.citations ?? []}
+                        plugins={["remarkGfm", "remarkTest"]}
+                      >
+                        {message.assistant.content}
+                      </MarkdownContent>
+                    )}
+                    {isLastMessage && isLoading && (
+                      <p className="text-(color:--grayscale-a10) thinking-dots">
+                        Thinking
+                      </p>
+                    )}
+                    {(!isLastMessage || !isLoading) &&
+                      renderActions?.(
+                        message,
+                        messageQueryIds[message.assistant?.id || ""]
+                      )}
+                  </section>
+                </div>
+              </article>
+              <FootnoteCommands
+                onSelect={onSelectHit}
+                prefetch={prefetch}
+                domain={domain}
+              />
             </ChatbotTurnContextProvider>
           );
         })}

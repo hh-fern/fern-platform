@@ -83,7 +83,7 @@ const MemoizedCommandSearchHits = memo(
     items,
     onSelect,
     prefetch,
-    sentinelRef,  
+    sentinelRef,
     forceWindowOpen,
   }: {
     domain: string;

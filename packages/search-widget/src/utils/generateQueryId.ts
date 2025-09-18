@@ -1,4 +1,3 @@
 export const generateQueryId = () => {
-    return crypto.randomUUID();
-  };
-  
+  return crypto.randomUUID();
+};

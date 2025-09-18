@@ -25,7 +25,16 @@ export const CommandLink = forwardRef<
   }
 >(
   (
-    { href, target, rel, onSelect, prefetch, domain, forceWindowOpen, ...props },
+    {
+      href,
+      target,
+      rel,
+      onSelect,
+      prefetch,
+      domain,
+      forceWindowOpen,
+      ...props
+    },
     forwardedRef
   ) => {
     const ref = useRef<HTMLAnchorElement>(null);
