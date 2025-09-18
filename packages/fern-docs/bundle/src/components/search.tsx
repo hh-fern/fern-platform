@@ -12,7 +12,6 @@ import { useFernUser } from "@fern-docs/components/state/fern-user";
 import { useCurrentVersionId } from "@fern-docs/components/state/navigation";
 import {
   AlgoliaSearchClientRoot,
-  DesktopCommandWithAskAI,
   CommandActions,
   CommandEmpty,
   CommandGroupFilters,
@@ -20,6 +19,7 @@ import {
   CommandSearchHits,
   DefaultDesktopBackButton,
   DesktopCommand,
+  DesktopCommandWithAskAI,
   DesktopSearchDialog,
   MeiliSearchClientRoot,
   SEARCH_INDEX,
