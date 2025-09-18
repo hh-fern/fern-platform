@@ -63,7 +63,7 @@ import { DesktopCommandRoot } from "./desktop-command-root";
 import { FootnoteCommands } from "./footnote-commands";
 import { HideHeadersInUserMessage } from "./hide-headers-in-user-messages";
 import { FilterDropdownMenu, FilterManager } from "./filter-components";
-// import { Suggestions } from "./suggestions";
+import { Suggestions } from "./suggestions";
 
 type PropsWithElement<T> = T & { node: HastElement };
 
@@ -528,14 +528,14 @@ const DesktopAskAIChat = ({
           domain={domain}
           renderActions={renderActions}
         >
-          {/* {suggestionsApi && (
+          {suggestionsApi && (
             <Suggestions
               api={suggestionsApi}
               body={body}
               headers={headers}
               askAI={askAI}
             />
-          )} */}
+          )}
         </AskAICommandItems>
       </Command.List>
       <AskAIComposer
@@ -670,10 +670,10 @@ const AskAIComposer = forwardRef<
             }
             side="top"
           >
-            <span className="pointer-events-auto cursor-pointer">
+            <div className="pointer-events-auto cursor-pointer">
               <Button
                 size="icon"
-                className="rounded-full"
+                className="rounded-full bg-(color:--accent-a11)"
                 variant="default"
                 onClick={
                   error
@@ -697,7 +697,7 @@ const AskAIComposer = forwardRef<
                   <ArrowUp />
                 )}
               </Button>
-            </span>
+            </div>
           </FernTooltip>
         </div>
       </div>

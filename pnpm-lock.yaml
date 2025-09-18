@@ -2597,6 +2597,12 @@ importers:
       '@fern-api/docs-auth':
         specifier: workspace:*
         version: link:../commons/docs-auth
+      '@fern-api/docs-server':
+        specifier: workspace:*
+        version: link:../commons/docs-server
+      '@fern-api/docs-utils':
+        specifier: workspace:*
+        version: link:../commons/docs-utils
       '@fern-api/fai-sdk':
         specifier: workspace:*
         version: link:../fai-sdk

@@ -7,7 +7,6 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import { SearchModal } from "../components/search";
 import { generateConversationId } from "../utils/generate-conversation-id";
-import { FernButton } from "@fern-docs/components/FernButton";
 
 export const searchDialogOpenAtom = atom(false);
 export const searchInitializedAtom = atom(false);

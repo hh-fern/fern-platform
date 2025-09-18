@@ -22,6 +22,12 @@
       "path": "../commons/docs-auth"
     },
     {
+      "path": "../commons/docs-server"
+    },
+    {
+      "path": "../commons/docs-utils"
+    },
+    {
       "path": "../commons/fdr-utils"
     },
     {

@@ -7,13 +7,6 @@ import { atom, useAtom, useAtomValue } from "jotai";
 import { AlgoliaSearchClientRoot } from "@fern-docs/search-ui/components/search/algolia-search-client";
 import { CommandSearchHits, CommandEmpty, DefaultDesktopBackButton, CommandGroupFilters, DesktopSearchDialog, CommandActions, CommandGroupTheme  } from "@fern-docs/search-ui";
 import { useLazyRef } from "@fern-ui/react-commons";
-import * as Dialog from "@radix-ui/react-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@fern-docs/search-ui/components/ui/tooltip";
 
 import { useApiRouteSWRImmutable } from "@/hooks/useApiRouteSWR";
 import { atomWithStorageString } from "../utils/atomWithStorageString";
@@ -82,6 +75,7 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
     });
 
     let chatEndpoint = useApiRoute(`/api/fern-docs/search/v2/chat`, DOMAIN);
+    let suggestionsEndpoint = useApiRoute(`/api/fern-docs/search/v2/suggest`, DOMAIN);
     const facetApiEndpoint = useApiRoute(`/api/fern-docs/search/v2/facet`, DOMAIN);
 
     const facetFetcher = React.useCallback(
@@ -143,6 +137,7 @@ export const SearchModal = forwardRef<HTMLButtonElement, SearchButtonProps>(
               setAskAI={setAskAI}
               api={chatEndpoint}
               body={{ algoliaSearchKey: apiKey }}
+              suggestionsApi={suggestionsEndpoint}
             >
               {children}
             </AskAiStandaloneModal>
