@@ -27,7 +27,7 @@ import "../styles/desktop.scss";
 import { atomWithStorageString } from "../utils/atomWithStorageString";
 
 export const SEARCH_INDEX = "fern_docs_search";
-export const DOMAIN = "https://merge-test.docs.buildwithfern.com";
+export const DOMAIN = "http://localhost:3001";
 
 const ApiKeySchema = z.object({
   appId: z.string(),
