@@ -12,7 +12,7 @@ import { useFernUser } from "@fern-docs/components/state/fern-user";
 import { useCurrentVersionId } from "@fern-docs/components/state/navigation";
 import {
   AlgoliaSearchClientRoot,
-  AskAiStandaloneModal,
+  DesktopCommandWithAskAI,
   CommandActions,
   CommandEmpty,
   CommandGroupFilters,
@@ -210,7 +210,7 @@ export const SearchV2 = React.memo(function SearchV2({
     >
       <DesktopSearchDialog open={open} onOpenChange={setOpen}>
         {isAskAiEnabled ? (
-          <AskAiStandaloneModal
+          <DesktopCommandWithAskAI
             useConversationId={() => conversationIdHook}
             domain={domain}
             headers={{
@@ -245,7 +245,7 @@ export const SearchV2 = React.memo(function SearchV2({
             openSearchPanel={openSearchPanel}
           >
             {children}
-          </AskAiStandaloneModal>
+          </DesktopCommandWithAskAI>
         ) : (
           <DesktopCommand
             onEscapeKeyDown={() => setOpen(false)}
