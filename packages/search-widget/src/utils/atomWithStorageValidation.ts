@@ -87,8 +87,8 @@ export function atomWithStorageValidation<VALUE>(
 
           if (e.key === key && e.newValue !== e.oldValue) {
             callback(
-              (validate != null
-                ? validate.safeParse(e.newValue)?.data
+              (validate != null && e.newValue != null
+                ? validate.safeParse(parse(e.newValue))?.data
                 : (e.newValue as VALUE)) ?? initialValue
             );
           }
