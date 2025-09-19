@@ -131,6 +131,8 @@ export const EndpointUrl = React.forwardRef<
     }
   }, [options, environmentId, baseUrl]);
 
+  baseUrl = baseUrl ?? "https://host.com";
+  
   return (
     <FernTooltipProvider>
       <FernTooltip
