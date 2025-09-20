@@ -765,10 +765,37 @@ importers:
         version: 5.94.0(@swc/core@1.5.7(@swc/helpers@0.5.15))
 
   packages/fdr-sdk:
-    dependencies:
+    devDependencies:
+      '@babel/core':
+        specifier: ^7.26.9
+        version: 7.28.4
+      '@babel/preset-env':
+        specifier: ^7.26.0
+        version: 7.26.9(@babel/core@7.28.4)
+      '@babel/preset-typescript':
+        specifier: ^7.26.0
+        version: 7.26.0(@babel/core@7.28.4)
+      '@fern-api/snippets':
+        specifier: workspace:*
+        version: link:../snippets
       '@fern-api/ui-core-utils':
         specifier: workspace:*
         version: link:../commons/core-utils
+      '@fern-platform/configs':
+        specifier: workspace:*
+        version: link:../configs
+      '@types/node-fetch':
+        specifier: ^2.6.3
+        version: 2.6.9
+      '@types/qs':
+        specifier: 6.9.14
+        version: 6.9.14
+      '@types/tinycolor2':
+        specifier: ^1.4.6
+        version: 1.4.6
+      '@types/ungap__structured-clone':
+        specifier: ^1.2.0
+        version: 1.2.0
       '@ungap/structured-clone':
         specifier: ^1.2.0
         version: 1.2.0
@@ -805,43 +832,15 @@ importers:
       ts-essentials:
         specifier: ^10.0.4
         version: 10.0.4(typescript@5.7.3)
-      url-join:
-        specifier: 5.0.0
-        version: 5.0.0
-    devDependencies:
-      '@babel/core':
-        specifier: ^7.26.9
-        version: 7.28.4
-      '@babel/preset-env':
-        specifier: ^7.26.0
-        version: 7.26.9(@babel/core@7.28.4)
-      '@babel/preset-typescript':
-        specifier: ^7.26.0
-        version: 7.26.0(@babel/core@7.28.4)
-      '@fern-api/snippets':
-        specifier: workspace:*
-        version: link:../snippets
-      '@fern-platform/configs':
-        specifier: workspace:*
-        version: link:../configs
-      '@types/node-fetch':
-        specifier: ^2.6.3
-        version: 2.6.9
-      '@types/qs':
-        specifier: 6.9.14
-        version: 6.9.14
-      '@types/tinycolor2':
-        specifier: ^1.4.6
-        version: 1.4.6
-      '@types/ungap__structured-clone':
-        specifier: ^1.2.0
-        version: 1.2.0
       tsup:
         specifier: ^8.3.5
         version: 8.3.5(@swc/core@1.5.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.5.6)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.8.0)
       typescript:
         specifier: 5.7.3
         version: 5.7.3
+      url-join:
+        specifier: 5.0.0
+        version: 5.0.0
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.15.29)(jiti@2.4.2)(jsdom@24.0.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(less@4.2.0)(lightningcss@1.29.1)(msw@2.10.3(@types/node@22.15.29)(typescript@5.7.3))(sass@1.77.0)(stylus@0.62.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.8.0)
