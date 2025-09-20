@@ -10,7 +10,7 @@ export default defineConfig({
     "client/index": "src/client/index.ts",
     "utils/traversers/index": "src/utils/traversers/index.ts",
   },
-  external: [],
+  external: ["@fern-api/snippets", "httpsnippet-lite"],
   noExternal: [],
   dts: false,
   splitting: false,
