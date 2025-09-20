@@ -836,6 +836,9 @@ importers:
       '@types/ungap__structured-clone':
         specifier: ^1.2.0
         version: 1.2.0
+      tsup:
+        specifier: ^8.3.5
+        version: 8.3.5(@swc/core@1.5.7(@swc/helpers@0.5.15))(jiti@2.4.2)(postcss@8.5.6)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.8.0)
       typescript:
         specifier: 5.7.3
         version: 5.7.3
@@ -40934,7 +40937,7 @@ snapshots:
       source-map: 0.8.0-beta.0
       sucrase: 3.35.0
       tinyexec: 0.3.2
-      tinyglobby: 0.2.13
+      tinyglobby: 0.2.15
       tree-kill: 1.2.2
     optionalDependencies:
       '@swc/core': 1.5.7(@swc/helpers@0.5.15)
