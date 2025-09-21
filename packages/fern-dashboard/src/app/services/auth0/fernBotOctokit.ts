@@ -1,3 +1,5 @@
+import { cacheLife } from "next/dist/server/use-cache/cache-life";
+
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/core";
 
@@ -63,9 +65,18 @@ export async function getFernBotOctokitForRepo(owner: string, repo: string): Pro
  * @param repo - The name of the repository
  * @returns A discriminated union result with the installation id or an error
  */
-export async function getFernBotInstallationId(owner: string, repo: string): Promise<GetFernBotInstallationIdResult> {
-    const appId = process.env.FERN_BOT_APP_ID;
-    const privateKeyEnv = process.env.FERN_BOT_PRIVATE_KEY;
+export async function getFernBotInstallationId(
+  owner: string,
+  repo: string
+): Promise<GetFernBotInstallationIdResult> {
+  "use cache";
+
+  // revalidate every 15 minutes
+  // TODO: increase the cache life and make this invalidated via gh webhook
+  cacheLife("default");
+
+  const appId = process.env.FERN_BOT_APP_ID;
+  const privateKeyEnv = process.env.FERN_BOT_PRIVATE_KEY;
 
     if (!appId) {
         return { ok: false, error: { type: "MISSING_APP_ID" } };
