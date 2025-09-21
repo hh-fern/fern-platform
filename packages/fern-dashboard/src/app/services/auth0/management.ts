@@ -172,26 +172,57 @@ export async function getOrgIdFromName(orgName: Auth0OrgName) {
   );
 }
 
-export async function getMyOrganizations(userId: Auth0UserID) {
+const ORGANIZATIONS_PER_PAGE = 50;
+
+/**
+ * gets all organizations for a user (will page through all results)
+ */
+export async function getMyOrganizations(
+  userId: Auth0UserID
+): Promise<Auth0Organization[]> {
+  "use cache";
+
   const auth0 = getAuth0ManagementClient();
   const allOrganizations: Auth0Organization[] = [];
   let page = 0;
-  const per_page = 50;
+  let totalOrganizations = Infinity;
 
-  while (true) {
-    const { data: organizations } = await auth0.users.getUserOrganizations({
+  do {
+    const {
+      data: { total, organizations },
+    } = await auth0.users.getUserOrganizations({
       id: userId,
       page,
-      per_page,
+      per_page: ORGANIZATIONS_PER_PAGE,
+      include_totals: true,
     });
+
+    totalOrganizations = total;
     allOrganizations.push(...(organizations as Auth0Organization[]));
-    page++;
-    if (organizations.length < per_page) {
-      break;
-    }
-  }
+    page += 1;
+  } while (allOrganizations.length < totalOrganizations);
 
   return allOrganizations;
+}
+
+/**
+ * gets the first organization for a user
+ */
+export async function getFirstOrganizationForUser(
+  userId: Auth0UserID
+): Promise<Auth0Organization | undefined> {
+  "use cache";
+
+  const auth0 = getAuth0ManagementClient();
+  const {
+    data: [organization],
+  } = await auth0.users.getUserOrganizations({
+    id: userId,
+    page: 0,
+    per_page: 1,
+  });
+
+  return organization as Auth0Organization | undefined;
 }
 
 export async function getOrgMembers(

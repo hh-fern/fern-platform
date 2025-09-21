@@ -8,7 +8,10 @@ import {
   type Auth0SessionData,
   getCurrentSession,
 } from "./services/auth0/getCurrentSession";
-import { getMyOrganizations } from "./services/auth0/management";
+import {
+  getFirstOrganizationForUser,
+  getMyOrganizations,
+} from "./services/auth0/management";
 import { Auth0OrgName } from "./services/auth0/types";
 
 export default async function Page() {
@@ -35,8 +38,7 @@ export default async function Page() {
 async function getOrCreateFirstOrgForUser(
   session: Auth0SessionData
 ): Promise<{ orgName: Auth0OrgName }> {
-  const organizations = await getMyOrganizations(session.user.sub);
-  const firstOrg = organizations[0];
+  const firstOrg = await getFirstOrganizationForUser(session.user.sub);
   if (firstOrg != null) {
     return {
       orgName: Auth0OrgName(firstOrg.name),
