@@ -1,3 +1,5 @@
+import { cacheLife } from "next/dist/server/use-cache/cache-life";
+
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/core";
 
@@ -72,6 +74,12 @@ export async function getFernBotInstallationId(
   owner: string,
   repo: string
 ): Promise<GetFernBotInstallationIdResult> {
+  "use cache";
+
+  // revalidate every 15 minutes
+  // TODO: increase the cache life and make this invalidated via gh webhook
+  cacheLife("default");
+
   const appId = process.env.FERN_BOT_APP_ID;
   const privateKeyEnv = process.env.FERN_BOT_PRIVATE_KEY;
 
