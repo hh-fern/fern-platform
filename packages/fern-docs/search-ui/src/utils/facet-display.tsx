@@ -1,4 +1,5 @@
-import React, { ReactNode } from "react";
+import type { ReactNode } from "react";
+import React from "react";
 
 import {
   AvailabilityBadge,
@@ -10,7 +11,7 @@ import {
   SEARCHABLE_FACET_ATTRIBUTES,
 } from "@fern-docs/search-keyword/types";
 
-import { FilterOption } from "../types";
+import type { FilterOption } from "../types";
 
 const FACET_DISPLAY_MAP: Record<string, Record<string, ReactNode>> = {
   method: {

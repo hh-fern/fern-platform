@@ -13,7 +13,7 @@ export function FootnoteCommands({
   onSelect?: (path: string) => void;
   prefetch?: (path: string) => Promise<void>;
   domain: string;
-}) {
+}): React.ReactNode {
   const { footnotesAtom } = useChatbotTurnContext();
   const footnotes = useAtomValue(footnotesAtom);
   return (

@@ -1,11 +1,16 @@
 import { useMemo } from "react";
 
-import { atom, useAtom } from "jotai";
+import { type SetStateAction, type WritableAtom, useAtom } from "jotai";
+import type { RESET } from "jotai/utils";
 import { atomWithDefault } from "jotai/utils";
 
-import { FacetFilter } from "@fern-docs/search-keyword";
+import type { FacetFilter } from "@fern-docs/search-keyword";
 
-export const filtersAtom = atomWithDefault<readonly FacetFilter[]>(() => []);
+export const filtersAtom: WritableAtom<
+  readonly FacetFilter[],
+  [typeof RESET | SetStateAction<readonly FacetFilter[]>],
+  void
+> = atomWithDefault<readonly FacetFilter[]>(() => []);
 
 export type FiltersContext = {
   filtersAtom: typeof filtersAtom;

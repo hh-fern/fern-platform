@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import type { ComponentProps, PropsWithChildren, ReactNode } from "react";
 
 import { tunnel } from "@fern-ui/react-commons";
 
@@ -9,13 +9,16 @@ interface DesktopCommandBadgesProps {
   onDropdownClose?: () => void;
 }
 
-export const aboveInput = tunnel();
+export const aboveInput: {
+  In: (props: PropsWithChildren) => null;
+  Out: () => ReactNode;
+  useHasChildren: () => boolean;
+} = tunnel();
 
-export const DesktopCommandBadges = forwardRef<
-  HTMLDivElement,
-  DesktopCommandBadgesProps & ComponentPropsWithoutRef<"div">
->((props, ref) => {
-  const { onDropdownClose, children, ...rest } = props;
+export const DesktopCommandBadges = (
+  props: DesktopCommandBadgesProps & ComponentProps<"div">
+): JSX.Element | false => {
+  const { onDropdownClose, children, ref, ...rest } = props;
   const { filters, setFilters } = useFacetFilters();
   const hasChildren = aboveInput.useHasChildren();
 
@@ -45,8 +48,7 @@ export const DesktopCommandBadges = forwardRef<
       <aboveInput.Out />
     </div>
   );
-});
+};
 
-DesktopCommandBadges.displayName = "DesktopCommandBadges";
-
-export const DesktopCommandAboveInput = aboveInput.In;
+export const DesktopCommandAboveInput: (props: PropsWithChildren) => null =
+  aboveInput.In;

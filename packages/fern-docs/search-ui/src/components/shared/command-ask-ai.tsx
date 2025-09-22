@@ -1,18 +1,17 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import { type ComponentProps } from "react";
 
 import { Sparkles } from "lucide-react";
-
-import { Badge } from "@fern-docs/components/badges";
 
 import * as Command from "../cmdk";
 import { useSearchBox } from "../search/useSearchBox";
 
-export const CommandAskAIGroup = forwardRef<
-  HTMLDivElement,
-  { onAskAI: (initialInput: string) => void } & ComponentPropsWithoutRef<
-    typeof Command.Group
-  >
->(({ onAskAI, ...props }, ref) => {
+export function CommandAskAIGroup({
+  ref,
+  onAskAI,
+  ...props
+}: { onAskAI: (initialInput: string) => void } & ComponentProps<
+  typeof Command.Group
+>): React.ReactNode {
   const { query } = useSearchBox();
   const wordCount = query
     .trim()
@@ -31,30 +30,30 @@ export const CommandAskAIGroup = forwardRef<
       </Command.Item>
     </Command.Group>
   );
-});
+}
 
-CommandAskAIGroup.displayName = "CommandAskAIGroup";
-
-export const AskAIText = forwardRef<HTMLSpanElement, { query: string }>(
-  ({ query }, ref) => {
-    return (
-      <span
-        ref={ref}
-        className="inline-flex items-baseline overflow-hidden whitespace-nowrap"
-      >
-        Ask AI
-        {query.trimStart().length > 0 && (
-          <>
-            <span className="ms-1">&ldquo;</span>
-            <span className="min-w-0 shrink overflow-hidden text-ellipsis font-semibold">
-              {query}
-            </span>
-            <span>&rdquo;</span>
-          </>
-        )}
-      </span>
-    );
-  }
-);
-
-AskAIText.displayName = "AskAIText";
+export function AskAIText({
+  ref,
+  query,
+}: {
+  ref?: ComponentProps<"span">["ref"];
+  query: string;
+}): React.ReactNode {
+  return (
+    <span
+      ref={ref}
+      className="inline-flex items-baseline overflow-hidden whitespace-nowrap"
+    >
+      Ask AI
+      {query.trimStart().length > 0 && (
+        <>
+          <span className="ms-1">&ldquo;</span>
+          <span className="min-w-0 shrink overflow-hidden text-ellipsis font-semibold">
+            {query}
+          </span>
+          <span>&rdquo;</span>
+        </>
+      )}
+    </span>
+  );
+}

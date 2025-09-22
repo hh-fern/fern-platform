@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp, Minus } from "lucide-react";
 
 import { cn } from "@fern-docs/components";
 import { Badge } from "@fern-docs/components/badges";
-import { FacetFilter } from "@fern-docs/search-keyword";
+import type { FacetFilter } from "@fern-docs/search-keyword";
 
 import { getFacetDisplay, toFilterLabel } from "../../utils/facet-display";
 import { useFacets } from "../search/algolia-search-client";
@@ -42,7 +42,7 @@ export function DesktopFilterDropdownMenu({
   className?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-}) {
+}): React.ReactNode {
   const [isOpen, setIsOpen] = useState(false);
 
   const isDropdownOpen = open !== undefined ? open : isOpen;

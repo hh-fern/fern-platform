@@ -2725,6 +2725,15 @@ importers:
       '@ai-sdk/react':
         specifier: 2.0.0-beta.2
         version: 2.0.0-beta.2(react@19.0.0)(zod@3.25.49)
+      '@fern-platform/configs':
+        specifier: workspace:*
+        version: link:../../configs
+      '@swc/cli':
+        specifier: 'catalog:'
+        version: 0.7.8(@swc/core@1.13.5)(chokidar@4.0.3)
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.13.5
       '@tailwindcss/postcss':
         specifier: ^4.0.9
         version: 4.0.9

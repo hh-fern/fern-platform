@@ -1,9 +1,5 @@
-import {
-  ComponentPropsWithoutRef,
-  PropsWithChildren,
-  ReactNode,
-  memo,
-} from "react";
+import type { ComponentProps, PropsWithChildren, ReactNode } from "react";
+import { memo } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { TooltipPortal } from "@radix-ui/react-tooltip";
@@ -64,20 +60,23 @@ function DialogCloseX({ className }: { className?: string }) {
     </Dialog.DialogClose>
   );
 }
-export const DesktopSearchDialog = memo(
+
+type DesktopSearchDialogProps = PropsWithChildren<
+  {
+    trigger?: ReactNode;
+    asChild?: boolean;
+    afterInput?: ReactNode;
+  } & ComponentProps<typeof Dialog.Root>
+>;
+
+export const DesktopSearchDialog: React.FC<DesktopSearchDialogProps> = memo(
   ({
     children,
     asChild,
     trigger,
     afterInput,
     ...rest
-  }: PropsWithChildren<
-    {
-      trigger?: ReactNode;
-      asChild?: boolean;
-      afterInput?: ReactNode;
-    } & ComponentPropsWithoutRef<typeof Dialog.Root>
-  >) => {
+  }: DesktopSearchDialogProps): JSX.Element => {
     return (
       <Dialog.Root {...rest}>
         {trigger}

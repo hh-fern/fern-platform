@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  Dispatch,
-  SetStateAction,
+  type Dispatch,
+  type SetStateAction,
   createContext,
   useContext,
   useMemo,
@@ -31,7 +31,7 @@ function CommandUxProvider(props: {
   // focus: (opts?: { scrollToTop?: boolean }) => void;
   setInputRef: (ref: HTMLInputElement | HTMLTextAreaElement | null) => void;
   children: React.ReactNode;
-}) {
+}): JSX.Element {
   const [inputError, setInputError] = useControllableState<string | null>({
     prop: props.inputError,
     defaultProp: null,

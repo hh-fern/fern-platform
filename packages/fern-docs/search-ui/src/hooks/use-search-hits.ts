@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useDeferredValue } from "react";
 import { useHits, useInfiniteHits } from "react-instantsearch";
 
+import type { InfiniteHitsRenderState } from "instantsearch.js/es/connectors/infinite-hits/connectInfiniteHits";
 import type { SendEventForHits } from "instantsearch.js/es/lib/utils";
 
 import { isSelfHosted } from "@fern-api/docs-server";
@@ -29,7 +31,7 @@ export function useSendEvent(): SendEventForHits {
   return sendEvent;
 }
 
-export function useInfiniteSearchHits() {
+export function useInfiniteSearchHits(): InfiniteHitsRenderState<AlgoliaRecord> {
   if (isSelfHosted()) {
     return useMeilisearchInfiniteHits();
   }

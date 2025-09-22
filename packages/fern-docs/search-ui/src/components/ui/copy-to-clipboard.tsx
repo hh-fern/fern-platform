@@ -1,10 +1,5 @@
-import {
-  ComponentPropsWithoutRef,
-  forwardRef,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import type { ComponentProps, ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { Slot } from "@radix-ui/react-slot";
@@ -18,14 +13,17 @@ import {
   TooltipTrigger,
 } from "./tooltip";
 
-export const CopyToClipboard = forwardRef<
-  HTMLButtonElement,
-  Omit<ComponentPropsWithoutRef<"button">, "content"> & {
-    asChild?: boolean;
-    content: string | (() => string | Promise<string>);
-    duration?: number;
-  }
->(({ asChild, content, duration = 2_000, ...props }, ref) => {
+export function CopyToClipboard({
+  asChild,
+  content,
+  duration = 2_000,
+  ref,
+  ...props
+}: Omit<ComponentProps<"button">, "content"> & {
+  asChild?: boolean;
+  content: string | (() => string | Promise<string>);
+  duration?: number;
+}): ReactNode {
   const interval = useRef<number | null>(null);
   const [copied, setCopied] = useState(false);
   const Comp = asChild ? Slot : "button";
@@ -71,6 +69,4 @@ export const CopyToClipboard = forwardRef<
       </Tooltip>
     </TooltipProvider>
   );
-});
-
-CopyToClipboard.displayName = "CopyToClipboard";
+}

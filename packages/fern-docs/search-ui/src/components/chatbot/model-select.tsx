@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  ComponentPropsWithoutRef,
-  ReactNode,
-  createContext,
-  forwardRef,
-  useContext,
-} from "react";
+import type { ComponentProps, ReactNode } from "react";
+import { createContext, useContext } from "react";
 
 import { cn } from "@fern-docs/components";
 
@@ -69,7 +64,7 @@ export function ChatbotModelProvider({
 }: {
   children: ReactNode;
   models: ChatbotModel[];
-}) {
+}): JSX.Element {
   return (
     <ChatbotModelContext.Provider value={models}>
       {children}
@@ -81,71 +76,60 @@ export function useChatbotModels(): ChatbotModel[] {
   return useContext(ChatbotModelContext);
 }
 
-export const ChatbotModelSelect = forwardRef<
-  HTMLButtonElement,
-  ComponentPropsWithoutRef<"button"> & {
-    value?: string;
-    defaultValue?: string;
-    onValueChange?: (value: string) => void;
-    open?: boolean;
-    defaultOpen?: boolean;
-    onOpenChange?: (open: boolean) => void;
-    disabled?: boolean;
-    required?: boolean;
-    onCloseAutoFocus?: ComponentPropsWithoutRef<
-      typeof SelectContent
-    >["onCloseAutoFocus"];
-  }
->(
-  (
-    {
-      value,
-      defaultValue,
-      onValueChange,
-      open,
-      defaultOpen,
-      onOpenChange,
-      disabled,
-      required,
-      onCloseAutoFocus,
-      ...props
-    },
-    ref
-  ) => {
-    const models = useChatbotModels();
-    return (
-      <Select
-        name="model"
-        value={value}
-        onValueChange={onValueChange}
-        open={open}
-        defaultOpen={defaultOpen}
-        onOpenChange={onOpenChange}
-        disabled={disabled}
-        required={required}
+export function ChatbotModelSelect({
+  value,
+  defaultValue,
+  onValueChange,
+  open,
+  defaultOpen,
+  onOpenChange,
+  disabled,
+  required,
+  onCloseAutoFocus,
+  ref,
+  ...props
+}: ComponentProps<"button"> & {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  disabled?: boolean;
+  required?: boolean;
+  onCloseAutoFocus?: ComponentProps<typeof SelectContent>["onCloseAutoFocus"];
+}): ReactNode {
+  const models = useChatbotModels();
+  return (
+    <Select
+      name="model"
+      value={value}
+      onValueChange={onValueChange}
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange}
+      disabled={disabled}
+      required={required}
+    >
+      <SelectTrigger
+        ref={ref}
+        {...props}
+        className={cn("rounded-full shadow-none", props.className)}
       >
-        <SelectTrigger
-          ref={ref}
-          {...props}
-          className={cn("rounded-full shadow-none", props.className)}
-        >
-          <SelectValue placeholder="Select a model" />
-        </SelectTrigger>
-        <SelectContent onCloseAutoFocus={onCloseAutoFocus}>
-          <SelectGroup>
-            {models.map(({ provider, model, displayName }) => (
-              <SelectItem key={model} value={model}>
-                <Icon provider={provider} /> {displayName}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    );
-  }
-);
-
-ChatbotModelSelect.displayName = "ChatbotModelSelect";
+        <SelectValue placeholder="Select a model" />
+      </SelectTrigger>
+      <SelectContent onCloseAutoFocus={onCloseAutoFocus}>
+        <SelectGroup>
+          {models.map(({ provider, model, displayName }) => (
+            <SelectItem key={model} value={model}>
+              <Icon provider={provider} /> {displayName}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
 
 function Icon({ provider }: { provider: "anthropic" | "openai" | "cohere" }) {
   if (provider === "anthropic") {

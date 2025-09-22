@@ -11,7 +11,7 @@ import { isNonNullish } from "@fern-api/ui-core-utils";
 import { cn } from "@fern-docs/components";
 import { Badge } from "@fern-docs/components/badges";
 
-import { AskFernRecordHit } from "../../types";
+import type { AskFernRecordHit } from "../../types";
 import { PageIcon } from "../icons/page";
 import {
   Tooltip,
@@ -21,7 +21,11 @@ import {
 } from "../ui/tooltip";
 import { useChatbotTurnContext } from "./turn-context";
 
-export function FootnoteSup({ node }: { node?: HastElement }) {
+export function FootnoteSup({
+  node,
+}: {
+  node?: HastElement;
+}): JSX.Element | null {
   const { footnotesAtom } = useChatbotTurnContext();
   const footnotes = useAtomValue(footnotesAtom);
 
@@ -132,7 +136,7 @@ export function FootnotesSection({
   node: HastElement;
   searchResults: AskFernRecordHit[];
   className?: string;
-}) {
+}): JSX.Element | null {
   const { footnotesAtom } = useChatbotTurnContext();
   const [footnotes, setFootnotes] = useAtom(footnotesAtom);
 

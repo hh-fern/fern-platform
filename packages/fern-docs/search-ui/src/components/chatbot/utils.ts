@@ -1,20 +1,26 @@
-import { UIMessage } from "@ai-sdk/react";
-import { ToolUIPart, UIDataTypes, UIMessagePart, UITools } from "ai";
+import type { UIMessage } from "@ai-sdk/react";
+import type { ToolUIPart, UIDataTypes, UIMessagePart, UITools } from "ai";
 import { z } from "zod";
 
 import { isNonNullish } from "@fern-api/ui-core-utils";
 
-import { AskFernRecordHit } from "../../types";
+import type { AskFernRecordHit } from "../../types";
 
-const SearchResult = z.object({
+export type SearchResult = {
+  title: string;
+  url: string;
+  icon?: string;
+  type?: string;
+  api_type?: string;
+};
+
+const SearchResult: z.ZodType<SearchResult> = z.object({
   title: z.string(),
   url: z.string(),
   icon: z.string().optional(),
   type: z.string().optional(),
   api_type: z.string().optional(),
 });
-
-export type SearchResult = z.infer<typeof SearchResult>;
 
 export interface SqueezedMessage {
   user?: {

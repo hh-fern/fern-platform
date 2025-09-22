@@ -1,9 +1,7 @@
-import { forwardRef } from "react";
-
-export const OpenAI = forwardRef<
-  SVGSVGElement,
-  React.ComponentPropsWithoutRef<"svg">
->((props, ref) => (
+export const OpenAI = ({
+  ref,
+  ...props
+}: React.ComponentProps<"svg">): JSX.Element => (
   <svg
     ref={ref}
     style={{ color: "currentcolor" }}
@@ -17,6 +15,4 @@ export const OpenAI = forwardRef<
       fill="currentColor"
     ></path>
   </svg>
-));
-
-OpenAI.displayName = "OpenAI";
+);

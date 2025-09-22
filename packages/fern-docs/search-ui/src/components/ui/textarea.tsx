@@ -1,58 +1,46 @@
-import {
-  ComponentProps,
-  RefObject,
-  forwardRef,
-  useEffect,
-  useRef,
-} from "react";
+import type { ComponentProps, RefObject } from "react";
+import { useEffect, useRef } from "react";
 
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-export const TextArea = forwardRef<
-  HTMLTextAreaElement,
-  ComponentProps<"textarea"> & {
-    onValueChange?: (value: string) => void;
-    minLines?: number;
-    maxLines?: number;
-    lineHeight?: number;
-    padding?: number;
-  }
->(
-  (
-    {
-      onValueChange,
-      minLines,
-      maxLines,
-      lineHeight = 24,
-      padding = 0,
-      value,
-      ...props
-    },
-    forwardedRef
-  ) => {
-    const inputRef = useRef<HTMLTextAreaElement>(null);
-    useAutosizeTextArea(inputRef, minLines, lineHeight, padding, value);
-    return (
-      <textarea
-        ref={composeRefs(inputRef, forwardedRef)}
-        value={value}
-        {...props}
-        onChange={composeEventHandlers(props.onChange, (e) => {
-          onValueChange?.(e.target.value);
-        })}
-        style={{
-          maxHeight: maxLines
-            ? `${maxLines * lineHeight + padding * 2}px`
-            : undefined,
-          ...props.style,
-        }}
-      />
-    );
-  }
-);
+type TextAreaProps = ComponentProps<"textarea"> & {
+  onValueChange?: (value: string) => void;
+  minLines?: number;
+  maxLines?: number;
+  lineHeight?: number;
+  padding?: number;
+};
 
-TextArea.displayName = "TextArea";
+export function TextArea({
+  ref,
+  onValueChange,
+  minLines,
+  maxLines,
+  lineHeight = 24,
+  padding = 0,
+  value,
+  ...props
+}: TextAreaProps): React.ReactNode {
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  useAutosizeTextArea(inputRef, minLines, lineHeight, padding, value);
+  return (
+    <textarea
+      ref={composeRefs(inputRef, ref)}
+      value={value}
+      {...props}
+      onChange={composeEventHandlers(props.onChange, (e) => {
+        onValueChange?.(e.target.value);
+      })}
+      style={{
+        maxHeight: maxLines
+          ? `${maxLines * lineHeight + padding * 2}px`
+          : undefined,
+        ...props.style,
+      }}
+    />
+  );
+}
 
 // Updates the height of a <textarea> when the value changes.
 function useAutosizeTextArea(

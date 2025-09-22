@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import type { ComponentProps } from "react";
 
 import { Play } from "lucide-react";
 
@@ -6,13 +6,15 @@ import { Kbd } from "@fern-docs/components";
 
 import * as Command from "../cmdk";
 
-export const CommandGroupPlayground = forwardRef<
-  HTMLDivElement,
-  ComponentPropsWithoutRef<typeof Command.Group> & {
-    togglePlayground?: () => void;
-    playgroundOpen?: boolean;
-  }
->(({ togglePlayground, playgroundOpen, ...props }, ref) => {
+export function CommandGroupPlayground({
+  ref,
+  togglePlayground,
+  playgroundOpen,
+  ...props
+}: ComponentProps<typeof Command.Group> & {
+  togglePlayground?: () => void;
+  playgroundOpen?: boolean;
+}): React.ReactNode {
   if (togglePlayground == null) {
     return false;
   }
@@ -29,6 +31,4 @@ export const CommandGroupPlayground = forwardRef<
       </Command.Item>
     </Command.Group>
   );
-});
-
-CommandGroupPlayground.displayName = "CommandGroupPlayground";
+}

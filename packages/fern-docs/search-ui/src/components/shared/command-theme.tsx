@@ -1,15 +1,16 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import { type ComponentProps } from "react";
 
 import { Laptop, Moon, Sun } from "lucide-react";
 
 import * as Command from "../cmdk";
 
-export const CommandGroupTheme = forwardRef<
-  HTMLDivElement,
-  ComponentPropsWithoutRef<typeof Command.Group> & {
-    setTheme?: (theme: "light" | "dark" | "system") => void;
-  }
->(({ setTheme, ...props }, ref) => {
+export const CommandGroupTheme = ({
+  setTheme,
+  ref,
+  ...props
+}: ComponentProps<typeof Command.Group> & {
+  setTheme?: (theme: "light" | "dark" | "system") => void;
+}): JSX.Element | false => {
   if (setTheme == null) {
     return false;
   }
@@ -42,6 +43,4 @@ export const CommandGroupTheme = forwardRef<
       </Command.Item>
     </Command.Group>
   );
-});
-
-CommandGroupTheme.displayName = "CommandGroupTheme";
+};

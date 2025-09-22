@@ -1,9 +1,7 @@
-import { forwardRef } from "react";
-
-export const Anthropic = forwardRef<
-  SVGSVGElement,
-  React.ComponentPropsWithoutRef<"svg">
->((props, ref) => (
+export const Anthropic = ({
+  ref,
+  ...props
+}: React.ComponentProps<"svg">): JSX.Element => (
   <svg
     ref={ref}
     style={{ color: "currentcolor" }}
@@ -19,6 +17,4 @@ export const Anthropic = forwardRef<
       ></path>
     </g>
   </svg>
-));
-
-Anthropic.displayName = "Anthropic";
+);

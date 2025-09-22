@@ -1,12 +1,13 @@
-import { ComponentProps, forwardRef } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { useSearchHits } from "../../hooks/use-search-hits";
 import * as Command from "../cmdk";
 
-export const CommandEmpty = forwardRef<
-  HTMLDivElement,
-  ComponentProps<typeof Command.Empty>
->(({ children, ...props }, ref) => {
+export function CommandEmpty({
+  children,
+  ref,
+  ...props
+}: ComponentProps<typeof Command.Empty>): ReactNode {
   const query = Command.useCommandState((state) => state.search);
   const items = useSearchHits();
 
@@ -36,6 +37,4 @@ export const CommandEmpty = forwardRef<
       </div>
     )
   );
-});
-
-CommandEmpty.displayName = "CommandEmpty";
+}

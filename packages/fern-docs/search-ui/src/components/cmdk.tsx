@@ -1,16 +1,17 @@
 "use client";
 
-import {
-  ComponentPropsWithoutRef,
+import type {
+  ComponentProps,
   KeyboardEvent,
   ReactElement,
   ReactNode,
   Ref,
   RefCallback,
   RefObject,
+} from "react";
+import {
   cloneElement,
   createContext,
-  forwardRef,
   isValidElement,
   useContext,
   useEffect,
@@ -35,7 +36,7 @@ import {
 import { commandScore } from "./command-score";
 
 type Children = { children?: ReactNode };
-type DivProps = ComponentPropsWithoutRef<"div"> & {
+type DivProps = ComponentProps<"div"> & {
   asChild?: boolean;
 };
 
@@ -70,12 +71,9 @@ type ListProps = Children &
      */
     label?: string;
   };
-const ScrollLogicalPositionSchema = z.enum([
-  "center",
-  "end",
-  "nearest",
-  "start",
-]);
+const ScrollLogicalPositionSchema: z.ZodEnum<
+  ["center", "end", "nearest", "start"]
+> = z.enum(["center", "end", "nearest", "start"]);
 type ScrollLogicalPosition = z.infer<typeof ScrollLogicalPositionSchema>;
 type ItemProps = Children &
   Omit<DivProps, "disabled" | "onSelect" | "value"> & {
@@ -108,7 +106,7 @@ type GroupProps = Children &
     forceMount?: boolean;
   };
 type InputProps = Omit<
-  ComponentPropsWithoutRef<"input">,
+  ComponentProps<"input">,
   "value" | "onChange" | "type"
 > & {
   asChild?: boolean;
@@ -237,7 +235,7 @@ const useTriggerSelection = (): (() => void) =>
 //     return "cmdk" + id;
 // };
 
-const Root = forwardRef<HTMLDivElement, CommandProps>((props, forwardedRef) => {
+const Root = (props: CommandProps): ReactElement => {
   const state = useLazyRef<State>(() => ({
     /** Value of the search query. */
     search: "",
@@ -270,6 +268,7 @@ const Root = forwardRef<HTMLDivElement, CommandProps>((props, forwardedRef) => {
     disablePointerSelection,
     disableAutoSelection,
     vimBindings = true,
+    ref,
     ...etc
   } = props;
 
@@ -720,7 +719,7 @@ const Root = forwardRef<HTMLDivElement, CommandProps>((props, forwardedRef) => {
 
   return (
     <Primitive.div
-      ref={forwardedRef}
+      ref={ref}
       tabIndex={-1}
       {...etc}
       data-cmdk-root=""
@@ -815,16 +814,14 @@ const Root = forwardRef<HTMLDivElement, CommandProps>((props, forwardedRef) => {
       ))}
     </Primitive.div>
   );
-});
-
-Root.displayName = "CommandRoot";
+};
 
 /**
  * Command menu item. Becomes active on pointer enter or through keyboard navigation.
  * Preferably pass a `value`, otherwise the value will be inferred from `children` or
  * the rendered item's `textContent`.
  */
-const Item = forwardRef<HTMLDivElement, ItemProps>((props, forwardedRef) => {
+const Item = (props: ItemProps): ReactElement | null => {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   const groupContext = useContext(GroupContext);
@@ -891,6 +888,7 @@ const Item = forwardRef<HTMLDivElement, ItemProps>((props, forwardedRef) => {
     forceMount: ___,
     keywords: ____,
     scrollLogicalPosition,
+    ref: forwardedRef,
     ...etc
   } = props;
 
@@ -914,16 +912,14 @@ const Item = forwardRef<HTMLDivElement, ItemProps>((props, forwardedRef) => {
       {props.children}
     </Primitive.div>
   );
-});
-
-Item.displayName = "CommandItem";
+};
 
 /**
  * Group command menu items together with a heading.
  * Grouped items are always shown together.
  */
-const Group = forwardRef<HTMLDivElement, GroupProps>((props, forwardedRef) => {
-  const { heading, children, forceMount, ...etc } = props;
+const Group = (props: GroupProps): ReactElement => {
+  const { heading, children, forceMount, ref: forwardedRef, ...etc } = props;
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
@@ -978,101 +974,97 @@ const Group = forwardRef<HTMLDivElement, GroupProps>((props, forwardedRef) => {
       ))}
     </Primitive.div>
   );
-});
-
-Group.displayName = "CommandGroup";
+};
 
 /**
  * A visual and semantic separator between items or groups.
  * Visible when the search query is empty or `alwaysRender` is true, hidden otherwise.
  */
-const Separator = forwardRef<HTMLDivElement, SeparatorProps>(
-  (props, forwardedRef) => {
-    const { alwaysRender, ...etc } = props;
-    const ref = useRef<HTMLDivElement>(null);
-    const render = useCmdk((state) => !state.search);
+const Separator = (props: SeparatorProps): ReactElement | null => {
+  const { alwaysRender, ref: forwardedRef, ...etc } = props;
+  const ref = useRef<HTMLDivElement>(null);
+  const render = useCmdk((state) => !state.search);
 
-    if (!alwaysRender && !render) {
-      return null;
-    }
-    return (
-      <Primitive.div
-        ref={mergeRefs([ref, forwardedRef])}
-        {...etc}
-        data-cmdk-separator=""
-        role="separator"
-      />
-    );
+  if (!alwaysRender && !render) {
+    return null;
   }
-);
-
-Separator.displayName = "CommandSeparator";
+  return (
+    <Primitive.div
+      ref={mergeRefs([ref, forwardedRef])}
+      {...etc}
+      data-cmdk-separator=""
+      role="separator"
+    />
+  );
+};
 
 /**
  * Command menu input.
  * All props are forwarded to the underyling `input` element.
  */
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  (props, forwardedRef) => {
-    const { onValueChange, ...etc } = props;
-    const isControlled = props.value != null;
-    const store = useStore();
-    const search = useCmdk((state) => state.search);
-    const value = useCmdk((state) => state.value);
-    const context = useCommand();
+const Input = (props: InputProps): ReactElement => {
+  const { onValueChange, ref: forwardedRef, ...etc } = props;
+  const isControlled = props.value != null;
+  const store = useStore();
+  const search = useCmdk((state) => state.search);
+  const value = useCmdk((state) => state.value);
+  const context = useCommand();
 
-    const selectedItemId = useMemo(() => {
-      const item = context.listInnerRef.current?.querySelector(
-        `${ITEM_SELECTOR}[${VALUE_ATTR}="${encodeURIComponent(value)}"]`
-      );
-      return item?.getAttribute("id");
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value]);
-
-    useEffect(() => {
-      if (props.value != null) {
-        store.setState("search", props.value);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.value]);
-
-    return (
-      <Primitive.input
-        ref={forwardedRef}
-        {...etc}
-        data-cmdk-input=""
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
-        aria-autocomplete="list"
-        role="combobox"
-        aria-expanded={true}
-        aria-controls={context.listId}
-        aria-labelledby={context.labelId}
-        aria-activedescendant={selectedItemId ?? undefined}
-        id={context.inputId}
-        type="text"
-        value={isControlled ? props.value : search}
-        onChange={(e) => {
-          if (!isControlled) {
-            store.setState("search", e.target.value);
-          }
-
-          onValueChange?.(e.target.value);
-        }}
-      />
+  const selectedItemId = useMemo(() => {
+    const item = context.listInnerRef.current?.querySelector(
+      `${ITEM_SELECTOR}[${VALUE_ATTR}="${encodeURIComponent(value)}"]`
     );
-  }
-);
+    return item?.getAttribute("id");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
-Input.displayName = "CommandInput";
+  useEffect(() => {
+    if (props.value != null) {
+      store.setState("search", props.value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.value]);
+
+  return (
+    <Primitive.input
+      ref={forwardedRef}
+      {...etc}
+      data-cmdk-input=""
+      autoComplete="off"
+      autoCorrect="off"
+      spellCheck={false}
+      aria-autocomplete="list"
+      role="combobox"
+      aria-expanded={true}
+      aria-controls={context.listId}
+      aria-labelledby={context.labelId}
+      aria-activedescendant={selectedItemId ?? undefined}
+      id={context.inputId}
+      type="text"
+      value={isControlled ? props.value : search}
+      onChange={(e) => {
+        if (!isControlled) {
+          store.setState("search", e.target.value);
+        }
+
+        onValueChange?.(e.target.value);
+      }}
+    />
+  );
+};
 
 /**
  * Contains `Item`, `Group`, and `Separator`.
  * Use the `--cmdk-list-height` CSS variable to animate height based on the number of results.
  */
-const List = forwardRef<HTMLDivElement, ListProps>((props, forwardedRef) => {
-  const { children, label = "Suggestions", className, ...etc } = props;
+const List = (props: ListProps): ReactElement => {
+  const {
+    children,
+    label = "Suggestions",
+    className,
+    ref: forwardedRef,
+    ...etc
+  } = props;
   const ref = useRef<HTMLDivElement>(null);
   const height = useRef<HTMLDivElement>(null);
   const context = useCommand();
@@ -1120,50 +1112,47 @@ const List = forwardRef<HTMLDivElement, ListProps>((props, forwardedRef) => {
       ))}
     </Primitive.div>
   );
-});
-
-List.displayName = "CommandList";
+};
 
 /**
  * Renders the command menu in a Radix Dialog.
  */
-const Dialog = forwardRef<HTMLDivElement, DialogProps>(
-  (props, forwardedRef) => {
-    const {
-      open,
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      onOpenChange,
-      overlayClassName,
-      contentClassName,
-      container,
-      ...etc
-    } = props;
-    return (
-      <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
-        <RadixDialog.Portal container={container}>
-          <RadixDialog.Overlay
-            data-cmdk-overlay=""
-            className={overlayClassName}
-          />
-          <RadixDialog.Content
-            aria-label={props.label}
-            data-cmdk-dialog=""
-            className={contentClassName}
-          >
-            <Root ref={forwardedRef} {...etc} />
-          </RadixDialog.Content>
-        </RadixDialog.Portal>
-      </RadixDialog.Root>
-    );
-  }
-);
-
-Dialog.displayName = "CommandDialog";
+const Dialog = (props: DialogProps): ReactElement => {
+  const {
+    open,
+    overlayClassName,
+    contentClassName,
+    container,
+    ref: forwardedRef,
+    ...etc
+  } = props;
+  return (
+    <RadixDialog.Root
+      open={open}
+      onOpenChange={(open) => props.onOpenChange?.(open)}
+    >
+      <RadixDialog.Portal container={container}>
+        <RadixDialog.Overlay
+          data-cmdk-overlay=""
+          className={overlayClassName}
+        />
+        <RadixDialog.Content
+          aria-label={props.label}
+          data-cmdk-dialog=""
+          className={contentClassName}
+        >
+          <Root ref={forwardedRef} {...etc} />
+        </RadixDialog.Content>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
+  );
+};
 
 /**
  * Automatically renders when there are no results for the search query.
  */
-const Empty = forwardRef<HTMLDivElement, EmptyProps>((props, forwardedRef) => {
+const Empty = (props: EmptyProps): ReactElement | null => {
+  const { ref: forwardedRef, ...etc } = props;
   const render = useCmdk((state) => state.filtered.count === 0);
 
   if (!render) {
@@ -1172,42 +1161,42 @@ const Empty = forwardRef<HTMLDivElement, EmptyProps>((props, forwardedRef) => {
   return (
     <Primitive.div
       ref={forwardedRef}
-      {...props}
+      {...etc}
       data-cmdk-empty=""
       role="presentation"
     />
   );
-});
-
-Empty.displayName = "CommandEmpty";
+};
 
 /**
  * You should conditionally render this with `progress` while loading asynchronous items.
  */
-const Loading = forwardRef<HTMLDivElement, LoadingProps>(
-  (props, forwardedRef) => {
-    const { progress, children, label = "Loading...", ...etc } = props;
+const Loading = (props: LoadingProps): ReactElement => {
+  const {
+    progress,
+    children,
+    label = "Loading...",
+    ref: forwardedRef,
+    ...etc
+  } = props;
 
-    return (
-      <Primitive.div
-        ref={forwardedRef}
-        {...etc}
-        data-cmdk-loading=""
-        role="progressbar"
-        aria-valuenow={progress}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={label}
-      >
-        {SlottableWithNestedChildren(props, (child) => (
-          <div aria-hidden>{child}</div>
-        ))}
-      </Primitive.div>
-    );
-  }
-);
-
-Loading.displayName = "CommandLoading";
+  return (
+    <Primitive.div
+      ref={forwardedRef}
+      {...etc}
+      data-cmdk-loading=""
+      role="progressbar"
+      aria-valuenow={progress}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={label}
+    >
+      {SlottableWithNestedChildren(props, (child) => (
+        <div aria-hidden>{child}</div>
+      ))}
+    </Primitive.div>
+  );
+};
 
 export {
   Dialog,
@@ -1281,7 +1270,9 @@ function useLazyRef<T>(fn: () => T) {
 // ESM is still a nightmare with Next.js so I'm just gonna copy the package code in
 // https://github.com/gregberge/react-merge-refs
 // Copyright (c) 2020 Greg Bergé
-function mergeRefs<T = any>(refs: (RefObject<T> | Ref<T>)[]): RefCallback<T> {
+function mergeRefs<T = any>(
+  refs: (RefObject<T> | Ref<T> | undefined)[]
+): RefCallback<T> {
   return (value) => {
     refs.forEach((ref) => {
       if (typeof ref === "function") {

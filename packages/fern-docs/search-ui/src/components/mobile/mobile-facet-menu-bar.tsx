@@ -1,9 +1,5 @@
-import {
-  ComponentPropsWithoutRef,
-  Fragment,
-  ReactNode,
-  forwardRef,
-} from "react";
+import type { ComponentProps, ReactNode } from "react";
+import { Fragment } from "react";
 
 import * as Menubar from "@radix-ui/react-menubar";
 import { Check, ChevronDown, Minus } from "lucide-react";
@@ -18,11 +14,12 @@ import {
   HttpMethodBadge,
   isAvailability,
 } from "@fern-docs/components/badges";
-import { FacetFilter } from "@fern-docs/search-keyword";
-import { FacetName } from "@fern-docs/search-keyword/types";
+import type { FacetFilter } from "@fern-docs/search-keyword";
+import type { FacetName } from "@fern-docs/search-keyword/types";
 
 import { getFacetDisplay, toFilterLabel } from "../../utils/facet-display";
-import { useFacetFilters, useFacets } from "../search/algolia-search-client";
+import { useFacets } from "../search/algolia-search-client";
+import { useFacetFilters } from "../search/useFacetFilters";
 
 export function MobileFacetMenuBar({
   onUpdateFilters,
@@ -153,13 +150,15 @@ function MobileFacetMenu({
   );
 }
 
-const FacetBadge = forwardRef<
-  HTMLButtonElement,
-  { facet: FacetName; value?: string } & Omit<
-    ComponentPropsWithoutRef<"button">,
-    "color" | "variant"
-  >
->(({ facet, value, ...props }, ref) => {
+function FacetBadge({
+  facet,
+  value,
+  ref,
+  ...props
+}: { facet: FacetName; value?: string } & Omit<
+  ComponentProps<"button">,
+  "color" | "variant"
+> & { ref?: React.Ref<HTMLButtonElement> }) {
   if (value != null && isHttpMethod(value)) {
     return (
       <HttpMethodBadge
@@ -207,23 +206,20 @@ const FacetBadge = forwardRef<
       <ChevronDown />
     </Badge>
   );
-});
+}
 
-FacetBadge.displayName = "FacetBadge";
-
-const MenubarItem = forwardRef<HTMLDivElement, Menubar.MenubarItemProps>(
-  (props, ref) => {
-    return (
-      <Menubar.Item
-        ref={ref}
-        {...props}
-        className={cn(
-          "focus:bg-(color:--accent-a3) flex cursor-pointer items-center justify-between px-4 py-2 focus:outline-none",
-          props.className
-        )}
-      />
-    );
-  }
-);
-
-MenubarItem.displayName = "MenubarItem";
+function MenubarItem({
+  ref,
+  ...props
+}: Menubar.MenubarItemProps & { ref?: React.Ref<HTMLDivElement> }) {
+  return (
+    <Menubar.Item
+      ref={ref}
+      {...props}
+      className={cn(
+        "focus:bg-(color:--accent-a3) flex cursor-pointer items-center justify-between px-4 py-2 focus:outline-none",
+        props.className
+      )}
+    />
+  );
+}

@@ -1,4 +1,4 @@
-import { SVGProps, forwardRef } from "react";
+import type { SVGProps } from "react";
 
 import {
   ChevronsLeftRight,
@@ -10,14 +10,17 @@ import {
 
 import { FaIcon } from "@fern-docs/components";
 
-export const PageIcon = forwardRef<
-  SVGSVGElement,
-  SVGProps<SVGSVGElement> & {
-    icon: string | undefined;
-    type: string | undefined;
-    isSubPage?: boolean;
-  }
->(({ icon, type, isSubPage, ...props }, ref) => {
+export const PageIcon = ({
+  icon,
+  type,
+  isSubPage,
+  ref,
+  ...props
+}: SVGProps<SVGSVGElement> & {
+  icon: string | undefined;
+  type: string | undefined;
+  isSubPage?: boolean;
+}): JSX.Element => {
   if (icon) {
     return <FaIcon icon={icon} ref={ref} {...props} />;
   }
@@ -43,6 +46,4 @@ export const PageIcon = forwardRef<
   }
 
   return <FileText ref={ref} {...props} />;
-});
-
-PageIcon.displayName = "PageIcon";
+};

@@ -240,7 +240,11 @@ export default [
       },
     },
     {
-      files: ["packages/commons/**/*", "packages/fdr-sdk/**/*"],
+      files: [
+        "packages/commons/**/*",
+        "packages/fdr-sdk/**/*",
+        "packages/fern-docs/search-ui/**/*",
+      ],
       rules: {
         "@typescript-eslint/consistent-type-exports": "error",
         "@typescript-eslint/consistent-type-imports": "error",

@@ -4,16 +4,23 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "@fern-docs/components";
 
-const Popover = PopoverPrimitive.Root;
+const Popover: React.FC<PopoverPrimitive.PopoverProps> = PopoverPrimitive.Root;
 
-const PopoverTrigger = PopoverPrimitive.Trigger;
+const PopoverTrigger: React.FC<PopoverPrimitive.PopoverTriggerProps> =
+  PopoverPrimitive.Trigger;
 
-const PopoverAnchor = PopoverPrimitive.Anchor;
+const PopoverAnchor: React.FC<PopoverPrimitive.PopoverAnchorProps> =
+  PopoverPrimitive.Anchor;
 
-const PopoverContent = React.forwardRef<
-  React.ComponentRef<typeof PopoverPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(({ className, align = "center", sideOffset = 4, ...props }, ref) => (
+const PopoverContent = ({
+  className,
+  align = "center",
+  sideOffset = 4,
+  ref,
+  ...props
+}: React.ComponentProps<
+  typeof PopoverPrimitive.Content
+>): React.JSX.Element => (
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
       ref={ref}
@@ -26,7 +33,6 @@ const PopoverContent = React.forwardRef<
       {...props}
     />
   </PopoverPrimitive.Portal>
-));
-PopoverContent.displayName = PopoverPrimitive.Content.displayName;
+);
 
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };

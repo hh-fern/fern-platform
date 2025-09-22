@@ -1,13 +1,15 @@
-import { PropsWithChildren, ReactNode, memo, useEffect, useRef } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
+import { memo, useEffect, useRef } from "react";
 import { Snippet } from "react-instantsearch";
 
 import { TooltipPortal } from "@radix-ui/react-tooltip";
+import { noop } from "ts-essentials";
 
 import {
   useInfiniteSearchHits,
   useSendEvent,
 } from "../../hooks/use-search-hits";
-import { AlgoliaRecordHit } from "../../types";
+import type { AlgoliaRecordHit } from "../../types";
 import * as Command from "../cmdk";
 import { PageIcon } from "../icons/page";
 import { useFacetFilters } from "../search/useFacetFilters";
@@ -19,7 +21,8 @@ import {
 } from "../ui/tooltip";
 import { CommandLink } from "./command-link";
 import { HitContent } from "./hit-content";
-import { GroupedHit, generateHits } from "./hits";
+import type { GroupedHit } from "./hits";
+import { generateHits } from "./hits";
 
 export const CommandSearchHits = ({
   domain,
@@ -54,6 +57,8 @@ export const CommandSearchHits = ({
     }
 
     triggerSelection();
+
+    return noop;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, isLastPage, showMore]);
 

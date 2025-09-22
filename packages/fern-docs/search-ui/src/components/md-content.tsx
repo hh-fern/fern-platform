@@ -19,7 +19,7 @@ export function MarkdownContent({
     url: string;
   }[];
   plugins?: string[];
-}) {
+}): JSX.Element {
   /*
     Claude 3.5 sometimes doesn't create footnote definitions correctly
     remark-gfm requires that footnotes look like [^1] in the text

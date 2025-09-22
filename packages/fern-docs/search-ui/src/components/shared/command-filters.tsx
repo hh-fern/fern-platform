@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { ListFilter } from "lucide-react";
 
@@ -14,10 +14,10 @@ import { useFacets, usePreloadFacets } from "../search/algolia-search-client";
 import { useFacetFilters } from "../search/useFacetFilters";
 import { useSearchBox } from "../search/useSearchBox";
 
-export const CommandGroupFilters = forwardRef<
-  HTMLDivElement,
-  ComponentPropsWithoutRef<typeof Command.Group>
->((props, ref) => {
+export function CommandGroupFilters({
+  ref,
+  ...props
+}: ComponentProps<typeof Command.Group>): ReactNode {
   const { clear } = useSearchBox();
   const { filters, setFilters } = useFacetFilters();
   const options = toFilterOptions(useFacets(filters).facets);
@@ -56,6 +56,4 @@ export const CommandGroupFilters = forwardRef<
       ))}
     </Command.Group>
   );
-});
-
-CommandGroupFilters.displayName = "CommandGroupFilters";
+}

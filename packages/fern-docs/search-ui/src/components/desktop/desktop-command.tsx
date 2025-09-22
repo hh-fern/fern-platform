@@ -1,8 +1,8 @@
 import {
-  ComponentPropsWithoutRef,
-  KeyboardEvent,
-  ReactNode,
-  forwardRef,
+  type ComponentProps,
+  type KeyboardEvent,
+  type PropsWithChildren,
+  type ReactNode,
   memo,
   useEffect,
   useRef,
@@ -13,7 +13,6 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 import { TooltipPortal } from "@radix-ui/react-tooltip";
 import { ArrowLeft } from "lucide-react";
 
-import { isSelfHosted } from "@fern-api/docs-server";
 import { Button } from "@fern-docs/components/button";
 import { Kbd } from "@fern-docs/components/kbd";
 import { tunnel, usePlatformKbdShortcut } from "@fern-ui/react-commons";
@@ -40,16 +39,29 @@ export interface DesktopCommandProps {
   placeholder?: string;
 }
 
-export const beforeInput = tunnel();
-export const afterInput = tunnel();
+export const beforeInput: {
+  In: (props: PropsWithChildren) => null;
+  Out: () => ReactNode;
+  useHasChildren: () => boolean;
+} = tunnel();
+export const afterInput: {
+  In: (props: PropsWithChildren) => null;
+  Out: () => ReactNode;
+  useHasChildren: () => boolean;
+} = tunnel();
 
 /**
  * The desktop command is intended to be used within a dialog component.
  */
-const DesktopCommand = forwardRef<
-  HTMLDivElement,
-  DesktopCommandProps & ComponentPropsWithoutRef<typeof DesktopCommandRoot>
->(({ onPopState, children, placeholder, asChild, ...props }, forwardedRef) => {
+const DesktopCommand = ({
+  onPopState,
+  children,
+  placeholder,
+  asChild,
+  ref: forwardedRef,
+  ...props
+}: DesktopCommandProps &
+  ComponentProps<typeof DesktopCommandRoot>): JSX.Element => {
   const { filters, handlePopState: handlePopFilters } = useFacetFilters();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -80,12 +92,19 @@ const DesktopCommand = forwardRef<
       </DesktopCommandContent>
     </DesktopCommandRoot>
   );
-});
+};
 
-DesktopCommand.displayName = "DesktopCommand";
-
-export const DesktopCommandContent = memo(
-  ({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) => {
+export const DesktopCommandContent: React.FC<{
+  children: ReactNode;
+  asChild?: boolean;
+}> = memo(
+  ({
+    children,
+    asChild,
+  }: {
+    children: ReactNode;
+    asChild?: boolean;
+  }): JSX.Element => {
     const inputRef = useRef<HTMLInputElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     return (
@@ -120,10 +139,10 @@ export const DesktopCommandContent = memo(
 DesktopCommandContent.displayName = "DesktopCommandContent";
 
 const DesktopCommandInputSearch = memo(
-  forwardRef<
-    HTMLInputElement,
-    ComponentPropsWithoutRef<typeof DesktopCommandInput>
-  >((props, forwardedRef) => {
+  ({
+    ref: forwardedRef,
+    ...props
+  }: ComponentProps<typeof DesktopCommandInput>): JSX.Element => {
     const inputRef = useRef<HTMLInputElement>(null);
     const { query, refine } = useSearchBox();
     useEffect(() => {
@@ -148,7 +167,7 @@ const DesktopCommandInputSearch = memo(
         }}
       />
     );
-  })
+  }
 );
 
 DesktopCommandInputSearch.displayName = "DesktopCommandInputSearch";
@@ -237,7 +256,8 @@ const DefaultDesktopBackButton = (): ReactNode => {
   return <DesktopBackButton pop={popFilter} clear={clearFilters} />;
 };
 
-const DesktopCommandAfterInput = afterInput.In;
+const DesktopCommandAfterInput: (props: PropsWithChildren) => null =
+  afterInput.In;
 
 export {
   DefaultDesktopBackButton,

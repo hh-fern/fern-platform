@@ -1,13 +1,18 @@
-import React, { createContext, useContext, useEffect, useMemo } from "react";
+import type React from "react";
+import { createContext, useMemo } from "react";
 
 import { useAtom } from "jotai";
-import { RESET, atomWithDefault } from "jotai/utils";
+import type { atomWithDefault } from "jotai/utils";
+import { RESET } from "jotai/utils";
 
-import { FacetFilter, FacetsResponse } from "@fern-docs/search-keyword";
+import type { FacetFilter, FacetsResponse } from "@fern-docs/search-keyword";
 
 import { filtersAtom } from "./FilterProvider";
 
-export const FacetFiltersContext = createContext({
+export const FacetFiltersContext: React.Context<{
+  preloadFacets: (_: readonly FacetFilter[]) => Promise<FacetsResponse>;
+  fetchFacets: (_: readonly string[]) => Promise<FacetsResponse>;
+}> = createContext({
   preloadFacets: (_: readonly FacetFilter[]): Promise<FacetsResponse> =>
     Promise.resolve({}),
   fetchFacets: (_: readonly string[]): Promise<FacetsResponse> =>

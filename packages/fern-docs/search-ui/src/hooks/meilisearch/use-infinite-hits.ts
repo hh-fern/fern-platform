@@ -1,12 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useInfiniteHits } from "react-instantsearch";
 
+import type { InfiniteHitsRenderState } from "instantsearch.js/es/connectors/infinite-hits/connectInfiniteHits";
 import type { SendEventForHits } from "instantsearch.js/es/lib/utils";
+
+import type {
+  AlgoliaRecord,
+  FacetFilter,
+} from "@fern-docs/search-keyword/types";
 
 import { useMeiliSearchClient } from "../../components/search/meili-search-client";
 import { useFacetFilters } from "../../components/search/useFacetFilters";
 import { useSearchBox } from "../../components/search/useSearchBox";
-import type { AlgoliaRecordHit, FacetFilter } from "../../types";
+import type { AlgoliaRecordHit } from "../../types";
 
 function useSearchQuery(): string {
   const { query } = useSearchBox();
@@ -41,13 +46,11 @@ interface MeilisearchResponse {
 
 const HITS_PER_PAGE = 20;
 
-export function useMeilisearchInfiniteHits(): ReturnType<
-  typeof useInfiniteHits
-> {
+export function useMeilisearchInfiniteHits(): InfiniteHitsRenderState<AlgoliaRecord> {
   const [allHits, setAllHits] = useState<AlgoliaRecordHit[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalHits, setTotalHits] = useState(0);
+  const [_totalHits, setTotalHits] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [results, setResults] = useState<any>();
 
@@ -97,7 +100,6 @@ export function useMeilisearchInfiniteHits(): ReturnType<
       lastQueryRef.current = query;
       lastFiltersRef.current = filtersString;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, filters]);
 
   // Fetch hits from Meilisearch, distinct on api_endpoint_page
@@ -190,7 +192,7 @@ export function useMeilisearchInfiniteHits(): ReturnType<
   useEffect(() => {
     // Only fetch if query or filters are not empty
     if (query || Object.keys(filters).length > 0) {
-      fetchHits(0, false);
+      void fetchHits(0, false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, JSON.stringify(filters), fetchHits]);
@@ -202,7 +204,7 @@ export function useMeilisearchInfiniteHits(): ReturnType<
     }
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    fetchHits(nextPage, true);
+    void fetchHits(nextPage, true);
   }, [currentPage, hasMore, isLoading, fetchHits]);
 
   // Show previous function (for going back)
@@ -295,8 +297,8 @@ function convertSnippeting(
 
 // Also implement the simpler hooks for completeness
 export function useMeilisearchHits(): AlgoliaRecordHit[] {
-  const { hits } = useMeilisearchInfiniteHits();
-  return hits as AlgoliaRecordHit[];
+  const { items } = useMeilisearchInfiniteHits();
+  return items as AlgoliaRecordHit[];
 }
 
 export function useMeilisearchSendEvent(): SendEventForHits {

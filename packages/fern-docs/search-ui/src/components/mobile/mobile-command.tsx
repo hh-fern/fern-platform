@@ -1,10 +1,11 @@
-import { ComponentPropsWithoutRef, forwardRef, useRef, useState } from "react";
+import type { ComponentProps } from "react";
+import { useRef, useState } from "react";
 
 import { cn } from "@fern-docs/components";
 import { Button } from "@fern-docs/components/button";
+import type { FacetFilter } from "@fern-docs/search-keyword/types";
 
 import { FERN_SEARCH_MOBILE_COMMAND_ID } from "../../constants";
-import { FacetFilter } from "../../types";
 import { FACET_DISPLAY_NAME_MAP } from "../../utils/facet-display";
 import * as Command from "../cmdk";
 import { useFacetFilters } from "../search/useFacetFilters";
@@ -18,11 +19,13 @@ export interface MobileCommandProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export const MobileCommand = forwardRef<
-  HTMLDivElement,
-  MobileCommandProps & ComponentPropsWithoutRef<typeof Command.Root>
->((props, ref) => {
-  const { open, onOpenChange, children, ...rest } = props;
+export function MobileCommand({
+  ref,
+  open,
+  onOpenChange,
+  children,
+  ...rest
+}: MobileCommandProps & ComponentProps<typeof Command.Root>): React.ReactNode {
   const { query, refine } = useSearchBox();
   const { filters, resetFilters } = useFacetFilters();
 
@@ -128,9 +131,7 @@ export const MobileCommand = forwardRef<
       </Command.List>
     </Command.Root>
   );
-});
-
-MobileCommand.displayName = "MobileCommand";
+}
 
 function toPlaceholder(filters: readonly FacetFilter[]): string {
   if (filters.length === 0) {

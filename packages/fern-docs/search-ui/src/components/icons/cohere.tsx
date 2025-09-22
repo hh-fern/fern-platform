@@ -1,9 +1,7 @@
-import { forwardRef } from "react";
-
-export const Cohere = forwardRef<
-  SVGSVGElement,
-  React.ComponentPropsWithoutRef<"svg">
->((props, ref) => (
+export const Cohere = ({
+  ref,
+  ...props
+}: React.ComponentProps<"svg">): JSX.Element => (
   <svg
     ref={ref}
     style={{ color: "currentcolor" }}
@@ -36,6 +34,4 @@ export const Cohere = forwardRef<
       </clipPath>
     </defs>
   </svg>
-));
-
-Cohere.displayName = "Cohere";
+);

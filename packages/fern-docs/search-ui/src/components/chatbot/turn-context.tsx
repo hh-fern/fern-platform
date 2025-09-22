@@ -1,8 +1,10 @@
 "use client";
 
-import { ReactNode, createContext, useContext, useRef } from "react";
+import type { ReactNode } from "react";
+import { createContext, useContext, useRef } from "react";
 
-import { PrimitiveAtom, atom } from "jotai";
+import type { PrimitiveAtom } from "jotai";
+import { atom } from "jotai";
 
 export interface Footnote {
   ids: string[];
@@ -21,7 +23,7 @@ export function ChatbotTurnContextProvider({
   children,
 }: {
   children: ReactNode;
-}) {
+}): JSX.Element {
   const footnotes = useRef(atom<Footnote[]>([]));
 
   return (

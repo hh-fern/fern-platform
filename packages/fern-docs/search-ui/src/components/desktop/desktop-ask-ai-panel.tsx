@@ -1,12 +1,13 @@
 "use client";
 
-import {
-  ComponentPropsWithoutRef,
+import type {
+  ComponentProps,
   KeyboardEventHandler,
   ReactElement,
   ReactNode,
+} from "react";
+import {
   createElement,
-  forwardRef,
   isValidElement,
   memo,
   useCallback,
@@ -16,9 +17,10 @@ import {
   useState,
 } from "react";
 import React from "react";
-import { Components } from "react-markdown";
+import type { Components } from "react-markdown";
 
-import { UIMessage, useChat } from "@ai-sdk/react";
+import type { UIMessage } from "@ai-sdk/react";
+import { useChat } from "@ai-sdk/react";
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { DefaultChatTransport } from "ai";
@@ -33,6 +35,7 @@ import {
   X,
 } from "lucide-react";
 import { useIsomorphicLayoutEffect } from "swr/_internal";
+import { noop } from "ts-essentials";
 
 import { isNonNullish } from "@fern-api/ui-core-utils";
 import { FernButton, FernTooltip, cn } from "@fern-docs/components";
@@ -42,7 +45,7 @@ import {
   FERN_ASK_AI_PANEL_HEADER_ID,
   FERN_ASK_AI_PANEL_INPUT_ID,
 } from "@fern-docs/components/constants";
-import { FacetFilter } from "@fern-docs/search-keyword";
+import type { FacetFilter } from "@fern-docs/search-keyword";
 import { useEventCallback } from "@fern-ui/react-commons";
 
 import { MAX_AI_CHAT_MESSAGE_LENGTH } from "../../constants";
@@ -50,8 +53,8 @@ import { isQueryIdPart } from "../../utils/query-id-part";
 import { AskAiContextPill } from "../ask-ai-context-pill";
 import { FootnoteSup, FootnotesSection } from "../chatbot/footnote";
 import { ChatbotTurnContextProvider } from "../chatbot/turn-context";
+import type { SqueezedMessage } from "../chatbot/utils";
 import {
-  SqueezedMessage,
   combineSearchResults,
   ensureMessagePartsHaveNewLines,
   squeezeMessages,
@@ -75,117 +78,108 @@ type PropsWithElement<T> = T & { node: HastElement };
 
 export const MIN_ASK_FERN_PANEL_WIDTH = 344;
 
-export const DesktopAskAiPanel = forwardRef<
-  HTMLDivElement,
-  Omit<ComponentPropsWithoutRef<typeof DesktopCommandRoot>, "children"> & {
-    api?: string;
-    suggestionsApi?: string;
-    body?: object;
-    headers?: Record<string, string>;
-    chatId?: string;
-    onSelectHit?: (path: string) => void;
-    prefetch?: (path: string) => Promise<void>;
-    domain: string;
-    renderActions?: (message: SqueezedMessage, queryId?: string) => ReactNode;
-    initialInput?: string;
-    setInitialInput?: (initialInput: string) => void;
-    children?: ReactNode;
-    darkCodeEnabled?: boolean;
-    useConversationId: () => {
-      conversationId: string;
-      setConversationId: (conversationId: string) => void;
-      resetConversationId: () => void;
-    };
-    useQueryId: () => {
-      queryId: string;
-      setQueryId: (queryId: string) => void;
-      resetQueryId: () => void;
-    };
-    onClose?: () => void;
-    pageContext?: { title: string; url: string } | null;
-    onRemovePageContext?: () => void;
-    searchDialogOpen: boolean;
-    isSidePanelOpen?: boolean;
-    panelWidth: number;
-  }
->(
-  (
-    {
-      children,
-      api,
-      suggestionsApi,
-      body,
-      headers,
-      chatId,
-      onSelectHit,
-      prefetch,
-      domain,
-      renderActions,
-      initialInput,
-      setInitialInput,
-      asChild,
-      darkCodeEnabled,
-      useConversationId,
-      useQueryId,
-      onClose,
-      pageContext,
-      onRemovePageContext,
-      searchDialogOpen,
-      isSidePanelOpen = false,
-      panelWidth,
-      ...props
-    },
-    forwardedRef
-  ) => {
-    const ref = useRef<HTMLDivElement>(null);
-    const { filters } = useFacetFilters();
+export const DesktopAskAiPanel = ({
+  ref: forwardedRef,
+  children,
+  api,
+  suggestionsApi,
+  body,
+  headers,
+  chatId,
+  onSelectHit,
+  prefetch,
+  domain,
+  renderActions,
+  initialInput,
+  setInitialInput,
+  asChild,
+  darkCodeEnabled,
+  useConversationId,
+  useQueryId,
+  onClose,
+  pageContext,
+  onRemovePageContext,
+  searchDialogOpen,
+  isSidePanelOpen = false,
+  panelWidth,
+  ...props
+}: Omit<ComponentProps<typeof DesktopCommandRoot>, "children"> & {
+  api?: string;
+  suggestionsApi?: string;
+  body?: object;
+  headers?: Record<string, string>;
+  chatId?: string;
+  onSelectHit?: (path: string) => void;
+  prefetch?: (path: string) => Promise<void>;
+  domain: string;
+  renderActions?: (message: SqueezedMessage, queryId?: string) => ReactNode;
+  initialInput?: string;
+  setInitialInput?: (initialInput: string) => void;
+  children?: ReactNode;
+  darkCodeEnabled?: boolean;
+  useConversationId: () => {
+    conversationId: string;
+    setConversationId: (conversationId: string) => void;
+    resetConversationId: () => void;
+  };
+  useQueryId: () => {
+    queryId: string;
+    setQueryId: (queryId: string) => void;
+    resetQueryId: () => void;
+  };
+  onClose?: () => void;
+  pageContext?: { title: string; url: string } | null;
+  onRemovePageContext?: () => void;
+  searchDialogOpen: boolean;
+  isSidePanelOpen?: boolean;
+  panelWidth: number;
+}): JSX.Element => {
+  const ref = useRef<HTMLDivElement>(null);
+  const { filters } = useFacetFilters();
 
-    return (
-      <DesktopCommandRoot
-        label={"Ask AI"}
-        {...props}
-        ref={composeRefs(forwardedRef, ref)}
-        shouldFilter={false}
-        disableAutoSelection={true}
-        onPopState={undefined}
-        onEscapeKeyDown={undefined}
-        escapeKeyShouldPopState={false}
-        data-fern-search="desktop-command"
-        data-mode={"ask-ai"}
-        style={{
-          minWidth: `${MIN_ASK_FERN_PANEL_WIDTH - 48}px`,
-        }}
-        className=""
-      >
-        <DesktopAskAIContent
-          useConversationId={useConversationId}
-          useQueryId={useQueryId}
-          api={api}
-          suggestionsApi={suggestionsApi}
-          body={body}
-          headers={headers}
-          filters={filters}
-          initialInput={initialInput}
-          setInitialInput={setInitialInput}
-          chatId={chatId}
-          onSelectHit={onSelectHit}
-          prefetch={prefetch}
-          domain={domain}
-          renderActions={renderActions}
-          darkCodeEnabled={darkCodeEnabled}
-          onClose={onClose}
-          pageContext={pageContext}
-          onRemovePageContext={onRemovePageContext}
-          searchDialogOpen={searchDialogOpen}
-          isSidePanelOpen={isSidePanelOpen}
-          panelWidth={panelWidth}
-        />
-      </DesktopCommandRoot>
-    );
-  }
-);
-
-DesktopAskAiPanel.displayName = "DesktopAskAiPanel";
+  return (
+    <DesktopCommandRoot
+      label={"Ask AI"}
+      {...props}
+      ref={composeRefs(forwardedRef, ref)}
+      shouldFilter={false}
+      disableAutoSelection={true}
+      onPopState={undefined}
+      onEscapeKeyDown={undefined}
+      escapeKeyShouldPopState={false}
+      data-fern-search="desktop-command"
+      data-mode={"ask-ai"}
+      style={{
+        minWidth: `${MIN_ASK_FERN_PANEL_WIDTH - 48}px`,
+      }}
+      className=""
+    >
+      <DesktopAskAIContent
+        useConversationId={useConversationId}
+        useQueryId={useQueryId}
+        api={api}
+        suggestionsApi={suggestionsApi}
+        body={body}
+        headers={headers}
+        filters={filters}
+        initialInput={initialInput}
+        setInitialInput={setInitialInput}
+        chatId={chatId}
+        onSelectHit={onSelectHit}
+        prefetch={prefetch}
+        domain={domain}
+        renderActions={renderActions}
+        darkCodeEnabled={darkCodeEnabled}
+        onClose={onClose}
+        pageContext={pageContext}
+        onRemovePageContext={onRemovePageContext}
+        searchDialogOpen={searchDialogOpen}
+        isSidePanelOpen={isSidePanelOpen}
+        panelWidth={panelWidth}
+      />
+    </DesktopCommandRoot>
+  );
+};
 
 const DesktopAskAIContent = (props: {
   initialInput?: string;
@@ -310,6 +304,7 @@ const DesktopAskAIChat = ({
       };
     } else {
       setIsAnimating(false);
+      return noop;
     }
   }, [isSidePanelOpen]);
 
@@ -321,7 +316,7 @@ const DesktopAskAIChat = ({
       queryId,
       filters,
     };
-  }, [body, conversationId, queryId, filters, window.location.href]);
+  }, [body, conversationId, queryId, filters]);
 
   const transport = new DefaultChatTransport({
     api: api || "/api/chat",
@@ -650,176 +645,168 @@ const DesktopAskAIChat = ({
   );
 };
 
-const AskAIComposer = forwardRef<
-  HTMLTextAreaElement,
-  ComponentPropsWithoutRef<typeof TextArea> & {
-    error?: Error;
-    onError?: (e?: Error) => void;
-    isLoading?: boolean;
-    stop?: () => void;
-    onSend?: (message: string) => void;
-    onPopState?: KeyboardEventHandler<HTMLTextAreaElement>;
-    filters?: readonly FacetFilter[];
-  }
->(
-  (
-    {
-      error,
-      onError,
-      isLoading,
-      stop,
-      onSend,
-      onPopState,
-      filters = [],
-      ...props
-    },
-    forwardedRef
-  ) => {
-    const value = typeof props.value === "string" ? props.value : "";
-    const isOverLimit = value.length > MAX_AI_CHAT_MESSAGE_LENGTH;
-    const canSubmit =
-      value
-        .trim()
-        .split(/\s+/)
-        .filter((word) => word.length > 0).length >= 1 && !isOverLimit;
-    const inputRef = useRef<HTMLTextAreaElement>(null);
-    return (
-      <div className="relative p-4">
-        <div
-          className="relative cursor-text border border-b-0 pl-3 pt-3"
-          onClick={() => inputRef.current?.focus()}
-          style={{
-            borderColor: "var(--color-border-default)",
-            borderRadius: "16px 16px 0 0",
-          }}
-        >
-          <DesktopCommandInput asChild>
-            <TextArea
-              id={FERN_ASK_AI_PANEL_INPUT_ID}
-              ref={composeRefs(forwardedRef, inputRef)}
-              autoFocus
-              placeholder="Ask AI a question..."
-              minLines={1}
-              lineHeight={18}
-              maxLines={8}
-              padding={6}
-              maxLength={MAX_AI_CHAT_MESSAGE_LENGTH}
-              {...props}
-              className={cn(
-                "block w-full resize-none focus:outline-none",
-                props.className
-              )}
-              style={{
-                fontSize: "15px",
-                lineHeight: "18px",
-                maxHeight: "192px",
-                border: "none",
-                borderRadius: "0",
-                padding: "0",
-                paddingRight: "11px",
-                backgroundColor: "transparent",
-                ...props.style,
-              }}
-              onKeyDown={composeEventHandlers(
-                props.onKeyDown,
-                (e) => {
-                  if (e.key === "Enter") {
-                    if (value.length === 0) {
-                      return;
-                    } else if (isLoading) {
-                    } else {
-                      if (!e.shiftKey && canSubmit) {
-                        onSend?.(value);
-                        e.preventDefault();
-                      }
-                    }
-
-                    // Only stop propagation if we actually handled the event
-                    if (value.length > 0) {
-                      e.stopPropagation();
-                    }
-                  } else if (
-                    value.length > 0 &&
-                    (e.key === "ArrowUp" || e.key === "ArrowDown")
-                  ) {
-                    e.stopPropagation();
-                  } else if (
-                    value.length === 0 &&
-                    e.key === "Backspace" &&
-                    (e.ctrlKey || e.metaKey)
-                  ) {
-                    onPopState?.(e);
-                  }
-                },
-                { checkForDefaultPrevented: false }
-              )}
-            />
-          </DesktopCommandInput>
-        </div>
-
-        <div
-          className="pointer-events-none flex items-center justify-between border border-t-0 pb-3 pl-3 pr-3 pt-1"
-          style={{
-            borderColor: "var(--color-border-default)",
-            borderRadius: "0 0 16px 16px",
-          }}
-        >
-          <div className="pointer-events-auto flex min-w-0 flex-1 items-center">
-            {filters.length === 0 ? (
-              <FilterDropdownMenu filters={filters} />
-            ) : (
-              <FilterManager filters={filters} />
+const AskAIComposer = ({
+  error,
+  onError,
+  isLoading,
+  stop,
+  onSend,
+  onPopState,
+  filters = [],
+  ref: forwardedRef,
+  ...props
+}: ComponentProps<typeof TextArea> & {
+  error?: Error;
+  onError?: (e?: Error) => void;
+  isLoading?: boolean;
+  stop?: () => void;
+  onSend?: (message: string) => void;
+  onPopState?: KeyboardEventHandler<HTMLTextAreaElement>;
+  filters?: readonly FacetFilter[];
+}): JSX.Element => {
+  const value = typeof props.value === "string" ? props.value : "";
+  const isOverLimit = value.length > MAX_AI_CHAT_MESSAGE_LENGTH;
+  const canSubmit =
+    value
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0).length >= 1 && !isOverLimit;
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  return (
+    <div className="relative p-4">
+      <div
+        className="relative cursor-text border border-b-0 pl-3 pt-3"
+        onClick={() => inputRef.current?.focus()}
+        style={{
+          borderColor: "var(--color-border-default)",
+          borderRadius: "16px 16px 0 0",
+        }}
+      >
+        <DesktopCommandInput asChild>
+          <TextArea
+            id={FERN_ASK_AI_PANEL_INPUT_ID}
+            ref={composeRefs(forwardedRef, inputRef)}
+            autoFocus
+            placeholder="Ask AI a question..."
+            minLines={1}
+            lineHeight={18}
+            maxLines={8}
+            padding={6}
+            maxLength={MAX_AI_CHAT_MESSAGE_LENGTH}
+            {...props}
+            className={cn(
+              "block w-full resize-none focus:outline-none",
+              props.className
             )}
-          </div>
-          <div className="pointer-events-auto flex items-center gap-2">
-            <FernTooltip
-              content={
-                isOverLimit
-                  ? `Message must be ${MAX_AI_CHAT_MESSAGE_LENGTH} characters or fewer`
-                  : error
-                    ? "An error occurred - click to reset the conversation."
-                    : undefined
-              }
-              side="top"
-            >
-              <Button
-                size="icon"
-                className="h-[32px] w-[32px]"
-                variant="default"
-                onClick={
-                  error
-                    ? () => {
-                        onError?.();
-                        if (canSubmit) {
-                          onSend?.(value);
-                        }
-                      }
-                    : isLoading
-                      ? () => stop?.()
-                      : () => onSend?.(value)
+            style={{
+              fontSize: "15px",
+              lineHeight: "18px",
+              maxHeight: "192px",
+              border: "none",
+              borderRadius: "0",
+              padding: "0",
+              paddingRight: "11px",
+              backgroundColor: "transparent",
+              ...props.style,
+            }}
+            onKeyDown={composeEventHandlers(
+              props.onKeyDown,
+              (e) => {
+                if (e.key === "Enter") {
+                  if (value.length === 0) {
+                    return;
+                  } else if (isLoading) {
+                    // Do nothing while loading
+                  } else {
+                    if (!e.shiftKey && canSubmit) {
+                      onSend?.(value);
+                      e.preventDefault();
+                    }
+                  }
+
+                  // Only stop propagation if we actually handled the event
+                  if (value.length > 0) {
+                    e.stopPropagation();
+                  }
+                } else if (
+                  value.length > 0 &&
+                  (e.key === "ArrowUp" || e.key === "ArrowDown")
+                ) {
+                  e.stopPropagation();
+                } else if (
+                  value.length === 0 &&
+                  e.key === "Backspace" &&
+                  (e.ctrlKey || e.metaKey)
+                ) {
+                  onPopState?.(e);
                 }
-                style={{
-                  borderRadius: "8px",
-                }}
-                disabled={!isLoading && !canSubmit}
-              >
-                {error ? (
-                  <CircleAlert size={16} />
-                ) : isLoading ? (
-                  <StopCircle />
-                ) : (
-                  <ArrowUp size={16} />
-                )}
-              </Button>
-            </FernTooltip>
-          </div>
+              },
+              { checkForDefaultPrevented: false }
+            )}
+          />
+        </DesktopCommandInput>
+      </div>
+
+      <div
+        className="pointer-events-none flex items-center justify-between border border-t-0 pb-3 pl-3 pr-3 pt-1"
+        style={{
+          borderColor: "var(--color-border-default)",
+          borderRadius: "0 0 16px 16px",
+        }}
+      >
+        <div className="pointer-events-auto flex min-w-0 flex-1 items-center">
+          {filters.length === 0 ? (
+            <FilterDropdownMenu filters={filters} />
+          ) : (
+            <FilterManager filters={filters} />
+          )}
+        </div>
+        <div className="pointer-events-auto flex items-center gap-2">
+          <FernTooltip
+            content={
+              isOverLimit
+                ? `Message must be ${MAX_AI_CHAT_MESSAGE_LENGTH} characters or fewer`
+                : error
+                  ? "An error occurred - click to reset the conversation."
+                  : undefined
+            }
+            side="top"
+          >
+            <Button
+              size="icon"
+              className="h-[32px] w-[32px]"
+              variant="default"
+              onClick={
+                error
+                  ? () => {
+                      onError?.();
+                      if (canSubmit) {
+                        onSend?.(value);
+                      }
+                    }
+                  : isLoading
+                    ? () => stop?.()
+                    : () => onSend?.(value)
+              }
+              style={{
+                borderRadius: "8px",
+              }}
+              disabled={!isLoading && !canSubmit}
+            >
+              {error ? (
+                <CircleAlert size={16} />
+              ) : isLoading ? (
+                <StopCircle />
+              ) : (
+                <ArrowUp size={16} />
+              )}
+            </Button>
+          </FernTooltip>
         </div>
       </div>
-    );
-  }
-);
-
-AskAIComposer.displayName = "AskAIComposer";
+    </div>
+  );
+};
 
 const AskAICommandItems = memo<{
   messages: UIMessage[];

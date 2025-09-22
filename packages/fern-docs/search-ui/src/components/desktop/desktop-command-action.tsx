@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef, forwardRef } from "react";
+import type { ComponentProps } from "react";
 
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { CircleStop, CornerDownLeft } from "lucide-react";
@@ -12,10 +12,14 @@ interface DesktopCommandActionProps {
   onStopAskAI?: () => void;
 }
 
-export const AskAiAction = forwardRef<
-  HTMLButtonElement,
-  DesktopCommandActionProps & ComponentPropsWithoutRef<typeof Button>
->(({ isLoading, onClickAskAI, onStopAskAI, onClose, ...props }, ref) => {
+export const AskAiAction = ({
+  isLoading,
+  onClickAskAI,
+  onStopAskAI,
+  onClose,
+  ref,
+  ...props
+}: DesktopCommandActionProps & ComponentProps<typeof Button>): JSX.Element => {
   if (isLoading) {
     return (
       <Button
@@ -47,6 +51,4 @@ export const AskAiAction = forwardRef<
       </Button>
     );
   }
-});
-
-AskAiAction.displayName = "AskAiAction";
+};

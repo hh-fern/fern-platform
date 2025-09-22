@@ -1,4 +1,5 @@
-import { ComponentPropsWithoutRef, forwardRef, useEffect, useRef } from "react";
+import type { ComponentProps, RefObject } from "react";
+import { useEffect, useRef } from "react";
 
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -15,10 +16,14 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 
-export const DesktopCommandInputError = forwardRef<
-  HTMLButtonElement,
-  ComponentPropsWithoutRef<typeof TooltipTrigger>
->(({ children, asChild, ...props }, ref) => {
+export const DesktopCommandInputError = ({
+  children,
+  asChild,
+  ref,
+  ...props
+}: ComponentProps<typeof TooltipTrigger> & {
+  ref?: RefObject<HTMLButtonElement>;
+}): JSX.Element => {
   const { inputError } = useCommandUx();
   if (inputError == null) {
     const Comp = asChild ? Slot : "button";
@@ -42,14 +47,13 @@ export const DesktopCommandInputError = forwardRef<
       </Tooltip>
     </TooltipProvider>
   );
-});
+};
 
-DesktopCommandInputError.displayName = "DesktopCommandInputError";
-
-export const DesktopCommandInput = forwardRef<
-  HTMLInputElement,
-  ComponentPropsWithoutRef<typeof Command.Input>
->(({ children, ...props }, forwardedRef) => {
+export const DesktopCommandInput = ({
+  children,
+  ref: forwardedRef,
+  ...props
+}: ComponentProps<typeof Command.Input>): JSX.Element => {
   const scrollSelectedIntoView = Command.useScrollSelectedIntoView();
   const inputRef = useRef<HTMLInputElement>(null);
   const selectionStateStart = useRef<number | null>(null);
@@ -103,6 +107,4 @@ export const DesktopCommandInput = forwardRef<
       {children}
     </Command.Input>
   );
-});
-
-DesktopCommandInput.displayName = "DesktopCommandInput";
+};

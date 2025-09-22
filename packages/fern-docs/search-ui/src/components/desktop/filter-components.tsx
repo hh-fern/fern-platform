@@ -1,12 +1,10 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { ListFilter, Plus } from "lucide-react";
 
 import { Badge } from "@fern-docs/components/badges";
 import { Button } from "@fern-docs/components/button";
-import { FacetFilter } from "@fern-docs/search-keyword";
+import type { FacetFilter } from "@fern-docs/search-keyword";
 
 import { getFacetDisplay, toFilterOptions } from "../../utils/facet-display";
 import { Filter } from "../icons/filter";
@@ -33,7 +31,7 @@ export const FilterDropdownMenu = ({
   filters: readonly FacetFilter[];
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-}) => {
+}): React.ReactNode => {
   const { clear } = useSearchBox();
   const { setFilters } = useFacetFilters();
   const options = toFilterOptions(useFacets(filters).facets);
@@ -99,7 +97,7 @@ export const AddFilterButton = ({
   filters: readonly FacetFilter[];
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-}) => {
+}): React.ReactNode => {
   const { clear } = useSearchBox();
   const { setFilters } = useFacetFilters();
   const options = toFilterOptions(useFacets(filters).facets);
@@ -157,7 +155,7 @@ export const FilterManager = ({
   filters,
 }: {
   filters: readonly FacetFilter[];
-}) => {
+}): React.ReactNode => {
   const { setFilters } = useFacetFilters();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
