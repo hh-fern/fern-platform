@@ -1,8 +1,8 @@
 import assertNever from "@fern-api/ui-core-utils/assertNever";
 
-import { APIV1Write } from "../../../client";
+import type { APIV1Write } from "../../../client";
 import {
-  ResolveTypeById,
+  type ResolveTypeById,
   generateExampleFromTypeReference,
   generateExampleFromTypeShape,
   generateHttpRequestBodyExample,
@@ -274,7 +274,30 @@ function generatePath(
           if (value == null) {
             throw new Error("Path parameter is missing: " + part.value);
           }
-          pathString += value;
+
+          if (typeof value === "string") {
+            pathString += value;
+          } else if (
+            typeof value === "number" ||
+            typeof value === "bigint" ||
+            typeof value === "boolean"
+          ) {
+            pathString += String(value);
+          } else if (typeof value === "undefined") {
+            // do nothing
+          } else if (typeof value === "symbol") {
+            throw new Error("Path parameter is a symbol: " + part.value);
+          } else if (typeof value === "function") {
+            throw new Error("Path parameter is a function: " + part.value);
+          } else if (typeof value === "object") {
+            if (value == null) {
+              // do nothing
+            } else {
+              throw new Error("Path parameter is an object: " + part.value);
+            }
+          } else {
+            throw new Error("Path parameter is an unknown type: " + part.value);
+          }
         }
         break;
       default:

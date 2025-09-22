@@ -1,7 +1,14 @@
-import { MarkOptional, UnreachableCaseError } from "ts-essentials";
+import { type MarkOptional, UnreachableCaseError } from "ts-essentials";
 
-import { FernNavigation } from "../..";
-import { DeleterAction } from "../../utils/traversers/types";
+import type { DeleterAction } from "../../utils/traversers/types";
+import {
+  type NavigationNode,
+  type NavigationNodeParent,
+  getChildren,
+  isLeaf,
+  isPage,
+  isSectionOverview,
+} from "../versions/latest";
 
 /**
  * @param parent delete node from this parent (mutable)
@@ -9,8 +16,8 @@ import { DeleterAction } from "../../utils/traversers/types";
  * @returns the id of the deleted node or null if the node was not deletable from the parent
  */
 export function mutableDeleteChild(
-  parent: FernNavigation.NavigationNodeParent | undefined,
-  node: FernNavigation.NavigationNode
+  parent: NavigationNodeParent | undefined,
+  node: NavigationNode
 ): DeleterAction {
   /**
    * The idea here is we should only delete leaf nodes (we're treating changelogs here like a leaf node)
@@ -19,13 +26,13 @@ export function mutableDeleteChild(
    * Instead, we'll just remove the overviewPageId, which will make the section a non-visitable node, yet still retain its children.
    */
   if (
-    !FernNavigation.isLeaf(node) &&
-    FernNavigation.isPage(node) &&
-    FernNavigation.getChildren(node).length > 0 &&
+    !isLeaf(node) &&
+    isPage(node) &&
+    getChildren(node).length > 0 &&
     node.type !== "changelog"
   ) {
     // if the node to be deleted is a section, remove the overviewPageId
-    if (FernNavigation.isSectionOverview(node)) {
+    if (isSectionOverview(node)) {
       (node as MarkOptional<typeof node, "overviewPageId">).overviewPageId =
         undefined;
 
@@ -40,10 +47,7 @@ export function mutableDeleteChild(
   }
 
   // if the node is not a leaf node, don't delete it from the parent unless it has no children
-  if (
-    !FernNavigation.isLeaf(node) &&
-    FernNavigation.getChildren(node).length > 0
-  ) {
+  if (!isLeaf(node) && getChildren(node).length > 0) {
     return "noop";
   }
 
@@ -110,9 +114,9 @@ export function mutableDeleteChild(
       throw new UnreachableCaseError(parent);
   }
 
-  if (FernNavigation.isPage(parent)) {
+  if (isPage(parent)) {
     return "noop";
-  } else if (FernNavigation.getChildren(parent).length > 0) {
+  } else if (getChildren(parent).length > 0) {
     return "deleted";
   } else {
     return "should-delete-parent";

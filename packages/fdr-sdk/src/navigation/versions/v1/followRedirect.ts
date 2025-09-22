@@ -1,17 +1,16 @@
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 
-import { FernNavigation } from "../../..";
+import type { Slug } from "../../../client/generated/api/resources/navigation/resources/v1";
+import type { NavigationNode } from "./NavigationNode";
 import { hasMetadata } from "./NavigationNodeWithMetadata";
 
 export function followRedirect(
-  nodeToFollow: FernNavigation.V1.NavigationNode | undefined
-): FernNavigation.V1.Slug | undefined {
+  nodeToFollow: NavigationNode | undefined
+): Slug | undefined {
   if (nodeToFollow == null) {
     return undefined;
   }
-  return visitDiscriminatedUnion(nodeToFollow)._visit<
-    FernNavigation.V1.Slug | undefined
-  >({
+  return visitDiscriminatedUnion(nodeToFollow)._visit<Slug | undefined>({
     link: () => undefined,
 
     // leaf nodes
@@ -53,9 +52,7 @@ export function followRedirect(
   });
 }
 
-export function followRedirects(
-  nodes: FernNavigation.V1.NavigationNode[]
-): FernNavigation.V1.Slug | undefined {
+export function followRedirects(nodes: NavigationNode[]): Slug | undefined {
   for (const node of nodes) {
     // skip hidden nodes
     if (hasMetadata(node) && node.hidden) {

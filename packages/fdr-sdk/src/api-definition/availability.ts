@@ -5,7 +5,7 @@ import * as Latest from "./latest";
  *
  * This is used to sort the availability levels in the UI, and to determine the stability level of a type reference when multiple are available.
  */
-export const AvailabilityOrder = [
+export const AvailabilityOrder: readonly Latest.Availability[] = [
   Latest.Availability.Stable,
   Latest.Availability.GenerallyAvailable,
   Latest.Availability.Beta,

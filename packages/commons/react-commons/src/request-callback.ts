@@ -1,4 +1,7 @@
-export function isomorphicRequestIdleCallback(fn: () => void, timeout = 0) {
+export function isomorphicRequestIdleCallback(
+  fn: () => void,
+  timeout = 0
+): () => void {
   try {
     if (requestIdleCallback) {
       const handle = requestIdleCallback(fn, { timeout });
@@ -11,7 +14,7 @@ export function isomorphicRequestIdleCallback(fn: () => void, timeout = 0) {
   return () => clearTimeout(timeoutId);
 }
 
-export function isomorphicRequestAnimationFrame(fn: () => void) {
+export function isomorphicRequestAnimationFrame(fn: () => void): () => void {
   try {
     if (requestAnimationFrame) {
       const handle = requestAnimationFrame(fn);

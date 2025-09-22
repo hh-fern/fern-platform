@@ -1,10 +1,26 @@
-import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
-import type { HttpMethod } from "@fern-api/docs-utils";
-import type { DocsV1Read } from "@fern-api/fdr-sdk";
+import type { AuthEdgeConfig } from "@fern-api/docs-auth";
 import type {
+  AuthState,
+  DynamicIRsByLanguage,
+  FernFonts,
+} from "@fern-api/docs-server";
+import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import type { DocsMetadata } from "@fern-api/docs-server/docs-loader";
+import type { HttpMethod } from "@fern-api/docs-utils";
+import type { EdgeFlags, FernColorTheme } from "@fern-api/docs-utils";
+import type { FileData } from "@fern-api/docs-utils/types/file-data";
+import type { FernLayoutConfig } from "@fern-api/docs-utils/types/layout-config";
+import type { DocsV1Read } from "@fern-api/fdr-sdk";
+import type { ApiDefinition, FernNavigation } from "@fern-api/fdr-sdk";
+import type {
+  AuthScheme,
   EndpointId,
+  ObjectProperty,
   PruningNodeType,
+  TypeDefinition,
+  TypeId,
 } from "@fern-api/fdr-sdk/api-definition";
+import type { Slug } from "@fern-api/fdr-sdk/navigation";
 
 import {
   createCachedDocsLoader,
@@ -21,38 +37,59 @@ class EditableDocsLoader implements DocsLoader {
   domain: string;
   fern_token: string | undefined;
 
-  constructor(
-    docsLoader: DocsLoader,
-    private gitLoader?: GitLoader
-  ) {
+  constructor(docsLoader: DocsLoader) {
     this.readOnlyDocsLoader = docsLoader;
     this.domain = docsLoader.domain;
     this.fern_token = docsLoader.fern_token;
   }
 
-  getAuthConfig = () => this.readOnlyDocsLoader.getAuthConfig();
+  getAuthConfig = (): Promise<AuthEdgeConfig | undefined> =>
+    this.readOnlyDocsLoader.getAuthConfig();
 
-  getMetadata = () => this.readOnlyDocsLoader.getMetadata();
+  getMetadata = (): Promise<DocsMetadata> =>
+    this.readOnlyDocsLoader.getMetadata();
 
-  getFiles = () => this.readOnlyDocsLoader.getFiles();
+  getFiles = (): Promise<Record<string, FileData>> =>
+    this.readOnlyDocsLoader.getFiles();
 
-  getMdxBundlerFiles = () => this.readOnlyDocsLoader.getMdxBundlerFiles();
+  getMdxBundlerFiles = (): Promise<Record<string, string>> =>
+    this.readOnlyDocsLoader.getMdxBundlerFiles();
 
-  getPrunedApi = (id: string, ...nodes: PruningNodeType[]) =>
+  getPrunedApi = (
+    id: string,
+    ...nodes: PruningNodeType[]
+  ): Promise<ApiDefinition.ApiDefinition> =>
     this.readOnlyDocsLoader.getPrunedApi(id, ...nodes);
 
-  getEndpointById = (apiDefinitionId: string, endpointId: EndpointId) =>
-    this.readOnlyDocsLoader.getEndpointById(apiDefinitionId, endpointId);
+  getEndpointById = (
+    apiDefinitionId: string,
+    endpointId: EndpointId
+  ): Promise<{
+    endpoint: ApiDefinition.EndpointDefinition;
+    nodes: FernNavigation.EndpointNode[];
+    globalHeaders: ObjectProperty[];
+    authSchemes: AuthScheme[];
+    types: Record<TypeId, TypeDefinition>;
+  }> => this.readOnlyDocsLoader.getEndpointById(apiDefinitionId, endpointId);
 
-  getEndpointByLocator = (method: HttpMethod, path: string, example?: string) =>
-    this.readOnlyDocsLoader.getEndpointByLocator(method, path, example);
+  getEndpointByLocator = (
+    method: HttpMethod,
+    path: string,
+    example?: string
+  ): Promise<{
+    apiDefinitionId: ApiDefinition.ApiDefinitionId;
+    endpoint: ApiDefinition.EndpointDefinition;
+    slugs: Slug[];
+  }> => this.readOnlyDocsLoader.getEndpointByLocator(method, path, example);
 
-  getRoot = () => this.readOnlyDocsLoader.getRoot();
+  getRoot = (): Promise<FernNavigation.RootNode> =>
+    this.readOnlyDocsLoader.getRoot();
 
-  getNavigationNode = (id: string) =>
+  getNavigationNode = (id: string): Promise<FernNavigation.NavigationNode> =>
     this.readOnlyDocsLoader.getNavigationNode(id);
 
-  unsafe_getFullRoot = () => this.readOnlyDocsLoader.unsafe_getFullRoot();
+  unsafe_getFullRoot = (): Promise<FernNavigation.RootNode> =>
+    this.readOnlyDocsLoader.unsafe_getFullRoot();
 
   getConfig = (): Promise<
     Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">
@@ -68,20 +105,25 @@ class EditableDocsLoader implements DocsLoader {
     return this.readOnlyDocsLoader.getPage(pageId);
   }
 
-  getColors = () => this.readOnlyDocsLoader.getColors();
+  getColors = (): Promise<{
+    light?: FernColorTheme;
+    dark?: FernColorTheme;
+  }> => this.readOnlyDocsLoader.getColors();
 
-  getFonts = () => this.readOnlyDocsLoader.getFonts();
+  getFonts = (): Promise<FernFonts> => this.readOnlyDocsLoader.getFonts();
 
-  getLayout = () => this.readOnlyDocsLoader.getLayout();
+  getLayout = (): Promise<FernLayoutConfig> =>
+    this.readOnlyDocsLoader.getLayout();
 
-  getAuthState = (pathname?: string) =>
+  getAuthState = (pathname?: string): Promise<AuthState> =>
     this.readOnlyDocsLoader.getAuthState(pathname);
 
-  getEdgeFlags = () => this.readOnlyDocsLoader.getEdgeFlags();
+  getEdgeFlags = (): Promise<EdgeFlags> =>
+    this.readOnlyDocsLoader.getEdgeFlags();
 
-  getBaseUrl = () => this.readOnlyDocsLoader.getBaseUrl();
+  getBaseUrl = (): Promise<string> => this.readOnlyDocsLoader.getBaseUrl();
 
-  getDynamicIr = (apiName: string) =>
+  getDynamicIr = (apiName: string): Promise<DynamicIRsByLanguage | undefined> =>
     this.readOnlyDocsLoader.getDynamicIr(apiName);
 }
 
@@ -190,7 +232,6 @@ export const createEditableDocsLoader = async ({
   host,
   encodedDocsUrl,
   fernToken,
-  gitLoader,
   forceRevalidate,
   branchName,
 }: {
@@ -200,7 +241,7 @@ export const createEditableDocsLoader = async ({
   gitLoader?: GitLoader;
   forceRevalidate?: boolean;
   branchName?: string;
-}) => {
+}): Promise<EditableDocsLoader> => {
   const domain = decodeURIComponent(encodedDocsUrl);
   const docsLoader = await createCachedDocsLoader(
     host,
@@ -218,5 +259,5 @@ export const createEditableDocsLoader = async ({
     }
   );
 
-  return new EditableDocsLoader(docsLoader, gitLoader);
+  return new EditableDocsLoader(docsLoader);
 };

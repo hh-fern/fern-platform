@@ -4,7 +4,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "module": "esnext",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": true,
+    "isolatedDeclarations": true
   },
   "include": ["./src/**/*"]
 }

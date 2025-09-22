@@ -1,7 +1,8 @@
-import { FernNavigation } from "../../..";
+import type { ApiReferenceNode } from "../../../client/generated/api/resources/navigation/resources/latest";
+import type { NavigationNode } from "./NavigationNode";
 
 export function isApiReferenceNode(
-  node: FernNavigation.NavigationNode
-): node is FernNavigation.ApiReferenceNode {
+  node: NavigationNode
+): node is ApiReferenceNode {
   return node.type === "apiReference";
 }

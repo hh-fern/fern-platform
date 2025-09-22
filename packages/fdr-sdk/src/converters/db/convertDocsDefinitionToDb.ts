@@ -2,11 +2,8 @@ import { kebabCase } from "es-toolkit/string";
 
 import assertNever from "@fern-api/ui-core-utils/assertNever";
 
-import { FernNavigation } from "../..";
+import type { DocsV1Db, DocsV1Read, DocsV1Write } from "../../client";
 import {
-  DocsV1Db,
-  DocsV1Read,
-  DocsV1Write,
   FdrAPI,
   visitDbNavigationConfig,
   visitUnversionedDbNavigationConfig,
@@ -14,6 +11,9 @@ import {
   visitWriteNavigationConfig,
 } from "../../client";
 import { isNavigationTabLink } from "../../client/visitNavigationTab";
+import { FernNavigationV1ToLatest } from "../../navigation/migrators/v1ToV2";
+import { collectApiReferences } from "../../navigation/utils/collectApiReferences";
+import type { RootNode } from "../../navigation/versions/v1";
 import {
   DEFAULT_DARK_MODE_ACCENT_PRIMARY,
   DEFAULT_LIGHT_MODE_ACCENT_PRIMARY,
@@ -317,14 +317,13 @@ export function transformNavigationItemForDb(
 
 export function getReferencedApiDefinitionIds(
   navigationConfig: DocsV1Db.NavigationConfig | undefined,
-  root: FernNavigation.V1.RootNode | undefined
+  root: RootNode | undefined
 ): FdrAPI.ApiDefinitionId[] {
   if (root != null) {
-    const latest =
-      FernNavigation.migrate.FernNavigationV1ToLatest.create().root(root);
-    return FernNavigation.utils
-      .collectApiReferences(latest)
-      .map((reference) => reference.apiDefinitionId);
+    const latest = FernNavigationV1ToLatest.create().root(root);
+    return collectApiReferences(latest).map(
+      (reference) => reference.apiDefinitionId
+    );
   }
 
   if (navigationConfig != null) {

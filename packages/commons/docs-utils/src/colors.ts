@@ -1,18 +1,79 @@
-import { FileData } from "./types/file-data";
+import type { FileData } from "./types/file-data";
 
 export type RgbaColor = { r: number; g: number; b: number; a?: number };
 
 export type ArrayOf12<T> = [T, T, T, T, T, T, T, T, T, T, T, T];
 export const arrayOf12 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const;
 
-// prettier-ignore
-export const grayScaleNames = ['gray', 'mauve', 'slate', 'sage', 'olive', 'sand'] as const;
-export type GrayScaleName = (typeof grayScaleNames)[number];
+export type GrayScaleName =
+  | "gray"
+  | "mauve"
+  | "slate"
+  | "sage"
+  | "olive"
+  | "sand";
 
-// prettier-ignore
-export const scaleNames = [...grayScaleNames, 'tomato', 'red', 'ruby', 'crimson', 'pink',
-'plum', 'purple', 'violet', 'iris', 'indigo', 'blue', 'cyan', 'teal', 'jade', 'green',
-'grass', 'brown', 'orange', 'sky', 'mint', 'lime', 'yellow', 'amber'] as const;
+export const grayScaleNames: readonly GrayScaleName[] = [
+  "gray",
+  "mauve",
+  "slate",
+  "sage",
+  "olive",
+  "sand",
+] as const;
+
+export type ScaleNames =
+  | GrayScaleName
+  | "tomato"
+  | "red"
+  | "ruby"
+  | "crimson"
+  | "pink"
+  | "plum"
+  | "purple"
+  | "violet"
+  | "iris"
+  | "indigo"
+  | "blue"
+  | "cyan"
+  | "teal"
+  | "jade"
+  | "green"
+  | "grass"
+  | "brown"
+  | "orange"
+  | "sky"
+  | "mint"
+  | "lime"
+  | "yellow"
+  | "amber";
+
+export const scaleNames: readonly ScaleNames[] = [
+  ...grayScaleNames,
+  "tomato",
+  "red",
+  "ruby",
+  "crimson",
+  "pink",
+  "plum",
+  "purple",
+  "violet",
+  "iris",
+  "indigo",
+  "blue",
+  "cyan",
+  "teal",
+  "jade",
+  "green",
+  "grass",
+  "brown",
+  "orange",
+  "sky",
+  "mint",
+  "lime",
+  "yellow",
+  "amber",
+] as const;
 
 export interface ColorPalette {
   appearance: "light" | "dark";

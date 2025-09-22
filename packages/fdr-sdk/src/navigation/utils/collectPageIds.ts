@@ -1,12 +1,15 @@
-import { FernNavigation } from "../..";
+import {
+  type NavigationNode,
+  type PageId,
+  isPage,
+  traverseDF,
+} from "../versions/latest";
 import { getPageId } from "../versions/latest/getPageId";
 
-export function collectPageIds(
-  nav: FernNavigation.NavigationNode
-): Set<FernNavigation.PageId> {
-  const pageIds = new Set<FernNavigation.PageId>();
-  FernNavigation.traverseDF(nav, (node) => {
-    if (FernNavigation.isPage(node)) {
+export function collectPageIds(nav: NavigationNode): Set<PageId> {
+  const pageIds = new Set<PageId>();
+  traverseDF(nav, (node) => {
+    if (isPage(node)) {
       const pageId = getPageId(node);
       if (pageId != null) {
         pageIds.add(pageId);

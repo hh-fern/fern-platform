@@ -7,5 +7,5 @@ export * as DocsV1Write from "./DocsV1Write";
 export * as FdrAPI from "./FdrAPI";
 export * as DocsV2Read from "./generated/api/resources/docs/resources/v2/resources/read";
 export * as DocsV2Write from "./generated/api/resources/docs/resources/v2/resources/write";
-export * as Snippets from "./generated/api/resources/snippets/types";
-export * from "./generated/core/fetcher/APIResponse";
+export type * as Snippets from "./generated/api/resources/snippets/types";
+export type * from "./generated/core/fetcher/APIResponse";

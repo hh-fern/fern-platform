@@ -108,6 +108,9 @@ export default [
       rules: {
         ...vitest.configs.recommended.rules,
         "@typescript-eslint/no-empty-function": "off",
+        // there's something wrong with the vitest/valid-expect rule
+        // where the `message` parameter is being marked as invalid, even though it is.
+        "vitest/valid-expect": "off",
       },
       settings: {
         vitest: {
@@ -234,6 +237,13 @@ export default [
         "@typescript-eslint/no-base-to-string": "off",
         "@typescript-eslint/no-explicit-any": "off",
         eqeqeq: "off",
+      },
+    },
+    {
+      files: ["packages/commons/**/*", "packages/fdr-sdk/**/*"],
+      rules: {
+        "@typescript-eslint/consistent-type-exports": "error",
+        "@typescript-eslint/consistent-type-imports": "error",
       },
     }
   ),

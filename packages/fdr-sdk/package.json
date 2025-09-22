@@ -58,7 +58,7 @@
     "dev": "tsup --watch",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
-    "lint": "eslint --max-warnings 0 src --ext .ts --resolve-plugins-relative-to ../../",
+    "lint": "eslint --max-warnings 0 src --ext .ts",
     "test": "vitest --run --passWithNoTests --globals",
     "test:update": "vitest --run  --passWithNoTests --globals -u"
   },

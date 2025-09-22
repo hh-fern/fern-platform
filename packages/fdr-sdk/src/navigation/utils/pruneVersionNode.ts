@@ -1,30 +1,33 @@
-import { FernNavigation } from "../..";
+import {
+  type NavigationNode,
+  type Slug,
+  hasMetadata,
+  hasRedirect,
+  toDefaultSlug,
+  traverseDF,
+} from "../versions/latest";
 
-export function pruneVersionNode<T extends FernNavigation.NavigationNode>(
+export function pruneVersionNode<T extends NavigationNode>(
   node: T,
-  rootSlug: FernNavigation.Slug,
-  versionSlug: FernNavigation.Slug
+  rootSlug: Slug,
+  versionSlug: Slug
 ): T;
-export function pruneVersionNode<T extends FernNavigation.NavigationNode>(
+export function pruneVersionNode<T extends NavigationNode>(
   node: T | undefined,
-  rootSlug: FernNavigation.Slug,
-  versionSlug: FernNavigation.Slug
+  rootSlug: Slug,
+  versionSlug: Slug
 ): T | undefined;
-export function pruneVersionNode<T extends FernNavigation.NavigationNode>(
+export function pruneVersionNode<T extends NavigationNode>(
   node: T | undefined,
-  rootSlug: FernNavigation.Slug,
-  versionSlug: FernNavigation.Slug
+  rootSlug: Slug,
+  versionSlug: Slug
 ): T | undefined {
   if (node == null) {
     return undefined;
   }
-  FernNavigation.traverseDF(node, (node) => {
-    if (FernNavigation.hasMetadata(node)) {
-      const newSlug = FernNavigation.toDefaultSlug(
-        node.slug,
-        rootSlug,
-        versionSlug
-      );
+  traverseDF(node, (node) => {
+    if (hasMetadata(node)) {
+      const newSlug = toDefaultSlug(node.slug, rootSlug, versionSlug);
       // children of this node was already pruned
       if (node.slug === newSlug) {
         return "skip";
@@ -33,12 +36,8 @@ export function pruneVersionNode<T extends FernNavigation.NavigationNode>(
       node.slug = newSlug;
     }
 
-    if (FernNavigation.hasRedirect(node)) {
-      node.pointsTo = FernNavigation.toDefaultSlug(
-        node.pointsTo,
-        rootSlug,
-        versionSlug
-      );
+    if (hasRedirect(node)) {
+      node.pointsTo = toDefaultSlug(node.pointsTo, rootSlug, versionSlug);
     }
     return;
   });

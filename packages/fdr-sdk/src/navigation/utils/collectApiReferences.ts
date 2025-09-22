@@ -1,10 +1,12 @@
-import { FernNavigation } from "../..";
+import {
+  type ApiReferenceNode,
+  type NavigationNode,
+  traverseDF,
+} from "../versions/latest";
 
-export function collectApiReferences(
-  nav: FernNavigation.NavigationNode
-): FernNavigation.ApiReferenceNode[] {
-  const apiReferences: FernNavigation.ApiReferenceNode[] = [];
-  FernNavigation.traverseDF(nav, (node) => {
+export function collectApiReferences(nav: NavigationNode): ApiReferenceNode[] {
+  const apiReferences: ApiReferenceNode[] = [];
+  traverseDF(nav, (node) => {
     if (node.type === "apiReference") {
       apiReferences.push(node);
       return "skip";

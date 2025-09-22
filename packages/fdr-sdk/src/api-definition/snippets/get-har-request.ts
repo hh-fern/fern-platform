@@ -5,14 +5,14 @@ import {
   visitDiscriminatedUnion,
 } from "@fern-api/ui-core-utils";
 
-import {
-  type AuthSchemeId,
-  type EndpointDefinition,
-  type ExampleEndpointCall,
-  type ExampleEndpointRequest,
-  buildEndpointUrl,
-} from "../";
-import { ApiAuth } from "../../client/APIV1Read";
+import type { ApiAuth } from "../../client/APIV1Read";
+import type {
+  AuthSchemeId,
+  EndpointDefinition,
+  ExampleEndpointCall,
+  ExampleEndpointRequest,
+} from "../latest";
+import { buildEndpointUrl } from "../url";
 
 export function getHarRequest(
   endpoint: EndpointDefinition,

@@ -1,4 +1,5 @@
-import { FernNavigation } from "../../../..";
+import { Slug } from "../../../../client/generated/api/resources/navigation/resources/v1";
+import { slugjoin } from "../slugjoin";
 
 export class SlugGenerator {
   public static init(baseSlug: string): SlugGenerator {
@@ -11,21 +12,18 @@ export class SlugGenerator {
     private slug: string
   ) {}
 
-  public get(): FernNavigation.V1.Slug {
-    return FernNavigation.V1.Slug(FernNavigation.V1.slugjoin(this.slug));
+  public get(): Slug {
+    return Slug(slugjoin(this.slug));
   }
 
   public setProductSlug(productSlug: string): SlugGenerator {
     if (this.productSlug != null) {
-      if (
-        this.productSlug ===
-        FernNavigation.V1.slugjoin(this.baseSlug, productSlug)
-      ) {
+      if (this.productSlug === slugjoin(this.baseSlug, productSlug)) {
         return this;
       }
       throw new Error("Product already set");
     }
-    const slug = FernNavigation.V1.slugjoin(this.baseSlug, productSlug);
+    const slug = slugjoin(this.baseSlug, productSlug);
     if (this.baseSlug === productSlug) {
       throw new Error("Product slug is the same as base slug");
     }
@@ -36,19 +34,13 @@ export class SlugGenerator {
     if (this.versionSlug != null) {
       // If we have a product slug, we should always join with it
       if (this.productSlug) {
-        const expectedSlug = FernNavigation.V1.slugjoin(
-          this.productSlug,
-          versionSlug
-        );
+        const expectedSlug = slugjoin(this.productSlug, versionSlug);
         if (this.versionSlug === expectedSlug) {
           return this;
         }
       } else {
         // Only check base slug join if we don't have a product
-        if (
-          this.versionSlug ===
-          FernNavigation.V1.slugjoin(this.baseSlug, versionSlug)
-        ) {
+        if (this.versionSlug === slugjoin(this.baseSlug, versionSlug)) {
           return this;
         }
       }
@@ -57,8 +49,8 @@ export class SlugGenerator {
 
     // When creating a new version slug, always include product if present
     const slug = this.productSlug
-      ? FernNavigation.V1.slugjoin(this.productSlug, versionSlug)
-      : FernNavigation.V1.slugjoin(this.baseSlug, versionSlug);
+      ? slugjoin(this.productSlug, versionSlug)
+      : slugjoin(this.baseSlug, versionSlug);
 
     if (this.baseSlug === versionSlug) {
       throw new Error("Version slug is the same as base slug");
@@ -72,13 +64,13 @@ export class SlugGenerator {
       this.baseSlug,
       this.productSlug,
       this.versionSlug,
-      FernNavigation.V1.slugjoin(this.slug, slug)
+      slugjoin(this.slug, slug)
     );
   }
 
   public set(slug: string): SlugGenerator {
     // Normalize the input slug
-    slug = FernNavigation.V1.slugjoin(slug);
+    slug = slugjoin(slug);
 
     // Helper function to create a new SlugGenerator with the given slug
     const createWithSlug = (newSlug: string) => {
@@ -107,21 +99,17 @@ export class SlugGenerator {
       // If the slug starts with the product, insert version
       if (slug.startsWith(this.productSlug)) {
         const remaining = getRemainingAfterProduct(slug);
-        return createWithSlug(
-          FernNavigation.V1.slugjoin(this.versionSlug, remaining)
-        );
+        return createWithSlug(slugjoin(this.versionSlug, remaining));
       }
 
       // If the slug starts with the base, handle appropriately
       if (this.baseSlug.length > 0 && slug.startsWith(this.baseSlug)) {
         const remaining = getRemainingAfterBase(slug);
-        return createWithSlug(
-          FernNavigation.V1.slugjoin(this.baseSlug, remaining)
-        );
+        return createWithSlug(slugjoin(this.baseSlug, remaining));
       }
 
       // Otherwise, join with version
-      return createWithSlug(FernNavigation.V1.slugjoin(this.versionSlug, slug));
+      return createWithSlug(slugjoin(this.versionSlug, slug));
     }
 
     // If we have a version slug
@@ -132,14 +120,11 @@ export class SlugGenerator {
 
       if (this.baseSlug.length > 0 && slug.startsWith(this.baseSlug)) {
         return createWithSlug(
-          FernNavigation.V1.slugjoin(
-            this.versionSlug,
-            getRemainingAfterBase(slug)
-          )
+          slugjoin(this.versionSlug, getRemainingAfterBase(slug))
         );
       }
 
-      return createWithSlug(FernNavigation.V1.slugjoin(this.versionSlug, slug));
+      return createWithSlug(slugjoin(this.versionSlug, slug));
     }
 
     // If we have a product slug
@@ -149,12 +134,10 @@ export class SlugGenerator {
       }
 
       if (this.baseSlug.length > 0 && slug.startsWith(this.baseSlug)) {
-        return createWithSlug(
-          FernNavigation.V1.slugjoin(getRemainingAfterBase(slug))
-        );
+        return createWithSlug(slugjoin(getRemainingAfterBase(slug)));
       }
 
-      return createWithSlug(FernNavigation.V1.slugjoin(this.productSlug, slug));
+      return createWithSlug(slugjoin(this.productSlug, slug));
     }
 
     // If we have a base slug
@@ -163,7 +146,7 @@ export class SlugGenerator {
         return createWithSlug(slug);
       }
 
-      return createWithSlug(FernNavigation.V1.slugjoin(this.baseSlug, slug));
+      return createWithSlug(slugjoin(this.baseSlug, slug));
     }
 
     // If no special handling is needed, just use the slug as is

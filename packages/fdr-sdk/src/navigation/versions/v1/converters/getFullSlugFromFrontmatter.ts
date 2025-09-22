@@ -1,4 +1,5 @@
-import { FernNavigation } from "../../../..";
+import type { Slug } from "../../../../client/generated/api/resources/navigation/resources/v1";
+import { slugjoin } from "../slugjoin";
 
 /**
  * As as temporary workaround, we'll use a simple regex to extract the frontmatter and check for
@@ -6,10 +7,10 @@ import { FernNavigation } from "../../../..";
  */
 export function getFullSlugFromFrontmatter(
   frontmatter: string
-): FernNavigation.V1.Slug | undefined {
+): Slug | undefined {
   const match = frontmatter.match(/slug:\s*"?([^"\n\s]+)"?/);
-  if (match != null && match[1] != null) {
-    return FernNavigation.V1.slugjoin(match[1]);
+  if (match?.[1] != null) {
+    return slugjoin(match[1]);
   }
   return undefined;
 }

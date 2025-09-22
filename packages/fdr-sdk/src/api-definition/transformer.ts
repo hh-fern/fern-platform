@@ -1,7 +1,7 @@
 import identity from "@fern-api/ui-core-utils/identity";
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 
-import * as Latest from "./latest";
+import type * as Latest from "./latest";
 
 /**
  * Visitor for API definitions.
@@ -242,14 +242,16 @@ export class Transformer {
        * The following types do not have any nested types that need to be visited.
        */
 
-      CodeSnippet: visitor.CodeSnippet,
-      ErrorExample: visitor.ErrorExample,
-      ExampleWebSocketSession: visitor.ExampleWebSocketSession,
-      ObjectProperty: visitor.ObjectProperty,
-      EnumValue: visitor.EnumValue,
-      UndiscriminatedUnionVariant: visitor.UndiscriminatedUnionVariant,
-      FormDataFile: visitor.FormDataFile,
-      FormDataFiles: visitor.FormDataFiles,
+      CodeSnippet: (value, key) => visitor.CodeSnippet(value, key),
+      ErrorExample: (value, key) => visitor.ErrorExample(value, key),
+      ExampleWebSocketSession: (value, key) =>
+        visitor.ExampleWebSocketSession(value, key),
+      ObjectProperty: (value, key) => visitor.ObjectProperty(value, key),
+      EnumValue: (value, key) => visitor.EnumValue(value, key),
+      UndiscriminatedUnionVariant: (value, key) =>
+        visitor.UndiscriminatedUnionVariant(value, key),
+      FormDataFile: (value, key) => visitor.FormDataFile(value, key),
+      FormDataFiles: (value, key) => visitor.FormDataFiles(value, key),
 
       /**
        * The following types have nested types that need to be visited.

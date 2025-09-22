@@ -20,13 +20,13 @@ export const EVERYONE_ROLE = "everyone";
 /**
  * Revalidate all cached docs within 6 days because S3 signatures expire after 7 days.
  */
-export const REVALIDATE_SECONDS = 60 * 60 * 24 * 6;
+export const REVALIDATE_SECONDS: number = 60 * 60 * 24 * 6;
 
 /**
  * The following are domains that are used for previewing customer docs sites.
  * If the domain is `*.docs.buildwithfern.com`, it's a preview domain and SEO should be disabled.
  */
-export const FERN_DOCS_PREVIEW_DOMAINS = [
+export const FERN_DOCS_PREVIEW_DOMAINS: readonly string[] = [
   BUILDWITHFERN_COM,
   "ferndocs.com",
   "ferndocs.dev",
@@ -56,7 +56,7 @@ export const FERN_COLOR_ACCENT = "oklch(62.42% 0.1929 143.94)";
 export const FERN_COLOR_AIR = "oklch(99.56% 0.0078 139.44)";
 export const FERN_COLOR_GROUND = "oklch(16.16% 0.021 144.53)";
 
-export const FERN_DOCS_ORIGINS = [
+export const FERN_DOCS_ORIGINS: readonly string[] = [
   "app-dev.buildwithfern.com",
   "app-staging.buildwithfern.com",
   "app.buildwithfern.com",

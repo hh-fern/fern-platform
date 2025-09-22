@@ -112,7 +112,10 @@ const loadDynamicIRWithUrl = uncachedLoadDynamicIRWithUrl;
 /*
  * Domain key decoder/encoder functions
  */
-export function encodeDocsLoaderDomain(domain: string, branchName?: string) {
+export function encodeDocsLoaderDomain(
+  domain: string,
+  branchName?: string
+): string {
   return branchName ? `${domain}::${branchName}` : domain;
 }
 
@@ -278,7 +281,9 @@ export const getMetadataFromResponse = async (
   };
 };
 
-export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
+export const getMetadata = (
+  cacheConfig: Required<CacheConfig>
+): ((domainKey: string) => Promise<DocsMetadata>) =>
   cache(async (domainKey: string): Promise<DocsMetadata> => {
     "use cache";
     unstable_cacheTag(domainKey, "getMetadata");
@@ -476,7 +481,7 @@ const createGetPrunedApiCached = (
     { tags: [domainKey, "api"] }
   );
 
-export function createEndpointCacheKey(pruneType: PruningNodeType) {
+export function createEndpointCacheKey(pruneType: PruningNodeType): string {
   switch (pruneType.type) {
     case "endpoint":
       return `endpoint:${pruneType.endpointId}`;
@@ -604,7 +609,7 @@ const getEndpointByLocator = async (
 export function convertResponseToRootNode(
   response: DocsV2Read.LoadDocsForUrlResponse,
   edgeFlags: EdgeFlags
-) {
+): FernNavigation.RootNode | undefined {
   let root: FernNavigation.RootNode | undefined;
   if (response.definition.config.root) {
     root = FernNavigation.migrate.FernNavigationV1ToLatest.create().root(

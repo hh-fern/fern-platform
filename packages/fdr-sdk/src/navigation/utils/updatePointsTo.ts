@@ -1,5 +1,9 @@
-import { FernNavigation } from "../..";
 import { NodeCollector } from "../NodeCollector";
+import {
+  type NavigationNode,
+  hasPointsTo,
+  traverseDF,
+} from "../versions/latest";
 import { followRedirect } from "./followRedirect";
 
 /**
@@ -7,14 +11,12 @@ import { followRedirect } from "./followRedirect";
  *
  * @param input will be mutated
  */
-export function mutableUpdatePointsTo(
-  input: FernNavigation.NavigationNode
-): void {
+export function mutableUpdatePointsTo(input: NavigationNode): void {
   const collector = NodeCollector.collect(input);
   const slugMap = collector.getSlugMapWithParents();
 
-  FernNavigation.traverseDF(input, (node) => {
-    if (FernNavigation.hasPointsTo(node)) {
+  traverseDF(input, (node) => {
+    if (hasPointsTo(node)) {
       const pointsTo = followRedirect(node);
       if (pointsTo != null) {
         if (node.type === "root") {

@@ -1,9 +1,9 @@
 import { keys } from "@fern-api/ui-core-utils";
 
 import {
-  Loadable,
-  Loading,
-  NotFailed,
+  type Loadable,
+  type Loading,
+  type NotFailed,
   failed,
   isFailed,
   isLoaded,
@@ -151,7 +151,7 @@ export function visitLoadableArray<V, W>(
   return visitor.notFailed(Array<Loading<unknown>>(numLoading).fill(loading()));
 }
 
-export function isDoneLoading(loadable: Loadable<unknown>) {
+export function isDoneLoading(loadable: Loadable<unknown>): boolean {
   switch (loadable.type) {
     case "notStartedLoading":
     case "loading":

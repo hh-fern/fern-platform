@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { RefObject, useEffect, useMemo, useRef } from "react";
+import type { RefObject } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import fastdom from "fastdom";
 import { noop } from "ts-essentials";

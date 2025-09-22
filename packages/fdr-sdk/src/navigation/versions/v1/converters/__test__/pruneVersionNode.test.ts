@@ -1,4 +1,5 @@
-import { Slug, toDefaultSlug } from "../..";
+import { Slug } from "../../../../../client/generated/api/resources/navigation/resources/v1";
+import { toDefaultSlug } from "../../toDefaultSlug";
 
 describe("toDefaultSlug", () => {
   it("should return the default slug", () => {

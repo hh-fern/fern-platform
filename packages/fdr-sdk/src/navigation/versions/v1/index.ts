@@ -6,7 +6,7 @@ export * from "./converters/SlugGenerator";
 export * from "./converters/toRootNode";
 export * from "./followRedirect";
 export * from "./getPageId";
-export * from "./NavigationNode";
+export type * from "./NavigationNode";
 export * from "./NavigationNodeApiLeaf";
 export * from "./NavigationNodeLeaf";
 export * from "./NavigationNodeMarkdown";

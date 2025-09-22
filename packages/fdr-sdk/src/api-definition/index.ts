@@ -10,7 +10,7 @@ export * from "./snippets/curl";
 export * from "./snippets/SnippetHttpRequest";
 export * from "./status-message";
 export * from "./transformer";
-export * from "./types";
+export type * from "./types";
 export * from "./unwrap";
 export * from "./url";
 export * from "./snippets/backfill";

@@ -1,6 +1,11 @@
 import { mapValues } from "es-toolkit/object";
 
-import { FernNavigation } from "../../../..";
+import { PageId } from "../../../../client/generated/api/resources/commons";
+import {
+  NodeId,
+  type RootNode,
+  Slug,
+} from "../../../../client/generated/api/resources/navigation/resources/v1";
 import { APIV1Read, type DocsV2Read } from "../../../../client/types";
 import { getFrontmatter } from "../../../utils/getFrontmatter";
 import { getNoIndexFromFrontmatter } from "../../../utils/getNoIndexFromFrontmatter";
@@ -11,10 +16,9 @@ export function toRootNode(
   response: DocsV2Read.LoadDocsForUrlResponse,
   disableEndpointPairs: boolean = false,
   paginated?: boolean
-): FernNavigation.V1.RootNode {
-  const noindexMap: Record<FernNavigation.V1.PageId, boolean> = {};
-  const fullSlugMap: Record<FernNavigation.V1.PageId, FernNavigation.V1.Slug> =
-    {};
+): RootNode {
+  const noindexMap: Record<PageId, boolean> = {};
+  const fullSlugMap: Record<PageId, Slug> = {};
   Object.entries(response.definition.pages).forEach(([pageId, page]) => {
     const frontmatter = getFrontmatter(page.markdown);
     if (frontmatter == null) {
@@ -23,13 +27,13 @@ export function toRootNode(
 
     const noindex = getNoIndexFromFrontmatter(frontmatter);
     if (noindex != null) {
-      noindexMap[FernNavigation.V1.PageId(pageId)] = noindex;
+      noindexMap[PageId(pageId)] = noindex;
     }
 
     // get full slug from frontmatter
     const fullSlug = getFullSlugFromFrontmatter(frontmatter);
     if (fullSlug != null) {
-      fullSlugMap[FernNavigation.V1.PageId(pageId)] = fullSlug;
+      fullSlugMap[PageId(pageId)] = fullSlug;
     }
   });
 
@@ -48,30 +52,29 @@ export function toRootNode(
       paginated
     );
   } else {
-    // eslint-disable-next-line no-console
     console.error("No root node found");
     return {
       type: "root",
       version: "v1",
       child: {
         type: "unversioned",
-        id: FernNavigation.V1.NodeId("root-unversioned"),
+        id: NodeId("root-unversioned"),
         child: {
           type: "sidebarRoot",
-          id: FernNavigation.V1.NodeId("root-sidebar"),
+          id: NodeId("root-sidebar"),
           children: [],
         },
         landingPage: undefined,
       },
       title: response.definition.config.title ?? "",
-      slug: FernNavigation.V1.Slug(""),
+      slug: Slug(""),
       icon: undefined,
       hidden: undefined,
       authed: undefined,
       viewers: undefined,
       orphaned: undefined,
       featureFlags: undefined,
-      id: FernNavigation.V1.NodeId("root"),
+      id: NodeId("root"),
       pointsTo: undefined,
       roles: undefined,
     };

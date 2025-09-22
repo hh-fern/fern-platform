@@ -1,11 +1,11 @@
 import {
   PropertyKey,
-  TypeDefinition,
+  type TypeDefinition,
   TypeId,
-  TypeReference,
-  TypeShape,
+  type TypeReference,
+  type TypeShape,
 } from "../latest";
-import { TypeShapeOrReference } from "../types";
+import type { TypeShapeOrReference } from "../types";
 import { unwrapObjectType, unwrapReference } from "../unwrap";
 
 const PRIMITIVE_SHAPE: TypeShape = {

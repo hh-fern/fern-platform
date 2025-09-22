@@ -1,8 +1,8 @@
-import { FernNavigation } from "../../../..";
+import { NodeId } from "../../../../client/generated/api/resources/navigation/resources/v1";
 
 export class NodeIdGenerator {
   #ids: string[] = [];
-  public with<T>(key: string, cb: (id: FernNavigation.V1.NodeId) => T): T {
+  public with<T>(key: string, cb: (id: NodeId) => T): T {
     this.#ids.push(key);
     const result = cb(this.#stableId());
     this.#ids.pop();
@@ -10,7 +10,7 @@ export class NodeIdGenerator {
   }
 
   #generatedIds = new Set<string>();
-  #stableId(): FernNavigation.V1.NodeId {
+  #stableId(): NodeId {
     const id = this.#ids.join(".");
     let uniqId = id;
     let i = 0;
@@ -19,6 +19,6 @@ export class NodeIdGenerator {
       i++;
     }
     this.#generatedIds.add(uniqId);
-    return FernNavigation.V1.NodeId(uniqId);
+    return NodeId(uniqId);
   }
 }

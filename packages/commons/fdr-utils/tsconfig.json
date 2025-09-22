@@ -2,7 +2,9 @@
   "extends": "@fern-platform/configs/tsconfig/library.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "verbatimModuleSyntax": true,
+    "isolatedDeclarations": true
   },
   "include": ["./src/**/*"],
   "references": [

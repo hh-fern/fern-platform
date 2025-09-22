@@ -4,12 +4,33 @@ import urljoin from "url-join";
 import titleCase from "@fern-api/ui-core-utils/titleCase";
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 
-import { FernNavigation } from "../../../..";
-import { APIV1Read, DocsV1Read } from "../../../../client/types";
+import {
+  ApiDefinitionId,
+  type EndpointId,
+  type GrpcId,
+  PageId,
+  type WebSocketId,
+  type WebhookId,
+} from "../../../../client/generated/api/resources/commons/types";
+import type {
+  ApiPackageChild,
+  ApiPackageNode,
+  ApiReferenceNode,
+  EndpointNode,
+  EndpointPairNode,
+  GrpcNode,
+  Slug,
+  WebSocketNode,
+  WebhookNode,
+} from "../../../../client/generated/api/resources/navigation/resources/v1";
+import type { DocsV1Read } from "../../../../client/types";
+import { APIV1Read } from "../../../../client/types";
 import { ApiDefinitionHolder } from "../../../ApiDefinitionHolder";
 import { ROOT_PACKAGE_ID } from "../../../consts";
 import { isSubpackage } from "../../../utils/isSubpackage";
 import { stringifyEndpointPathParts } from "../../../utils/stringifyEndpointPathParts";
+import { convertAvailability } from "../convertAvailability";
+import { followRedirects } from "../followRedirect";
 import { ChangelogNavigationConverter } from "./ChangelogConverter";
 import { NodeIdGenerator } from "./NodeIdGenerator";
 import { SlugGenerator } from "./SlugGenerator";
@@ -18,14 +39,14 @@ export class ApiReferenceNavigationConverter {
   public static convert(
     apiSection: DocsV1Read.ApiSection,
     api: APIV1Read.ApiDefinition,
-    fullSlugMap?: Record<FernNavigation.V1.PageId, FernNavigation.V1.Slug>,
-    noindexMap?: Record<FernNavigation.V1.PageId, boolean>,
+    fullSlugMap?: Record<PageId, Slug>,
+    noindexMap?: Record<PageId, boolean>,
     parentSlug?: SlugGenerator,
     idgen?: NodeIdGenerator,
     lexicographic?: boolean,
     disableEndpointPairs?: boolean,
     paginated?: boolean
-  ) {
+  ): ApiReferenceNode {
     return new ApiReferenceNavigationConverter(
       apiSection,
       api,
@@ -39,38 +60,35 @@ export class ApiReferenceNavigationConverter {
     ).convert();
   }
 
-  apiDefinitionId: FernNavigation.V1.ApiDefinitionId;
+  apiDefinitionId: ApiDefinitionId;
   #holder: ApiDefinitionHolder;
-  #visitedEndpoints = new Set<FernNavigation.V1.EndpointId>();
-  #visitedWebSockets = new Set<FernNavigation.V1.WebSocketId>();
-  #visitedWebhooks = new Set<FernNavigation.V1.WebhookId>();
-  #visitedGrpcs = new Set<FernNavigation.V1.GrpcId>();
+  #visitedEndpoints = new Set<EndpointId>();
+  #visitedWebSockets = new Set<WebSocketId>();
+  #visitedWebhooks = new Set<WebhookId>();
+  #visitedGrpcs = new Set<GrpcId>();
   #visitedSubpackages = new Set<string>();
   #idgen: NodeIdGenerator;
   private constructor(
     private apiSection: DocsV1Read.ApiSection,
     private api: APIV1Read.ApiDefinition,
-    private fullSlugMap: Record<
-      FernNavigation.V1.PageId,
-      FernNavigation.V1.Slug
-    > = {},
-    private noindexMap: Record<FernNavigation.V1.PageId, boolean> = {},
+    private fullSlugMap: Record<PageId, Slug> = {},
+    private noindexMap: Record<PageId, boolean> = {},
     private parentSlug: SlugGenerator = SlugGenerator.init(""),
     idgen: NodeIdGenerator = new NodeIdGenerator(),
     private lexicographic: boolean = false,
     private disableEndpointPairs: boolean = false,
     private paginated: boolean | undefined
   ) {
-    this.apiDefinitionId = FernNavigation.V1.ApiDefinitionId(api.id);
+    this.apiDefinitionId = ApiDefinitionId(api.id);
     this.#holder = ApiDefinitionHolder.create(api);
     this.#idgen = idgen;
   }
 
-  private convert(): FernNavigation.V1.ApiReferenceNode {
+  private convert(): ApiReferenceNode {
     return this.#idgen.with(this.apiSection.urlSlug, (id) => {
       const overviewPageId =
         this.apiSection.navigation?.summaryPageId != null
-          ? FernNavigation.V1.PageId(this.apiSection.navigation.summaryPageId)
+          ? PageId(this.apiSection.navigation.summaryPageId)
           : undefined;
       const noindex =
         overviewPageId != null ? this.noindexMap[overviewPageId] : undefined;
@@ -94,13 +112,12 @@ export class ApiReferenceNavigationConverter {
               this.#idgen
             )
           : undefined;
-      const pointsTo =
-        FernNavigation.V1.followRedirects(children) ?? changelog?.slug;
+      const pointsTo = followRedirects(children) ?? changelog?.slug;
       return {
         id,
         type: "apiReference",
         title: this.apiSection.title,
-        apiDefinitionId: FernNavigation.V1.ApiDefinitionId(this.apiSection.api),
+        apiDefinitionId: ApiDefinitionId(this.apiSection.api),
         overviewPageId,
         noindex,
         paginated:
@@ -124,9 +141,7 @@ export class ApiReferenceNavigationConverter {
     });
   }
 
-  private convertChildren(
-    parentSlug: SlugGenerator
-  ): FernNavigation.V1.ApiPackageChild[] {
+  private convertChildren(parentSlug: SlugGenerator): ApiPackageChild[] {
     if (this.apiSection.navigation != null) {
       return this.convertApiNavigationItems(
         this.apiSection.navigation.items,
@@ -139,10 +154,10 @@ export class ApiReferenceNavigationConverter {
   }
 
   private convertEndpointNode(
-    endpointId: FernNavigation.V1.EndpointId,
+    endpointId: EndpointId,
     endpoint: APIV1Read.EndpointDefinition,
     parentSlug: SlugGenerator
-  ): FernNavigation.V1.EndpointNode | FernNavigation.V1.EndpointPairNode {
+  ): EndpointNode | EndpointPairNode {
     return this.#idgen.with(endpointId, (id) => {
       return {
         id,
@@ -154,9 +169,7 @@ export class ApiReferenceNavigationConverter {
         hidden: undefined,
         method: endpoint.method,
         apiDefinitionId: this.apiDefinitionId,
-        availability: FernNavigation.V1.convertAvailability(
-          endpoint.availability
-        ),
+        availability: convertAvailability(endpoint.availability),
         isResponseStream: endpoint.response?.type.type === "stream",
         playground: undefined,
         authed: undefined,
@@ -168,11 +181,11 @@ export class ApiReferenceNavigationConverter {
   }
 
   private convertGrpcNode(
-    grpcId: FernNavigation.V1.GrpcId,
+    grpcId: GrpcId,
     grpcEndpoint: APIV1Read.EndpointDefinition,
     grpcMethodType: APIV1Read.GrpcMethod,
     parentSlug: SlugGenerator
-  ): FernNavigation.V1.GrpcNode {
+  ): GrpcNode {
     return this.#idgen.with(grpcId, (id) => {
       return {
         id,
@@ -198,10 +211,10 @@ export class ApiReferenceNavigationConverter {
   }
 
   private convertWebSocketNode(
-    webSocketId: FernNavigation.V1.WebSocketId,
+    webSocketId: WebSocketId,
     webSocket: APIV1Read.WebSocketChannel,
     parentSlug: SlugGenerator
-  ): FernNavigation.V1.WebSocketNode {
+  ): WebSocketNode {
     return this.#idgen.with(webSocketId, (id) => ({
       id,
       type: "webSocket",
@@ -211,9 +224,7 @@ export class ApiReferenceNavigationConverter {
       icon: undefined,
       hidden: undefined,
       apiDefinitionId: this.apiDefinitionId,
-      availability: FernNavigation.V1.convertAvailability(
-        webSocket.availability
-      ),
+      availability: convertAvailability(webSocket.availability),
       playground: undefined,
       authed: undefined,
       viewers: undefined,
@@ -223,10 +234,10 @@ export class ApiReferenceNavigationConverter {
   }
 
   private convertWebhookNode(
-    webhookId: FernNavigation.V1.WebhookId,
+    webhookId: WebhookId,
     webhook: APIV1Read.WebhookDefinition,
     parentSlug: SlugGenerator
-  ): FernNavigation.V1.WebhookNode {
+  ): WebhookNode {
     return this.#idgen.with(webhookId, (id) => ({
       id,
       type: "webhook",
@@ -248,8 +259,8 @@ export class ApiReferenceNavigationConverter {
   private convertPackageToChildren(
     package_: APIV1Read.ApiDefinitionPackage,
     parentSlug: SlugGenerator
-  ): FernNavigation.V1.ApiPackageChild[] {
-    const children: FernNavigation.V1.ApiPackageChild[] = [];
+  ): ApiPackageChild[] {
+    const children: ApiPackageChild[] = [];
 
     let subpackageId = isSubpackage(package_)
       ? package_.subpackageId
@@ -336,7 +347,7 @@ export class ApiReferenceNavigationConverter {
       }
       const child = this.#idgen.with(
         subpackageId,
-        (id): FernNavigation.V1.ApiPackageNode | undefined => {
+        (id): ApiPackageNode | undefined => {
           const slug = parentSlug.apply(subpackage);
           const subpackageChildren = this.convertPackageToChildren(
             subpackage,
@@ -345,8 +356,7 @@ export class ApiReferenceNavigationConverter {
           if (subpackageChildren.length === 0) {
             return;
           }
-          const pointsTo =
-            FernNavigation.V1.followRedirects(subpackageChildren);
+          const pointsTo = followRedirects(subpackageChildren);
           return {
             id,
             type: "apiPackage",
@@ -392,8 +402,8 @@ export class ApiReferenceNavigationConverter {
     items: DocsV1Read.ApiNavigationConfigItem[],
     parentSlug: SlugGenerator,
     subpackageId: APIV1Read.SubpackageId
-  ): FernNavigation.V1.ApiPackageChild[] {
-    const children: FernNavigation.V1.ApiPackageChild[] = [];
+  ): ApiPackageChild[] {
+    const children: ApiPackageChild[] = [];
     let subpackage =
       subpackageId === "root"
         ? this.api.rootPackage
@@ -435,7 +445,7 @@ export class ApiReferenceNavigationConverter {
         page: (page) => {
           children.push(
             this.#idgen.with(page.urlSlug, (id) => {
-              const pageId = FernNavigation.V1.PageId(page.id);
+              const pageId = PageId(page.id);
               const noindex = this.noindexMap[pageId];
               return {
                 id,
@@ -534,9 +544,7 @@ export class ApiReferenceNavigationConverter {
           let slug = parentSlug.apply(subpackage);
 
           const overviewPageId =
-            summaryPageId != null
-              ? FernNavigation.V1.PageId(summaryPageId)
-              : undefined;
+            summaryPageId != null ? PageId(summaryPageId) : undefined;
           const noindex =
             overviewPageId != null
               ? this.noindexMap[overviewPageId]
@@ -568,7 +576,7 @@ export class ApiReferenceNavigationConverter {
               noindex,
               availability: undefined,
               apiDefinitionId: this.apiDefinitionId,
-              pointsTo: FernNavigation.V1.followRedirects(convertedItems),
+              pointsTo: followRedirects(convertedItems),
               playground: undefined,
               authed: undefined,
               viewers: undefined,
@@ -585,20 +593,15 @@ export class ApiReferenceNavigationConverter {
     return this.mergeEndpointPairs(children);
   }
 
-  private mergeEndpointPairs(
-    children: FernNavigation.V1.ApiPackageChild[]
-  ): FernNavigation.V1.ApiPackageChild[] {
+  private mergeEndpointPairs(children: ApiPackageChild[]): ApiPackageChild[] {
     // if batch stream toggle is disabled, return children as is and skip merging
     if (this.disableEndpointPairs) {
       return children;
     }
 
-    const toRet: FernNavigation.V1.ApiPackageChild[] = [];
+    const toRet: ApiPackageChild[] = [];
 
-    const methodAndPathToEndpointNode = new Map<
-      string,
-      FernNavigation.V1.EndpointNode
-    >();
+    const methodAndPathToEndpointNode = new Map<string, EndpointNode>();
     children.forEach((child) => {
       if (child.type !== "endpoint") {
         toRet.push(child);
@@ -617,7 +620,7 @@ export class ApiReferenceNavigationConverter {
 
       if (
         existing == null ||
-        toRet.indexOf(existing) === -1 ||
+        !toRet.includes(existing) ||
         existing.isResponseStream === child.isResponseStream
       ) {
         toRet.push(child);
@@ -625,7 +628,7 @@ export class ApiReferenceNavigationConverter {
       }
 
       const idx = toRet.indexOf(existing);
-      const pairNode: FernNavigation.V1.EndpointPairNode = this.#idgen.with(
+      const pairNode: EndpointPairNode = this.#idgen.with(
         "endpoint-pair",
         (id) => ({
           id,

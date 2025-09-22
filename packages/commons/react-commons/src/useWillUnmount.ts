@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 
 import createHandlerSetter, {
-  CallbackSetter,
+  type CallbackSetter,
 } from "./factory/createHandlerSetter";
 
 /**

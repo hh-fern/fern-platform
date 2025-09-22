@@ -1,22 +1,29 @@
 import { UnreachableCaseError } from "ts-essentials";
 
-import { FernNavigation } from "../..";
+import {
+  type NavigationNode,
+  type Slug,
+  getChildren,
+  hasMetadata,
+  isLeaf,
+  isPage,
+} from "../versions/latest";
 
 export function followRedirect(
-  nodeToFollow: FernNavigation.NavigationNode | undefined
-): FernNavigation.Slug | undefined {
+  nodeToFollow: NavigationNode | undefined
+): Slug | undefined {
   if (nodeToFollow == null) {
     return undefined;
   }
 
   // skip authed pages (but do not skip authed edge nodes, since we want to follow redirects to unauthed children)
   // TODO: the `authed: boolean` logic here is a bit convoluted and will cause confusion. We should revisit this.
-  if (FernNavigation.isPage(nodeToFollow) && !nodeToFollow.authed) {
+  if (isPage(nodeToFollow) && !nodeToFollow.authed) {
     return nodeToFollow.slug;
   }
 
   // skip other leaf nodes that were not returned above
-  if (FernNavigation.isLeaf(nodeToFollow)) {
+  if (isLeaf(nodeToFollow)) {
     return undefined;
   }
 
@@ -42,18 +49,18 @@ export function followRedirect(
     case "unversioned":
     case "version":
     case "changelog":
-      return followRedirects(FernNavigation.getChildren(nodeToFollow));
+      return followRedirects(getChildren(nodeToFollow));
     default:
       throw new UnreachableCaseError(nodeToFollow);
   }
 }
 
 export function followRedirects(
-  nodes: readonly FernNavigation.NavigationNode[]
-): FernNavigation.Slug | undefined {
+  nodes: readonly NavigationNode[]
+): Slug | undefined {
   for (const node of nodes) {
     // skip hidden nodes
-    if (FernNavigation.hasMetadata(node) && node.hidden) {
+    if (hasMetadata(node) && node.hidden) {
       continue;
     }
 

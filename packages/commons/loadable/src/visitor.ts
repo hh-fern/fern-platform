@@ -1,7 +1,7 @@
 import { assertNever } from "@fern-api/ui-core-utils";
 
 import {
-  Loadable,
+  type Loadable,
   isFailed,
   isLoaded,
   isLoading,

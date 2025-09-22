@@ -10,42 +10,42 @@
   "type": "module",
   "exports": {
     "./assertNever": {
-      "types": "./src/assertNever.ts",
-      "default": "./dist/assertNever.js"
+      "types": "./dist/types/assertNever.d.ts",
+      "default": "./dist/js/assertNever.js"
     },
     "./titleCase": {
-      "types": "./src/titleCase.ts",
-      "default": "./dist/titleCase.js"
+      "types": "./dist/types/titleCase.d.ts",
+      "default": "./dist/js/titleCase.js"
     },
     "./unknownToString": {
-      "types": "./src/unknownToString.ts",
-      "default": "./dist/unknownToString.js"
+      "types": "./dist/types/unknownToString.d.ts",
+      "default": "./dist/js/unknownToString.js"
     },
     "./visitDiscriminatedUnion": {
-      "types": "./src/visitDiscriminatedUnion.ts",
-      "default": "./dist/visitDiscriminatedUnion.js"
+      "types": "./dist/types/visitDiscriminatedUnion.d.ts",
+      "default": "./dist/js/visitDiscriminatedUnion.js"
     },
     "./isPlainObject": {
-      "types": "./src/objects/isPlainObject.ts",
+      "types": "./dist/types/objects/isPlainObject.d.ts",
       "default": "./dist/objects/isPlainObject.js"
     },
     "./identity": {
-      "types": "./src/identity.ts",
+      "types": "./dist/types/identity.d.ts",
       "default": "./dist/identity.js"
     },
     ".": {
-      "types": "./src/index.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/js/index.js"
     }
   },
-  "main": "dist/index.js",
-  "source": "src/index.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
-    "compile": "tsc --build",
+    "compile": "pnpm compile:js && pnpm compile:types",
+    "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
+    "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
     "depcheck": "depcheck",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
@@ -64,6 +64,8 @@
   },
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
     "@types/node": "^22.0.0",
     "@types/title": "^3.4.3",
     "@types/ua-parser-js": "^0.7.39",

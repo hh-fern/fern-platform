@@ -1,6 +1,6 @@
 "use client";
 
-import React, { PropsWithChildren, ReactNode } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
 import { atom, useAtomValue } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
@@ -10,7 +10,7 @@ export function tunnel(): {
   Out: () => ReactNode;
   useHasChildren: () => boolean;
 } {
-  const currentAtom = atom<React.ReactNode>(null);
+  const currentAtom = atom<ReactNode>(null);
 
   return {
     In: ({ children }: PropsWithChildren) => {

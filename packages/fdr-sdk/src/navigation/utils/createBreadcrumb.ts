@@ -2,14 +2,19 @@ import { noop } from "ts-essentials";
 
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 
-import { FernNavigation } from "../..";
+import {
+  type BreadcrumbItem,
+  type NavigationNode,
+  hasMetadata,
+  isLeaf,
+} from "../versions/latest";
 
 export function createBreadcrumb(
-  nodes: readonly FernNavigation.NavigationNode[]
-): FernNavigation.BreadcrumbItem[] {
-  const breadcrumb: FernNavigation.BreadcrumbItem[] = [];
+  nodes: readonly NavigationNode[]
+): BreadcrumbItem[] {
+  const breadcrumb: BreadcrumbItem[] = [];
   nodes.forEach((node) => {
-    if (!FernNavigation.hasMetadata(node) || FernNavigation.isLeaf(node)) {
+    if (!hasMetadata(node) || isLeaf(node)) {
       return;
     }
     visitDiscriminatedUnion(node)._visit({

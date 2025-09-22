@@ -1,10 +1,11 @@
 import assertNever from "@fern-api/ui-core-utils/assertNever";
 
-import { APIV1Db, APIV1Read } from "../../client";
+import type { APIV1Db} from "../../client";
+import { type APIV1Read } from "../../client";
 
 export function convertDbAPIDefinitionsToRead(
   dbApiDefinitions: Record<string, APIV1Db.DbApiDefinition>
-) {
+): Record<string, APIV1Read.ApiDefinition> {
   return Object.fromEntries(
     Object.entries(dbApiDefinitions).map(([id, dbDefinition]) => {
       const parsedApiDefinition = convertDbAPIDefinitionToRead(dbDefinition);

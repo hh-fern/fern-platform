@@ -11,8 +11,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/js/index.js"
     }
   },
   "files": [
@@ -20,7 +20,9 @@
   ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
-    "compile": "tsc --build",
+    "compile": "pnpm compile:js && pnpm compile:types",
+    "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
+    "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
     "depcheck": "depcheck",
     "dev": "tsc --watch",
     "format": "prettier --write --ignore-unknown \"**\"",
@@ -36,6 +38,8 @@
   },
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
     "@types/node": "^22.0.0",
     "depcheck": "^1.4.7",
     "stylelint": "^16.1.0",

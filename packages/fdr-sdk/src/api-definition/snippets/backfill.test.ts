@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  ApiDefinition,
+  type ApiDefinition,
   ApiDefinitionId,
   EndpointId,
   EnvironmentId,

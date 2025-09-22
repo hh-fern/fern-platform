@@ -1,7 +1,8 @@
-import { FernNavigation } from "../../..";
+import type { UnversionedNode } from "../../../client/generated/api/resources/navigation/resources/latest";
+import type { NavigationNode } from "./NavigationNode";
 
 export function isUnversionedNode(
-  node: FernNavigation.NavigationNode
-): node is FernNavigation.UnversionedNode {
+  node: NavigationNode
+): node is UnversionedNode {
   return node.type === "unversioned";
 }

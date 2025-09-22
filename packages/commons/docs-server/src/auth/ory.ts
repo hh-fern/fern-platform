@@ -1,4 +1,5 @@
-import { JWTPayload, createRemoteJWKSet, decodeJwt, jwtVerify } from "jose";
+import type { JWTPayload } from "jose";
+import { createRemoteJWKSet, decodeJwt, jwtVerify } from "jose";
 import urlJoin from "url-join";
 
 import {

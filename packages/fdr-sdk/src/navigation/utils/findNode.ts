@@ -1,7 +1,24 @@
 import { escapeRegExp } from "es-toolkit/string";
 
-import { FernNavigation } from "../..";
 import { NodeCollector } from "../NodeCollector";
+import {
+  type ApiReferenceNode,
+  type BreadcrumbItem,
+  type ChangelogNode,
+  type LandingPageNode,
+  type NavigationNodeNeighbor,
+  type NavigationNodePage,
+  type NavigationNodeParent,
+  type ProductNode,
+  type RootNode,
+  type SidebarRootNode,
+  Slug,
+  type TabChild,
+  type TabNode,
+  type VersionNode,
+  hasRedirect,
+  isPage,
+} from "../versions/latest";
 import { isApiReferenceNode } from "../versions/latest/isApiReferenceNode";
 import { isProductGroupNode } from "../versions/latest/isProductGroupNode";
 import { isProductNode } from "../versions/latest/isProductNode";
@@ -16,67 +33,58 @@ export type Node = Node.Found | Node.Redirect | Node.NotFound;
 export declare namespace Node {
   interface Found {
     type: "found";
-    node: FernNavigation.NavigationNodePage;
-    parents: readonly FernNavigation.NavigationNodeParent[];
-    breadcrumb: readonly FernNavigation.BreadcrumbItem[];
-    root: FernNavigation.RootNode;
-    products: readonly FernNavigation.ProductNode[];
-    currentProduct: FernNavigation.ProductNode | undefined;
+    node: NavigationNodePage;
+    parents: readonly NavigationNodeParent[];
+    breadcrumb: readonly BreadcrumbItem[];
+    root: RootNode;
+    products: readonly ProductNode[];
+    currentProduct: ProductNode | undefined;
     /**
      * This is true if the current product is the default product node (without the product slug prefix)
      */
     isCurrentProductDefault: boolean;
-    versions: readonly FernNavigation.VersionNode[];
-    currentVersion: FernNavigation.VersionNode | undefined;
+    versions: readonly VersionNode[];
+    currentVersion: VersionNode | undefined;
     /**
      * This is true if the current version is the default version node (without the version slug prefix)
      */
     isCurrentVersionDefault: boolean;
-    currentTab:
-      | FernNavigation.TabNode
-      | FernNavigation.ChangelogNode
-      | undefined;
-    tabs: readonly FernNavigation.TabChild[];
-    sidebar: FernNavigation.SidebarRootNode | undefined;
-    apiReference: FernNavigation.ApiReferenceNode | undefined;
-    next: FernNavigation.NavigationNodeNeighbor | undefined;
-    prev: FernNavigation.NavigationNodeNeighbor | undefined;
+    currentTab: TabNode | ChangelogNode | undefined;
+    tabs: readonly TabChild[];
+    sidebar: SidebarRootNode | undefined;
+    apiReference: ApiReferenceNode | undefined;
+    next: NavigationNodeNeighbor | undefined;
+    prev: NavigationNodeNeighbor | undefined;
     collector: NodeCollector;
-    landingPage: FernNavigation.LandingPageNode | undefined;
+    landingPage: LandingPageNode | undefined;
 
     /**
      * This is the part of the slug after the version (or basepath) prefix.
      *
      * For example, if the original slug is "docs/v1.0.0/foo/bar", the unversionedSlug is "foo/bar".
      */
-    unversionedSlug: FernNavigation.Slug;
+    unversionedSlug: Slug;
   }
 
   interface Redirect {
     type: "redirect";
-    redirect: FernNavigation.Slug;
+    redirect: Slug;
   }
 
   interface NotFound {
     type: "notFound";
-    redirect: FernNavigation.Slug | undefined;
+    redirect: Slug | undefined;
     authed: boolean | undefined;
   }
 }
 
-export function findNode(
-  root: FernNavigation.RootNode,
-  slug: FernNavigation.Slug
-): Node {
+export function findNode(root: RootNode, slug: Slug): Node {
   const collector = NodeCollector.collect(root);
   const found = collector.getSlugMapWithParents().get(slug);
 
   // if the slug points to a node that doesn't exist, we should redirect to the first likely node
   if (found == null) {
-    let maybeProductOrVersionNode:
-      | FernNavigation.RootNode
-      | FernNavigation.ProductNode
-      | FernNavigation.VersionNode = root;
+    let maybeProductOrVersionNode: RootNode | ProductNode | VersionNode = root;
     let foundProductNode = false;
 
     // the 404 behavior should be product-aware
@@ -135,7 +143,7 @@ export function findNode(
     (found.node.type === "apiReference" ? found.node : undefined);
 
   // if the node is visible (because it's a page), return it as "found"
-  if (FernNavigation.isPage(found.node)) {
+  if (isPage(found.node)) {
     const parentsAndNode = [...found.parents, found.node];
     const tabbedNodeIndex = parentsAndNode.findIndex(
       (node) => node === tabbedNode
@@ -172,7 +180,7 @@ export function findNode(
         : undefined;
     const slugPrefix =
       currentProduct?.slug ?? currentVersion?.slug ?? root.slug;
-    const unversionedSlug = FernNavigation.Slug(
+    const unversionedSlug = Slug(
       found.node.slug.replace(new RegExp(`^${escapeRegExp(slugPrefix)}/`), "")
     );
     return {
@@ -210,7 +218,7 @@ export function findNode(
   }
 
   // if the node has a redirect, return it
-  if (FernNavigation.hasRedirect(found.node) && found.node.pointsTo != null) {
+  if (hasRedirect(found.node) && found.node.pointsTo != null) {
     return { type: "redirect", redirect: found.node.pointsTo };
   }
 

@@ -185,8 +185,7 @@ function sortObject(object: unknown): unknown {
       return 0;
     });
 
-    for (const index in keys) {
-      const key = keys[index];
+    for (const key of keys) {
       if (key) {
         if (typeof object[key] === "object") {
           sortedObj[key] = sortObject(object[key]);

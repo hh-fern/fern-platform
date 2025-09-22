@@ -3,9 +3,10 @@ import tinycolor from "tinycolor2";
 
 import assertNever from "@fern-api/ui-core-utils/assertNever";
 
-import {
+import type {
   DocsV1Db,
-  DocsV1Read,
+  DocsV1Read} from "../../client";
+import {
   visitDbNavigationConfig,
   visitUnversionedDbNavigationConfig,
 } from "../../client";

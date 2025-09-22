@@ -1,8 +1,8 @@
-import { FernNavigation } from "@fern-api/fdr-sdk";
+import type { FernNavigation } from "@fern-api/fdr-sdk";
 
 export const getIsSingleOverviewPage = (
   found: FernNavigation.utils.Node.Found
-) => {
+): boolean => {
   let isSingleOverviewPage = false;
   if (
     found.sidebar != null &&
@@ -28,7 +28,7 @@ export const getIsSingleOverviewPage = (
   return isSingleOverviewPage;
 };
 
-export const getIsSidebarFixed = (config: any) => {
+export const getIsSidebarFixed = (config: any): boolean => {
   return (
     config.layout?.disableHeader ||
     config.layout?.tabsPlacement === "SIDEBAR" ||

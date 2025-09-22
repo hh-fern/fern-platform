@@ -2,42 +2,39 @@ import { once } from "es-toolkit/function";
 
 import { EMPTY_ARRAY } from "@fern-api/ui-core-utils";
 
-import { FernNavigation } from "./..";
 import { pruneVersionNode } from "./utils/pruneVersionNode";
-import { NavigationNodeWithMetadata, isProductNode } from "./versions";
+import type { NodeId, ProductNode, Slug, VersionNode } from "./versions/latest";
+import {
+  type NavigationNode,
+  type NavigationNodeNeighbor,
+  type NavigationNodeParent,
+  type NavigationNodeWithMetadata,
+  hasMarkdown,
+  hasMetadata,
+  isNeighbor,
+  isPage,
+  isProductNode,
+  traverseDF,
+} from "./versions/latest";
 
 interface NavigationNodeWithMetadataAndParents {
-  node: FernNavigation.NavigationNodeWithMetadata;
-  parents: readonly FernNavigation.NavigationNodeParent[];
-  next: FernNavigation.NavigationNodeNeighbor | undefined;
-  prev: FernNavigation.NavigationNodeNeighbor | undefined;
+  node: NavigationNodeWithMetadata;
+  parents: readonly NavigationNodeParent[];
+  next: NavigationNodeNeighbor | undefined;
+  prev: NavigationNodeNeighbor | undefined;
 }
 
-const NodeCollectorInstances = new WeakMap<
-  FernNavigation.NavigationNode,
-  NodeCollector
->();
+const NodeCollectorInstances = new WeakMap<NavigationNode, NodeCollector>();
 
 export class NodeCollector {
   private static readonly EMPTY = new NodeCollector(undefined);
-  private nodesInOrder: FernNavigation.NavigationNode[] = [];
-  private idToNode = new Map<
-    FernNavigation.NodeId,
-    FernNavigation.NavigationNode
-  >();
-  private idToNodeParents = new Map<
-    FernNavigation.NodeId,
-    readonly FernNavigation.NavigationNodeParent[]
-  >();
-  private slugToNode = new Map<
-    FernNavigation.Slug,
-    NavigationNodeWithMetadataAndParents
-  >();
-  private orphanedNodes: FernNavigation.NavigationNodeWithMetadata[] = [];
+  private nodesInOrder: NavigationNode[] = [];
+  private idToNode = new Map<NodeId, NavigationNode>();
+  private idToNodeParents = new Map<NodeId, readonly NavigationNodeParent[]>();
+  private slugToNode = new Map<Slug, NavigationNodeWithMetadataAndParents>();
+  private orphanedNodes: NavigationNodeWithMetadata[] = [];
 
-  public static collect(
-    rootNode: FernNavigation.NavigationNode | undefined
-  ): NodeCollector {
+  public static collect(rootNode: NavigationNode | undefined): NodeCollector {
     if (rootNode == null) {
       return NodeCollector.EMPTY;
     }
@@ -51,11 +48,11 @@ export class NodeCollector {
   }
 
   #last: NavigationNodeWithMetadataAndParents | undefined;
-  #lastNeighboringNode: FernNavigation.NavigationNodeNeighbor | undefined;
+  #lastNeighboringNode: NavigationNodeNeighbor | undefined;
   #setNode(
-    slug: FernNavigation.Slug,
-    node: FernNavigation.NavigationNodeWithMetadata,
-    parents: readonly FernNavigation.NavigationNodeParent[]
+    slug: Slug,
+    node: NavigationNodeWithMetadata,
+    parents: readonly NavigationNodeParent[]
   ) {
     const toSet = {
       node,
@@ -65,7 +62,7 @@ export class NodeCollector {
     };
     this.slugToNode.set(slug, toSet);
 
-    if (FernNavigation.isNeighbor(node)) {
+    if (isNeighbor(node)) {
       this.#lastNeighboringNode = node;
       if (this.#last != null) {
         this.#last.next = node;
@@ -74,17 +71,17 @@ export class NodeCollector {
     }
   }
 
-  private versionNodes: FernNavigation.VersionNode[] = [];
-  private defaultVersion: FernNavigation.VersionNode | undefined;
+  private versionNodes: VersionNode[] = [];
+  private defaultVersion: VersionNode | undefined;
 
-  private productNodes: FernNavigation.ProductNode[] = [];
-  private defaultProduct: FernNavigation.ProductNode | undefined;
+  private productNodes: ProductNode[] = [];
+  private defaultProduct: ProductNode | undefined;
 
-  constructor(rootNode: FernNavigation.NavigationNode | undefined) {
+  constructor(rootNode: NavigationNode | undefined) {
     if (rootNode == null) {
       return;
     }
-    FernNavigation.traverseDF(rootNode, (node, parents) => {
+    traverseDF(rootNode, (node, parents) => {
       if (node.type === "product") {
         this.productNodes.push(node);
       }
@@ -97,15 +94,13 @@ export class NodeCollector {
       if (node.type === "version" && node.default && rootNode.type === "root") {
         // if the node is the default version OF a product, we want to prune using the product slug, not the root slug.
         const productNode = parents.find(isProductNode);
-        const copy = JSON.parse(
-          JSON.stringify(node)
-        ) as FernNavigation.VersionNode;
+        const copy = JSON.parse(JSON.stringify(node)) as VersionNode;
         this.defaultVersion = pruneVersionNode(
           copy,
           productNode?.slug ?? rootNode.slug,
           node.slug
         );
-        FernNavigation.traverseDF(this.defaultVersion, (node, innerParents) => {
+        traverseDF(this.defaultVersion, (node, innerParents) => {
           this.visitNode(node, [...parents, ...innerParents], true);
         });
       }
@@ -115,8 +110,8 @@ export class NodeCollector {
   }
 
   private visitNode(
-    node: FernNavigation.NavigationNode,
-    parents: readonly FernNavigation.NavigationNodeParent[],
+    node: NavigationNode,
+    parents: readonly NavigationNodeParent[],
     isDefaultVersion = false
   ): void {
     if (!this.idToNode.has(node.id) || isDefaultVersion) {
@@ -132,7 +127,7 @@ export class NodeCollector {
 
     // there's currently no visitable page for changelog months and years
     if (
-      !FernNavigation.hasMetadata(node) ||
+      !hasMetadata(node) ||
       node.type === "changelogMonth" ||
       node.type === "changelogYear"
     ) {
@@ -144,8 +139,8 @@ export class NodeCollector {
       this.#setNode(node.slug, node, parents);
     } else if (
       !node.hidden &&
-      FernNavigation.isPage(node) &&
-      (existing.node.hidden || !FernNavigation.isPage(existing.node))
+      isPage(node) &&
+      (existing.node.hidden || !isPage(existing.node))
     ) {
       this.orphanedNodes.push(existing.node);
       this.#setNode(node.slug, node, parents);
@@ -154,50 +149,44 @@ export class NodeCollector {
     }
   }
 
-  public getOrphanedNodes(): FernNavigation.NavigationNodeWithMetadata[] {
+  public getOrphanedNodes(): NavigationNodeWithMetadata[] {
     return this.orphanedNodes;
   }
 
-  public getOrphanedPages = once(
-    (): FernNavigation.NavigationNodeWithMetadata[] => {
-      return this.orphanedNodes.filter(FernNavigation.isPage);
+  public getOrphanedPages: () => NavigationNodeWithMetadata[] = once(
+    (): NavigationNodeWithMetadata[] => {
+      return this.orphanedNodes.filter(isPage);
     }
   );
 
-  private getSlugMap = once(
-    (): Map<string, FernNavigation.NavigationNodeWithMetadata> => {
-      return new Map(
-        [...this.slugToNode.entries()].map(([slug, { node }]) => [slug, node])
-      );
-    }
-  );
+  private getSlugMap = once((): Map<string, NavigationNodeWithMetadata> => {
+    return new Map(
+      [...this.slugToNode.entries()].map(([slug, { node }]) => [slug, node])
+    );
+  });
 
-  get slugMap(): Map<string, FernNavigation.NavigationNodeWithMetadata> {
+  get slugMap(): Map<string, NavigationNodeWithMetadata> {
     return this.getSlugMap();
   }
 
-  get defaultVersionNode(): FernNavigation.VersionNode | undefined {
+  get defaultVersionNode(): VersionNode | undefined {
     return this.defaultVersion;
   }
 
-  get defaultProductNode(): FernNavigation.ProductNode | undefined {
+  get defaultProductNode(): ProductNode | undefined {
     return this.defaultProduct;
   }
 
-  public get(
-    id: FernNavigation.NodeId
-  ): FernNavigation.NavigationNode | undefined {
+  public get(id: NodeId): NavigationNode | undefined {
     return this.idToNode.get(id);
   }
 
-  public getParents(
-    id: FernNavigation.NodeId
-  ): readonly FernNavigation.NavigationNodeParent[] {
+  public getParents(id: NodeId): readonly NavigationNodeParent[] {
     return this.idToNodeParents.get(id) ?? EMPTY_ARRAY;
   }
 
   public getSlugMapWithParents = (): ReadonlyMap<
-    FernNavigation.Slug,
+    Slug,
     NavigationNodeWithMetadataAndParents
   > => {
     return this.slugToNode;
@@ -221,7 +210,7 @@ export class NodeCollector {
     return Array.from(
       new Set(
         [...this.slugToNode.values()]
-          .filter(({ node }) => FernNavigation.isPage(node))
+          .filter(({ node }) => isPage(node))
           .filter(({ node }) => !node.authed)
           .map(({ node }) => node.slug)
       )
@@ -240,11 +229,9 @@ export class NodeCollector {
     return Array.from(
       new Set(
         [...this.slugToNode.values()]
-          .filter(({ node }) => FernNavigation.isPage(node))
+          .filter(({ node }) => isPage(node))
           .filter(({ node }) => !node.hidden && !node.authed)
-          .filter(({ node }) =>
-            FernNavigation.hasMarkdown(node) ? !node.noindex : true
-          )
+          .filter(({ node }) => (hasMarkdown(node) ? !node.noindex : true))
           .map(({ node }) => node.canonicalSlug ?? node.slug)
       )
     );
@@ -257,11 +244,9 @@ export class NodeCollector {
     const slugRecord: Record<string, NavigationNodeWithMetadata> = {};
 
     [...this.slugToNode.values()]
-      .filter(({ node }) => FernNavigation.isPage(node))
+      .filter(({ node }) => isPage(node))
       .filter(({ node }) => !node.hidden)
-      .filter(({ node }) =>
-        FernNavigation.hasMarkdown(node) ? !node.noindex : true
-      )
+      .filter(({ node }) => (hasMarkdown(node) ? !node.noindex : true))
       .forEach((node) => {
         const canonicalSlug = node.node.canonicalSlug ?? node.node.slug;
         // Only keep the first node we see for each canonical slug
@@ -276,15 +261,15 @@ export class NodeCollector {
     return this.#getIndexablePageNodesWithAuth();
   }
 
-  public getProductNodes = (): FernNavigation.ProductNode[] => {
+  public getProductNodes = (): ProductNode[] => {
     return this.productNodes;
   };
 
-  public getVersionNodes = (): FernNavigation.VersionNode[] => {
+  public getVersionNodes = (): VersionNode[] => {
     return this.versionNodes;
   };
 
-  public getNodesInOrder = (): FernNavigation.NavigationNode[] => {
+  public getNodesInOrder = (): NavigationNode[] => {
     return this.nodesInOrder;
   };
 }

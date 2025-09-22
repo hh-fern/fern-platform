@@ -82,7 +82,7 @@ export function collectTypeDefinitionTree(
   let loop = 0;
   while (stack.length > 0) {
     if (loop++ > LARGE_LOOP_TOLERANCE) {
-      // eslint-disable-next-line no-console
+       
       console.error("Infinite loop detected when traversing type definitions");
       break;
     }

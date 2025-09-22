@@ -1,14 +1,18 @@
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 
-import { FernNavigation } from "../..";
+import type {
+  ApiDefinitionId,
+  NavigationNode,
+  WithApiDefinitionId,
+} from "../versions/latest";
 
 const RETURN_UNDEFINED = () => undefined;
-const RETURN_API_DEFINITION_ID = (node: FernNavigation.WithApiDefinitionId) =>
+const RETURN_API_DEFINITION_ID = (node: WithApiDefinitionId) =>
   node.apiDefinitionId;
 
 export function getApiReferenceId(
-  node: FernNavigation.NavigationNode | undefined
-): FernNavigation.ApiDefinitionId | undefined {
+  node: NavigationNode | undefined
+): ApiDefinitionId | undefined {
   if (node == null) {
     return undefined;
   }
