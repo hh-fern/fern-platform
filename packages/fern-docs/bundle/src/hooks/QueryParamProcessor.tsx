@@ -17,5 +17,5 @@ export function QueryParamProcessor() {
         searchParams.get("language") as ApiDefinition.Language
       );
     }
-  }, [searchParams]);
+  }, [searchParams, setSelectedLanguage]);
 }
