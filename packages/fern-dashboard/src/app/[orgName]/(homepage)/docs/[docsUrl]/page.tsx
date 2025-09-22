@@ -3,27 +3,25 @@ import "server-only";
 import { notFound } from "next/navigation";
 
 import getGithubSourceMetadataHandler from "@/app/api/get-github-source-metadata/handler";
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import getDocsSitesForOrg from "@/app/services/dal/fdr/getDocsSitesForOrg";
 import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
 import { validateGithubRepoAccess } from "@/app/services/dal/github/validators";
 import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
 import { FernCliVersionDisplay } from "@/components/docs-page/FernCliVersionDisplay";
-import {
-  GithubAuthState,
-  GithubSource,
-} from "@/components/docs-page/GithubSource";
+import type { GithubAuthState } from "@/components/docs-page/GithubSource";
+import { GithubSource } from "@/components/docs-page/GithubSource";
 import { VisualEditorSection } from "@/components/docs-page/visual-editor-section/VisualEditorSection";
 import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
-import { EncodedDocsUrl } from "@/utils/types";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page(props: {
   params: Promise<{ orgName: Auth0OrgName; docsUrl: EncodedDocsUrl }>;
-}) {
+}): Promise<React.JSX.Element> {
   const { orgName, docsUrl: encodedDocsUrl } = await props.params;
 
   const session = await getAuthenticatedSessionOrRedirect(orgName);

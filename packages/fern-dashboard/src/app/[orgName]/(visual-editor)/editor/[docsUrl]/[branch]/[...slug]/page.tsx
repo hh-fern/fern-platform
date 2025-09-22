@@ -4,17 +4,18 @@ import { notFound, redirect } from "next/navigation";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { NodeId, getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
+import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import { getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 import { mdxToHtml } from "@fern-docs/mdx";
 
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
-import { EncodedDocsUrl } from "@/utils/types";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 import PageNode from "./PageNode";
 
@@ -29,7 +30,7 @@ export default async function Page({
     slug: string[];
   }>;
   searchParams: Promise<Record<string, string>>;
-}) {
+}): Promise<React.JSX.Element> {
   const { orgName, docsUrl, branch, slug: slugArray } = await params;
 
   const { githubUrl, session } = await assertAuthAndFetchGithubUrl({

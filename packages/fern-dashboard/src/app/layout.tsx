@@ -27,7 +27,7 @@ export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.JSX.Element;
-}>) {
+}>): Promise<React.JSX.Element> {
   const session = await getCurrentSession();
 
   await applyOrgMappings();

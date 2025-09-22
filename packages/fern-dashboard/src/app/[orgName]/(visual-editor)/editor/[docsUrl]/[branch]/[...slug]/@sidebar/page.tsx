@@ -26,7 +26,7 @@ export default async function SidebarPage({
 }: {
   params: Promise<{ docsUrl: EncodedDocsUrl; slug: string[]; branch: string }>;
   searchParams: Promise<Record<string, string>>;
-}): Promise<JSX.Element> {
+}): Promise<JSX.Element | null> {
   const { docsUrl, slug: slugArray, branch } = await params;
   const resolvedSearchParams = await searchParams;
   const clientNodeId = resolvedSearchParams["client-node-id"];

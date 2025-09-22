@@ -39,7 +39,7 @@ export default async function EditorLayout({
     branch: string;
   }>;
   children: React.JSX.Element;
-}>) {
+}>): Promise<React.JSX.Element> {
   const { orgName, docsUrl: encodedDocsUrl, branch } = await params;
   const docsUrl = parseDocsUrlParam({ docsUrl: encodedDocsUrl });
 
