@@ -52,7 +52,8 @@
     "./layouts/*": "./src/layouts/*.tsx",
     "./providers/*": "./src/providers/*.tsx",
     "./mdx/*": "./src/mdx/*.tsx",
-    "./navigation/local-storage": "./src/navigation/localStorageUtils.ts"
+    "./navigation/local-storage": "./src/navigation/localStorageUtils.ts",
+    "./navigation": "./src/navigation/index.ts"
   },
   "files": [
     "src"

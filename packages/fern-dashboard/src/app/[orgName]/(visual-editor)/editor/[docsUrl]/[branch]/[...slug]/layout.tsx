@@ -1,7 +1,6 @@
 import React from "react";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
-import { FernThemeProvider } from "@fern-docs/components";
 import { AbstractHeaderTabsRoot } from "@fern-docs/components/abstract/AbstractHeaderTabsRoot";
 import { FERN_SEARCH_BUTTON_ID } from "@fern-docs/components/constants";
 import { NavbarLinks } from "@fern-docs/components/header/NavbarLinks";
@@ -10,6 +9,7 @@ import { SidebarContainer } from "@fern-docs/components/sidebar/SidebarContainer
 import { RootNodeProvider } from "@fern-docs/components/state/navigation";
 import { getAllSidebarRootNodes } from "@fern-docs/components/state/navigation-server";
 import { getSidebarRootNodeIdToChildToParentsMap } from "@fern-docs/components/state/navigation-server";
+import { FernThemeProvider } from "@fern-docs/components/theme";
 import AbstractDefaultDocs from "@fern-docs/components/theming/AbstractDefaultDocs";
 import { GlobalStyles } from "@fern-docs/components/theming/global-styles";
 import { DesktopSearchButton } from "@fern-docs/search-ui/components/desktop/desktop-search-button";

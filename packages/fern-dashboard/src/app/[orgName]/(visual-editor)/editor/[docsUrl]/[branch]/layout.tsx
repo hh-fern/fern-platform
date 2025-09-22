@@ -3,7 +3,7 @@ import "server-only";
 import { ThemeProvider } from "next-themes";
 import type React from "react";
 
-import { NavigationStoreProvider } from "@fern-docs/components";
+import { NavigationStoreProvider } from "@fern-docs/components/navigation";
 
 import { ClientMDXProvider } from "@/app/[orgName]/context/ClientMDXProvider";
 import { OrgNameProvider } from "@/app/[orgName]/context/OrgNameContext";

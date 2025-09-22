@@ -8,10 +8,11 @@ import { useRouter } from "@bprogress/next/app";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import {
   NavigationContext,
+  SectionWithHierarchy,
   UNNAMED_SECTION_DISPLAY_NAMES,
   createMdxFrontmatter,
-} from "@fern-docs/components";
-import { SectionWithHierarchy, getAllSections } from "@fern-docs/components";
+  getAllSections,
+} from "@fern-docs/components/navigation";
 import { mdxToHtml } from "@fern-docs/mdx";
 
 import { Auth0OrgName } from "@/app/services/auth0/types";

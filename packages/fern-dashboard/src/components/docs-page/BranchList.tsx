@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useRouter } from "@bprogress/next/app";
 
-import { createNavigationLocalStorage } from "@fern-docs/components";
+import { createNavigationLocalStorage } from "@fern-docs/components/navigation";
 
 import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";

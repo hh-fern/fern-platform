@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 
-import { cn } from "@fern-docs/components";
-
 import { AutoResizingInput } from "@/components/input/AutoResizingInput";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { usePages } from "@/providers/PagesStoreContext";
+import { cn } from "@/utils/utils";
 
 export declare namespace PageSubtitle {
   export interface Props {
