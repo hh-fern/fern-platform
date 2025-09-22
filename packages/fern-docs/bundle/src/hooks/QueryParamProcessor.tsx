@@ -13,9 +13,7 @@ export function QueryParamProcessor() {
 
   useEffect(() => {
     if (searchParams.get("language")) {
-      setSelectedLanguage(
-        searchParams.get("language") as ApiDefinition.Language
-      );
+      setSelectedLanguage(searchParams.get("language")!);
     }
   }, [searchParams, setSelectedLanguage]);
 }
