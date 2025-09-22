@@ -1,18 +1,22 @@
 "use client";
 
-import { ReactNode, createContext, useContext, useState } from "react";
+import type { Context, JSX, ReactNode } from "react";
+import { createContext, useContext, useState } from "react";
 
-export const BranchContext = createContext<{
+type BranchContextValue = {
   branch: string;
   setBranch: (branch: string) => void;
   branchFailed: boolean;
-}>({
-  branch: "",
-  setBranch: (_branch: string) => {
-    return;
-  },
-  branchFailed: false,
-});
+};
+
+export const BranchContext: Context<BranchContextValue> =
+  createContext<BranchContextValue>({
+    branch: "",
+    setBranch: (_branch: string) => {
+      return;
+    },
+    branchFailed: false,
+  });
 
 export function BranchProvider({
   branch,
@@ -22,7 +26,7 @@ export function BranchProvider({
   branch: string;
   branchFailed: boolean;
   children: ReactNode;
-}) {
+}): JSX.Element {
   const [currBranch, setBranchStore] = useState<string>(branch);
 
   function setBranch(branch: string) {
@@ -38,6 +42,6 @@ export function BranchProvider({
   );
 }
 
-export function useBranch() {
+export function useBranch(): BranchContextValue {
   return useContext(BranchContext);
 }

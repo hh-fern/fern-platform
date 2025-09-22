@@ -4,8 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { rescindInvitation } from "@/app/actions/rescindInvitation";
-import { ReactQueryKey, inferQueryData } from "@/state/queryKeys";
-import { OrgInvitation } from "@/state/types";
+import type { inferQueryData } from "@/state/queryKeys";
+import { ReactQueryKey } from "@/state/queryKeys";
+import type { OrgInvitation } from "@/state/types";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 
 import { DropdownMenuItem } from "../ui/dropdown-menu";
@@ -17,7 +18,7 @@ export declare namespace InviteeRow {
   }
 }
 
-export function InviteeRow({ invitation }: InviteeRow.Props) {
+export function InviteeRow({ invitation }: InviteeRow.Props): JSX.Element {
   const orgName = useOrgNameFromPathname();
   const queryKey = ReactQueryKey.orgInvitations(orgName);
 

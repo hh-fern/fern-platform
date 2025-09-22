@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import GradientExclamation from "@fern-docs/components/GradientExclamation";
 
 import { Button } from "@/components/ui/button";
-import { ERROR_DIGEST_KEYS } from "@/utils/errors";
+import type { ERROR_DIGEST_KEYS } from "@/utils/errors";
 import { ERROR_DIGEST_MESSAGES } from "@/utils/errors";
 
 export default function Error({
@@ -15,7 +15,7 @@ export default function Error({
 }: {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}): JSX.Element {
   const { orgName } = useParams();
 
   return (

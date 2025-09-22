@@ -1,13 +1,14 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import type { JSX } from "react";
 import React, { useEffect } from "react";
 
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 
-import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { PostHogIdentify } from "@/components/posthog/PostHogIdentify";
 import { PostHogPageView } from "@/components/posthog/PostHogPageView";
 import { isProduction } from "@/utils/environment";
@@ -19,7 +20,10 @@ export declare namespace PostHogProvider {
   }
 }
 
-export function PostHogProvider({ session, children }: PostHogProvider.Props) {
+export function PostHogProvider({
+  session,
+  children,
+}: PostHogProvider.Props): JSX.Element {
   const isPosthogTrackingEnabled =
     process.env.NEXT_PUBLIC_POSTHOG_TRACKING_ENABLED === "true";
 

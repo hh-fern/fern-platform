@@ -1,10 +1,8 @@
-"use client";
-
 import ChatBubbleLeftEllipsisIcon from "@heroicons/react/24/outline/ChatBubbleLeftEllipsisIcon";
 import SparklesIcon from "@heroicons/react/24/outline/SparklesIcon";
 
 import { AnalyticsHistogramTabItem } from "./AnalyticsHistogramTabItem";
-import { RenderType } from "./AnalyticsPageClient";
+import type { RenderType } from "./AnalyticsPageClient";
 
 export function AnalyticsHistogramTabBar({
   renderType,
@@ -12,7 +10,7 @@ export function AnalyticsHistogramTabBar({
 }: {
   renderType: RenderType;
   onChangeRenderType: (type: RenderType) => void;
-}) {
+}): JSX.Element {
   return (
     <div className="flex min-w-0">
       <AnalyticsHistogramTabItem

@@ -1,4 +1,8 @@
-import { RedisCacheKey, RedisCacheKeyType, inferCachedData } from "./cacheKey";
+import type {
+  RedisCacheKey,
+  RedisCacheKeyType,
+  inferCachedData,
+} from "./cacheKey";
 import { redisDel, redisGet, redisSet } from "./redis";
 
 export class AsyncRedisCache<T extends RedisCacheKeyType> {
@@ -57,7 +61,7 @@ export class AsyncRedisCache<T extends RedisCacheKeyType> {
     return await redisGet(key);
   }
 
-  public async invalidate(key: RedisCacheKey<T>) {
+  public async invalidate(key: RedisCacheKey<T>): Promise<void> {
     await redisDel(key);
   }
 }

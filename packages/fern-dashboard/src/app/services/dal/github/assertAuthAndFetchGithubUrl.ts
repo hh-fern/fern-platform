@@ -1,15 +1,21 @@
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 
-import { getCurrentSession } from "../../auth0/getCurrentSession";
-import { Auth0OrgName } from "../../auth0/types";
+import {
+  type Auth0SessionData,
+  getCurrentSession,
+} from "../../auth0/getCurrentSession";
+import type { Auth0OrgName } from "../../auth0/types";
 import { assertUserHasOrganizationAccess } from "../organization";
 import getDocsGithubUrl from "./getDocsGithubUrl";
 import { assertGithubAccessByUrl } from "./validators";
 
-export const assertAuthAndFetchGithubUrl = cache(
+export const assertAuthAndFetchGithubUrl: (params: {
+  orgName: Auth0OrgName;
+  docsUrl: DocsUrl;
+}) => Promise<{ githubUrl: string; session: Auth0SessionData }> = cache(
   async ({ orgName, docsUrl }: { orgName: Auth0OrgName; docsUrl: DocsUrl }) => {
     // Validate session
     const session = await getCurrentSession();

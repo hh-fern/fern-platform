@@ -1,7 +1,7 @@
-import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { MdxToHtmlResponse } from "@fern-docs/mdx";
+import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import type { MdxToHtmlResponse } from "@fern-docs/mdx";
 
-import {
+import type {
   PageContents,
   PageDependencies,
   PageMetadata,

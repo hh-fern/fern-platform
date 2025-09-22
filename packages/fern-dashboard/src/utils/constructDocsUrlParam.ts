@@ -1,5 +1,5 @@
-import { DocsUrl } from "./types";
+import type { DocsUrl } from "./types";
 
-export function constructDocsUrlParam(docsUrl: DocsUrl) {
+export function constructDocsUrlParam(docsUrl: DocsUrl): string {
   return encodeURIComponent(docsUrl);
 }

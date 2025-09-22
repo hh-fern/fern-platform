@@ -1,6 +1,5 @@
+import type { ComponentProps, ReactElement } from "react";
 import React, {
-  ComponentProps,
-  ReactElement,
   createContext,
   useCallback,
   useContext,

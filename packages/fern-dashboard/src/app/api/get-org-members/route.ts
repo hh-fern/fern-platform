@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import { z } from "zod";
 
 import { ensureUserBelongsToOrg } from "@/app/services/auth0/management";
-import { ResolvedReturnType } from "@/utils/types";
+import type { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";

@@ -6,7 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "@bprogress/next/app";
 import { ChevronDown } from "lucide-react";
 
-import { Auth0OrgName, Auth0Organization } from "@/app/services/auth0/types";
+import type {
+  Auth0OrgName,
+  Auth0Organization,
+} from "@/app/services/auth0/types";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { Button } from "@/components/ui/button";
 import { getOrgDisplayName } from "@/utils/getOrgDisplayName";
@@ -21,7 +24,7 @@ export const OrgSwitcherClient = ({
 }: {
   organizations: Auth0Organization[];
   currentOrgName: Auth0OrgName;
-}) => {
+}): JSX.Element => {
   const orgName = useOrgNameFromPathname();
   const [localOrgName, setLocalOrgName] = useState(currentOrgName);
   const [searchTerm, setSearchTerm] = useState("");

@@ -6,13 +6,13 @@ import { HeaderTabsList } from "@fern-docs/components/HeaderTabsList";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
-import { EncodedDocsUrl } from "@/utils/types";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 export default async function HeaderTabsPage({
   params,
 }: {
   params: Promise<{ docsUrl: EncodedDocsUrl; slug: string; branch: string }>;
-}) {
+}): Promise<JSX.Element | null> {
   const { docsUrl, slug, branch } = await params;
   const session = await getCurrentSession();
   const host = await getHostFromHeaders();

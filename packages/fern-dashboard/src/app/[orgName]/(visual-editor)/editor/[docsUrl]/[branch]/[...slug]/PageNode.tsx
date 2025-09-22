@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 
-import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { SerializableFoundNode } from "@fern-docs/components";
+import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import type { SerializableFoundNode } from "@fern-docs/components";
 import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
-import { MdxToHtmlResponse } from "@fern-docs/mdx";
+import type { MdxToHtmlResponse } from "@fern-docs/mdx";
 
 import { UnsupportedContent } from "@/components/editor/UnsupportedContent";
 import { CSSProvider } from "@/components/editor/extension-custom-element/CSSContext";
@@ -29,7 +29,7 @@ export default function PageNode({
   serializableFoundNode,
   clientNodeId,
   ...props
-}: PageNode.Props) {
+}: PageNode.Props): JSX.Element {
   const { buildPageDataFromSources } = usePages();
 
   const {

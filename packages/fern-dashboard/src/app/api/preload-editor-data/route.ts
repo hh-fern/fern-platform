@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import { z } from "zod";
 
-import { ResolvedReturnType } from "@/utils/types";
+import type { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";
@@ -13,11 +14,15 @@ export declare namespace preloadEditorData {
   export type Response = ResolvedReturnType<typeof handler>;
 }
 
-const PostPreloadEditorData = z.object({
+type PostPreloadEditorData = {
+  docsUrl: string;
+};
+
+const PostPreloadEditorData: z.ZodType<PostPreloadEditorData> = z.object({
   docsUrl: z.string(),
 });
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   const maybeSessionData = await maybeGetCurrentSession(req);
   if (maybeSessionData.errorResponse != null) {
     return maybeSessionData.errorResponse;

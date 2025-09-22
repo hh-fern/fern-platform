@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-import { Editor, EditorEvents } from "@tiptap/react";
+import type { Editor, EditorEvents } from "@tiptap/react";
 
 import { getChangedNodesFromHtml } from "@fern-docs/mdx";
 
@@ -22,7 +22,7 @@ export default function PageEditor({
   className,
   filename,
   initialHtml,
-}: PageEditor.Props) {
+}: PageEditor.Props): JSX.Element {
   const editorRef = useRef<Editor | null>(null);
   const skipNormalUpdateBecauseUpdateIsFromDevPanel = useRef(false);
   const latestTiptapHtml = useRef<string>(initialHtml || "");

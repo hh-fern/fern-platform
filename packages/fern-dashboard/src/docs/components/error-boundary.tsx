@@ -1,6 +1,5 @@
-"use client";
-
-import React, { PropsWithChildren, useEffect } from "react";
+import type { PropsWithChildren } from "react";
+import React, { useEffect } from "react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
 import * as Sentry from "@sentry/nextjs";
@@ -21,7 +20,7 @@ export function ErrorBoundaryFallback({
   className?: string;
   error: Error & { digest?: string };
   resetErrorBoundary?: () => void;
-}) {
+}): JSX.Element {
   // React Error Boundaries require manual Sentry integration because
   // Sentry's automatic client-side capture doesn't extend to caught React errors
   useEffect(() => {
@@ -62,7 +61,7 @@ export function ErrorBoundary({
 }: PropsWithChildren<{
   onResetAction?: () => void;
   fallback?: React.ReactNode;
-}>) {
+}>): JSX.Element {
   if (fallback != null) {
     return (
       <ReactErrorBoundary
@@ -92,8 +91,10 @@ export function ErrorBoundary({
 export function withErrorBoundary<T extends React.ComponentType<any>>(
   Component: T,
   fallback?: React.ReactNode
-) {
-  return function WithErrorBoundary(props: React.ComponentProps<T>) {
+): (props: React.ComponentProps<T>) => JSX.Element {
+  return function WithErrorBoundary(
+    props: React.ComponentProps<T>
+  ): JSX.Element {
     return (
       <ErrorBoundary fallback={fallback}>
         <Component {...props} />

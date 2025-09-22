@@ -6,12 +6,12 @@ import { useEffect } from "react";
 import { ArrowLeftIcon } from "lucide-react";
 
 import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
-import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useBranch } from "@/providers/BranchContext";
 import { useGitHubRepo } from "@/providers/GitHubRepoContext";
 import { useGitPrInfo } from "@/providers/GitPRContext";
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 
 import { ProfileImage } from "../layout/ProfileImage";
 import { Button } from "../ui/button";
@@ -28,7 +28,7 @@ export function HeaderToolbar({
 }: {
   session: Auth0SessionData;
   docsUrl: DocsUrl;
-}) {
+}): JSX.Element {
   const { name, picture } = session.user;
   const { gitPrUrl, setPrUrl } = useGitPrInfo();
   const { branch } = useBranch();

@@ -1,7 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
-  ReactNode,
   createContext,
   useCallback,
   useContext,
@@ -11,7 +11,7 @@ import {
 
 import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
-import { GithubPrStatus } from "@/app/services/github/types";
+import type { GithubPrStatus } from "@/app/services/github/types";
 
 export const GitPRContext = createContext<{
   gitPrUrl: string | undefined;

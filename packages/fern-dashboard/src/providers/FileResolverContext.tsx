@@ -1,15 +1,19 @@
 "use client";
 
+import type { Context } from "react";
 import { createContext, useContext } from "react";
 
 import { DashboardFileResolver } from "@fern-api/docs-server/dashboard-file-resolver";
-import { FileData } from "@fern-api/docs-utils/types/file-data";
+import type { FileData } from "@fern-api/docs-utils/types/file-data";
 
-export const FileResolverContext = createContext<{
+type FileResolverContextValue = {
   resolveFileSrc: DashboardFileResolver["getResolvedFileData"];
-}>({
-  resolveFileSrc: () => undefined,
-});
+};
+
+export const FileResolverContext: Context<FileResolverContextValue> =
+  createContext<FileResolverContextValue>({
+    resolveFileSrc: () => undefined,
+  });
 
 export const FileResolverProvider = ({
   children,
@@ -17,7 +21,7 @@ export const FileResolverProvider = ({
 }: {
   children: React.ReactNode;
   files: Record<string, FileData>;
-}) => {
+}): React.JSX.Element => {
   const fileResolver = new DashboardFileResolver(files);
 
   const resolveFileSrc = (src: string | undefined) =>
@@ -30,6 +34,6 @@ export const FileResolverProvider = ({
   );
 };
 
-export const useFileResolver = () => {
+export const useFileResolver = (): FileResolverContextValue => {
   return useContext(FileResolverContext);
 };

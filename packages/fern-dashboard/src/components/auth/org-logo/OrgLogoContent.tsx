@@ -1,4 +1,4 @@
-import { Auth0Organization } from "@/app/services/auth0/types";
+import type { Auth0Organization } from "@/app/services/auth0/types";
 
 import { OrgPlaceholderLogo } from "./OrgPlaceholderLogo";
 import { SvgOrgLogo } from "./SvgOrgLogo";
@@ -9,7 +9,9 @@ export declare namespace OrgLogoContent {
   }
 }
 
-export function OrgLogoContent({ organization }: OrgLogoContent.Props) {
+export function OrgLogoContent({
+  organization,
+}: OrgLogoContent.Props): JSX.Element {
   if (organization.branding?.logo_url == null) {
     return <OrgPlaceholderLogo org={organization} />;
   }

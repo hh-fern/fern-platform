@@ -1,18 +1,26 @@
 "use client";
 
-import { ReactNode, createContext, useContext, useState } from "react";
+import type { Context, ReactNode } from "react";
+import { createContext, useContext, useState } from "react";
 
-export const DevModeContext = createContext<{
+type DevModeContextValue = {
   panelOpen: boolean;
   setPanelOpen: (panelOpen: boolean) => void;
-}>({
-  panelOpen: false,
-  setPanelOpen: (_panelOpen: boolean) => {
-    return;
-  },
-});
+};
 
-export function DevModeProvider({ children }: { children: ReactNode }) {
+export const DevModeContext: Context<DevModeContextValue> =
+  createContext<DevModeContextValue>({
+    panelOpen: false,
+    setPanelOpen: (_panelOpen: boolean) => {
+      return;
+    },
+  });
+
+export function DevModeProvider({
+  children,
+}: {
+  children: ReactNode;
+}): React.JSX.Element {
   const [panelOpen, setPanelOpenStore] = useState<boolean>(false);
 
   function setPanelOpen(panelOpen: boolean) {
@@ -26,6 +34,6 @@ export function DevModeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useDevMode() {
+export function useDevMode(): DevModeContextValue {
   return useContext(DevModeContext);
 }

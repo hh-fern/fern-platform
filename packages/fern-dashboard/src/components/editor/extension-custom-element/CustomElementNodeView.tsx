@@ -1,6 +1,7 @@
 import React from "react";
 
-import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+import type { NodeViewProps } from "@tiptap/react";
+import { NodeViewWrapper } from "@tiptap/react";
 
 import FernEditorMDXRenderer from "@/components/editor/editor-mdx-renderer/FernEditorMDXRenderer";
 import { ErrorBoundary } from "@/docs/components/error-boundary";
@@ -8,7 +9,7 @@ import { useFileResolver } from "@/providers/FileResolverContext";
 
 import { UnsupportedContent } from "../UnsupportedContent";
 
-export const CustomElementNodeView = (props: NodeViewProps) => {
+export const CustomElementNodeView = (props: NodeViewProps): JSX.Element => {
   const { node, updateAttributes } = props;
   const { attrs } = node;
 

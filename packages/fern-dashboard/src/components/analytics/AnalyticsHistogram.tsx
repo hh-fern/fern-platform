@@ -1,13 +1,13 @@
-"use client";
-
-import { FernAI } from "@fern-api/fai-sdk";
+import type { FernAI } from "@fern-api/fai-sdk";
 
 import { cn } from "@/utils/utils";
 
 import { AnalyticsHistogramChart } from "./AnalyticsHistogramChart";
 import { AnalyticsHistogramTabBar } from "./AnalyticsHistogramTabBar";
-import { BORDER_STYLES, RenderType } from "./AnalyticsPageClient";
-import { TimeRangeOption, TimeRangeSelect } from "./TimeRangeSelect";
+import type { RenderType } from "./AnalyticsPageClient";
+import { BORDER_STYLES } from "./AnalyticsPageClient";
+import type { TimeRangeOption } from "./TimeRangeSelect";
+import { TimeRangeSelect } from "./TimeRangeSelect";
 import { TimeRange } from "./utils/get-request-params";
 import { parseLabel } from "./utils/parse-label";
 
@@ -29,7 +29,7 @@ export function AnalyticsHistogram({
   histogramTimeRange: TimeRange;
   setHistogramTimeRange: (range: TimeRange) => void;
   histogramData: FernAI.GetHistogramAnalyticsResponse;
-}) {
+}): JSX.Element {
   const chartData = histogramData.bars.map((bar) => ({
     displayLabel: parseLabel(bar.label),
     count: renderType === "QUERIES" ? bar.queryCount : bar.conversationCount,

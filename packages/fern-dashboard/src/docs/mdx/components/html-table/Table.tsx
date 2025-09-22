@@ -1,6 +1,7 @@
 "use client";
 
-import { ComponentProps, useState } from "react";
+import type { ComponentProps } from "react";
+import { useState } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -9,7 +10,10 @@ import { Expand } from "lucide-react";
 import { cn } from "@fern-docs/components";
 import { FernButton, FernScrollArea } from "@fern-docs/components";
 
-export function Table({ className, ...rest }: ComponentProps<"table">) {
+export function Table({
+  className,
+  ...rest
+}: ComponentProps<"table">): React.JSX.Element {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   return (

@@ -3,15 +3,12 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useMDXComponents } from "@mdx-js/react";
 import { getMDXComponent } from "mdx-bundler/client";
 
-import {
+import type {
   MdastNodes,
   MdxJsxAttribute,
   MdxJsxExpressionAttribute,
-  astToMDX,
-  htmlToMdx,
-  mdxToAST,
-  mdxToHtml,
 } from "@fern-docs/mdx";
+import { astToMDX, htmlToMdx, mdxToAST, mdxToHtml } from "@fern-docs/mdx";
 
 import TiptapEditor from "@/components/editor/TiptapEditor";
 import { EditorComponentProvider } from "@/components/editor/editor-component/EditorComponentContext";
@@ -21,7 +18,11 @@ import { useDebounce } from "@/hooks/useDebounce";
 
 import { UnsupportedContent } from "../UnsupportedContent";
 import { cachedBundleMDX } from "./cache";
-import { AttributeValue, JSXElement, ParsedMarkdownElement } from "./types";
+import type {
+  AttributeValue,
+  JSXElement,
+  ParsedMarkdownElement,
+} from "./types";
 
 function buildMdxElement(
   name: string,
@@ -529,7 +530,7 @@ function applyIndentation(mdx: string, indentLevel: number): string {
 const FernEditorMDXRenderer = ({
   mdx,
   onUpdate,
-}: FernEditorMDXRendererProps) => {
+}: FernEditorMDXRendererProps): JSX.Element => {
   return <FernEditorMDXRendererInternal mdx={mdx} onUpdate={onUpdate} />;
 };
 

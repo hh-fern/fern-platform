@@ -5,10 +5,8 @@ import { Suspense } from "react";
 
 import { Loader2 } from "lucide-react";
 
-import {
-  RedeemInviteTokenErrors,
-  redeemInviteToken,
-} from "@/app/actions/redeemInviteToken";
+import type { RedeemInviteTokenErrors } from "@/app/actions/redeemInviteToken";
+import { redeemInviteToken } from "@/app/actions/redeemInviteToken";
 import {
   GithubLoginButton,
   GoogleLoginButton,
@@ -25,7 +23,7 @@ export default async function AcceptInvitePage({
   params,
 }: {
   params: Promise<{ token: string }>;
-}) {
+}): Promise<JSX.Element> {
   const { token } = await params;
   return (
     <div className="relative flex h-[100dvh] w-screen items-center justify-center overflow-hidden">

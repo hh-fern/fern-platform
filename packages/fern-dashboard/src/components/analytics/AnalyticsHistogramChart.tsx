@@ -4,7 +4,7 @@ import { Bar, BarChart, CartesianGrid, Tooltip, XAxis } from "recharts";
 
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
-import { RenderType } from "./AnalyticsPageClient";
+import type { RenderType } from "./AnalyticsPageClient";
 
 interface AnalyticsHistogramProps {
   chartData: {
@@ -24,7 +24,7 @@ const CHART_CONFIG = {
 export function AnalyticsHistogramChart({
   chartData,
   renderType,
-}: AnalyticsHistogramProps) {
+}: AnalyticsHistogramProps): JSX.Element {
   return (
     <div
       style={{

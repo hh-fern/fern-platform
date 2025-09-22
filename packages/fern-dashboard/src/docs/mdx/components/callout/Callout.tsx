@@ -1,10 +1,5 @@
-import {
-  FC,
-  PropsWithChildren,
-  ReactElement,
-  isValidElement,
-  useRef,
-} from "react";
+import type { FC, PropsWithChildren, ReactElement } from "react";
+import { isValidElement, useRef } from "react";
 
 import {
   Bell,

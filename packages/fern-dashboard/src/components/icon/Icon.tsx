@@ -1,3 +1,4 @@
+import type { LucideProps } from "lucide-react";
 import {
   Bold,
   Code,
@@ -9,7 +10,6 @@ import {
   Link,
   List,
   ListOrdered,
-  LucideProps,
   MessageSquareQuote,
   Plus,
   Strikethrough,
@@ -18,10 +18,28 @@ import {
 } from "lucide-react";
 
 import { HeadingDropdown } from "./custom/HeadingDropdown";
-import { CustomIconProps } from "./custom/types";
+import type { CustomIconProps } from "./custom/types";
+
+type IconName =
+  | "Bold"
+  | "Code"
+  | "Heading1"
+  | "Heading2"
+  | "Heading3"
+  | "Image"
+  | "Italic"
+  | "Link"
+  | "List"
+  | "ListOrdered"
+  | "MessageSquareQuote"
+  | "Plus"
+  | "Strikethrough"
+  | "Type"
+  | "Underline"
+  | "HeadingDropdown";
 
 // Map icon names to their corresponding components
-const ICONS = {
+const ICONS: Record<IconName, React.ComponentType<LucideProps>> = {
   Bold,
   Code,
   Heading1,
@@ -40,9 +58,6 @@ const ICONS = {
   HeadingDropdown,
 };
 
-// Infer icon names type
-export type IconName = keyof typeof ICONS;
-
 // Maintain compatibility between Lucide React props and custom icon props
 type CommonIconProps = LucideProps & CustomIconProps;
 
@@ -52,7 +67,7 @@ export declare namespace Icon {
   }
 }
 
-export function Icon({ variant, ...props }: Icon.Props) {
+export function Icon({ variant, ...props }: Icon.Props): JSX.Element {
   const Component = ICONS[variant];
   const propsWithDefaults = defaultIconProps(props);
   return <Component {...propsWithDefaults} />;

@@ -1,6 +1,6 @@
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { getFernVersionUpdateInfo } from "@/app/services/dal/github/getFernVersionUpdateInfo";
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 
 import { UpgradeFernButton } from "../UpgradeFernButton";
 import { WarningNote } from "../WarningNote";
@@ -15,7 +15,7 @@ export async function CriticalUpdateWarning({
   docsUrl: DocsUrl;
   githubUrl: string;
   baseBranch: string;
-}) {
+}): Promise<JSX.Element | null> {
   const fernVersionInfoResult = await getFernVersionUpdateInfo({
     githubUrl,
     docsUrl,

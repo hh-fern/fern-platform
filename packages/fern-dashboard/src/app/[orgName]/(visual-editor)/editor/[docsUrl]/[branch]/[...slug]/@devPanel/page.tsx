@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
-import CodeEditor, { Monaco } from "@monaco-editor/react";
+import type { Monaco } from "@monaco-editor/react";
+import CodeEditor from "@monaco-editor/react";
 import { Code2 } from "lucide-react";
 
 import { mdxToHtml } from "@fern-docs/mdx";
@@ -16,7 +17,7 @@ import { useDevMode } from "@/providers/DevModeProvider";
 import { usePages } from "@/providers/PagesStoreContext";
 import { cn } from "@/utils/utils";
 
-export default function DevPanel() {
+export default function DevPanel(): JSX.Element {
   const { panelOpen } = useDevMode();
   const { currentFilename } = useCurrentPage();
   const { allMdxFiles, updatePage, emitSaveEvent } = usePages();

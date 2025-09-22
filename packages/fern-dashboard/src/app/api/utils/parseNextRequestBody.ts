@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-import { ZodType, z } from "zod";
+import type { ZodType, z } from "zod";
 
-import { MaybeErrorResponse } from "./MaybeErrorResponse";
+import type { MaybeErrorResponse } from "./MaybeErrorResponse";
 
 export async function parseNextRequestBody<T extends ZodType>(
   req: NextRequest,

@@ -1,7 +1,9 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import Image, { StaticImageData } from "next/image";
+import type { StaticImageData } from "next/image";
+import Image from "next/image";
+import type { JSX } from "react";
 
 import { useIsFirstClientSideRender } from "@/utils/useIsFirstClientSideRender";
 
@@ -51,7 +53,7 @@ function CrossfadeThemeImage({
   );
 }
 
-export function LoginImage() {
+export function LoginImage(): JSX.Element | null {
   // render `null` on the first render to match the SSR and avoid hydration errors
   const isFirstClientSideRender = useIsFirstClientSideRender();
   if (isFirstClientSideRender) {

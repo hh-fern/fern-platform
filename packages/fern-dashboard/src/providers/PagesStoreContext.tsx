@@ -1,16 +1,12 @@
 "use client";
 
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useRef,
-  useSyncExternalStore,
-} from "react";
+import type { ReactNode } from "react";
+import { createContext, useContext, useRef, useSyncExternalStore } from "react";
 
 import { useNavigation } from "@fern-docs/components";
 
-import { PagesSnapshot, PagesStore } from "./PagesStore";
+import type { PagesSnapshot } from "./PagesStore";
+import { PagesStore } from "./PagesStore";
 
 export type { PagesSnapshot };
 
@@ -28,7 +24,7 @@ export interface PagesStoreProviderProps {
 export function PagesStoreProvider({
   children,
   branchName,
-}: PagesStoreProviderProps) {
+}: PagesStoreProviderProps): JSX.Element {
   const { _navigationStore } = useNavigation();
   const storeRef = useRef<PagesStore>(new PagesStore(_navigationStore));
 

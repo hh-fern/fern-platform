@@ -14,7 +14,7 @@ import AbstractDefaultDocs from "@fern-docs/components/theming/AbstractDefaultDo
 import { GlobalStyles } from "@fern-docs/components/theming/global-styles";
 import { DesktopSearchButton } from "@fern-docs/search-ui/components/desktop/desktop-search-button";
 
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { PreviewHeader } from "@/components/docs-preview/PreviewHeader";
@@ -23,7 +23,7 @@ import { EditorRoutingProvider } from "@/providers/EditorRoutingContext";
 import { FileResolverProvider } from "@/providers/FileResolverContext";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
-import { EncodedDocsUrl } from "@/utils/types";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 import "./index.css";
 
@@ -49,7 +49,7 @@ export default async function VisualEditorPreviewLayout({
   sidebar: React.ReactNode;
   logo: React.ReactNode;
   devPanel: React.ReactNode;
-}>) {
+}>): Promise<React.JSX.Element> {
   const { orgName, docsUrl, branch } = await params;
 
   const { githubUrl, session } = await assertAuthAndFetchGithubUrl({

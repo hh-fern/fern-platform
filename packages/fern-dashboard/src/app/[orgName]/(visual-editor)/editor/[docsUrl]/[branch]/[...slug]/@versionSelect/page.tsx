@@ -11,13 +11,13 @@ import { VersionDropdown } from "@fern-docs/components/header/VersionDropdown";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
-import { EncodedDocsUrl } from "@/utils/types";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 export default async function VersionSelectPage({
   params,
 }: {
   params: Promise<{ docsUrl: EncodedDocsUrl; slug: string; branch: string }>;
-}) {
+}): Promise<JSX.Element | null> {
   const session = await getCurrentSession();
   const { docsUrl, slug, branch } = await params;
   const host = await getHostFromHeaders();

@@ -16,7 +16,7 @@ import { HiddenSidebar } from "@fern-docs/components/theming/HiddenSidebar";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
-import { EncodedDocsUrl } from "@/utils/types";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 import { CreatePageButton } from "./CreatePageButton";
 
@@ -26,7 +26,7 @@ export default async function SidebarPage({
 }: {
   params: Promise<{ docsUrl: EncodedDocsUrl; slug: string[]; branch: string }>;
   searchParams: Promise<Record<string, string>>;
-}) {
+}): Promise<JSX.Element> {
   const { docsUrl, slug: slugArray, branch } = await params;
   const resolvedSearchParams = await searchParams;
   const clientNodeId = resolvedSearchParams["client-node-id"];

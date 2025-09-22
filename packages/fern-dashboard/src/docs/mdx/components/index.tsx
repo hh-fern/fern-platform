@@ -1,6 +1,7 @@
 "use client";
 
-import React, { ComponentProps } from "react";
+import type { ComponentProps } from "react";
+import React from "react";
 
 import { NodeViewWrapper } from "@tiptap/react";
 

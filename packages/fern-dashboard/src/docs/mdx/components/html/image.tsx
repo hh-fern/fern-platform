@@ -1,6 +1,7 @@
 "use client";
 
-import { ComponentProps, ReactElement, forwardRef, useContext } from "react";
+import type { ComponentProps, ReactElement } from "react";
+import { forwardRef, useContext } from "react";
 import Zoom from "react-medium-image-zoom";
 
 import { cn } from "@fern-docs/components";

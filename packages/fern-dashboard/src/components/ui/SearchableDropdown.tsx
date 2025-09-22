@@ -1,4 +1,5 @@
-import { ReactNode, useState } from "react";
+import type { ReactNode } from "react";
+import { useState } from "react";
 
 import { SearchIcon } from "lucide-react";
 
@@ -33,7 +34,7 @@ export function SearchableDropdown<T>({
   renderItem,
   getItemKey,
   shouldShowSearch = true,
-}: SearchableDropdownProps<T>) {
+}: SearchableDropdownProps<T>): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

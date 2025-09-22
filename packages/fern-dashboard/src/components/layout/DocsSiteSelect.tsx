@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "@bprogress/next/app";
 
-import { FdrAPI } from "@fern-api/fdr-sdk/client/types";
+import type { FdrAPI } from "@fern-api/fdr-sdk/client/types";
 
 import {
   Select,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { constructDocsUrlParam } from "@/utils/constructDocsUrlParam";
 import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 
 export declare namespace DocsSiteSelect {
@@ -28,7 +28,7 @@ export declare namespace DocsSiteSelect {
 export const DocsSiteSelect = ({
   currentDocsUrl,
   docsSites,
-}: DocsSiteSelect.Props) => {
+}: DocsSiteSelect.Props): JSX.Element => {
   const orgName = useOrgNameFromPathname();
 
   const [localValue, setLocalValue] = useState(currentDocsUrl);

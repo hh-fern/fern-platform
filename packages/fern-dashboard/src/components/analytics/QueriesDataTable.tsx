@@ -1,9 +1,7 @@
 "use client";
 
+import type { Cell, ColumnDef, Row } from "@tanstack/react-table";
 import {
-  Cell,
-  ColumnDef,
-  Row,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -11,13 +9,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { FernAI } from "@fern-api/fai-sdk";
+import type { FernAI } from "@fern-api/fai-sdk";
 
 import { getConversation } from "@/app/actions/getConversation";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import { QueriesDataTableHeader } from "./QueriesDataTableHeader";
-import { TimeRange } from "./utils/get-request-params";
+import type { TimeRange } from "./utils/get-request-params";
 
 interface QueriesDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,7 +39,7 @@ export function QueriesDataTable<TData, TValue>({
   setQueryTimeRange,
   onExport,
   isExporting,
-}: QueriesDataTableProps<TData, TValue>) {
+}: QueriesDataTableProps<TData, TValue>): JSX.Element {
   const table = useReactTable({
     data,
     columns,

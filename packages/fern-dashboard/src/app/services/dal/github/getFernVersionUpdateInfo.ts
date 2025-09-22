@@ -5,13 +5,11 @@ import {
   compareVersions,
   getLatestFernCliVersion,
 } from "@/utils/fernCliVersion";
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 
 import { checkUpgradePrStatus } from "./checkUpgradePrStatus";
-import {
-  GetFernVersionFromRepoError,
-  getFernVersionFromRepo,
-} from "./getFernVersionFromRepo";
+import type { GetFernVersionFromRepoError } from "./getFernVersionFromRepo";
+import { getFernVersionFromRepo } from "./getFernVersionFromRepo";
 
 export type GetFernVersionUpdateInfoResult = {
   current: string;

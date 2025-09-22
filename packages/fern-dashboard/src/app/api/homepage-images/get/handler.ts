@@ -3,7 +3,7 @@ import { doesObjectExist, getPresignedUrlForS3Object } from "@/app/services/s3";
 import { getHomepageImagesS3BucketName } from "../constants";
 import generateHomepageImages from "../generate/handler";
 import { getS3KeyForHomepageScreenshot } from "../getS3KeyForHomepageScreenshot";
-import { Theme } from "../types";
+import type { Theme } from "../types";
 
 export default async function getHomepageImageUrl({
   urls,
@@ -11,7 +11,7 @@ export default async function getHomepageImageUrl({
 }: {
   urls: string[];
   theme: Theme;
-}) {
+}): Promise<{ imageUrl: string }> {
   for (const url of urls) {
     console.debug(`Getting homepage image for ${url}`);
     const bucketName = getHomepageImagesS3BucketName();

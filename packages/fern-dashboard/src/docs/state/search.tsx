@@ -3,7 +3,7 @@
 import React from "react";
 
 import { composeEventHandlers } from "@radix-ui/primitive";
-import { atom, useAtomValue, useSetAtom } from "jotai";
+import { type PrimitiveAtom, atom, useAtomValue, useSetAtom } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
@@ -11,9 +11,11 @@ import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { FERN_SEARCH_BUTTON_ID } from "@fern-docs/components/constants";
 import { DesktopSearchButton } from "@fern-docs/search-ui/components/desktop/desktop-search-button";
 
-export const searchDialogOpenAtom = atom(false);
-export const searchInitializedAtom = atom(false);
-export const isAskAiEnabledAtom = atom(false);
+export const searchDialogOpenAtom: PrimitiveAtom<boolean> =
+  atom<boolean>(false);
+export const searchInitializedAtom: PrimitiveAtom<boolean> =
+  atom<boolean>(false);
+export const isAskAiEnabledAtom: PrimitiveAtom<boolean> = atom<boolean>(false);
 
 export const SetIsAskAiEnabled = ({
   isAskAiEnabled,
@@ -26,11 +28,12 @@ export const SetIsAskAiEnabled = ({
   return null;
 };
 
-export const useIsAskAiEnabled = () => {
+export const useIsAskAiEnabled = (): boolean => {
   return useAtomValue(isAskAiEnabledAtom);
 };
 
-export const isDefaultSearchFilterOnAtom = atom(false);
+export const isDefaultSearchFilterOnAtom: PrimitiveAtom<boolean> =
+  atom<boolean>(false);
 
 export const SetIsDefaultSearchFilterOn = ({
   isDefaultSearchFilterOn,
@@ -43,11 +46,11 @@ export const SetIsDefaultSearchFilterOn = ({
   return null;
 };
 
-export const useIsDefaultSearchFilterOn = () => {
+export const useIsDefaultSearchFilterOn = (): boolean => {
   return useAtomValue(isDefaultSearchFilterOnAtom);
 };
 
-searchInitializedAtom.onMount = (setInitialized) => {
+searchInitializedAtom.onMount = (setInitialized: (value: boolean) => void) => {
   if (typeof window === "undefined") {
     return;
   }
@@ -67,9 +70,9 @@ searchInitializedAtom.onMount = (setInitialized) => {
   };
 };
 
-export const SearchV2Trigger = React.memo(function SearchV2Trigger(
+export function SearchV2Trigger(
   props: React.ComponentProps<typeof DesktopSearchButton>
-) {
+): React.JSX.Element {
   const isInitialized = useAtomValue(searchInitializedAtom);
   const toggleSearchDialog = useToggleSearchDialog();
   const isLocalEnvironment = isLocal();
@@ -88,7 +91,7 @@ export const SearchV2Trigger = React.memo(function SearchV2Trigger(
       placeholder={placeholder}
     />
   );
-});
+}
 
 export function useIsSearchDialogOpen(): boolean {
   return useAtomValue(searchDialogOpenAtom);

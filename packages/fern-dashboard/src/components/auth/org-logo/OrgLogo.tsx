@@ -1,4 +1,4 @@
-import { Auth0Organization } from "@/app/services/auth0/types";
+import type { Auth0Organization } from "@/app/services/auth0/types";
 
 import { OrgLogoContent } from "./OrgLogoContent";
 
@@ -8,7 +8,7 @@ export declare namespace OrgLogo {
   }
 }
 
-export function OrgLogo({ organization }: OrgLogo.Props) {
+export function OrgLogo({ organization }: OrgLogo.Props): JSX.Element {
   return (
     <div className="flex size-6">
       <OrgLogoContent organization={organization} />

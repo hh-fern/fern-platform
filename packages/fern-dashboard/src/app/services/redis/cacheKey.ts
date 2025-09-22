@@ -1,9 +1,13 @@
-import {
+import type {
   GetInvitations200ResponseOneOfInner,
   GetMembers200ResponseOneOfInner,
 } from "auth0";
 
-import { Auth0OrgID, Auth0OrgName, Auth0Organization } from "../auth0/types";
+import type {
+  Auth0OrgID,
+  Auth0OrgName,
+  Auth0Organization,
+} from "../auth0/types";
 
 export interface InviteToken {
   orgName: Auth0OrgName;

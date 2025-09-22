@@ -1,11 +1,12 @@
 import ChatBubbleLeftEllipsisIcon from "@heroicons/react/24/outline/ChatBubbleLeftEllipsisIcon";
 import MagnifyingGlassIcon from "@heroicons/react/24/outline/MagnifyingGlassIcon";
-import { Table } from "@tanstack/react-table";
+import type { Table } from "@tanstack/react-table";
 
 import { Input } from "@/components/ui/input";
 
 import { ExportButton } from "./ExportButton";
-import { TimeRangeOption, TimeRangeSelect } from "./TimeRangeSelect";
+import type { TimeRangeOption } from "./TimeRangeSelect";
+import { TimeRangeSelect } from "./TimeRangeSelect";
 import { TimeRange } from "./utils/get-request-params";
 
 const QUERIES_TIME_RANGE_OPTIONS: TimeRangeOption[] = [
@@ -29,7 +30,7 @@ export function QueriesDataTableHeader<TData>({
   setQueryTimeRange,
   onExport,
   isExporting,
-}: QueriesDataTableHeaderProps<TData>) {
+}: QueriesDataTableHeaderProps<TData>): JSX.Element {
   return (
     <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
       <div className="flex items-center gap-2">

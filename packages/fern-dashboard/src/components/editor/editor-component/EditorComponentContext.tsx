@@ -1,8 +1,9 @@
 "use client";
 
-import React, { ReactNode, createContext, useContext } from "react";
+import type { ReactNode } from "react";
+import React, { createContext, useContext } from "react";
 
-import { KeyedAttributes } from "../editor-mdx-renderer/types";
+import type { KeyedAttributes } from "../editor-mdx-renderer/types";
 
 interface EditorComponentContextValue {
   keyedAttributes: KeyedAttributes;
@@ -63,7 +64,7 @@ export const useEditorComponent = (): EditorComponentContextValue => {
   return useContext(EditorComponentContext);
 };
 
-export const InterceptedChildren = () => {
+export const InterceptedChildren = (): React.ReactElement => {
   const { providedChildren } = useContext(EditorComponentContext);
   return providedChildren;
 };

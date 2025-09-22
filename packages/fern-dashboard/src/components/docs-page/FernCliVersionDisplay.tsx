@@ -1,6 +1,6 @@
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { getFernVersionUpdateInfo } from "@/app/services/dal/github/getFernVersionUpdateInfo";
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 
 import { FernIcon } from "../theme/FernIcon";
 import { UpgradeFernButton } from "./UpgradeFernButton";
@@ -15,7 +15,7 @@ export async function FernCliVersionDisplay({
   docsUrl: DocsUrl;
   baseBranch?: string;
   orgName: Auth0OrgName;
-}) {
+}): Promise<JSX.Element | null> {
   const fernVersionInfoResult = await getFernVersionUpdateInfo({
     githubUrl,
     docsUrl,

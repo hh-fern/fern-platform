@@ -1,10 +1,10 @@
 import "server-only";
 
-import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { Auth0OrgName } from "@/app/services/auth0/types";
-import { DocsUrl } from "@/utils/types";
+import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
+import type { DocsUrl } from "@/utils/types";
 
-import { GithubAuthState } from "../GithubSource";
+import type { GithubAuthState } from "../GithubSource";
 import { CriticalUpdateWarning } from "./CriticalUpdateWarning";
 import { VisualEditorEmptyCard } from "./VisualEditorEmptyCard";
 import { VisualEditorSectionClient } from "./VisualEditorSectionClient";
@@ -22,7 +22,7 @@ export async function VisualEditorSection({
   githubAuthState: GithubAuthState;
   githubUrl?: string;
   orgName: Auth0OrgName;
-}) {
+}): Promise<JSX.Element> {
   if (!githubAuthState.validationResult.ok) {
     return (
       <VisualEditorEmptyCard>

@@ -1,8 +1,9 @@
-import React, { ComponentProps, PropsWithChildren } from "react";
+import type { ComponentProps, PropsWithChildren, ReactNode } from "react";
+import React from "react";
 
 import { last } from "es-toolkit/array";
 
-import { FernLink } from "@fern-docs/components/FernLink";
+import type { FernLink } from "@fern-docs/components/FernLink";
 
 import { Button } from "../button";
 import { Card } from "../card";
@@ -12,7 +13,7 @@ export function Download({
   children,
   src,
   filename,
-}: PropsWithChildren<{ src?: string; filename?: string }>) {
+}: PropsWithChildren<{ src?: string; filename?: string }>): ReactNode {
   if (!src) {
     return children;
   }

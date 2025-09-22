@@ -1,6 +1,6 @@
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import {
+import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import type {
   BuildPageDataProps,
   BuildPageDataResult,
   NavigationContext,
@@ -8,12 +8,12 @@ import {
   PageData,
   SectionWithHierarchy,
 } from "@fern-docs/components";
-import {
+import type {
   ChangedNodes,
   Frontmatter,
   MdxToHtmlResponse,
-  htmlToMdx,
 } from "@fern-docs/mdx";
+import { htmlToMdx } from "@fern-docs/mdx";
 
 import {
   compareFrontmatter,
@@ -22,7 +22,7 @@ import {
   createPageKey,
   createPageMetadata,
 } from "../utils/pagesStoreUtils";
-import { SaveEvent } from "./types";
+import type { SaveEvent } from "./types";
 
 type Filename = string;
 
@@ -242,7 +242,11 @@ export class PagesStore {
   }
 
   /** Prepare commit data for changed files */
-  prepareCommit(changedMdxFiles: Record<string, string>) {
+  prepareCommit(changedMdxFiles: Record<string, string>): {
+    changedFiles: Record<string, string>;
+    deletedFiles: string[];
+    docsYmlContent?: string | undefined;
+  } {
     return this._requireNavigationStore().prepareCommit(changedMdxFiles);
   }
 

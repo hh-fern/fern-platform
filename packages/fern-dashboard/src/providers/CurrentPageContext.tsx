@@ -1,18 +1,26 @@
 "use client";
 
-import { ReactNode, createContext, useContext, useState } from "react";
+import type { Context, ReactNode } from "react";
+import { createContext, useContext, useState } from "react";
 
-export const CurrentPageContext = createContext<{
+type CurrentPageContextValue = {
   currentFilename: string | null;
   setCurrentFilename: (filename: string) => void;
-}>({
-  currentFilename: null,
-  setCurrentFilename: () => {
-    return;
-  },
-});
+};
 
-export function CurrentPageProvider({ children }: { children: ReactNode }) {
+export const CurrentPageContext: Context<CurrentPageContextValue> =
+  createContext<CurrentPageContextValue>({
+    currentFilename: null,
+    setCurrentFilename: () => {
+      return;
+    },
+  });
+
+export function CurrentPageProvider({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element {
   const [currentFilename, setCurrentFilename] = useState<string | null>(null);
 
   return (
@@ -24,6 +32,6 @@ export function CurrentPageProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useCurrentPage() {
+export function useCurrentPage(): CurrentPageContextValue {
   return useContext(CurrentPageContext);
 }

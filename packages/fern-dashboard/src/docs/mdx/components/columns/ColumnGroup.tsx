@@ -1,4 +1,5 @@
-import { FC, type PropsWithChildren } from "react";
+import type { FC } from "react";
+import type { PropsWithChildren } from "react";
 
 import { cn } from "@fern-docs/components";
 

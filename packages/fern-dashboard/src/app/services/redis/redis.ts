@@ -1,10 +1,14 @@
 import { Redis } from "@upstash/redis";
 
-import { RedisCacheKey, RedisCacheKeyType, inferCachedData } from "./cacheKey";
+import type {
+  RedisCacheKey,
+  RedisCacheKeyType,
+  inferCachedData,
+} from "./cacheKey";
 
 let redis: Redis | undefined;
 
-export function getRedisClient() {
+export function getRedisClient(): Redis {
   if (redis == null) {
     redis = new Redis({
       url: process.env.KV_REST_API_URL,
@@ -18,7 +22,7 @@ export async function redisSet<T extends RedisCacheKeyType>(
   key: RedisCacheKey<T>,
   value: inferCachedData<T>,
   { ttlInSeconds }: { ttlInSeconds: number }
-) {
+): Promise<void> {
   await getRedisClient().set<inferCachedData<T>>(key, value, {
     ex: ttlInSeconds,
   });
@@ -33,6 +37,6 @@ export async function redisGet<T extends RedisCacheKeyType>(
 
 export async function redisDel<T extends RedisCacheKeyType>(
   key: RedisCacheKey<T>
-) {
+): Promise<void> {
   await getRedisClient().del(key);
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import Image, { StaticImageData } from "next/image";
+import type { StaticImageData } from "next/image";
+import Image from "next/image";
 
 import { useIsFirstClientSideRender } from "@/utils/useIsFirstClientSideRender";
 
@@ -60,7 +61,7 @@ function CrossfadeThemeImage({
   );
 }
 
-export function SDKsZeroStateImage() {
+export function SDKsZeroStateImage(): JSX.Element {
   const imgLight = exampleSDKsLight as unknown as {
     width: number;
     height: number;

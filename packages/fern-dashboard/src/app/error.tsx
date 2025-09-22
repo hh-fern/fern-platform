@@ -9,7 +9,7 @@ export default function Error({
   error: _error,
 }: {
   error: Error & { digest?: string };
-}) {
+}): JSX.Element {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2">
       <div className="flex h-24 w-24 items-center justify-center">

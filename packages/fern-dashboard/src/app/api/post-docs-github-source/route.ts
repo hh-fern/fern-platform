@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import { z } from "zod";
 
-import { ResolvedReturnType } from "@/utils/types";
+import type { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";
 import { parseNextRequestBody } from "../utils/parseNextRequestBody";
@@ -13,12 +14,18 @@ export declare namespace postDocsGithubSource {
   export type Response = ResolvedReturnType<typeof handler>;
 }
 
-const PostDocsGithubSourceRequest = z.object({
-  url: z.string(),
-  githubUrl: z.string(),
-});
+type PostDocsGithubSourceRequest = {
+  url: string;
+  githubUrl: string;
+};
 
-export async function POST(req: NextRequest) {
+const PostDocsGithubSourceRequest: z.ZodType<PostDocsGithubSourceRequest> =
+  z.object({
+    url: z.string(),
+    githubUrl: z.string(),
+  });
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
   const maybeSessionData = await maybeGetCurrentSession(req);
   if (maybeSessionData.errorResponse != null) {
     return maybeSessionData.errorResponse;

@@ -1,4 +1,4 @@
-import { MouseEventHandler } from "react";
+import type { MouseEventHandler } from "react";
 
 import { useCurrentEditor } from "@tiptap/react";
 import { BubbleMenu as EditorBubbleMenu } from "@tiptap/react/menus";
@@ -16,7 +16,7 @@ type BubbleMenuAction =
   | "toggleBulletList"
   | "toggleOrderedList";
 
-export default function BubbleMenu() {
+export default function BubbleMenu(): JSX.Element {
   const { editor } = useCurrentEditor();
 
   function menuItemClickHandler(action: BubbleMenuAction) {

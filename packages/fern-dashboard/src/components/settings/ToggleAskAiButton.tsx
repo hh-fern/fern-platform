@@ -10,7 +10,7 @@ import {
   reindexAskAi,
   toggleAskAi,
 } from "@/app/actions/toggleAskAi";
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 
 import { Button } from "../ui/button";
@@ -25,7 +25,7 @@ export declare namespace ToggleAskAiButton {
 export function ToggleAskAiButton({
   docsUrl,
   initialAskAiStatus,
-}: ToggleAskAiButton.Props) {
+}: ToggleAskAiButton.Props): JSX.Element {
   const [isEnabled, setIsEnabled] = useState<boolean | null>(
     initialAskAiStatus?.ask_ai_enabled ?? null
   );

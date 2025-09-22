@@ -1,14 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { FdrAPI } from "@fern-api/fdr-sdk/client/types";
+import type { FdrAPI } from "@fern-api/fdr-sdk/client/types";
+import type { Loadable } from "@fern-ui/loadable";
 
-import { Theme } from "@/app/api/homepage-images/types";
+import type { Theme } from "@/app/api/homepage-images/types";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { convertFdrDocsSiteUrlToDocsUrl } from "@/utils/getDocsSiteUrl";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 
 import { convertQueryResultToLoadable } from "./convertQueryResultToLoadable";
-import { ReactQueryKey, inferQueryData } from "./queryKeys";
+import type { inferQueryData } from "./queryKeys";
+import { ReactQueryKey } from "./queryKeys";
 
 export function useHomepageImageUrl({
   docsSite,
@@ -16,7 +18,9 @@ export function useHomepageImageUrl({
 }: {
   docsSite: FdrAPI.dashboard.DocsSite;
   theme: Theme;
-}) {
+}): Loadable<{
+  imageUrl: string;
+}> {
   const orgName = useOrgNameFromPathname();
   const docsUrls = docsSite.urls.map(convertFdrDocsSiteUrlToDocsUrl);
   const QUERY_KEY = ReactQueryKey.homepageImageUrl({

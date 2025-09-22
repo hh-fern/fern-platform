@@ -1,7 +1,8 @@
 "use client";
 
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { NavigationContext, getAllSections } from "@fern-docs/components";
+import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NavigationContext } from "@fern-docs/components";
+import { getAllSections } from "@fern-docs/components";
 
 import { DashboardTooltip } from "@/components/editor/DashboardTooltip";
 import { Icon } from "@/components/icon/Icon";
@@ -19,7 +20,7 @@ interface CreatePageButtonProps {
 export function CreatePageButton({
   root,
   navigationContext,
-}: CreatePageButtonProps) {
+}: CreatePageButtonProps): JSX.Element | boolean {
   const { prStatus } = useGitPrInfo();
   const isEditingDisabled = useEditingDisabled();
 

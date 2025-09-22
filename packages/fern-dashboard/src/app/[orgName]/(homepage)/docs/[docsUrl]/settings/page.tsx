@@ -5,13 +5,13 @@ import { Auth0OrgName } from "@/app/services/auth0/types";
 import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
 import { Settings } from "@/components/settings/Settings";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
-import { EncodedDocsUrl } from "@/utils/types";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 export default async function Page({
   params,
 }: {
   params: Promise<{ orgName: Auth0OrgName; docsUrl: EncodedDocsUrl }>;
-}) {
+}): Promise<JSX.Element> {
   const { orgName, docsUrl: encodedDocsUrl } = await params;
   const docsUrl = parseDocsUrlParam({ docsUrl: encodedDocsUrl });
 

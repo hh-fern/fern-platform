@@ -1,6 +1,6 @@
-import { CustomIconProps } from "./types";
+import type { CustomIconProps } from "./types";
 
-export function HeadingDropdown(props: CustomIconProps) {
+export function HeadingDropdown(props: CustomIconProps): JSX.Element {
   return (
     <svg
       width={props.size}

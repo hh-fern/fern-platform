@@ -1,4 +1,5 @@
-import React, { ReactNode, createContext, useContext } from "react";
+import type { ReactNode } from "react";
+import React, { createContext, useContext } from "react";
 
 interface CSSConfig {
   inline?: string[];
@@ -12,13 +13,13 @@ export const CSSProvider = ({
 }: {
   children: ReactNode;
   cssConfig?: CSSConfig;
-}) => {
+}): JSX.Element => {
   return (
     <CSSContext.Provider value={cssConfig}>{children}</CSSContext.Provider>
   );
 };
 
-export const useCSS = () => {
+export const useCSS = (): CSSConfig => {
   const context = useContext(CSSContext);
   if (context === undefined) {
     return { inline: [] };

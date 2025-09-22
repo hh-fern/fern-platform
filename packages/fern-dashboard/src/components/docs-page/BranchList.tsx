@@ -7,12 +7,12 @@ import { useRouter } from "@bprogress/next/app";
 import { createNavigationLocalStorage } from "@fern-docs/components";
 
 import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
-import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { GithubSourceRepo } from "@/app/services/github/types";
+import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import type { GithubSourceRepo } from "@/app/services/github/types";
 import { Button } from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
-import { DocsUrl, EncodedDocsUrl } from "@/utils/types";
+import type { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 
 import { BranchListItem } from "./BranchListItem";
 import { GoToEditorButton } from "./GoToEditorButton";
@@ -30,7 +30,7 @@ export function BranchList({
   session: Auth0SessionData;
   sourceRepo?: GithubSourceRepo;
   branches: string[];
-}) {
+}): JSX.Element {
   const orgName = useOrgName();
   const router = useRouter();
 

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
-import { Auth0UserID } from "../../auth0/types";
+import type { Auth0UserID } from "../../auth0/types";
 
 export type RepoIdentifier =
   | {
@@ -25,21 +25,29 @@ export interface GithubAccessValidationOptions {
   githubUrl?: string;
 }
 
-export const GithubIdentificationScheme = z.union([
-  z.object({
-    site: z.string(),
-    owner: z.string(),
-    repo: z.string(),
-  }),
-  z.object({
-    site: z.string(),
-    githubUrl: z.string(),
-  }),
-]);
+export type GithubIdentificationSchemeType =
+  | {
+      site: string;
+      owner: string;
+      repo: string;
+    }
+  | {
+      site: string;
+      githubUrl: string;
+    };
 
-export type GithubIdentificationSchemeType = z.infer<
-  typeof GithubIdentificationScheme
->;
+export const GithubIdentificationScheme: z.ZodType<GithubIdentificationSchemeType> =
+  z.union([
+    z.object({
+      site: z.string(),
+      owner: z.string(),
+      repo: z.string(),
+    }),
+    z.object({
+      site: z.string(),
+      githubUrl: z.string(),
+    }),
+  ]);
 
 // Wrapper-specific types
 export interface RepoData {

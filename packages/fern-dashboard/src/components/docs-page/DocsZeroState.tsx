@@ -1,4 +1,4 @@
-import { User } from "@auth0/nextjs-auth0/types";
+import type { User } from "@auth0/nextjs-auth0/types";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "../ui/button";
@@ -10,7 +10,9 @@ export declare namespace DocsZeroState {
   }
 }
 
-export async function DocsZeroState({ user }: DocsZeroState.Props) {
+export async function DocsZeroState({
+  user,
+}: DocsZeroState.Props): Promise<JSX.Element> {
   let welcomeString = "Welcome";
   const firstName = getFirstName(user);
   if (firstName != null) {

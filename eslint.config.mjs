@@ -244,6 +244,7 @@ export default [
         "packages/commons/**/*",
         "packages/fdr-sdk/**/*",
         "packages/fern-docs/search-ui/**/*",
+        "packages/fern-dashboard/**/*",
       ],
       rules: {
         "@typescript-eslint/consistent-type-exports": "error",

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { FernConfigJsonErrors } from "@fern-api/docs-loader";
+import type { FernConfigJsonErrors } from "@fern-api/docs-loader";
 
 import {
   getValidationErrorMessage,
@@ -8,7 +8,7 @@ import {
 } from "@/utils/errors";
 
 import { checkOrgWritePermissionToRepo } from "./checkOrgWritePermissionToRepo";
-import { RepoIdentifier } from "./types";
+import type { RepoIdentifier } from "./types";
 
 export type GithubRepoValidationError =
   | { type: "REPO_NOT_CONNECTED" }

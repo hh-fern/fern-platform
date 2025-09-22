@@ -2,14 +2,17 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import type { Loadable } from "@fern-ui/loadable";
+
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 
 import { convertQueryResultToLoadable } from "./convertQueryResultToLoadable";
-import { ReactQueryKey, inferQueryData } from "./queryKeys";
-import { OrgInvitation } from "./types";
+import type { inferQueryData } from "./queryKeys";
+import { ReactQueryKey } from "./queryKeys";
+import type { OrgInvitation } from "./types";
 
-export function useOrgInvitations() {
+export function useOrgInvitations(): Loadable<OrgInvitation[]> {
   const orgName = useOrgNameFromPathname();
   const queryKey = ReactQueryKey.orgInvitations(orgName);
 

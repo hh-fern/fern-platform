@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 
 import { createNavigationLocalStorage } from "@fern-docs/components";
 
-import { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { getRelevantUserBranchesForSite } from "@/app/services/dal/mongodb/getRelevantUserBranchesForSite";
-import { GithubSourceRepo } from "@/app/services/github/types";
+import type { GithubSourceRepo } from "@/app/services/github/types";
 import Card from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 
 import { BranchList } from "../BranchList";
 import { GoToEditorButton } from "../GoToEditorButton";
@@ -29,7 +29,7 @@ export function VisualEditorSectionClient({
   docsUrl: DocsUrl;
   sourceRepo?: GithubSourceRepo;
   orgName: Auth0OrgName;
-}) {
+}): JSX.Element {
   const [relevantBranches, setRelevantBranches] = useState<string[]>([]);
   const [loadingBranches, setLoadingBranches] = useState(true);
 

@@ -1,12 +1,14 @@
 "use server";
 
-import { User } from "@auth0/nextjs-auth0/types";
+import type { User } from "@auth0/nextjs-auth0/types";
 
-import { FernVenusApi, FernVenusApiClient } from "@fern-api/venus-api-sdk";
-import { APIResponse } from "@fern-api/venus-api-sdk/core";
+import type { FernVenusApiClient } from "@fern-api/venus-api-sdk";
+import { FernVenusApi } from "@fern-api/venus-api-sdk";
+import type { APIResponse } from "@fern-api/venus-api-sdk/core";
 
 import { getCurrentSessionOrThrow } from "../services/auth0/getCurrentSession";
-import { Auth0OrgName, Auth0UserID } from "../services/auth0/types";
+import type { Auth0UserID } from "../services/auth0/types";
+import { Auth0OrgName } from "../services/auth0/types";
 import { getVenusClient } from "../services/venus/getVenusClient";
 
 export async function createPersonalProject(): Promise<{

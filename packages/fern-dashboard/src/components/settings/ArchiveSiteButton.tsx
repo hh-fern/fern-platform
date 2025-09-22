@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { archiveSite } from "@/app/actions/archiveSite";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { delay } from "@/utils/delay";
-import { DocsUrl } from "@/utils/types";
+import type { DocsUrl } from "@/utils/types";
 
 import { Button } from "../ui/button";
 
@@ -22,7 +22,7 @@ export declare namespace ArchiveSiteButton {
 export function ArchiveSiteButton({
   docsUrl,
   orgName,
-}: ArchiveSiteButton.Props) {
+}: ArchiveSiteButton.Props): JSX.Element {
   const [isArchiving, setIsArchiving] = useState(false);
   const router = useRouter();
 

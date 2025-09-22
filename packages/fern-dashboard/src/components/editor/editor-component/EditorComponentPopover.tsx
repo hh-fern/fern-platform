@@ -1,13 +1,7 @@
 "use client";
 
-import React, {
-  ReactNode,
-  RefObject,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import type { ReactNode, RefObject } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 import * as Popover from "@radix-ui/react-popover";
 import { EllipsisVertical, Trash2, TriangleAlert } from "lucide-react";
@@ -24,13 +18,11 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/utils/utils";
 
-import { AttributeValue } from "../editor-mdx-renderer/types";
+import type { AttributeValue } from "../editor-mdx-renderer/types";
 import { useEditorComponent } from "./EditorComponentContext";
+import type { AttributeConfig, AttributeValues, Control } from "./controls";
 import {
-  AttributeConfig,
-  AttributeValues,
   CheckboxControl,
-  Control,
   IntegerInputControl,
   SelectControl,
   TextInputControl,
@@ -53,7 +45,9 @@ interface EditorComponentPopoverContextValue<
 const EditorComponentPopoverContext =
   createContext<EditorComponentPopoverContextValue<any> | null>(null);
 
-export function useEditorComponentPopover<T extends AttributeConfig>() {
+export function useEditorComponentPopover<
+  T extends AttributeConfig,
+>(): EditorComponentPopoverContextValue<T> {
   const context = useContext(
     EditorComponentPopoverContext
   ) as EditorComponentPopoverContextValue<T> | null;
@@ -76,7 +70,7 @@ export function EditorComponentPopoverProvider<T extends AttributeConfig>({
   children: ReactNode;
   targetRef?: RefObject<HTMLElement | null>;
   hoverSlopThreshold?: number;
-}) {
+}): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const [isWithinThreshold, setIsWithinThreshold] = useState(false);
 
@@ -442,7 +436,7 @@ export function EditorComponentPopoverButton<T extends AttributeConfig>({
 }: {
   className?: string;
   disableDelete?: boolean;
-}) {
+}): JSX.Element {
   const {
     attributes,
     values,

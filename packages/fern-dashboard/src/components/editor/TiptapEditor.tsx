@@ -4,10 +4,9 @@ import { useEffect } from "react";
 
 import CodeBlock from "@tiptap/extension-code-block";
 import Placeholder from "@tiptap/extension-placeholder";
+import type { EditorProviderProps, Extension } from "@tiptap/react";
 import {
   EditorProvider,
-  EditorProviderProps,
-  Extension,
   ReactNodeViewRenderer,
   useCurrentEditor,
 } from "@tiptap/react";
@@ -23,7 +22,7 @@ import BubbleMenu from "./BubbleMenu";
 import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
 import { createCodeBlockComponent } from "./extension-code-block/CodeBlockComponent";
-import { LowlightInstance } from "./extension-code-block/types";
+import type { LowlightInstance } from "./extension-code-block/types";
 import CustomElement from "./extension-custom-element";
 import { FVEAttributesExtension } from "./extension-fve-attributes";
 import { LowlightPlugin } from "./tiptap-node/lowlight/lowlight-plugin";
@@ -100,7 +99,7 @@ export default function TiptapEditor({
   onCreate,
   onUpdate,
   disableDragging,
-}: TiptapEditor.Props) {
+}: TiptapEditor.Props): JSX.Element {
   const isEditingDisabled = useEditingDisabled();
 
   return (

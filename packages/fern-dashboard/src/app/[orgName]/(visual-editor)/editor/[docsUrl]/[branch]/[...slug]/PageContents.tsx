@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 
-import { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { MdxToHtmlResponse } from "@fern-docs/mdx";
+import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import type { MdxToHtmlResponse } from "@fern-docs/mdx";
 
 import { useCurrentPage } from "@/providers/CurrentPageContext";
 import { usePages } from "@/providers/PagesStoreContext";
@@ -28,7 +28,7 @@ export default function PageContents({
   initialFrontmatter,
   initialOriginalFrontmatter,
   clientNodeId,
-}: PageContents.Props) {
+}: PageContents.Props): JSX.Element {
   const { title, subtitle } = initialFrontmatter ?? {};
 
   const { setCurrentFilename } = useCurrentPage();

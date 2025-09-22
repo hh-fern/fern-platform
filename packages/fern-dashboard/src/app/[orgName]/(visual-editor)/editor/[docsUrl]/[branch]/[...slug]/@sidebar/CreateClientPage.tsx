@@ -6,15 +6,16 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useRouter } from "@bprogress/next/app";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NavigationContext } from "@fern-docs/components";
 import {
-  NavigationContext,
   UNNAMED_SECTION_DISPLAY_NAMES,
   createMdxFrontmatter,
 } from "@fern-docs/components";
-import { SectionWithHierarchy, getAllSections } from "@fern-docs/components";
+import type { SectionWithHierarchy } from "@fern-docs/components";
+import { getAllSections } from "@fern-docs/components";
 import { mdxToHtml } from "@fern-docs/mdx";
 
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,7 +35,7 @@ import { useGitPrInfo } from "@/providers/GitPRContext";
 import { usePages } from "@/providers/PagesStoreContext";
 import { constructEditorSlug } from "@/utils/editor-routing";
 import { pageTitleToSlug } from "@/utils/pageTitleToSlug";
-import { EncodedDocsUrl } from "@/utils/types";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 interface CreateClientPageProps {
   children: React.ReactNode;
@@ -48,7 +49,7 @@ export function CreateClientPage({
   root,
   disabled = false,
   navigationContext,
-}: CreateClientPageProps) {
+}: CreateClientPageProps): JSX.Element {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [pageTitle, setPageTitle] = useState("");
   const [pageSlug, setPageSlug] = useState("");

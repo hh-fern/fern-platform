@@ -5,7 +5,7 @@ import {
   getFernBotOctokitForRepo,
 } from "@/app/services/auth0/fernBotOctokit";
 import { getOwnerAndRepoFromGithubUrl } from "@/app/services/github/github";
-import { GithubSourceRepo } from "@/app/services/github/types";
+import type { GithubSourceRepo } from "@/app/services/github/types";
 
 const EMPTY_RESPONSE: GithubSourceRepo = {
   githubUrl: undefined,

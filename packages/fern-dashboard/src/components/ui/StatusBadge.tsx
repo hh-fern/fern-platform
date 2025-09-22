@@ -1,4 +1,4 @@
-import { GithubPrStatus } from "@/app/services/github/types";
+import type { GithubPrStatus } from "@/app/services/github/types";
 import { cn } from "@/utils/utils";
 
 export type StatusBadgeType =
@@ -74,7 +74,7 @@ export function StatusBadge({
   onClick,
   afterSlot,
   hideDot,
-}: StatusBadgeProps) {
+}: StatusBadgeProps): React.JSX.Element {
   const config = statusConfig[status];
 
   return (
