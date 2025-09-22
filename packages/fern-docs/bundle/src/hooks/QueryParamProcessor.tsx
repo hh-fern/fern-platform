@@ -3,8 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-import { ApiDefinition } from "@fern-api/fdr-sdk";
-
 import { useProgrammingLanguage } from "@/state/language";
 
 export function QueryParamProcessor() {
