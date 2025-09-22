@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 
 import { BookOpen, X } from "lucide-react";
 
@@ -13,7 +13,7 @@ export const AskAiContextPill = ({
 }): ReactNode => {
   if (!pageContext) return null;
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onSelectHit?.(pageContext.url);

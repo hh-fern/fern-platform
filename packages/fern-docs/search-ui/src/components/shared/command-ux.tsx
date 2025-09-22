@@ -2,6 +2,7 @@
 
 import {
   type Dispatch,
+  type ReactNode,
   type SetStateAction,
   createContext,
   useContext,
@@ -30,7 +31,7 @@ function CommandUxProvider(props: {
   setInputError: Dispatch<SetStateAction<string | null | undefined>>;
   // focus: (opts?: { scrollToTop?: boolean }) => void;
   setInputRef: (ref: HTMLInputElement | HTMLTextAreaElement | null) => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }): JSX.Element {
   const [inputError, setInputError] = useControllableState<string | null>({
     prop: props.inputError,

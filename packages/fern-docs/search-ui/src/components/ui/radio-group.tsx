@@ -1,4 +1,4 @@
-import React from "react";
+import type { ComponentProps, JSX } from "react";
 
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";
@@ -9,9 +9,7 @@ const RadioGroup = ({
   className,
   ref,
   ...props
-}: React.ComponentProps<
-  typeof RadioGroupPrimitive.Root
->): React.JSX.Element => {
+}: ComponentProps<typeof RadioGroupPrimitive.Root>): JSX.Element => {
   return (
     <RadioGroupPrimitive.Root
       className={cn("grid gap-2", className)}
@@ -25,9 +23,7 @@ const RadioGroupItem = ({
   className,
   ref,
   ...props
-}: React.ComponentProps<
-  typeof RadioGroupPrimitive.Item
->): React.JSX.Element => {
+}: ComponentProps<typeof RadioGroupPrimitive.Item>): JSX.Element => {
   return (
     <RadioGroupPrimitive.Item
       ref={ref}

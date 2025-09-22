@@ -1,17 +1,15 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, FC, JSX } from "react";
 
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "@fern-docs/components";
 
-const Select: React.FC<SelectPrimitive.SelectProps> = SelectPrimitive.Root;
+const Select: FC<SelectPrimitive.SelectProps> = SelectPrimitive.Root;
 
-const SelectGroup: React.FC<SelectPrimitive.SelectGroupProps> =
-  SelectPrimitive.Group;
+const SelectGroup: FC<SelectPrimitive.SelectGroupProps> = SelectPrimitive.Group;
 
-const SelectValue: React.FC<SelectPrimitive.SelectValueProps> =
-  SelectPrimitive.Value;
+const SelectValue: FC<SelectPrimitive.SelectValueProps> = SelectPrimitive.Value;
 
 function SelectTrigger({
   className,

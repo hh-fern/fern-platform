@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, ReactNode, Ref } from "react";
 import { Fragment } from "react";
 
 import * as Menubar from "@radix-ui/react-menubar";
@@ -158,7 +158,7 @@ function FacetBadge({
 }: { facet: FacetName; value?: string } & Omit<
   ComponentProps<"button">,
   "color" | "variant"
-> & { ref?: React.Ref<HTMLButtonElement> }) {
+> & { ref?: Ref<HTMLButtonElement> }) {
   if (value != null && isHttpMethod(value)) {
     return (
       <HttpMethodBadge
@@ -211,7 +211,7 @@ function FacetBadge({
 function MenubarItem({
   ref,
   ...props
-}: Menubar.MenubarItemProps & { ref?: React.Ref<HTMLDivElement> }) {
+}: Menubar.MenubarItemProps & { ref?: Ref<HTMLDivElement> }) {
   return (
     <Menubar.Item
       ref={ref}

@@ -2,6 +2,7 @@
 
 import type {
   ComponentProps,
+  ComponentType,
   KeyboardEventHandler,
   ReactElement,
   ReactNode,
@@ -539,10 +540,7 @@ const DesktopAskAIChat = ({
           prefetch={prefetch}
           components={useMemo(
             (): Components => ({
-              pre({
-                node,
-                ...props
-              }: PropsWithElement<React.ComponentProps<"pre">>) {
+              pre({ node, ...props }: PropsWithElement<ComponentProps<"pre">>) {
                 if (
                   isValidElement(props.children) &&
                   props.children.type === "code"
@@ -574,7 +572,7 @@ const DesktopAskAIChat = ({
                 children,
                 node,
                 ...props
-              }: PropsWithElement<React.ComponentProps<"a">>) => (
+              }: PropsWithElement<ComponentProps<"a">>) => (
                 <a
                   {...props}
                   className="decoration-(color:--accent-a10) hover:text-(color:--accent-a10) font-semibold hover:decoration-2"
@@ -589,7 +587,7 @@ const DesktopAskAIChat = ({
                 children,
                 node,
                 ...props
-              }: PropsWithElement<React.ComponentProps<"p">>) => (
+              }: PropsWithElement<ComponentProps<"p">>) => (
                 <p {...props}>{children}</p>
               ),
             }),
@@ -944,7 +942,7 @@ const AskAICommandItems = memo<{
                                 node,
                                 ...props
                               }: PropsWithElement<
-                                React.ComponentProps<"section">
+                                ComponentProps<"section">
                               >) => {
                                 if (node?.properties.dataFootnotes) {
                                   return (
@@ -958,9 +956,9 @@ const AskAICommandItems = memo<{
 
                                 if ("section" in components) {
                                   return createElement(
-                                    components.section as React.ComponentType<
+                                    components.section as ComponentType<
                                       PropsWithElement<
-                                        React.ComponentProps<"section">
+                                        ComponentProps<"section">
                                       >
                                     >,
                                     {

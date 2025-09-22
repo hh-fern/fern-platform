@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, FC, JSX } from "react";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -6,16 +6,15 @@ import { X } from "lucide-react";
 
 import { cn } from "@fern-docs/components";
 
-const Dialog: React.FC<DialogPrimitive.DialogProps> = DialogPrimitive.Root;
+const Dialog: FC<DialogPrimitive.DialogProps> = DialogPrimitive.Root;
 
-const DialogTrigger: React.FC<DialogPrimitive.DialogTriggerProps> =
+const DialogTrigger: FC<DialogPrimitive.DialogTriggerProps> =
   DialogPrimitive.Trigger;
 
-const DialogPortal: React.FC<DialogPrimitive.DialogPortalProps> =
+const DialogPortal: FC<DialogPrimitive.DialogPortalProps> =
   DialogPrimitive.Portal;
 
-const DialogClose: React.FC<DialogPrimitive.DialogCloseProps> =
-  DialogPrimitive.Close;
+const DialogClose: FC<DialogPrimitive.DialogCloseProps> = DialogPrimitive.Close;
 
 function DialogOverlay({
   className,
@@ -64,7 +63,7 @@ function DialogContent({
 const DialogHeader = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>): JSX.Element => (
+}: ComponentProps<"div">): JSX.Element => (
   <div
     className={cn(
       "flex flex-col space-y-1.5 text-center sm:text-left",
@@ -77,7 +76,7 @@ const DialogHeader = ({
 const DialogFooter = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>): JSX.Element => (
+}: ComponentProps<"div">): JSX.Element => (
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",

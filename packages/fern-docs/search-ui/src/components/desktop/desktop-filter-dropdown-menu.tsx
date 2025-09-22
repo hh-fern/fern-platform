@@ -42,7 +42,7 @@ export function DesktopFilterDropdownMenu({
   className?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-}): React.ReactNode {
+}): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
 
   const isDropdownOpen = open !== undefined ? open : isOpen;

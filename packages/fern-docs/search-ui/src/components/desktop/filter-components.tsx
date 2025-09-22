@@ -31,7 +31,7 @@ export const FilterDropdownMenu = ({
   filters: readonly FacetFilter[];
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-}): React.ReactNode => {
+}): JSX.Element => {
   const { clear } = useSearchBox();
   const { setFilters } = useFacetFilters();
   const options = toFilterOptions(useFacets(filters).facets);
@@ -97,7 +97,7 @@ export const AddFilterButton = ({
   filters: readonly FacetFilter[];
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-}): React.ReactNode => {
+}): JSX.Element | null => {
   const { clear } = useSearchBox();
   const { setFilters } = useFacetFilters();
   const options = toFilterOptions(useFacets(filters).facets);
@@ -155,7 +155,7 @@ export const FilterManager = ({
   filters,
 }: {
   filters: readonly FacetFilter[];
-}): React.ReactNode => {
+}): JSX.Element => {
   const { setFilters } = useFacetFilters();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { type Dispatch, useMemo } from "react";
 
 import { type SetStateAction, type WritableAtom, useAtom } from "jotai";
 import type { RESET } from "jotai/utils";
@@ -18,7 +18,7 @@ export type FiltersContext = {
 
 export interface FiltersManager<T = readonly FacetFilter[]> {
   filters: T;
-  setFilters: React.Dispatch<React.SetStateAction<T>>;
+  setFilters: Dispatch<SetStateAction<T>>;
 }
 
 export function createFiltersContext(): FiltersContext {

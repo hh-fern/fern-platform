@@ -4,7 +4,7 @@ import { Kbd } from "@fern-docs/components";
 import { cn } from "@fern-docs/components";
 
 export const CommandKbd: FC<{ className?: string }> = memo(
-  ({ className }: { className?: string }): React.ReactNode => {
+  ({ className }: { className?: string }): JSX.Element => {
     return (
       <span className={cn("inline-flex items-center gap-1", className)}>
         <Kbd>{"⌘"}</Kbd>
@@ -15,7 +15,7 @@ export const CommandKbd: FC<{ className?: string }> = memo(
 CommandKbd.displayName = "CommandKbd";
 
 export const ForwardSlashKbd: FC<{ className?: string }> = memo(
-  ({ className }: { className?: string }): React.ReactNode => {
+  ({ className }: { className?: string }): JSX.Element => {
     return (
       <span className={cn("inline-flex items-center gap-1", className)}>
         <Kbd>{"/"}</Kbd>

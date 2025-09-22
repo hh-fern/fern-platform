@@ -11,7 +11,7 @@ export function CommandAskAIGroup({
   ...props
 }: { onAskAI: (initialInput: string) => void } & ComponentProps<
   typeof Command.Group
->): React.ReactNode {
+>): JSX.Element {
   const { query } = useSearchBox();
   const wordCount = query
     .trim()
@@ -38,7 +38,7 @@ export function AskAIText({
 }: {
   ref?: ComponentProps<"span">["ref"];
   query: string;
-}): React.ReactNode {
+}): JSX.Element {
   return (
     <span
       ref={ref}

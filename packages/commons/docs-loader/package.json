@@ -10,14 +10,8 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/js/index.js"
-    },
-    "./client": {
-      "types": "./dist/types/index.client.d.ts",
-      "default": "./dist/js/index.client.js"
-    }
+    ".": "./src/index.ts",
+    "./client": "./src/index.client.ts"
   },
   "files": [
     "dist"

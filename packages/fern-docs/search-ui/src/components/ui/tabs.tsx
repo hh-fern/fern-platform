@@ -1,16 +1,16 @@
-import React from "react";
+import type { ComponentProps, FC, JSX } from "react";
 
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import { cn } from "@fern-docs/components";
 
-const Tabs: React.FC<TabsPrimitive.TabsProps> = TabsPrimitive.Root;
+const Tabs: FC<TabsPrimitive.TabsProps> = TabsPrimitive.Root;
 
 const TabsList = ({
   className,
   ref,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List>): React.JSX.Element => (
+}: ComponentProps<typeof TabsPrimitive.List>): JSX.Element => (
   <TabsPrimitive.List
     ref={ref}
     className={cn(
@@ -25,7 +25,7 @@ const TabsTrigger = ({
   className,
   ref,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Trigger>): React.JSX.Element => (
+}: ComponentProps<typeof TabsPrimitive.Trigger>): JSX.Element => (
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
@@ -40,7 +40,7 @@ const TabsContent = ({
   className,
   ref,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Content>): React.JSX.Element => (
+}: ComponentProps<typeof TabsPrimitive.Content>): JSX.Element => (
   <TabsPrimitive.Content
     ref={ref}
     className={cn(

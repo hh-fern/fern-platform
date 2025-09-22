@@ -1,13 +1,13 @@
-import React from "react";
+import type { ComponentProps, FC, ReactNode } from "react";
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 import { cn } from "@fern-docs/components";
 
-const TooltipProvider: React.FC<TooltipPrimitive.TooltipProviderProps> =
+const TooltipProvider: FC<TooltipPrimitive.TooltipProviderProps> =
   TooltipPrimitive.Provider;
 
-const Tooltip: React.FC<TooltipPrimitive.TooltipProps> = TooltipPrimitive.Root;
+const Tooltip: FC<TooltipPrimitive.TooltipProps> = TooltipPrimitive.Root;
 
 const TooltipTrigger: typeof TooltipPrimitive.Trigger =
   TooltipPrimitive.Trigger;
@@ -18,9 +18,9 @@ function TooltipContent({
   sideOffset = 4,
   animate = true,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content> & {
+}: ComponentProps<typeof TooltipPrimitive.Content> & {
   animate?: boolean;
-}): React.ReactNode {
+}): ReactNode {
   return (
     <TooltipPrimitive.Content
       ref={ref}

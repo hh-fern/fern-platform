@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactNode } from "react";
+import type { PropsWithChildren, ReactNode, RefObject } from "react";
 import { memo, useEffect, useRef } from "react";
 import { Snippet } from "react-instantsearch";
 
@@ -91,7 +91,7 @@ const MemoizedCommandSearchHits = memo(
     items: AlgoliaRecordHit[];
     onSelect: (path: string) => void;
     prefetch?: (path: string) => void | Promise<void>;
-    sentinelRef: React.RefObject<HTMLLIElement | null>;
+    sentinelRef: RefObject<HTMLLIElement | null>;
   }) => {
     const groups = generateHits(items);
 

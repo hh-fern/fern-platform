@@ -21,7 +21,7 @@ export function TextArea({
   padding = 0,
   value,
   ...props
-}: TextAreaProps): React.ReactNode {
+}: TextAreaProps): JSX.Element {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   useAutosizeTextArea(inputRef, minLines, lineHeight, padding, value);
   return (

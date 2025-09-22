@@ -1,5 +1,6 @@
 import {
   type ComponentProps,
+  type FC,
   type KeyboardEvent,
   type PropsWithChildren,
   type ReactNode,
@@ -94,7 +95,7 @@ const DesktopCommand = ({
   );
 };
 
-export const DesktopCommandContent: React.FC<{
+export const DesktopCommandContent: FC<{
   children: ReactNode;
   asChild?: boolean;
 }> = memo(
@@ -184,7 +185,7 @@ function DesktopBackButton({
    * if true, the text says `Del` to go back or `Ctrl` `Del` to go to root search
    */
   showAdditionalCommand?: boolean;
-}): React.ReactNode {
+}): ReactNode {
   const shortcut = usePlatformKbdShortcut();
 
   const additionalCommand = showAdditionalCommand && shortcut && (

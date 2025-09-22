@@ -25,7 +25,7 @@ export function MobileCommand({
   onOpenChange,
   children,
   ...rest
-}: MobileCommandProps & ComponentProps<typeof Command.Root>): React.ReactNode {
+}: MobileCommandProps & ComponentProps<typeof Command.Root>): JSX.Element {
   const { query, refine } = useSearchBox();
   const { filters, resetFilters } = useFacetFilters();
 

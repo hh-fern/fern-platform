@@ -1,4 +1,4 @@
-import React from "react";
+import type { ComponentProps, JSX } from "react";
 
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
@@ -10,7 +10,7 @@ const Separator = ({
   decorative = true,
   ref,
   ...props
-}: React.ComponentProps<typeof SeparatorPrimitive.Root>): React.JSX.Element => (
+}: ComponentProps<typeof SeparatorPrimitive.Root>): JSX.Element => (
   <SeparatorPrimitive.Root
     ref={ref}
     decorative={decorative}

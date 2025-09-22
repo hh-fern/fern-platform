@@ -1,4 +1,4 @@
-import React from "react";
+import type { ComponentProps, FC, HTMLAttributes, JSX } from "react";
 
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -8,22 +8,20 @@ import { X } from "lucide-react";
 
 import { cn } from "@fern-docs/components";
 
-const Sheet: React.FC<SheetPrimitive.DialogProps> = SheetPrimitive.Root;
+const Sheet: FC<SheetPrimitive.DialogProps> = SheetPrimitive.Root;
 
-const SheetTrigger: React.FC<SheetPrimitive.DialogTriggerProps> =
+const SheetTrigger: FC<SheetPrimitive.DialogTriggerProps> =
   SheetPrimitive.Trigger;
 
-const SheetClose: React.FC<SheetPrimitive.DialogCloseProps> =
-  SheetPrimitive.Close;
+const SheetClose: FC<SheetPrimitive.DialogCloseProps> = SheetPrimitive.Close;
 
-const SheetPortal: React.FC<SheetPrimitive.DialogPortalProps> =
-  SheetPrimitive.Portal;
+const SheetPortal: FC<SheetPrimitive.DialogPortalProps> = SheetPrimitive.Portal;
 
 const SheetOverlay = ({
   className,
   ref,
   ...props
-}: React.ComponentProps<typeof SheetPrimitive.Overlay>): React.JSX.Element => (
+}: ComponentProps<typeof SheetPrimitive.Overlay>): JSX.Element => (
   <SheetPrimitive.Overlay
     className={cn(
       "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80",
@@ -60,7 +58,7 @@ const sheetVariants: (
 );
 
 interface SheetContentProps
-  extends React.ComponentProps<typeof SheetPrimitive.Content>,
+  extends ComponentProps<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {}
 
 const SheetContent = ({
@@ -69,7 +67,7 @@ const SheetContent = ({
   children,
   ref,
   ...props
-}: SheetContentProps): React.JSX.Element => (
+}: SheetContentProps): JSX.Element => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
@@ -89,7 +87,7 @@ const SheetContent = ({
 const SheetHeader = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+}: HTMLAttributes<HTMLDivElement>): JSX.Element => (
   <div
     className={cn(
       "flex flex-col space-y-2 text-center sm:text-left",
@@ -102,7 +100,7 @@ const SheetHeader = ({
 const SheetFooter = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element => (
+}: HTMLAttributes<HTMLDivElement>): JSX.Element => (
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
@@ -116,7 +114,7 @@ const SheetTitle = ({
   className,
   ref,
   ...props
-}: React.ComponentProps<typeof SheetPrimitive.Title>): React.JSX.Element => (
+}: ComponentProps<typeof SheetPrimitive.Title>): JSX.Element => (
   <SheetPrimitive.Title
     ref={ref}
     className={cn(
@@ -131,9 +129,7 @@ const SheetDescription = ({
   className,
   ref,
   ...props
-}: React.ComponentProps<
-  typeof SheetPrimitive.Description
->): React.JSX.Element => (
+}: ComponentProps<typeof SheetPrimitive.Description>): JSX.Element => (
   <SheetPrimitive.Description
     ref={ref}
     className={cn("text-(color:--accent-12) text-sm", className)}

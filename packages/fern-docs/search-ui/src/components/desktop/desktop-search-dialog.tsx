@@ -1,4 +1,4 @@
-import type { ComponentProps, PropsWithChildren, ReactNode } from "react";
+import type { ComponentProps, FC, PropsWithChildren, ReactNode } from "react";
 import { memo } from "react";
 
 import * as Dialog from "@radix-ui/react-dialog";
@@ -69,7 +69,7 @@ type DesktopSearchDialogProps = PropsWithChildren<
   } & ComponentProps<typeof Dialog.Root>
 >;
 
-export const DesktopSearchDialog: React.FC<DesktopSearchDialogProps> = memo(
+export const DesktopSearchDialog: FC<DesktopSearchDialogProps> = memo(
   ({
     children,
     asChild,

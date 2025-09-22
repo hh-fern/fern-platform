@@ -14,7 +14,7 @@ export function CommandGroupPlayground({
 }: ComponentProps<typeof Command.Group> & {
   togglePlayground?: () => void;
   playgroundOpen?: boolean;
-}): React.ReactNode {
+}): JSX.Element | false {
   if (togglePlayground == null) {
     return false;
   }

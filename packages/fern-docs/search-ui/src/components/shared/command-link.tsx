@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, Ref } from "react";
 import { useCallback, useEffect, useRef } from "react";
 
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -23,7 +23,7 @@ export function CommandLink({
   target?: string;
   rel?: string;
   prefetch?: (href: string) => void | Promise<void>;
-  ref?: React.Ref<HTMLAnchorElement>;
+  ref?: Ref<HTMLAnchorElement>;
 }): JSX.Element {
   const ref = useRef<HTMLAnchorElement>(null);
   const isSelected = Command.useCommandState((state) => state.value === href);

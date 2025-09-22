@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { type ReactNode, useCallback, useMemo } from "react";
 
 import { preload } from "swr";
 
@@ -20,10 +20,10 @@ export function FacetFiltersProvider({
   initialFilters,
   fetchFacets,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   initialFilters?: Partial<Record<FacetName, string>>;
   fetchFacets: (filters: readonly string[]) => Promise<FacetsResponse>;
-}): React.ReactNode {
+}): ReactNode {
   const { setFilters } = useFacetFilters();
 
   const preloadFacets = useCallback(

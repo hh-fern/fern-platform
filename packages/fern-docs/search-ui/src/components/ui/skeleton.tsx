@@ -1,11 +1,8 @@
-import React from "react";
+import type { ComponentProps, JSX } from "react";
 
 import { cn } from "@fern-docs/components";
 
-function Skeleton({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>): React.JSX.Element {
+function Skeleton({ className, ...props }: ComponentProps<"div">): JSX.Element {
   return (
     <div
       className={cn(

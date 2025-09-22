@@ -61,7 +61,7 @@ export const CommandKbd = ({
   className,
 }: {
   className?: string;
-}): React.ReactNode => {
+}): JSX.Element => {
   return (
     <div className={cn("inline-flex", className)}>
       <Kbd>{"/"}</Kbd>

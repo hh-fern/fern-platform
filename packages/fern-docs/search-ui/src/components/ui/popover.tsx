@@ -1,15 +1,15 @@
-import React from "react";
+import type { ComponentProps, FC, JSX } from "react";
 
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "@fern-docs/components";
 
-const Popover: React.FC<PopoverPrimitive.PopoverProps> = PopoverPrimitive.Root;
+const Popover: FC<PopoverPrimitive.PopoverProps> = PopoverPrimitive.Root;
 
-const PopoverTrigger: React.FC<PopoverPrimitive.PopoverTriggerProps> =
+const PopoverTrigger: FC<PopoverPrimitive.PopoverTriggerProps> =
   PopoverPrimitive.Trigger;
 
-const PopoverAnchor: React.FC<PopoverPrimitive.PopoverAnchorProps> =
+const PopoverAnchor: FC<PopoverPrimitive.PopoverAnchorProps> =
   PopoverPrimitive.Anchor;
 
 const PopoverContent = ({
@@ -18,9 +18,7 @@ const PopoverContent = ({
   sideOffset = 4,
   ref,
   ...props
-}: React.ComponentProps<
-  typeof PopoverPrimitive.Content
->): React.JSX.Element => (
+}: ComponentProps<typeof PopoverPrimitive.Content>): JSX.Element => (
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
       ref={ref}

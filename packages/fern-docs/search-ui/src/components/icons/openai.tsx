@@ -1,7 +1,9 @@
+import type { ComponentProps } from "react";
+
 export const OpenAI = ({
   ref,
   ...props
-}: React.ComponentProps<"svg">): JSX.Element => (
+}: ComponentProps<"svg">): JSX.Element => (
   <svg
     ref={ref}
     style={{ color: "currentcolor" }}

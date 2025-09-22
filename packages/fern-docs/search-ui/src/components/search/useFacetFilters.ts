@@ -1,5 +1,11 @@
-import type React from "react";
-import { createContext, useMemo } from "react";
+import {
+  type Context,
+  type Dispatch,
+  type KeyboardEventHandler,
+  type SetStateAction,
+  createContext,
+  useMemo,
+} from "react";
 
 import { useAtom } from "jotai";
 import type { atomWithDefault } from "jotai/utils";
@@ -9,7 +15,7 @@ import type { FacetFilter, FacetsResponse } from "@fern-docs/search-keyword";
 
 import { filtersAtom } from "./FilterProvider";
 
-export const FacetFiltersContext: React.Context<{
+export const FacetFiltersContext: Context<{
   preloadFacets: (_: readonly FacetFilter[]) => Promise<FacetsResponse>;
   fetchFacets: (_: readonly string[]) => Promise<FacetsResponse>;
 }> = createContext({
@@ -24,11 +30,11 @@ export const FacetFiltersContext: React.Context<{
  */
 export interface FacetFiltersManager<T = readonly FacetFilter[]> {
   filters: T;
-  setFilters: React.Dispatch<React.SetStateAction<T>>;
+  setFilters: Dispatch<SetStateAction<T>>;
   clearFilters: () => void;
   resetFilters: () => void;
   popFilter: () => void;
-  handlePopState: React.KeyboardEventHandler<HTMLElement>;
+  handlePopState: KeyboardEventHandler<HTMLElement>;
 }
 
 /**
