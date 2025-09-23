@@ -3,12 +3,17 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "strictNullChecks": true,
-    "jsx": "react-jsx"
+    "jsx": "preserve"
   },
-  "exclude": ["node_modules", "**/__snapshots__"],
+  "exclude": [
+    "node_modules",
+    "**/__snapshots__"
+  ],
   "include": [
     "src/**/*",
     ".next/types/**/*.ts",
