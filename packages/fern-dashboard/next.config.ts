@@ -68,6 +68,14 @@ let nextConfig: NextConfig = {
     if (isServer) {
       webpackConfig.externals = webpackConfig.externals || [];
       webpackConfig.externals.push("esbuild");
+
+      // https://github.com/open-telemetry/opentelemetry-js/issues/4173#issuecomment-1822938936
+      webpackConfig.ignoreWarnings = webpackConfig.ignoreWarnings || [];
+      webpackConfig.ignoreWarnings.push({
+        module: /opentelemetry/,
+        message:
+          /Critical dependency: the request of a dependency is an expression/,
+      });
     }
 
     webpackConfig.module.rules.push({
