@@ -6,16 +6,17 @@ import { withSentryConfig } from "@sentry/nextjs";
 const CSP_HEADER = `
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usepylon.com *.posthog.com *.pusher.com d3vl36l12sfx26.cloudfront.net cdn.jsdelivr.net va.vercel-scripts.com;
+  worker-src 'self' blob:;
   connect-src 'self' * ws:;
-  style-src 'self' 'unsafe-inline' *.usepylon.com *.posthog.com cdn.jsdelivr.net;
-  font-src 'self' pylon-avatars.s3.us-west-1.amazonaws.com *.usepylon.com *.buildwithfern.com;
+  style-src 'self' 'unsafe-inline' *.usepylon.com *.posthog.com cdn.jsdelivr.net cdnjs.cloudflare.com;
+  font-src 'self' pylon-avatars.s3.us-west-1.amazonaws.com *.usepylon.com *.buildwithfern.com cdn.jsdelivr.net;
   img-src 'self' *;
   frame-src 'self' *;
   object-src 'self' *;
   media-src 'self' *;
 `.replace(/\n/g, "");
 
-const nextConfig: NextConfig = {
+let nextConfig: NextConfig = {
   outputFileTracingExcludes: {
     "./": ["**/*.map"],
   },
@@ -30,7 +31,10 @@ const nextConfig: NextConfig = {
     "@fern-api/ui-core-utils",
   ],
   experimental: {
-    optimizePackageImports: [],
+    optimizePackageImports: [
+      // this will separate the `createLowlight` from the `all` import
+      "lowlight",
+    ],
     useCache: true,
     ppr: "incremental",
   },
@@ -112,41 +116,45 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-export default withSentryConfig(nextConfig, {
-  // For all available options, see:
-  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+if (process.env.NODE_ENV === "production") {
+  nextConfig = withSentryConfig(nextConfig, {
+    // For all available options, see:
+    // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-  org: "buildwithfern",
-  project: "fern-dashboard",
+    org: "buildwithfern",
+    project: "fern-dashboard",
 
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
+    // Only print logs for uploading source maps in CI
+    silent: !process.env.CI,
 
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+    // For all available options, see:
+    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: false,
+    // Upload a larger set of source maps for prettier stack traces (increases build time)
+    widenClientFileUpload: false,
 
-  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
-  tunnelRoute: "/monitoring",
+    // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+    // This can increase your server load as well as your hosting bill.
+    // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+    // side errors will fail.
+    tunnelRoute: "/monitoring",
 
-  sourcemaps: {
-    // Note: maybe we can use these to reduce the size of the source maps, has to be tested
-    // assets: "./.next/**/*.{js,js.map}",
-    // ignore: ["**/node_modules/**"],
-    deleteSourcemapsAfterUpload: true,
-  },
+    sourcemaps: {
+      // Note: maybe we can use these to reduce the size of the source maps, has to be tested
+      // assets: "./.next/**/*.{js,js.map}",
+      // ignore: ["**/node_modules/**"],
+      deleteSourcemapsAfterUpload: true,
+    },
 
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
+    // Automatically tree-shake Sentry logger statements to reduce bundle size
+    disableLogger: true,
 
-  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-  // See the following for more information:
-  // https://docs.sentry.io/product/crons/
-  // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: true,
-});
+    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+    // See the following for more information:
+    // https://docs.sentry.io/product/crons/
+    // https://vercel.com/docs/cron-jobs
+    automaticVercelMonitors: true,
+  });
+}
+
+export default nextConfig;

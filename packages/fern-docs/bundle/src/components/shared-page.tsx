@@ -1,5 +1,6 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import {
   notFound,
   permanentRedirect,
@@ -10,6 +11,7 @@ import React from "react";
 
 import { compact } from "es-toolkit/array";
 
+import { cacheSeed } from "@fern-api/docs-server";
 import { DocsLoader } from "@fern-api/docs-server/docs-loader";
 import { withPrunedNavigationLoader } from "@fern-api/docs-server/withPrunedNavigation";
 import {
@@ -225,17 +227,29 @@ export default async function SharedPage({
 
   // even if nav-links are globally disabled, we should calculate the neighbors
   // in case the page overrides this global setting
-  const neighborsPromise = (async () => {
-    const start = Date.now();
-    const result = await getNeighbors(
-      loader,
-      serializeNextMdx ?? serialize,
-      found
-    );
-    const end = Date.now();
-    console.log(`[SharedPage] getNeighbors() took ${end - start}ms`);
-    return result;
-  })();
+  const neighborsPromise = unstable_cache(
+    async () => {
+      const start = Date.now();
+      const result = await getNeighbors(
+        loader,
+        serializeNextMdx ?? serialize,
+        found
+      );
+      const end = Date.now();
+      console.log(`[SharedPage] getNeighbors() took ${end - start}ms`);
+      return result;
+    },
+    [
+      "getNeighbors",
+      loader.domain,
+      found.node.slug,
+      found.currentProduct?.productId ?? "",
+      found.currentVersion?.versionId ?? "",
+      found.currentTab?.title ?? "",
+      serializeNextMdx ? "nextMdx" : "mdx",
+    ],
+    { tags: [loader.domain, cacheSeed(), "getNeighbors"] }
+  );
 
   // if the current node requires authentication and the user is not authenticated, redirect to the auth page
   if (found.node.authed && !authState.authed) {
@@ -298,7 +312,7 @@ export default async function SharedPage({
   let neighbors;
   {
     const start = Date.now();
-    neighbors = await neighborsPromise;
+    neighbors = await neighborsPromise();
     const end = Date.now();
     console.log(
       `[SharedPage] neighborsPromise (getNeighbors) took ${end - start}ms`
@@ -369,7 +383,14 @@ async function getNeighbor(
     let page, mdx;
     {
       const start = Date.now();
-      page = await loader.getPage(pageId);
+      const cached_page = unstable_cache(
+        async () => {
+          return await loader.getPage(pageId);
+        },
+        ["neighbor-page", pageId],
+        { tags: [loader.domain, cacheSeed(), "neighbor-page", pageId] }
+      );
+      page = await cached_page();
       const end = Date.now();
       console.log(
         `[getNeighbor] loader.getPage(${pageId}) took ${end - start}ms`

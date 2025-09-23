@@ -5,43 +5,57 @@
   "type": "module",
   "exports": {
     "./navigation": {
-      "types": "./dist/navigation/index.d.ts",
-      "default": "./dist/navigation/index.js"
+      "types": "./dist/types/navigation/index.d.ts",
+      "import": "./dist/js/navigation/index.mjs",
+      "require": "./dist/js/navigation/index.js",
+      "default": "./dist/navigation/index.mjs"
     },
     "./api-definition": {
-      "types": "./dist/api-definition/index.d.ts",
-      "default": "./dist/api-definition/index.js"
+      "types": "./dist/types/api-definition/index.d.ts",
+      "import": "./dist/js/api-definition/index.mjs",
+      "require": "./dist/js/api-definition/index.js",
+      "default": "./dist/js/api-definition/index.mjs"
     },
     "./docs": {
-      "types": "./dist/docs/index.d.ts",
-      "default": "./dist/docs/index.js"
+      "types": "./dist/types/docs/index.d.ts",
+      "import": "./dist/js/docs/index.mjs",
+      "require": "./dist/js/docs/index.js",
+      "default": "./dist/js/docs/index.mjs"
     },
     "./client": {
-      "types": "./dist/client/FdrClient.d.ts",
-      "default": "./dist/client/FdrClient.js"
+      "types": "./dist/types/client/FdrClient.d.ts",
+      "import": "./dist/js/client/FdrClient.mjs",
+      "require": "./dist/js/client/FdrClient.js",
+      "default": "./dist/js/client/FdrClient.mjs"
     },
     "./client/types": {
-      "types": "./dist/client/types.d.ts",
-      "default": "./dist/client/types.js"
+      "types": "./dist/types/client/types.d.ts",
+      "import": "./dist/js/client/types.mjs",
+      "require": "./dist/js/client/types.js",
+      "default": "./dist/js/client/types.mjs"
     },
     "./traversers": {
-      "types": "./dist/utils/traversers/index.d.ts",
-      "default": "./dist/utils/traversers/index.js"
+      "types": "./dist/types/utils/traversers/index.d.ts",
+      "import": "./dist/js/utils/traversers/index.mjs",
+      "require": "./dist/js/utils/traversers/index.js",
+      "default": "./dist/js/utils/traversers/index.mjs"
     },
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/js/index.mjs",
+      "require": "./dist/js/index.js",
+      "default": "./dist/js/index.mjs"
     }
   },
-  "main": "dist/index.js",
-  "source": "src/index.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "clean": "rm -rf ./dist && tsc --build --clean",
-    "compile": "tsc --build",
-    "dev": "tsc --watch tsconfig.build.json",
+    "clean": "rm -rf ./dist",
+    "compile": "pnpm compile:js && pnpm compile:types",
+    "compile:js": "tsup",
+    "compile:types": "tsc --emitDeclarationOnly --outDir dist/types",
+    "dev": "tsup --watch",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "lint": "eslint --max-warnings 0 src --ext .ts --resolve-plugins-relative-to ../../",
@@ -49,7 +63,6 @@
     "test:update": "vitest --run  --passWithNoTests --globals -u"
   },
   "dependencies": {
-    "@fern-api/snippets": "workspace:*",
     "@fern-api/ui-core-utils": "workspace:*",
     "@ungap/structured-clone": "^1.2.0",
     "dayjs": "^1.11.11",
@@ -69,11 +82,13 @@
     "@babel/core": "^7.26.9",
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
+    "@fern-api/snippets": "workspace:*",
     "@fern-platform/configs": "workspace:*",
     "@types/node-fetch": "2.6.9",
     "@types/qs": "6.9.14",
     "@types/tinycolor2": "^1.4.6",
     "@types/ungap__structured-clone": "^1.2.0",
+    "tsup": "^8.3.5",
     "typescript": "^5",
     "vitest": "^3.2.4"
   }

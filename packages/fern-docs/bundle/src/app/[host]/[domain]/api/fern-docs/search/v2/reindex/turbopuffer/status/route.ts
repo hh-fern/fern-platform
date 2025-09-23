@@ -2,13 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
-import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 
-import { JobManager, createJobStatusResponse } from "@/jobs";
+import { createJobStatusResponse } from "@/jobs";
+import { getMessageStatus } from "@/server/queue";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  console.log("CHECK TURBOPUFFER REINDEX STATUS");
-
   if (isLocal() || isSelfHosted()) {
     return NextResponse.json(
       "turbopuffer status check is not accessible in local preview mode",
@@ -25,7 +23,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  const domain = getDocsDomainEdge(req);
-  const job = await JobManager.getJobStatus(domain);
-  return createJobStatusResponse(job);
+  const status = await getMessageStatus(jobId);
+  return createJobStatusResponse(jobId, status);
 }
