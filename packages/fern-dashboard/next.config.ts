@@ -1,5 +1,6 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
 import type { NextConfig } from "next";
+import withRspack from "next-rspack";
 
 import { withSentryConfig } from "@sentry/nextjs";
 
@@ -31,11 +32,13 @@ let nextConfig: NextConfig = {
     "@fern-api/ui-core-utils",
   ],
   experimental: {
+    webpackBuildWorker: true,
     optimizePackageImports: [
       // this will separate the `createLowlight` from the `all` import
       "lowlight",
     ],
     useCache: true,
+    // ppr requires next@canary track
     ppr: "incremental",
   },
   images: {
@@ -61,24 +64,45 @@ let nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (webpackConfig, { isServer }) => {
-    webpackConfig.externals.push("sharp");
+  webpack: (config, { isServer }) => {
+    config.externals.push(
+      "sharp",
+      // mongodb subdependencies are optional, and need to be externalized for rspack.
+      // add them + install dependencies as needed.
+      "kerberos",
+      "@mongodb-js/zstd",
+      "@aws-sdk/credential-providers",
+      "gcp-metadata",
+      "snappy",
+      "mongodb-client-encryption"
+    );
 
     // esbuild is only used on the server (mdx-bundler), so only externalize it there
     if (isServer) {
-      webpackConfig.externals = webpackConfig.externals || [];
-      webpackConfig.externals.push("esbuild");
+      config.externals = config.externals || [];
+      config.externals.push("esbuild");
 
       // https://github.com/open-telemetry/opentelemetry-js/issues/4173#issuecomment-1822938936
-      webpackConfig.ignoreWarnings = webpackConfig.ignoreWarnings || [];
-      webpackConfig.ignoreWarnings.push({
+      config.ignoreWarnings = config.ignoreWarnings || [];
+      config.ignoreWarnings.push({
         module: /opentelemetry/,
         message:
           /Critical dependency: the request of a dependency is an expression/,
       });
     }
 
-    webpackConfig.module.rules.push({
+    // rspack's internal configuration for "lib" will bundle all shared node_modules into a giant chunk,
+    // so we need to kill it
+    if (
+      config.optimization.splitChunks.cacheGroups != null &&
+      config.optimization.splitChunks.cacheGroups.lib != null
+    ) {
+      delete config.optimization.splitChunks.cacheGroups.lib;
+    }
+
+    // glslify is used to import 3d shaders (WaveformComplexShader)
+    // into the bundle
+    config.module.rules.push({
       test: /\.(glsl|vs|fs|vert|frag)$/,
       exclude: /node_modules/,
       use: [
@@ -91,7 +115,8 @@ let nextConfig: NextConfig = {
         },
       ],
     });
-    return webpackConfig;
+
+    return config;
   },
 
   // vercel chokes on monorepo compilation and we run compile before building
@@ -123,6 +148,11 @@ let nextConfig: NextConfig = {
   // This is required to support PostHog trailing slash API requests
   skipTrailingSlashRedirect: true,
 };
+
+// only use rspack in development
+if (process.env.NODE_ENV === "development") {
+  nextConfig = withRspack(nextConfig);
+}
 
 if (process.env.NODE_ENV === "production") {
   nextConfig = withSentryConfig(nextConfig, {

@@ -7,7 +7,7 @@
     "url": "https://github.com/fern-api/fern-platform.git",
     "directory": "packages/fern-dashboard"
   },
-  "sideEffects": false,
+  "type": "module",
   "scripts": {
     "clean": "rm -rf ./lib ./dist ./.next && tsc --build --clean",
     "compile": "tsc --build",
@@ -142,6 +142,7 @@
     "dotenv-cli": "^6.0.0",
     "glslify-import": "^3.1.0",
     "glslify-loader": "^2.0.0",
+    "next-rspack": "^15.5.3",
     "prisma": "5.13.0",
     "raw-loader": "^4.0.2",
     "sass": "^1.77.0",
