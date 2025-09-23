@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import CheckCircleIcon from "@heroicons/react/24/outline/CheckCircleIcon";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 

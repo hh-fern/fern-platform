@@ -5,7 +5,7 @@ import { applyOrgMappings } from "@/orgMappings";
 
 import { createPersonalProject } from "./actions/createPersonalProject";
 import {
-  Auth0SessionData,
+  type Auth0SessionData,
   getCurrentSession,
 } from "./services/auth0/getCurrentSession";
 import { getMyOrganizations } from "./services/auth0/management";

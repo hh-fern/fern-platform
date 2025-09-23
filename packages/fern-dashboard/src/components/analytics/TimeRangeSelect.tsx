@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import CalendarDaysIcon from "@heroicons/react/24/outline/CalendarDaysIcon";
 
 import {
   Select,

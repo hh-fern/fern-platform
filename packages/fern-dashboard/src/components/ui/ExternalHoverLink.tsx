@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import ArrowTopRightOnSquareIcon from "@heroicons/react/24/outline/ArrowTopRightOnSquareIcon";
 
 import { cn } from "@/utils/utils";
 
