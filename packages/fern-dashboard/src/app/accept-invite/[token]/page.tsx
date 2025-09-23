@@ -1,14 +1,10 @@
-import "server-only";
-
 import Link from "next/link";
-import { Suspense } from "react";
-
-import { Loader2 } from "lucide-react";
 
 import {
   RedeemInviteTokenErrors,
   redeemInviteToken,
 } from "@/app/actions/redeemInviteToken";
+import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import {
   GithubLoginButton,
   GoogleLoginButton,
@@ -16,6 +12,7 @@ import {
 import { LoginImage } from "@/components/login-page/LoginImage";
 import { Button } from "@/components/ui/button";
 
+import { AcceptInviteClient } from "./AcceptInviteClient";
 import AcceptInviteSuccess from "./AcceptInviteSuccess";
 import "./invite-page.scss";
 
@@ -27,6 +24,7 @@ export default async function AcceptInvitePage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
+  const session = await getCurrentSession();
   return (
     <div className="relative flex h-[100dvh] w-screen items-center justify-center overflow-hidden">
       <div className="pointer-events-none fixed inset-0 overflow-hidden opacity-60">
@@ -36,9 +34,15 @@ export default async function AcceptInvitePage({
         <h2 className="text-center text-3xl font-extrabold text-gray-900">
           Accept Invitation
         </h2>
-        <Suspense fallback={<Loader text="Accepting invitation..." />}>
+        {session == null ? (
           <AcceptInviteHandler token={token} />
-        </Suspense>
+        ) : (
+          <AcceptInviteClient token={token} session={session} />
+        )}
+
+        {/* <Suspense fallback={<Loader text="Accepting invitation..." />}>
+          <AcceptInviteHandler token={token} />
+        </Suspense> */}
       </div>
     </div>
   );
@@ -102,13 +106,4 @@ const DisplayTokenError = ({ type }: RedeemInviteTokenErrors) => {
     default:
       return "Failed to accept invitation.";
   }
-};
-
-const Loader = ({ text }: { text: string }) => {
-  return (
-    <div className="text-muted-foreground flex items-center justify-center gap-2">
-      <Loader2 className="h-4 w-4 animate-spin" />
-      {text}
-    </div>
-  );
 };

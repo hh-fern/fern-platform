@@ -8,10 +8,12 @@ export function ProfileImage({
   picture,
   name,
   className,
+  size = 32,
 }: {
   picture?: string;
   name?: string;
   className?: string;
+  size?: number;
 }) {
   return (
     <>
@@ -20,8 +22,8 @@ export function ProfileImage({
           src={picture}
           alt={name ?? "user photo"}
           className={cn("rounded-full", className)}
-          width={32}
-          height={32}
+          width={size}
+          height={size}
         />
       ) : (
         <div
