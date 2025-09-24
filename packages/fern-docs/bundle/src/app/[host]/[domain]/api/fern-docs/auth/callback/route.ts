@@ -11,6 +11,8 @@ import { getAuthEdgeConfig } from "@fern-docs/edge-config";
 
 import { redirectWithLoginError } from "@/server/redirectWithLoginError";
 
+export const runtime = "edge";
+
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const domain = getDocsDomainEdge(req);
   const host = req.nextUrl.host;

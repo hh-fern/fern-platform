@@ -191,8 +191,28 @@ export const MaybeFernLink = React.forwardRef<
 
 function stripNextLinkProps<T extends MaybeFernLinkProps>(
   props: T
-): Omit<T, "href" | "locale" | "prefetch" | "replace" | "scroll" | "shallow"> {
-  const { href, locale, prefetch, replace, scroll, shallow, ...rest } = props;
+): Omit<
+  T,
+  | "href"
+  | "locale"
+  | "legacyBehavior"
+  | "prefetch"
+  | "replace"
+  | "scroll"
+  | "shallow"
+  | "passHref"
+> {
+  const {
+    href,
+    locale,
+    legacyBehavior,
+    prefetch,
+    replace,
+    scroll,
+    shallow,
+    passHref,
+    ...rest
+  } = props;
   return rest;
 }
 

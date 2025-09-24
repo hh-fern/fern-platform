@@ -31,6 +31,8 @@ import {
   getAuthEdgeConfig,
 } from "@fern-docs/edge-config";
 
+export const runtime = "edge";
+
 export async function GET(
   req: NextRequest
 ): Promise<NextResponse<APIKeyInjectionConfig>> {

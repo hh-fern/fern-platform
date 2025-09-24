@@ -5,6 +5,8 @@ import { getAllEdge } from "./getEdge";
 import { isLocal } from "./isLocal";
 import { isSelfHosted } from "./isSelfHosted";
 
+export const runtime = "edge";
+
 const ORG_LEVEL_EDGE_FLAGS = ["bypass-extended-github-auth" as const];
 
 type OrgEdgeFlag = (typeof ORG_LEVEL_EDGE_FLAGS)[number];
