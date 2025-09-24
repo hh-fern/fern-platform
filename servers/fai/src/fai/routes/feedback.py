@@ -27,6 +27,15 @@ from src.fai.models.db.feedback_db import FeedbackDb
 from src.settings import LOGGER
 
 
+@fai_app.options("/feedback/{domain}")
+async def feedback_options() -> JSONResponse:
+    response = JSONResponse(content={})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
+
+
 @fai_app.post(
     "/feedback/{domain}", response_model=CreateFeedbackResponse, openapi_extra={"x-fern-audiences": ["internal"]}
 )
@@ -47,10 +56,15 @@ async def create_feedback(
         )
         db.add(feedback)
         await db.commit()
-        return JSONResponse(content=jsonable_encoder(CreateFeedbackResponse(feedback_id=feedback.id)))
+
+        response = JSONResponse(content=jsonable_encoder(CreateFeedbackResponse(feedback_id=feedback.id)))
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
     except Exception as e:
         LOGGER.exception(f"Failed to create feedback for domain {domain}")
-        return JSONResponse(status_code=500, content={"detail": str(e)})
+        error_response = JSONResponse(status_code=500, content={"detail": str(e)})
+        error_response.headers["Access-Control-Allow-Origin"] = "*"
+        return error_response
 
 
 @fai_app.get(
