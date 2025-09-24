@@ -174,76 +174,76 @@ export const CustomElement = Node.create<CustomElementOptions>({
             }
           }
 
-          // Check if any step involves a custom element
-          let hasCustomElement = false;
-          transaction.steps.forEach((step) => {
-            if (step instanceof ReplaceStep) {
-              state.doc.nodesBetween(step.from, step.to, (node) => {
-                if (node.type.name === TAG) {
-                  hasCustomElement = true;
-                }
-              });
-            }
-          });
+          //   // Check if any step involves a custom element
+          //   let hasCustomElement = false;
+          //   transaction.steps.forEach((step) => {
+          //     if (step instanceof ReplaceStep) {
+          //       state.doc.nodesBetween(step.from, step.to, (node) => {
+          //         if (node.type.name === TAG) {
+          //           hasCustomElement = true;
+          //         }
+          //       });
+          //     }
+          //   });
 
-          // If no custom elements are involved, allow the transaction
-          if (!hasCustomElement) {
-            return true;
-          }
+          //   // If no custom elements are involved, allow the transaction
+          //   if (!hasCustomElement) {
+          //     return true;
+          //   }
 
-          // Check if this is a drag operation (remove + insert pattern)
-          const replaceSteps = transaction.steps.filter(
-            (step) => step instanceof ReplaceStep
-          ) as ReplaceStep[];
+          //   // Check if this is a drag operation (remove + insert pattern)
+          //   const replaceSteps = transaction.steps.filter(
+          //     (step) => step instanceof ReplaceStep
+          //   ) as ReplaceStep[];
 
-          if (replaceSteps.length === 2) {
-            const [removeStep, insertStep] = replaceSteps;
+          //   if (replaceSteps.length === 2) {
+          //     const [removeStep, insertStep] = replaceSteps;
 
-            // Check if this looks like a drag operation:
-            // - One step removes content (slice size 0, from !== to)
-            // - Another step inserts content (slice size > 0, from === to)
-            const hasRemovalStep =
-              removeStep?.slice?.content?.size === 0 &&
-              removeStep?.from !== removeStep?.to;
-            const hasInsertionStep =
-              !!insertStep?.slice?.content?.size &&
-              insertStep?.from === insertStep?.to;
+          //     // Check if this looks like a drag operation:
+          //     // - One step removes content (slice size 0, from !== to)
+          //     // - Another step inserts content (slice size > 0, from === to)
+          //     const hasRemovalStep =
+          //       removeStep?.slice?.content?.size === 0 &&
+          //       removeStep?.from !== removeStep?.to;
+          //     const hasInsertionStep =
+          //       !!insertStep?.slice?.content?.size &&
+          //       insertStep?.from === insertStep?.to;
 
-            if (hasRemovalStep && hasInsertionStep) {
-              return true;
-            }
-          }
+          //     if (hasRemovalStep && hasInsertionStep) {
+          //       return true;
+          //     }
+          //   }
 
-          // For other transactions involving custom elements, only allow deletion of selected nodes
-          let result = true;
-          const hasInsertion = replaceSteps.some(
-            (step) => step.slice.content.size > 0
-          );
+          //   // For other transactions involving custom elements, only allow deletion of selected nodes
+          //   let result = true;
+          //   const hasInsertion = replaceSteps.some(
+          //     (step) => step.slice.content.size > 0
+          //   );
 
-          transaction.steps.forEach((step) => {
-            if (step instanceof ReplaceStep) {
-              const isDeletion =
-                step.slice.content.size === 0 && step.from !== step.to;
-              if (isDeletion && !hasInsertion) {
-                // Check if a custom element is being deleted
-                state.doc.nodesBetween(step.from, step.to, (node, pos) => {
-                  if (node.type.name === TAG) {
-                    // Check if the custom element is currently selected
-                    const { selection } = state;
-                    const isSelectedNode =
-                      selection instanceof NodeSelection &&
-                      selection.from === pos;
+          //   transaction.steps.forEach((step) => {
+          //     if (step instanceof ReplaceStep) {
+          //       const isDeletion =
+          //         step.slice.content.size === 0 && step.from !== step.to;
+          //       if (isDeletion && !hasInsertion) {
+          //         // Check if a custom element is being deleted
+          //         state.doc.nodesBetween(step.from, step.to, (node, pos) => {
+          //           if (node.type.name === TAG) {
+          //             // Check if the custom element is currently selected
+          //             const { selection } = state;
+          //             const isSelectedNode =
+          //               selection instanceof NodeSelection &&
+          //               selection.from === pos;
 
-                    if (!isSelectedNode) {
-                      // Block deletion if the custom element is not selected
-                      result = false;
-                    }
-                  }
-                });
-              }
-            }
-          });
-          return result;
+          //             if (!isSelectedNode) {
+          //               // Block deletion if the custom element is not selected
+          //               result = false;
+          //             }
+          //           }
+          //         });
+          //       }
+          //     }
+          //   });
+          return true;
         },
       }),
     ];

@@ -113,6 +113,78 @@ export default function TiptapEditor({
         attributes: {
           class: "prose prose-md focus:outline-none max-w-none p-4",
         },
+        handleDOMEvents: {
+          dragstart: (view, event) => {
+            console.log("dragstart", event, view.dom);
+            // event.dataTransfer?.setData("text/plain", view.dom);
+            // event.stopPropagation();
+            // event.stopImmediatePropagation();
+          },
+          dragenter: (view, event) => {
+            console.log("dragenter", event, view);
+            // event.stopPropagation();
+            // event.stopImmediatePropagation();
+          },
+          dragleave: (view, event) => {
+            console.log("dragleave", event, view);
+            // event.stopPropagation();
+            // event.stopImmediatePropagation();
+          },
+          drag: (view, event) => {
+            console.log("drag", event, view);
+            // event.stopPropagation();
+            // event.stopImmediatePropagation();
+            // event.preventDefault();
+            // event.stopPropagation();
+            // event.stopImmediatePropagation();
+            // event.dataTransfer?.setData("text/plain", view.dom.innerHTML);
+            // // Prevent dragging text/content to other editors
+            // // This prevents the deletion that occurs when dragging between editors
+            // const target = event.target as HTMLElement;
+
+            // // Only prevent drag for text content, not custom elements or media
+            // if (
+            //   target.closest('[data-type="customElement"]') ||
+            //   target.closest('[data-type="mediaUpload"]')
+            // ) {
+            //   return false; // Allow custom elements to be dragged (they handle their own prevention)
+            // }
+
+            // // Prevent all other content (text, paragraphs, headings) from being dragged
+            // event.preventDefault();
+            // console.log("dragstart prevented for:", target);
+            // return true;
+          },
+          drop: (view, event) => {
+            console.log("drop", event, view);
+            // console.log("target", event.target);
+            // console.log("currentTarget", event.currentTarget);
+            // event.preventDefault();
+            // event.stopPropagation();
+            // event.stopImmediatePropagation();
+            // event.dataTransfer?.setData("text/plain", view.dom.innerHTML);
+            // event.stopPropagation();
+            // event.stopImmediatePropagation();
+          },
+          // dragenter: (view, event) => {
+          //   event.preventDefault();
+          //   event.stopPropagation();
+          //   event.stopImmediatePropagation();
+          //   console.log("dragenter", event, view);
+          // },
+          // dragleave: (view, event) => {
+          //   // event.preventDefault();
+          //   // event.stopPropagation();
+          //   // event.stopImmediatePropagation();
+          //   console.log("dragleave", event, view);
+          // },
+          dragend: (view, event) => {
+            // event.preventDefault();
+            // event.stopPropagation();
+            // event.stopImmediatePropagation();
+            console.log("dragend", event, view);
+          },
+        },
       }}
       parseOptions={{
         // Required to preserve formatting in custom element previews
