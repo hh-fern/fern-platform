@@ -5,6 +5,257 @@ import { ApiDefinition } from "@fern-api/fdr-sdk";
  * This ensures consistency between frontend display and OpenAPI generation
  */
 
+/**
+ * Class to handle OpenAPI spec to YAML formatting
+ */
+export class OpenApiYamlFormatter {
+  /**
+   * Smart YAML string formatting - only quote when necessary
+   */
+  private formatYamlString(value: any, isMultiline = false, isEnum = false): string {
+    if (value === null || value === undefined) return 'null';
+    if (value === '') return '""';
+
+    // Convert to string if it's not already and strip leading/trailing whitespace
+    const stringValue = String(value).trim();
+    if (!stringValue) return '""';
+
+    // Check if string actually contains multiple lines
+    const hasMultipleLines = stringValue.includes('\n');
+
+    // For enum values, be more permissive with quoting
+    const needsQuoting = isEnum
+      ? /^(true|false|null|yes|no|on|off)$/i.test(stringValue) ||
+        /^[-]?\d+(\.\d+)?$/.test(stringValue) ||
+        stringValue.includes('"') ||
+        stringValue.includes("'") ||
+        stringValue.includes('\n')
+      : /[:\[\]{},|>*&!%#`@]|^[-?]|^\d|^(true|false|null|yes|no|on|off)$/i.test(stringValue) ||
+        stringValue.includes('\n') ||
+        stringValue.includes('"') ||
+        stringValue.includes("'");
+
+    // Handle multi-line strings with pipe style
+    if (isMultiline && hasMultipleLines) {
+      // Use pipe style for multi-line strings with proper indentation
+      return `|\n${stringValue.split('\n').map(line => `  ${line}`).join('\n')}`;
+    }
+
+    // For single-line strings (even if they're long), keep them on the same line
+    if (needsQuoting) {
+      // For enums, avoid escaping unless absolutely necessary
+      if (isEnum && !stringValue.includes('"')) {
+        return `'${stringValue}'`;
+      }
+      // Escape double quotes and use double quotes
+      return `"${stringValue.replace(/"/g, '\\"')}"`;
+    }
+
+    return stringValue;
+  }
+
+  /**
+   * Helper function to format schema as YAML with smart formatting
+   */
+  private formatSchemaYaml(schema: any, lines: string[], indent: string): void {
+    if (schema.type) {
+      lines.push(`${indent}type: ${schema.type}`);
+    }
+    if (schema.format) {
+      lines.push(`${indent}format: ${schema.format}`);
+    }
+    if (schema.description) {
+      const formattedDesc = this.formatYamlString(schema.description, true);
+      if (formattedDesc.startsWith('|')) {
+        // Handle pipe style with proper indentation
+        const styleLines = formattedDesc.split('\n');
+        lines.push(`${indent}description: ${styleLines[0]}`);
+        styleLines.slice(1).forEach(line => {
+          lines.push(`${indent}${line}`);
+        });
+      } else {
+        lines.push(`${indent}description: ${formattedDesc}`);
+      }
+    }
+    if (schema.enum && Array.isArray(schema.enum)) {
+      // Use enum-specific formatting to avoid unnecessary escaping
+      const formattedEnums = schema.enum.map((e: any) => {
+        return this.formatYamlString(e, false, true);
+      });
+      lines.push(`${indent}enum: [${formattedEnums.join(', ')}]`);
+    }
+    // Required should come after type/description but before properties (standard OpenAPI order)
+    if (schema.required && Array.isArray(schema.required) && schema.required.length > 0) {
+      const formattedRequired = schema.required.map((r: string) => this.formatYamlString(r));
+      lines.push(`${indent}required: [${formattedRequired.join(', ')}]`);
+    }
+
+    if (schema.properties && typeof schema.properties === 'object') {
+      lines.push(`${indent}properties:`);
+      Object.entries(schema.properties).forEach(([key, value]: [string, any]) => {
+        lines.push(`${indent}  ${key}:`);
+        this.formatSchemaYaml(value, lines, `${indent}    `);
+      });
+    }
+    if (schema.items) {
+      lines.push(`${indent}items:`);
+      this.formatSchemaYaml(schema.items, lines, `${indent}  `);
+    }
+
+    if (schema.uniqueItems) {
+      lines.push(`${indent}uniqueItems: true`);
+    }
+    if (schema.additionalProperties !== undefined) {
+      lines.push(`${indent}additionalProperties:`);
+      this.formatSchemaYaml(schema.additionalProperties, lines, `${indent}  `);
+    }
+    if (schema.oneOf) {
+      lines.push(`${indent}oneOf:`);
+      schema.oneOf.forEach((item: any) => {
+        lines.push(`${indent}  -`);
+        this.formatSchemaYaml(item, lines, `${indent}    `);
+      });
+    }
+  }
+
+  /**
+   * Format OpenAPI spec as YAML with improved formatting
+   */
+  private formatOpenApiAsYaml(spec: any): string {
+    const lines: string[] = [];
+
+    // Add OpenAPI version at the top
+    lines.push('openapi: 3.1.1');
+
+    // Add paths section
+    lines.push('paths:');
+
+    Object.entries(spec.paths).forEach(([path, pathSpec]: [string, any]) => {
+      lines.push(`  ${path}:`);
+      Object.entries(pathSpec).forEach(([method, operation]: [string, any]) => {
+        lines.push(`    ${method}:`);
+        if (operation.operationId) lines.push(`      operationId: ${operation.operationId}`);
+        if (operation.summary) lines.push(`      summary: ${operation.summary}`);
+        if (operation.description) {
+          const formattedDesc = this.formatYamlString(operation.description, true);
+          if (formattedDesc.startsWith('|')) {
+            // Handle pipe style with proper indentation
+            const styleLines = formattedDesc.split('\n');
+            lines.push(`      description: ${styleLines[0]}`);
+            styleLines.slice(1).forEach(line => {
+              lines.push(`      ${line}`);
+            });
+          } else {
+            lines.push(`      description: ${formattedDesc}`);
+          }
+        }
+        if (operation.tags) lines.push(`      tags: [${operation.tags.join(', ')}]`);
+
+        if (operation.parameters && operation.parameters.length > 0) {
+          lines.push(`      parameters:`);
+          operation.parameters.forEach((param: any) => {
+            lines.push(`        - name: ${param.name}`);
+            lines.push(`          in: ${param.in}`);
+            if (param.required) lines.push(`          required: true`);
+            if (param.description) {
+              const formattedDesc = this.formatYamlString(param.description, true);
+              if (formattedDesc.startsWith('|')) {
+                const styleLines = formattedDesc.split('\n');
+                lines.push(`          description: ${styleLines[0]}`);
+                styleLines.slice(1).forEach(line => {
+                  lines.push(`          ${line}`);
+                });
+              } else {
+                lines.push(`          description: ${formattedDesc}`);
+              }
+            }
+            lines.push(`          schema:`);
+            this.formatSchemaYaml(param.schema, lines, '            ');
+          });
+        }
+
+        if (operation.requestBody) {
+          lines.push(`      requestBody:`);
+          if (operation.requestBody.description) {
+            const formattedDesc = this.formatYamlString(operation.requestBody.description, true);
+            if (formattedDesc.startsWith('|')) {
+              const styleLines = formattedDesc.split('\n');
+              lines.push(`        description: ${styleLines[0]}`);
+              styleLines.slice(1).forEach(line => {
+                lines.push(`        ${line}`);
+              });
+            } else {
+              lines.push(`        description: ${formattedDesc}`);
+            }
+          }
+          lines.push(`        content:`);
+          Object.entries(operation.requestBody.content).forEach(([contentType, content]: [string, any]) => {
+            lines.push(`          ${contentType}:`);
+            lines.push(`            schema:`);
+            this.formatSchemaYaml(content.schema, lines, '              ');
+          });
+        }
+
+        if (operation.responses && Object.keys(operation.responses).length > 0) {
+          lines.push(`      responses:`);
+          Object.entries(operation.responses).forEach(([statusCode, response]: [string, any]) => {
+            lines.push(`        ${statusCode}:`);
+            if (response.description) {
+              const formattedDesc = this.formatYamlString(response.description, true);
+              if (formattedDesc.startsWith('|')) {
+                const styleLines = formattedDesc.split('\n');
+                lines.push(`          description: ${styleLines[0]}`);
+                styleLines.slice(1).forEach(line => {
+                  lines.push(`          ${line}`);
+                });
+              } else {
+                lines.push(`          description: ${formattedDesc}`);
+              }
+            }
+            if (response.content && Object.keys(response.content).length > 0) {
+              lines.push(`          content:`);
+              Object.entries(response.content).forEach(([contentType, content]: [string, any]) => {
+                lines.push(`            ${contentType}:`);
+                lines.push(`              schema:`);
+                this.formatSchemaYaml(content.schema, lines, '                ');
+              });
+            }
+          });
+        }
+      });
+    });
+
+    return lines.join('\n');
+  }
+
+  /**
+   * Generate OpenAPI YAML from an EndpointDefinition
+   */
+  public generateYamlFromEndpoint(
+    endpoint: ApiDefinition.EndpointDefinition,
+    apiDefinition?: any
+  ): string {
+    const path = ApiDefinition.toCurlyBraceEndpointPathLiteral(endpoint.path);
+    const method = endpoint.method.toLowerCase();
+    
+    // Create EndpointContext similar to frontend
+    const context = {
+      endpoint,
+      types: apiDefinition?.types || {},
+      auth: apiDefinition?.auths && endpoint.auth && endpoint.auth.length > 0 && endpoint.auth[0] 
+        ? apiDefinition.auths[endpoint.auth[0]] 
+        : undefined,
+      globalHeaders: apiDefinition?.globalHeaders
+    };
+    
+    // Generate OpenAPI spec using frontend-mirroring logic
+    const openApiSpec = generateOpenApiFromEndpointContext(context, path, method);
+    
+    // Convert to YAML
+    return this.formatOpenApiAsYaml(openApiSpec);
+  }
+}
+
 export interface EndpointContext {
   endpoint: ApiDefinition.EndpointDefinition;
   types: Record<string, ApiDefinition.TypeDefinition>;
@@ -464,11 +715,7 @@ export function generateOpenApiFromEndpointContext(
       const errorStatusCode = error.statusCode?.toString() || "400";
       openApiSpec.paths[path][method].responses[errorStatusCode] = {
         description: error.description || `Error response with status ${errorStatusCode}`,
-        content: error.body ? {
-          "application/json": {
-            schema: convertToOpenApiSchema(error.body, { types })
-          }
-        } : {}
+        content: {}
       };
     });
   }
