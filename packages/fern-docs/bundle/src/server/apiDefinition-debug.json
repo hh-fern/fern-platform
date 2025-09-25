@@ -1,0 +1,61 @@
+{
+  "types": {
+    "BaseUser": {
+      "name": "BaseUser",
+      "shape": {
+        "type": "object",
+        "extends": [],
+        "properties": [
+          {
+            "key": "id",
+            "valueShape": {
+              "type": "primitive",
+              "value": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "key": "name",
+            "valueShape": {
+              "type": "primitive",
+              "value": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "TimestampFields": {
+      "name": "TimestampFields",
+      "shape": {
+        "type": "object",
+        "extends": [],
+        "properties": [
+          {
+            "key": "created_at",
+            "valueShape": {
+              "type": "primitive",
+              "value": {
+                "type": "datetime"
+              }
+            }
+          },
+          {
+            "key": "updated_at",
+            "valueShape": {
+              "type": "optional",
+              "shape": {
+                "type": "primitive",
+                "value": {
+                  "type": "datetime"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

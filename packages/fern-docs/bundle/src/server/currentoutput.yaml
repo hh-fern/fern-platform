@@ -1,0 +1,547 @@
+openapi: 3.1.1
+paths:
+  /v2/chat:
+    post:
+      operationId: chat-stream
+      summary: Chat API (v2)
+      description: |
+        Generates a text response to a user message. To learn how to use the Chat API and RAG follow our [Text Generation guides](https://docs.cohere.com/v2/docs/chat-api).
+        
+        Follow the [Migration Guide](https://docs.cohere.com/v2/docs/migrating-v1-to-v2) for instructions on moving from API v1 to API v2.
+      tags: [subpackage_v2]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: "Bearer authentication of the form `Bearer <token>`, where token is your auth token."
+          schema:
+            type: string
+        - name: X-Client-Name
+          in: header
+          description: The name of the project that is making the request.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stream, model, messages]
+              properties:
+                stream:
+                  type: string
+                  description: |
+                    Defaults to `false`.
+                    
+                    When `true`, the response will be a SSE stream of events.
+                    
+                    Streaming is beneficial for user interfaces that render the contents of the response piece by piece, as it gets generated.
+                  enum: [[object Object]]
+                model:
+                  type: string
+                  description: "The name of a compatible [Cohere model](https://docs.cohere.com/v2/docs/models) or the ID of a [fine-tuned](https://docs.cohere.com/v2/docs/chat-fine-tuning) model."
+                messages:
+                  type: array
+                  description: |
+                    A list of chat messages in chronological order, representing a conversation between the user and the model.
+                    
+                    Messages can be from `User`, `Assistant`, `Tool` and `System` roles. Learn more about messages and roles in [the Chat API guide](https://docs.cohere.com/v2/docs/chat-api).
+                  items:
+                    description: Represents a single message in the chat history from a given role.
+                    oneOf:
+                      -
+                        type: object
+                        description: A message from the user.
+                        required: [role, content]
+                        properties:
+                          role:
+                            type: string
+                            enum: [user]
+                          content:
+                            description: |
+                              The content of the message. This can be a string or a list of content blocks.
+                              If a string is provided, it will be treated as a text content block.
+                            oneOf:
+                              -
+                                type: string
+                              -
+                                type: array
+                                items:
+                                  description: A Content block which contains information about the content type and the content itself.
+                                  oneOf:
+                                    -
+                                      type: object
+                                      description: Text content of the message.
+                                      required: [type, text]
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum: [text]
+                                        text:
+                                          type: string
+                                    -
+                                      type: object
+                                      description: Image content of the message.
+                                      required: [type, image_url]
+                                      properties:
+                                        type:
+                                          type: string
+                                          description: Type of message content
+                                          enum: [text, image_url]
+                                        image_url:
+                                          type: object
+                                          required: [url]
+                                          properties:
+                                            url:
+                                              type: string
+                                              description: URL of an image. Can be either a base64 data URI or a web URL.
+                                            detail:
+                                              type: string
+                                              description: "Controls the level of detail in image processing. `\"auto\"` is the default and lets the system choose, `\"low\"` is faster but less detailed, and `\"high\"` preserves maximum detail. You can save tokens and speed up responses by using detail: `\"low\"`."
+                                              enum: [auto, low, high]
+                      -
+                        type: object
+                        description: A message from the assistant role can contain text and tool call information.
+                        required: [role]
+                        properties:
+                          role:
+                            type: string
+                            enum: [assistant]
+                          tool_calls:
+                            type: array
+                            items:
+                              type: object
+                              description: An array of tool calls to be made.
+                              properties:
+                                id:
+                                  type: string
+                                type:
+                                  type: string
+                                  enum: [function]
+                                function:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    arguments:
+                                      type: string
+                          tool_plan:
+                            type: string
+                            description: A chain-of-thought style reflection and plan that the model generates when working with Tools.
+                          content:
+                            oneOf:
+                              -
+                                type: string
+                              -
+                                type: array
+                                items:
+                                  oneOf:
+                                    -
+                                      type: object
+                                      description: Text content of the message.
+                                      required: [type, text]
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum: [text]
+                                        text:
+                                          type: string
+                                    -
+                                      type: object
+                                      description: "Thinking content of the message. This will be present when `thinking` is enabled, and will contain the models internal reasoning."
+                                      required: [type, thinking]
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum: [thinking]
+                                        thinking:
+                                          type: string
+                          citations:
+                            type: array
+                            items:
+                              type: object
+                              description: Citation information containing sources and the text cited.
+                              properties:
+                                start:
+                                  type: integer
+                                  description: Start index of the cited snippet in the original source text.
+                                end:
+                                  type: integer
+                                  description: End index of the cited snippet in the original source text.
+                                text:
+                                  type: string
+                                  description: Text snippet that is being cited.
+                                sources:
+                                  type: array
+                                  items:
+                                    description: A source object containing information about the source of the data cited.
+                                    oneOf:
+                                      -
+                                        type: object
+                                        description: tool variant
+                                        required: [type]
+                                        properties:
+                                          type:
+                                            type: string
+                                            description: "Discriminator value: tool"
+                                            enum: [tool]
+                                      -
+                                        type: object
+                                        description: document variant
+                                        required: [type]
+                                        properties:
+                                          type:
+                                            type: string
+                                            description: "Discriminator value: document"
+                                            enum: [document]
+                                    discriminator:
+                                      propertyName: type
+                                content_index:
+                                  type: integer
+                                  description: Index of the content block in which this citation appears.
+                                type:
+                                  type: string
+                                  description: The type of citation which indicates what part of the response the citation is for.
+                                  enum: [TEXT_CONTENT, THINKING_CONTENT, PLAN]
+                      -
+                        type: object
+                        description: A message from the system.
+                        required: [role, content]
+                        properties:
+                          role:
+                            type: string
+                            enum: [system]
+                          content:
+                            oneOf:
+                              -
+                                type: string
+                              -
+                                type: array
+                                items:
+                                  oneOf:
+                                    -
+                                      type: object
+                                      description: Text content of the message.
+                                      required: [type, text]
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum: [text]
+                                        text:
+                                          type: string
+                      -
+                        type: object
+                        description: A message with Tool outputs.
+                        required: [role, tool_call_id, content]
+                        properties:
+                          role:
+                            type: string
+                            enum: [tool]
+                          tool_call_id:
+                            type: string
+                            description: The id of the associated tool call that has provided the given content
+                          content:
+                            description: "Outputs from a tool. The content should formatted as a JSON object string, or a list of tool content blocks"
+                            oneOf:
+                              -
+                                type: string
+                              -
+                                type: array
+                                items:
+                                  description: A content block which contains information about the content of a tool result
+                                  oneOf:
+                                    -
+                                      type: object
+                                      description: Text content of the message.
+                                      required: [type, text]
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum: [text]
+                                        text:
+                                          type: string
+                                    -
+                                      type: object
+                                      description: Document content.
+                                      required: [type, document]
+                                      properties:
+                                        type:
+                                          type: string
+                                          enum: [document]
+                                        document:
+                                          type: object
+                                          description: |
+                                            Relevant information that could be used by the model to generate a more accurate reply.
+                                            The content of each document are generally short (should be under 300 words). Metadata should be used to provide additional information, both the key name and the value will be
+                                            passed to the model.
+                                          required: [data]
+                                          properties:
+                                            data:
+                                              type: object
+                                              description: A relevant document that the model can cite to generate a more accurate reply. Each document is a string-any dictionary.
+                                              properties:
+                                            id:
+                                              type: string
+                                              description: Unique identifier for this document which will be referenced in citations. If not provided an ID will be automatically generated.
+                tools:
+                  type: array
+                  description: |
+                    A list of tools (functions) available to the model. The model response may contain 'tool_calls' to the specified tools.
+                    
+                    Learn more in the [Tool Use guide](https://docs.cohere.com/docs/tools).
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [function]
+                      function:
+                        type: object
+                        description: The function to be executed.
+                        required: [name, parameters]
+                        properties:
+                          name:
+                            type: string
+                            description: The name of the function.
+                          description:
+                            type: string
+                            description: The description of the function.
+                          parameters:
+                            type: object
+                            description: The parameters of the function as a JSON schema.
+                            properties:
+                strict_tools:
+                  type: boolean
+                  description: |
+                    When set to `true`, tool calls in the Assistant message will be forced to follow the tool definition strictly. Learn more in the [Structured Outputs (Tools) guide](https://docs.cohere.com/docs/structured-outputs-json#structured-outputs-tools).
+                    
+                    **Note**: The first few requests with a new set of tools will take longer to process.
+                documents:
+                  type: array
+                  description: A list of relevant documents that the model can cite to generate a more accurate reply. Each document is either a string or document object with content and metadata.
+                  items:
+                    oneOf:
+                      -
+                        type: string
+                      -
+                        type: object
+                        description: |
+                          Relevant information that could be used by the model to generate a more accurate reply.
+                          The content of each document are generally short (should be under 300 words). Metadata should be used to provide additional information, both the key name and the value will be
+                          passed to the model.
+                        required: [data]
+                        properties:
+                          data:
+                            type: object
+                            description: A relevant document that the model can cite to generate a more accurate reply. Each document is a string-any dictionary.
+                            properties:
+                          id:
+                            type: string
+                            description: Unique identifier for this document which will be referenced in citations. If not provided an ID will be automatically generated.
+                citation_options:
+                  type: object
+                  description: Options for controlling citation generation.
+                  properties:
+                    mode:
+                      type: string
+                      description: |
+                        Defaults to `"accurate"`.
+                        Dictates the approach taken to generating citations as part of the RAG flow by allowing the user to specify whether they want `"accurate"` results, `"fast"` results or no results.
+                        
+                        **Note**: `command-r7b-12-2024` and `command-a-03-2025` only support `"fast"` and `"off"` modes. The default is `"fast"`.
+                      enum: [FAST, ACCURATE, 'OFF']
+                response_format:
+                  description: |
+                    Configuration for forcing the model output to adhere to the specified format. Supported on [Command R](https://docs.cohere.com/v2/docs/command-r), [Command R+](https://docs.cohere.com/v2/docs/command-r-plus) and newer models.
+                    
+                    The model can be forced into outputting JSON objects by setting `{ "type": "json_object" }`.
+                    
+                    A [JSON Schema](https://json-schema.org/) can optionally be provided, to ensure a specific structure.
+                    
+                    **Note**: When using  `{ "type": "json_object" }` your `message` should always explicitly instruct the model to generate a JSON (eg: _"Generate a JSON ..."_) . Otherwise the model may end up getting stuck generating an infinite stream of characters and eventually run out of context length.
+                    
+                    **Note**: When `json_schema` is not specified, the generated object can have up to 5 layers of nesting.
+                    
+                    **Limitation**: The parameter is not supported when used in combinations with the `documents` or `tools` parameters.
+                  oneOf:
+                    -
+                      type: object
+                      required: [type]
+                      properties:
+                        type:
+                          type: string
+                          description: |
+                            Defaults to `"text"`.
+                            
+                            When set to `"json_object"`, the model's output will be a valid JSON Object.
+                          enum: [text, json_object]
+                    -
+                      type: object
+                      required: [type]
+                      properties:
+                        type:
+                          type: string
+                          description: |
+                            Defaults to `"text"`.
+                            
+                            When set to `"json_object"`, the model's output will be a valid JSON Object.
+                          enum: [text, json_object]
+                        json_schema:
+                          type: object
+                          description: |
+                            A [JSON schema](https://json-schema.org/overview/what-is-jsonschema) object that the output will adhere to. There are some restrictions we have on the schema, refer to [our guide](https://docs.cohere.com/docs/structured-outputs-json#schema-constraints) for more information.
+                            Example (required name and age object):
+                            ```json
+                            {
+                              "type": "object",
+                              "properties": {
+                                "name": {"type": "string"},
+                                "age": {"type": "integer"}
+                              },
+                              "required": ["name", "age"]
+                            }
+                            ```
+                            
+                            **Note**: This field must not be specified when the `type` is set to `"text"`.
+                          properties:
+                safety_mode:
+                  type: string
+                  description: |
+                    Used to select the [safety instruction](https://docs.cohere.com/v2/docs/safety-modes) inserted into the prompt. Defaults to `CONTEXTUAL`.
+                    When `OFF` is specified, the safety instruction will be omitted.
+                    
+                    Safety modes are not yet configurable in combination with `tools` and `documents` parameters.
+                    
+                    **Note**: This parameter is only compatible newer Cohere models, starting with [Command R 08-2024](https://docs.cohere.com/docs/command-r#august-2024-release) and [Command R+ 08-2024](https://docs.cohere.com/docs/command-r-plus#august-2024-release).
+                    
+                    **Note**: `command-r7b-12-2024` and newer models only support `"CONTEXTUAL"` and `"STRICT"` modes.
+                  enum: [CONTEXTUAL, STRICT, 'OFF']
+                max_tokens:
+                  type: integer
+                  description: |
+                    The maximum number of output tokens the model will generate in the response. If not set, `max_tokens` defaults to the model's maximum output token limit. You can find the maximum output token limits for each model in the [model documentation](https://docs.cohere.com/docs/models).
+                    
+                    **Note**: Setting a low value may result in incomplete generations. In such cases, the `finish_reason` field in the response will be set to `"MAX_TOKENS"`.
+                    
+                    **Note**: If `max_tokens` is set higher than the model's maximum output token limit, the generation will be capped at that model-specific maximum limit.
+                stop_sequences:
+                  type: array
+                  description: "A list of up to 5 strings that the model will use to stop generation. If the model generates a string that matches any of the strings in the list, it will stop generating tokens and return the generated text up to that point not including the stop sequence."
+                  items:
+                    type: string
+                temperature:
+                  type: number
+                  format: double
+                  description: |
+                    Defaults to `0.3`.
+                    
+                    A non-negative float that tunes the degree of randomness in generation. Lower temperatures mean less random generations, and higher temperatures mean more random generations.
+                    
+                    Randomness can be further maximized by increasing the  value of the `p` parameter.
+                seed:
+                  type: integer
+                  description: |
+                    If specified, the backend will make a best effort to sample tokens
+                    deterministically, such that repeated requests with the same
+                    seed and parameters should return the same result. However,
+                    determinism cannot be totally guaranteed.
+                frequency_penalty:
+                  type: number
+                  format: double
+                  description: |
+                    Defaults to `0.0`, min value of `0.0`, max value of `1.0`.
+                    Used to reduce repetitiveness of generated tokens. The higher the value, the stronger a penalty is applied to previously present tokens, proportional to how many times they have already appeared in the prompt or prior generation.
+                presence_penalty:
+                  type: number
+                  format: double
+                  description: |
+                    Defaults to `0.0`, min value of `0.0`, max value of `1.0`.
+                    Used to reduce repetitiveness of generated tokens. Similar to `frequency_penalty`, except that this penalty is applied equally to all tokens that have already appeared, regardless of their exact frequencies.
+                k:
+                  type: integer
+                  description: |
+                    Ensures that only the top `k` most likely tokens are considered for generation at each step. When `k` is set to `0`, k-sampling is disabled.
+                    Defaults to `0`, min value of `0`, max value of `500`.
+                p:
+                  type: number
+                  format: double
+                  description: |
+                    Ensures that only the most likely tokens, with total probability mass of `p`, are considered for generation at each step. If both `k` and `p` are enabled, `p` acts after `k`.
+                    Defaults to `0.75`. min value of `0.01`, max value of `0.99`.
+                logprobs:
+                  type: boolean
+                  description: "Defaults to `false`. When set to `true`, the log probabilities of the generated tokens will be included in the response."
+                tool_choice:
+                  type: string
+                  description: |
+                    Used to control whether or not the model will be forced to use a tool when answering. When `REQUIRED` is specified, the model will be forced to use at least one of the user-defined tools, and the `tools` parameter must be passed in the request.
+                    When `NONE` is specified, the model will be forced **not** to use one of the specified tools, and give a direct response.
+                    If tool_choice isn't specified, then the model is free to choose whether to use the specified tools or not.
+                    
+                    **Note**: This parameter is only compatible with models [Command-r7b](https://docs.cohere.com/v2/docs/command-r7b) and newer.
+                  enum: [REQUIRED, NONE]
+                thinking:
+                  type: object
+                  description: "Configuration for [reasoning features](https://docs.cohere.com/docs/reasoning)."
+                  required: [type]
+                  properties:
+                    type:
+                      type: string
+                      description: "Reasoning is enabled by default for models that support it, but can be turned off by setting `\"type\": \"disabled\"`."
+                      enum: [enabled, disabled]
+                    token_budget:
+                      type: integer
+                      description: |
+                        The maximum number of tokens the model can use for thinking, which must be set to a positive integer.
+                        The model will stop thinking if it reaches the thinking token budget and will proceed with the response.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+        400:
+          description: |
+            This error is returned when the request is not well formed. This could be because:
+              - JSON is invalid
+              - The request is missing required fields
+              - The request contains an invalid combination of fields
+        401:
+          description: |
+            This error indicates that the operation attempted to be performed is not allowed. This could be because:
+              - The api token is invalid
+              - The user does not have the necessary permissions
+        403:
+          description: |
+            This error indicates that the operation attempted to be performed is not allowed. This could be because:
+              - The api token is invalid
+              - The user does not have the necessary permissions
+        404:
+          description: |
+            This error is returned when a resource is not found. This could be because:
+              - The endpoint does not exist
+              - The resource does not exist eg model id, dataset id
+        422:
+          description: |
+            This error is returned when the request is not well formed. This could be because:
+              - JSON is invalid
+              - The request is missing required fields
+              - The request contains an invalid combination of fields
+        429:
+          description: Too many requests
+        498:
+          description: This error is returned when a request or response contains a deny-listed token.
+        499:
+          description: This error is returned when a request is cancelled by the user.
+        500:
+          description: This error is returned when an uncategorised internal server error occurs.
+        501:
+          description: This error is returned when the requested feature is not implemented.
+        503:
+          description: |
+            This error is returned when the service is unavailable. This could be due to:
+              - Too many users trying to access the service at the same time
+        504:
+          description: |
+            This error is returned when a request to the server times out. This could be due to:
+              - An internal services taking too long to respond

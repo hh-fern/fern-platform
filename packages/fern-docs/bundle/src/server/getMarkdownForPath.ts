@@ -144,9 +144,9 @@ export function endpointDefinitionToMarkdown(
       .join("\n"),
     typeof endpoint.description === "string" ? endpoint.description : undefined,
     fullUrl ? `Reference: ${fullUrl}` : undefined,
-    hasExamples ? "## SDK Examples" : undefined,
-    hasExamples ? examplesContent : undefined,
     ...endpointSections,
+    hasExamples ? "## SDK Code Examples" : undefined,
+    hasExamples ? examplesContent : undefined,
   ]
     .filter(isNonNullish)
     .join("\n\n");
