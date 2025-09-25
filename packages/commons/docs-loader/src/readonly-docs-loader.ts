@@ -420,10 +420,7 @@ const createGetPrunedApiCached = (
           );
           if (cached != null) {
             const metadata = await getMetadata(cacheConfig)(domainKey);
-            const dynamicIr = await getDynamicIr(id)(
-              metadata.org,
-              metadata.domain
-            );
+            const dynamicIr = await getDynamicIr(id)(metadata.org);
             return await backfillSnippets(
               cached,
               dynamicIr,
@@ -465,7 +462,7 @@ const createGetPrunedApiCached = (
         );
       }
       const metadata = await getMetadata(cacheConfig)(domainKey);
-      const dynamicIr = await getDynamicIr(id)(metadata.org, metadata.domain);
+      const dynamicIr = await getDynamicIr(id)(metadata.org);
       return backfillSnippets(pruned, dynamicIr, await flagsPromise);
     },
     [domainKey, cacheSeed(), cacheConfig.cacheKeySuffix],
@@ -1039,16 +1036,13 @@ const getLayout = (cacheConfig: Required<CacheConfig>) =>
   });
 
 const getDynamicIr = (apiName: string) =>
-  cache(async (orgId: string, domain: string) => {
+  cache(async (orgId: string) => {
     "use cache";
     unstable_cacheTag(orgId, "getDynamicIr");
-
-    const api = await getApi(domain, apiName);
 
     const response = await loadDynamicIRWithUrl({
       orgId,
       apiName,
-      snippetsConfig: api.snippetsConfiguration,
     });
 
     if (response) {
@@ -1128,7 +1122,9 @@ const getAskAiEnabled = (cacheConfig: Required<CacheConfig>) =>
         await new FernAIClient({
           baseUrl:
             process.env.FAI_SERVER_URL ?? "https://fai.buildwithfern.com",
-          token: process.env.FERN_TOKEN ?? "",
+          headers: {
+            Authorization: `Bearer ${process.env.FERN_TOKEN ?? ""}`,
+          },
         }).settings.getSettings({ domain })
       ).ask_ai_enabled;
 
@@ -1248,7 +1244,7 @@ export const createCachedDocsLoader = async (
     },
     getDynamicIr: async (apiName: string) => {
       const m = await metadata;
-      return getDynamicIr(apiName)(m.org, m.domain);
+      return getDynamicIr(apiName)(m.org);
     },
     clearKvCache: () => clearKvCache(domainKey),
     isAskAiEnabled: () => getAskAiEnabled(config)(domainKey),

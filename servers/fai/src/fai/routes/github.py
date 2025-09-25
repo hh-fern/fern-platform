@@ -15,10 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from turbopuffer import AsyncTurbopuffer
 
 from src.fai.app import fai_app
-from src.fai.dependencies import (
-    get_db,
-    verify_token,
-)
+from src.fai.dependencies import get_db
 from src.fai.models.api.connectors.github_api import (
     CodeIndexStatusResponse,
     GitHubFileInfoRequest,
@@ -42,13 +39,12 @@ from src.settings import (
 @fai_app.post(
     "/github/{domain}/reference-md/index",
     response_model=IndexResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["customers"]},
 )
 async def index_reference_md(
     domain: str,
     body: GitHubFileInfoRequest = Body(...),
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     """
     Index an SDK repository's reference.md file.
@@ -99,12 +95,11 @@ async def index_reference_md(
 @fai_app.get(
     "/github/{domain}/indexed",
     response_model=CodeIndexStatusResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["customers"]},
 )
 async def check_code_index_status(
     domain: str,
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> CodeIndexStatusResponse:
     """
     Check if the domain has a non-empty code index in both database and turbopuffer.

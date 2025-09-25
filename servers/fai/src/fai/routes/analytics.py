@@ -11,10 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.fai.app import fai_app
-from src.fai.dependencies import (
-    get_db,
-    verify_token,
-)
+from src.fai.dependencies import get_db
 from src.fai.models.api.analytics_api import (
     GetHistogramAnalyticsResponse,
     GetInsightsResponse,
@@ -45,8 +42,7 @@ from src.settings import (
 @fai_app.get(
     "/analytics/histogram/{domain}",
     response_model=GetHistogramAnalyticsResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
-    dependencies=[Depends(get_db), Depends(verify_token)],
+    openapi_extra={"x-fern-audiences": ["internal"]},
 )
 async def get_analytics_histogram(
     domain: str,
@@ -58,7 +54,6 @@ async def get_analytics_histogram(
     ),
     group_by: GroupBy = QueryParam(default=GroupBy.DAY, description="The field to group the analytics by"),
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     try:
         now = datetime.now()
@@ -86,9 +81,7 @@ async def get_analytics_histogram(
 
 
 @fai_app.get(
-    "/analytics/insights/{domain}",
-    response_model=GetInsightsResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
+    "/analytics/insights/{domain}", response_model=GetInsightsResponse, openapi_extra={"x-fern-audiences": ["internal"]}
 )
 async def get_analytics_insights(
     domain: str,
@@ -99,7 +92,6 @@ async def get_analytics_insights(
         default=None, description="The end date of the period to retrieve analytics for"
     ),
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     try:
         if end_date is None:

@@ -17,7 +17,6 @@ from src.fai.models.api.guidance_api import (
     UpdateGuidanceResponse,
 )
 from src.fai.models.db.guidance_db import GuidanceDb
-from tests.conftest import TEST_FERN_TOKEN
 from tests.factories import (
     CreateGuidanceRequestFactory,
     UpdateGuidanceRequestFactory,
@@ -35,11 +34,7 @@ class TestGuidanceRoutes:
         with patch("src.fai.routes.guidance.sync_guidance_db_to_tpuf", new_callable=AsyncMock), patch(
             "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
         ):
-            response = test_client.post(
-                f"/guidance/{domain}/create",
-                json=mock_request.model_dump(mode="json"),
-                headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
-            )
+            response = test_client.post(f"/guidance/{domain}/create", json=mock_request.model_dump(mode="json"))
 
         assert response.status_code == 200, f"Unexpected response: {response.text}"
 
@@ -69,9 +64,7 @@ class TestGuidanceRoutes:
             "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
         ):
             create_response = test_client.post(
-                f"/guidance/{domain}/create",
-                json=create_request.model_dump(mode="json"),
-                headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
+                f"/guidance/{domain}/create", json=create_request.model_dump(mode="json")
             )
 
         assert create_response.status_code == 200
@@ -87,9 +80,7 @@ class TestGuidanceRoutes:
             "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
         ):
             response = test_client.patch(
-                f"/guidance/{domain}/{guidance_id}",
-                json=update_request.model_dump(mode="json"),
-                headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
+                f"/guidance/{domain}/{guidance_id}", json=update_request.model_dump(mode="json")
             )
 
         assert response.status_code == 200, f"Unexpected response: {response.text}"
@@ -119,9 +110,7 @@ class TestGuidanceRoutes:
             "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
         ):
             create_response = test_client.post(
-                f"/guidance/{domain}/create",
-                json=create_request.model_dump(mode="json"),
-                headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
+                f"/guidance/{domain}/create", json=create_request.model_dump(mode="json")
             )
 
         create_data = create_response.json()
@@ -134,9 +123,7 @@ class TestGuidanceRoutes:
             "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
         ):
             response = test_client.patch(
-                f"/guidance/{domain}/{guidance_id}",
-                json=update_request.model_dump(mode="json"),
-                headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
+                f"/guidance/{domain}/{guidance_id}", json=update_request.model_dump(mode="json")
             )
 
         assert response.status_code == 200
@@ -157,9 +144,7 @@ class TestGuidanceRoutes:
         update_request = UpdateGuidanceRequestFactory.build()
 
         response = test_client.patch(
-            f"/guidance/{domain}/{non_existent_id}",
-            json=update_request.model_dump(mode="json"),
-            headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
+            f"/guidance/{domain}/{non_existent_id}", json=update_request.model_dump(mode="json")
         )
 
         assert response.status_code == 404, "Should return 404 for non-existent guidance"
@@ -174,9 +159,7 @@ class TestGuidanceRoutes:
             "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
         ):
             create_response = test_client.post(
-                f"/guidance/{domain}/create",
-                json=create_request.model_dump(mode="json"),
-                headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
+                f"/guidance/{domain}/create", json=create_request.model_dump(mode="json")
             )
 
         create_data = create_response.json()
@@ -186,9 +169,7 @@ class TestGuidanceRoutes:
         with patch("src.fai.routes.guidance.sync_guidance_db_to_tpuf", new_callable=AsyncMock), patch(
             "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
         ):
-            response = test_client.delete(
-                f"/guidance/{domain}/{guidance_id}", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-            )
+            response = test_client.delete(f"/guidance/{domain}/{guidance_id}")
 
         assert response.status_code == 200, f"Unexpected response: {response.text}"
 
@@ -212,9 +193,7 @@ class TestGuidanceRoutes:
         domain = create_test_domain()
         non_existent_id = create_test_id()
 
-        response = test_client.delete(
-            f"/guidance/{domain}/{non_existent_id}", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.delete(f"/guidance/{domain}/{non_existent_id}")
 
         assert response.status_code == 200, "Should return 200 even for non-existent guidance"
 
@@ -232,18 +211,14 @@ class TestGuidanceRoutes:
             "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
         ):
             create_response = test_client.post(
-                f"/guidance/{domain}/create",
-                json=create_request.model_dump(mode="json"),
-                headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
+                f"/guidance/{domain}/create", json=create_request.model_dump(mode="json")
             )
 
         create_data = create_response.json()
         guidance_id = create_data["guidance_id"]
 
         # Get guidance
-        response = test_client.get(
-            f"/guidance/{domain}/{guidance_id}", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/guidance/{domain}/{guidance_id}")
 
         assert response.status_code == 200, f"Unexpected response: {response.text}"
 
@@ -263,9 +238,7 @@ class TestGuidanceRoutes:
         domain = create_test_domain()
         non_existent_id = create_test_id()
 
-        response = test_client.get(
-            f"/guidance/{domain}/{non_existent_id}", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/guidance/{domain}/{non_existent_id}")
 
         assert response.status_code == 404, "Should return 404 for non-existent guidance"
 
@@ -283,16 +256,10 @@ class TestGuidanceRoutes:
             with patch("src.fai.routes.guidance.sync_guidance_db_to_tpuf", new_callable=AsyncMock), patch(
                 "src.fai.routes.guidance.sync_index_to_target", new_callable=AsyncMock
             ):
-                test_client.post(
-                    f"/guidance/{domain}/create",
-                    json=create_request.model_dump(mode="json"),
-                    headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
-                )
+                test_client.post(f"/guidance/{domain}/create", json=create_request.model_dump(mode="json"))
 
         # Get guidances with pagination
-        response = test_client.get(
-            f"/guidance/{domain}?page=1&limit=3", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/guidance/{domain}?page=1&limit=3")
 
         assert response.status_code == 200, f"Unexpected response: {response.text}"
 
@@ -312,21 +279,15 @@ class TestGuidanceRoutes:
         domain = create_test_domain()
 
         # Test invalid page
-        response = test_client.get(
-            f"/guidance/{domain}?page=0&limit=10", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/guidance/{domain}?page=0&limit=10")
         assert response.status_code == 400, "Should return 400 for invalid page"
 
         # Test invalid limit
-        response = test_client.get(
-            f"/guidance/{domain}?page=1&limit=0", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/guidance/{domain}?page=1&limit=0")
         assert response.status_code == 400, "Should return 400 for invalid limit"
 
         # Test limit too large
-        response = test_client.get(
-            f"/guidance/{domain}?page=1&limit=2000", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/guidance/{domain}?page=1&limit=2000")
         assert response.status_code == 400, "Should return 400 for limit too large"
 
     @pytest.mark.asyncio
@@ -334,9 +295,7 @@ class TestGuidanceRoutes:
         domain = create_test_domain()
 
         # Get guidances for domain with no data
-        response = test_client.get(
-            f"/guidance/{domain}?page=1&limit=10", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/guidance/{domain}?page=1&limit=10")
 
         assert response.status_code == 200, f"Unexpected response: {response.text}"
 

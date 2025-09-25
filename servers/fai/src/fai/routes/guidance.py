@@ -16,10 +16,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.fai.app import fai_app
-from src.fai.dependencies import (
-    get_db,
-    verify_token,
-)
+from src.fai.dependencies import get_db
 from src.fai.models.api.commons.pagination import PaginationResponse
 from src.fai.models.api.guidance_api import (
     CreateGuidanceRequest,
@@ -45,13 +42,12 @@ from src.settings import LOGGER
 @fai_app.post(
     "/guidance/{domain}/create",
     response_model=CreateGuidanceResponse,
-    openapi_extra={"x-fern-audiences": ["customers"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["customers"]},
 )
 async def create_guidance(
     domain: str,
     body: CreateGuidanceRequest = Body(...),
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     try:
         new_db_guidance = GuidanceDb(
@@ -79,14 +75,13 @@ async def create_guidance(
 @fai_app.patch(
     "/guidance/{domain}/{guidance_id}",
     response_model=UpdateGuidanceResponse,
-    openapi_extra={"x-fern-audiences": ["customers"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["customers"]},
 )
 async def update(
     domain: str,
     guidance_id: str,
     body: UpdateGuidanceRequest = Body(...),
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     try:
         db_guidance = await db.execute(
@@ -116,13 +111,12 @@ async def update(
 @fai_app.delete(
     "/guidance/{domain}/{guidance_id}",
     response_model=DeleteGuidanceResponse,
-    openapi_extra={"x-fern-audiences": ["customers"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["customers"]},
 )
 async def delete_guidance_by_id(
     domain: str,
     guidance_id: str,
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     try:
         db_guidance = await db.execute(
@@ -146,13 +140,12 @@ async def delete_guidance_by_id(
 @fai_app.get(
     "/guidance/{domain}/{guidance_id}",
     response_model=GetGuidanceResponse,
-    openapi_extra={"x-fern-audiences": ["customers"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["customers"]},
 )
 async def get_guidance_by_id(
     domain: str,
     guidance_id: str,
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     try:
         db_guidance = await db.execute(
@@ -169,16 +162,13 @@ async def get_guidance_by_id(
 
 
 @fai_app.get(
-    "/guidance/{domain}",
-    response_model=GetGuidancesResponse,
-    openapi_extra={"x-fern-audiences": ["customers"], "security": [{"bearerAuth": []}]},
+    "/guidance/{domain}", response_model=GetGuidancesResponse, openapi_extra={"x-fern-audiences": ["customers"]}
 )
 async def get_guidances(
     domain: str,
     page: int | None = QueryParam(default=None, description="The page number for pagination"),
     limit: int | None = QueryParam(default=None, description="The number of documents per page"),
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     try:
         if page is None or page < 1:

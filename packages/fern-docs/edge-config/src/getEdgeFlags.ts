@@ -209,6 +209,10 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       domain,
       config["llms-txt-disabled"]
     );
+    const isDynamicSnippetsEnabled = checkDomainMatchesCustomers(
+      domain,
+      config["dynamic-snippets"]
+    );
     return {
       isApiPlaygroundEnabled: isDevelopment(domain) || isApiPlaygroundEnabled,
       isApiScrollingDisabled,
@@ -246,6 +250,7 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isPosthogDisabled,
       isNextMdxRef,
       isLlmsTxtDisabled,
+      isDynamicSnippetsEnabled,
     };
   } catch (e) {
     console.error(`[get-edge-flags] ${JSON.stringify(e)}`);
@@ -284,6 +289,7 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
       isPosthogDisabled: false,
       isNextMdxRef: false,
       isLlmsTxtDisabled: false,
+      isDynamicSnippetsEnabled: false,
     };
   }
 }

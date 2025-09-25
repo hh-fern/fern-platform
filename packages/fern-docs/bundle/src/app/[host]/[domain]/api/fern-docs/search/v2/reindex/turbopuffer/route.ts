@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createOpenAI } from "@ai-sdk/openai";
-import { kv } from "@vercel/kv";
 
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { track } from "@fern-api/docs-server/analytics/posthog";
 import {
   fdrEnvironment,
   fernToken_admin,
+  getFaiOrigin,
   openaiApiKey,
   turbopufferApiKey,
 } from "@fern-api/docs-server/env-variables";
@@ -17,6 +17,7 @@ import { postToSlack } from "@fern-api/docs-server/slack";
 import { Gate, withBasicTokenAnonymous } from "@fern-api/docs-server/withRbac";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { slugToHref, withoutStaging } from "@fern-api/docs-utils";
+import { FernAIClient } from "@fern-api/fai-sdk";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import {
   getFernDocsIndexName,
@@ -71,23 +72,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       getEdgeFlags(domain),
     ]);
 
-    const faiClient = getFaiClient({
-      token: fernToken_admin(),
-    });
+    const isAskAiEnabled = (
+      await getFaiClient({
+        token: process.env.FERN_TOKEN ?? "",
+      }).settings.getSettings({ domain })
+    ).ask_ai_enabled;
 
-    const isAskAiEnabled = (await faiClient.settings.getSettings({ domain }))
-      .ask_ai_enabled;
-
-    const askAiProcessing = await kv.hget(domain, "tpuf_job").then((job) => {
-      return (
-        job &&
-        typeof job === "object" &&
-        "status" in job &&
-        job.status === "in_progress"
-      );
-    });
-
-    if (!isAskAiEnabled && !askAiProcessing) {
+    if (!isAskAiEnabled) {
       return NextResponse.json("Ask Fern is not enabled for this domain", {
         status: 404,
       });
@@ -114,6 +105,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         );
       },
       deleteExisting,
+    });
+    const faiClient = new FernAIClient({
+      baseUrl: getFaiOrigin(),
     });
 
     const syncResponse = await faiClient.index.syncIndexToQueryIndex(domain, {
@@ -151,12 +145,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       job_id: syncResponse.job_id,
     });
 
-    await kv.hset(domain, {
-      tpuf_job: {
-        status: "completed",
-      },
-    });
-
     return NextResponse.json(
       {
         added: numInserted,
@@ -178,12 +166,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       `:rotating_light: [TURBOPUFFER] Failed to reindex ${domain} with the following error: ${String(error)}`,
       "turbopuffer-reindex"
     );
-
-    await kv.hset(domain, {
-      tpuf_job: {
-        status: "failed",
-      },
-    });
 
     return NextResponse.json(`Internal server error, error: ${String(error)}`, {
       status: 500,

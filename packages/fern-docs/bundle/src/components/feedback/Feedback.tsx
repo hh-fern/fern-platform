@@ -39,9 +39,7 @@ export const Feedback: FC<FeedbackProps> = ({
   const [isHelpful, setIsHelpful] = useState<"yes" | "no" | undefined>();
   const [showFeedbackInput, setShowFeedbackInput] = useState(false);
 
-  const faiClient = new FernAIClient({
-    baseUrl: getFaiOrigin(),
-  });
+  const faiClient = new FernAIClient({ baseUrl: getFaiOrigin() });
 
   const ref = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);

@@ -5,7 +5,7 @@
 import * as environments from "../../../../environments.js";
 import * as core from "../../../../core/index.js";
 import * as FernAI from "../../../index.js";
-import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers.js";
+import { mergeHeaders } from "../../../../core/headers.js";
 import * as errors from "../../../../errors/index.js";
 
 export declare namespace Query {
@@ -13,7 +13,6 @@ export declare namespace Query {
         environment?: core.Supplier<environments.FernAIEnvironment | string>;
         /** Specify a custom URL to connect the client to. */
         baseUrl?: core.Supplier<string>;
-        token?: core.Supplier<core.BearerToken | undefined>;
         /** Additional headers to include in requests. */
         headers?: Record<string, string | core.Supplier<string | undefined> | undefined>;
     }
@@ -40,44 +39,34 @@ export class Query {
     }
 
     /**
-     * @param {FernAI.CreateQueryRequest} request
+     * @param {FernAI.Query} request
      * @param {Query.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link FernAI.UnprocessableEntityError}
      *
      * @example
      *     await client.query.createQuery({
+     *         query_id: "query_id",
+     *         conversation_id: "conversation_id",
      *         domain: "domain",
-     *         body: {
-     *             query_id: "query_id",
-     *             conversation_id: "conversation_id",
-     *             domain: "domain",
-     *             text: "text",
-     *             role: "role",
-     *             source: "source",
-     *             created_at: "2024-01-15T09:30:00Z"
-     *         }
+     *         text: "text",
+     *         role: "role",
+     *         source: "source",
+     *         created_at: "2024-01-15T09:30:00Z"
      *     })
      */
     public createQuery(
-        request: FernAI.CreateQueryRequest,
+        request: FernAI.Query,
         requestOptions?: Query.RequestOptions,
     ): core.HttpResponsePromise<FernAI.CreateQueryResponse> {
         return core.HttpResponsePromise.fromPromise(this.__createQuery(request, requestOptions));
     }
 
     private async __createQuery(
-        request: FernAI.CreateQueryRequest,
+        request: FernAI.Query,
         requestOptions?: Query.RequestOptions,
     ): Promise<core.WithRawResponse<FernAI.CreateQueryResponse>> {
-        const { domain, body: _body } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        _queryParams["domain"] = domain;
-        let _headers: core.Fetcher.Args["headers"] = mergeHeaders(
-            this._options?.headers,
-            mergeOnlyDefinedHeaders({ Authorization: await this._getAuthorizationHeader() }),
-            requestOptions?.headers,
-        );
+        let _headers: core.Fetcher.Args["headers"] = mergeHeaders(this._options?.headers, requestOptions?.headers);
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -88,9 +77,9 @@ export class Query {
             method: "POST",
             headers: _headers,
             contentType: "application/json",
-            queryParameters: { ..._queryParams, ...requestOptions?.queryParams },
+            queryParameters: requestOptions?.queryParams,
             requestType: "json",
-            body: _body,
+            body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -188,11 +177,7 @@ export class Query {
             _queryParams["end_date"] = endDate;
         }
 
-        let _headers: core.Fetcher.Args["headers"] = mergeHeaders(
-            this._options?.headers,
-            mergeOnlyDefinedHeaders({ Authorization: await this._getAuthorizationHeader() }),
-            requestOptions?.headers,
-        );
+        let _headers: core.Fetcher.Args["headers"] = mergeHeaders(this._options?.headers, requestOptions?.headers);
         const _response = await core.fetcher({
             url: core.url.join(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -242,14 +227,5 @@ export class Query {
                     rawResponse: _response.rawResponse,
                 });
         }
-    }
-
-    protected async _getAuthorizationHeader(): Promise<string | undefined> {
-        const bearer = await core.Supplier.get(this._options.token);
-        if (bearer != null) {
-            return `Bearer ${bearer}`;
-        }
-
-        return undefined;
     }
 }

@@ -36,6 +36,7 @@ export async function backfillSnippets(
   flags: {
     usesApplicationJsonInFormDataValue: boolean;
     isHttpSnippetsEnabled: boolean;
+    isDynamicSnippetsEnabled: boolean;
     alwaysEnableJavaScriptFetch: boolean;
   }
 ): Promise<ApiDefinition> {
@@ -44,7 +45,7 @@ export async function backfillSnippets(
     endpoints: await Promise.all(
       Object.entries(apiDefinition.endpoints).map(async ([id, endpoint]) => {
         let dynamicGenerators: Record<string, any> = {};
-        if (dynamicIr) {
+        if (dynamicIr && flags.isDynamicSnippetsEnabled) {
           dynamicGenerators = createSnippetGenerators({ endpoint, dynamicIr });
         }
 

@@ -16,17 +16,14 @@ export async function DocsSiteSwitcher({
     return null;
   }
 
-  const response = await getDocsSitesForOrg({
+  const { docsSites } = await getDocsSitesForOrg({
     orgName,
     token: session.accessToken,
   });
-  if (!response.ok) {
-    return null;
-  }
 
   return (
     <DocsSiteSelect
-      docsSites={response.docsSites}
+      docsSites={docsSites}
       currentDocsUrl={
         docsUrl != null ? parseDocsUrlParam({ docsUrl: docsUrl }) : undefined
       }

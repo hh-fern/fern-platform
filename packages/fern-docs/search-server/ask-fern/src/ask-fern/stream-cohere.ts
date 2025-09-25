@@ -169,21 +169,20 @@ export async function runRouteForCohere({
           const end = Date.now();
           const faiClient = new FernAIClient({
             baseUrl: getFaiOrigin(),
-            token: fernToken_admin(),
+            headers: {
+              Authorization: `Bearer ${fernToken_admin()}`,
+            },
           });
           try {
             await faiClient.query.createQuery({
+              query_id: assistantQueryId,
+              conversation_id: conversationId,
               domain,
-              body: {
-                query_id: assistantQueryId,
-                conversation_id: conversationId,
-                domain,
-                text: responseText,
-                role: "ASSISTANT",
-                source: chatSource.toUpperCase(),
-                created_at: new Date(end).toISOString(),
-                time_to_first_token: timeToFirstToken,
-              },
+              text: responseText,
+              role: "ASSISTANT",
+              source: chatSource.toUpperCase(),
+              created_at: new Date(end).toISOString(),
+              time_to_first_token: timeToFirstToken,
             });
           } catch (error) {
             console.log("Error creating assistant query", error);

@@ -5,7 +5,6 @@ import { FdrAPI } from "@fern-api/fdr-sdk";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import getDocsSitesForOrg from "@/app/services/dal/fdr/getDocsSitesForOrg";
-import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
 import { constructDocsUrlParam } from "@/utils/constructDocsUrlParam";
 import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
 
@@ -17,18 +16,11 @@ export async function DocsNavbarItems({ orgName }: { orgName: Auth0OrgName }) {
   if (session == null) {
     return null;
   }
-
-  await getAuthenticatedSessionOrRedirect(orgName);
-
-  const response = await getDocsSitesForOrg({
+  const { docsSites } = await getDocsSitesForOrg({
     orgName,
     token: session.accessToken,
   });
-  if (!response.ok) {
-    return null;
-  }
 
-  const docsSites: FdrAPI.dashboard.DocsSite[] = response.docsSites;
   const firstDocsSite: FdrAPI.dashboard.DocsSite | undefined = docsSites[0];
 
   return (

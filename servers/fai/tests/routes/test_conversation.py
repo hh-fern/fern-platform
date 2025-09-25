@@ -1,6 +1,5 @@
 from fastapi.testclient import TestClient
 
-from tests.conftest import TEST_FERN_TOKEN
 from tests.factories import (
     create_test_domain,
     create_test_id,
@@ -12,9 +11,7 @@ class TestGetConversation:
         domain = create_test_domain()
         conversation_id = create_test_id()
 
-        response = test_client.get(
-            f"/conversation/{domain}/{conversation_id}", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/conversation/{domain}/{conversation_id}")
 
         assert response.status_code in [200, 404]
         if response.status_code == 200:
@@ -28,10 +25,7 @@ class TestGetConversation:
         domain = create_test_domain()
         nonexistent_conversation_id = create_test_id()
 
-        response = test_client.get(
-            f"/conversation/{domain}/{nonexistent_conversation_id}",
-            headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
-        )
+        response = test_client.get(f"/conversation/{domain}/{nonexistent_conversation_id}")
 
         assert response.status_code == 404
         data = response.json()

@@ -23,13 +23,17 @@ export function DeleteBranchButton({
   onBranchDelete: (branch: string) => void;
 }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const { prStatus } = useGitPrInfo();
+  const { prTitle, prStatus } = useGitPrInfo();
 
   const handleDeleteClick = () => {
+    const hasCommittedChanges = prTitle || prStatus;
+
     if (prStatus === "closed" || prStatus === "merged") {
       onBranchDelete(branch);
-    } else {
+    } else if (hasCommittedChanges) {
       setShowDeleteDialog(true);
+    } else {
+      onBranchDelete(branch);
     }
   };
 
@@ -46,7 +50,7 @@ export function DeleteBranchButton({
     if (prStatus === "open" || prStatus === "draft") {
       return "This session has committed changes. Are you sure you want to remove this session?";
     }
-    return "Deleting this session will clear any unsaved changes. Are you sure you want to remove this session?";
+    return "Deleting this session will clear any unsaved changes.Are you sure you want to remove this session?";
   };
 
   return (

@@ -2,23 +2,24 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 import httpx
-from fastapi import Depends
+from fastapi import (
+    Depends,
+    Request,
+)
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.fai.app import fai_app
-from src.fai.dependencies import (
-    get_db,
-    verify_token,
-)
+from src.fai.dependencies import get_db
 from src.fai.models.api.settings_api import (
     GetSettingsResponse,
     ToggleAskAiResponse,
     ToggleStatusResponse,
 )
 from src.fai.models.db.settings_db import SettingsDb
+from src.fai.utils.get_venus_client import get_venus_client
 from src.settings import LOGGER
 
 
@@ -29,10 +30,20 @@ from src.settings import LOGGER
 )
 async def get_settings(
     domain: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> JSONResponse:
     """Get settings for a domain and organization."""
     try:
+        token = get_token_from_auth_header(request.headers.get("Authorization"))
+        if token is None:
+            return JSONResponse(content=jsonable_encoder(GetSettingsResponse(ask_ai_enabled=False, job_id=None)))
+
+        venus_client = get_venus_client(token=token)
+        is_fern_member = "fern" in venus_client.organization.get_org_ids_from_token()
+        if not is_fern_member:
+            return JSONResponse(content=jsonable_encoder(GetSettingsResponse(ask_ai_enabled=False, job_id=None)))
+
         stripped_domain = strip_domain(domain)
 
         existing = await db.execute(select(SettingsDb).where(SettingsDb.domain == stripped_domain))
@@ -50,36 +61,48 @@ async def get_settings(
 @fai_app.post(
     "/settings/ask-ai/toggle",
     response_model=ToggleAskAiResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["internal"]},
 )
 async def toggle_ask_ai(
     domain: str,
     org_name: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     """Toggle Ask AI setting and return job_id for tracking."""
     LOGGER.info(f"Toggling Ask AI for domain {domain} and org_name {org_name}")
     try:
+        token = get_token_from_auth_header(request.headers.get("Authorization"))
+        if token is None:
+            return JSONResponse(content=jsonable_encoder(ToggleAskAiResponse(success=False, ask_ai_enabled=False)))
+
+        venus_client = get_venus_client(token=token)
+        is_fern_member = "fern" in venus_client.organization.get_org_ids_from_token()
+        if not is_fern_member:
+            return JSONResponse(content=jsonable_encoder(ToggleAskAiResponse(success=False, ask_ai_enabled=False)))
+
         stripped_domain = strip_domain(domain)
 
+        # Check existing record
         existing = await db.execute(select(SettingsDb).where(SettingsDb.domain == stripped_domain))
         existing_record = existing.scalar_one_or_none()
 
         job_id = None
 
         if existing_record and existing_record.last_reindex_time is not None and existing_record.job_id is None:
+            # Disable Ask AI - clear the last_reindex_time but keep the record
             existing_record.last_reindex_time = None
             existing_record.job_id = None
             LOGGER.info(f"Disabled Ask AI for domain {stripped_domain}")
             await db.commit()
         else:
+            # Enable Ask AI - either create new record or update existing one
             LOGGER.info(f"Enabling Ask AI and starting reindex for domain {stripped_domain}")
             try:
                 async with httpx.AsyncClient(follow_redirects=True) as client:
                     response = await client.get(f"https://{domain}/api/fern-docs/search/v2/reindex/turbopuffer/start")
                     if response.status_code == 200:
-                        job_id = response.json().get("job_id", None)
+                        job_id = response.json().get("job_id", None)  # Job ID for upsert task
                         LOGGER.info(
                             f"Successfully started turbopuffer reindex for domain {stripped_domain}, job_id: {job_id}"
                         )
@@ -101,7 +124,7 @@ async def toggle_ask_ai(
                     domain=stripped_domain,
                     org_name=org_name,
                     job_id=job_id,
-                    last_reindex_time=None,
+                    last_reindex_time=None,  # Don't set until job completes
                 )
                 db.add(new_record)
                 await db.commit()
@@ -125,32 +148,45 @@ async def toggle_ask_ai(
 @fai_app.post(
     "/settings/ask-ai/reindex",
     response_model=ToggleAskAiResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["internal"]},
 )
 async def reindex_ask_ai(
     domain: str,
     org_name: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     """Manually trigger reindex for an already enabled Ask AI setup."""
     LOGGER.info(f"Manual reindex triggered for domain {domain} and org_name {org_name}")
     try:
+        token = get_token_from_auth_header(request.headers.get("Authorization"))
+        if token is None:
+            return JSONResponse(content=jsonable_encoder(ToggleAskAiResponse(success=False, ask_ai_enabled=False)))
+
+        venus_client = get_venus_client(token=token)
+        is_fern_member = "fern" in venus_client.organization.get_org_ids_from_token()
+        if not is_fern_member:
+            return JSONResponse(content=jsonable_encoder(ToggleAskAiResponse(success=False, ask_ai_enabled=False)))
+
         stripped_domain = strip_domain(domain)
 
+        # Check existing record - Ask AI must already be enabled
         existing = await db.execute(select(SettingsDb).where(SettingsDb.domain == stripped_domain))
         existing_record = existing.scalar_one_or_none()
 
         if not existing_record or existing_record.last_reindex_time is None:
+            # Ask AI is not enabled, cannot reindex
             return JSONResponse(content=jsonable_encoder(ToggleAskAiResponse(success=False, ask_ai_enabled=False)))
 
         if existing_record.job_id is not None:
+            # Already reindexing, return existing job_id
             return JSONResponse(
                 content=jsonable_encoder(
                     ToggleAskAiResponse(success=True, job_id=existing_record.job_id, ask_ai_enabled=True)
                 )
             )
 
+        # Start reindex and get job_id
         job_id = None
         try:
             async with httpx.AsyncClient(follow_redirects=True) as client:
@@ -169,6 +205,7 @@ async def reindex_ask_ai(
             LOGGER.error(f"Failed to start manual reindex for domain {stripped_domain}: {e}")
             return JSONResponse(content=jsonable_encoder(ToggleAskAiResponse(success=False, ask_ai_enabled=True)))
 
+        # Update record with job_id but keep last_reindex_time (Ask AI stays enabled)
         existing_record.job_id = job_id
         await db.commit()
         LOGGER.info(f"Started manual reindex for domain {stripped_domain} with job_id: {job_id}")
@@ -185,17 +222,27 @@ async def reindex_ask_ai(
 @fai_app.get(
     "/settings/ask-ai/toggle/status",
     response_model=ToggleStatusResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
+    openapi_extra={"x-fern-audiences": ["internal"]},
 )
 async def get_toggle_status(
     domain: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     """Get the status of Ask AI toggle operation."""
     try:
+        token = get_token_from_auth_header(request.headers.get("Authorization"))
+        if token is None:
+            return JSONResponse(content=jsonable_encoder(ToggleStatusResponse(status="error", ask_ai_enabled=False)))
+
+        venus_client = get_venus_client(token=token)
+        is_fern_member = "fern" in venus_client.organization.get_org_ids_from_token()
+        if not is_fern_member:
+            return JSONResponse(content=jsonable_encoder(ToggleStatusResponse(status="error", ask_ai_enabled=False)))
+
         stripped_domain = strip_domain(domain)
 
+        # Get the settings record
         existing = await db.execute(select(SettingsDb).where(SettingsDb.domain == stripped_domain))
         existing_record = existing.scalar_one_or_none()
 
@@ -203,6 +250,7 @@ async def get_toggle_status(
             return JSONResponse(content=jsonable_encoder(ToggleStatusResponse(status="error", ask_ai_enabled=False)))
 
         if not existing_record.job_id:
+            # Ask AI is enabled if record exists AND has a non-null last_reindex_time
             ask_ai_enabled = existing_record.last_reindex_time is not None
 
             return JSONResponse(
@@ -217,6 +265,7 @@ async def get_toggle_status(
                 )
             )
 
+        # Check job status using the turbopuffer status endpoint
         async with httpx.AsyncClient(follow_redirects=True) as client:
             response = await client.get(
                 f"https://{domain}/api/fern-docs/search/v2/reindex/turbopuffer/status?job_id={existing_record.job_id}"
@@ -225,13 +274,13 @@ async def get_toggle_status(
                 status_data = response.json()
                 job_status = status_data.get("status", None)
 
-                if job_status == "completed":
+                if (job_status == "completed"):
                     existing_record.job_id = None
                     existing_record.last_reindex_time = datetime.utcnow()
-                elif job_status == "failed":
+                elif (job_status == "failed"):
                     existing_record.job_id = None
                     existing_record.last_reindex_time = None
-
+                
                 await db.commit()
 
                 return JSONResponse(

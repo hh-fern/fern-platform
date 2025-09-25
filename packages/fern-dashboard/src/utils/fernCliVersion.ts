@@ -31,9 +31,6 @@ export function compareVersions(
   version: string,
   versionToCompareAgainst: string
 ): boolean {
-  if (version === "*") {
-    return false;
-  }
   const v1 = parseVersion(version);
   const v2 = parseVersion(versionToCompareAgainst);
 

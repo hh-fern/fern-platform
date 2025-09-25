@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 
-import { APIV1Write, FdrAPI } from "@fern-api/fdr-sdk";
+import { FdrAPI } from "@fern-api/fdr-sdk";
 import { getS3KeyForDynamicIr } from "@fern-api/fdr-sdk/docs";
 
 import { getSignedUrl } from "./loadDocsDefinitionFromS3";
@@ -12,26 +12,25 @@ export type DynamicIRsByLanguage = Record<
   FdrAPI.api.v1.register.DynamicIr
 >;
 
+const generatorLanguages = [
+  "typescript",
+  "python",
+  "java",
+  "go",
+  "php",
+  "ruby",
+  "csharp",
+];
+
 export const loadDynamicIRFromS3 = cache(
   async (
     orgName: string,
     apiName: string,
-    snippetsConfig: APIV1Write.SnippetsConfig,
     docsBucketName: string
   ): Promise<DynamicIRsByLanguage | undefined> => {
     const dynamicIRsByLanguage: DynamicIRsByLanguage = {};
     try {
-      for (const [sdkLanguage, packageName] of Object.entries(snippetsConfig)) {
-        const language = sdkLanguage.replace("Sdk", "");
-
-        if (!packageName) {
-          continue;
-        }
-
-        console.debug(
-          `Fetching dynamic IR for ${orgName}:${apiName}:${language}...`
-        );
-
+      for (const language of generatorLanguages) {
         const s3Key = getS3KeyForDynamicIr({
           orgName,
           apiName,
@@ -57,7 +56,7 @@ export const loadDynamicIRFromS3 = cache(
           dynamicIRsByLanguage[language] =
             json as FdrAPI.api.v1.register.DynamicIr;
         } else {
-          console.error(
+          console.debug(
             `Failed to load dynamic IR for ${s3Key} from S3. Status: ${response.status}. Error: ${await response.text()}`
           );
         }

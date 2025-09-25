@@ -85,7 +85,6 @@ export declare namespace TiptapEditor {
   export interface Props {
     autofocus?: boolean;
     className?: string;
-    disableDragging?: boolean;
     initialContent: string;
     onCreate?: EditorProviderProps["onCreate"];
     onUpdate?: EditorProviderProps["onUpdate"];
@@ -99,7 +98,6 @@ export default function TiptapEditor({
   initialContent,
   onCreate,
   onUpdate,
-  disableDragging,
 }: TiptapEditor.Props) {
   const isEditingDisabled = useEditingDisabled();
 
@@ -113,8 +111,7 @@ export default function TiptapEditor({
       ]}
       editorProps={{
         attributes: {
-          class:
-            "prose prose-md focus:outline-none max-w-none p-4 prose-inherit-colors",
+          class: "prose prose-md focus:outline-none max-w-none p-4",
         },
       }}
       parseOptions={{
@@ -148,7 +145,7 @@ export default function TiptapEditor({
         {/* DEV NOTE: The floating menu and bubble menu MUST be rendered before the editor content to reconcile
         a dom bug with tiptap's floating menus.
         Context here: https://github.com/ueberdosis/tiptap/issues/4619#issuecomment-1869042861 */}
-        {!isEditingDisabled && !disableDragging && <NodeHoverHandle />}
+        {!isEditingDisabled && <NodeHoverHandle />}
         {!isEditingDisabled && <FloatingMenu />}
         {!isEditingDisabled && <BubbleMenu />}
       </div>

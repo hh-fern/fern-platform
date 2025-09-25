@@ -39,8 +39,6 @@ async function main() {
             SLACK_CLIENT_ID: getEnvVarOrThrow("SLACK_CLIENT_ID"),
             SLACK_CLIENT_SECRET: getEnvVarOrThrow("SLACK_CLIENT_SECRET"),
             SLACK_SIGNING_SECRET: getEnvVarOrThrow("SLACK_SIGNING_SECRET"),
-            KV_REST_API_READ_ONLY_TOKEN: getEnvVarOrThrow("KV_REST_API_READ_ONLY_TOKEN"),
-            KV_REST_API_URL: getEnvVarOrThrow("KV_REST_API_URL"),
           },
           {
             env: { account: "985111089818", region: "us-east-1" },
@@ -66,8 +64,6 @@ async function main() {
             SLACK_CLIENT_ID: getEnvVarOrThrow("SLACK_CLIENT_ID"),
             SLACK_CLIENT_SECRET: getEnvVarOrThrow("SLACK_CLIENT_SECRET"),
             SLACK_SIGNING_SECRET: getEnvVarOrThrow("SLACK_SIGNING_SECRET"),
-            KV_REST_API_READ_ONLY_TOKEN: getEnvVarOrThrow("KV_REST_API_READ_ONLY_TOKEN"),
-            KV_REST_API_URL: getEnvVarOrThrow("KV_REST_API_URL"),
           },
           {
             env: { account: "985111089818", region: "us-east-1" },
@@ -93,8 +89,6 @@ async function main() {
             SLACK_CLIENT_ID: getEnvVarOrThrow("SLACK_CLIENT_ID"),
             SLACK_CLIENT_SECRET: getEnvVarOrThrow("SLACK_CLIENT_SECRET"),
             SLACK_SIGNING_SECRET: getEnvVarOrThrow("SLACK_SIGNING_SECRET"),
-            KV_REST_API_READ_ONLY_TOKEN: getEnvVarOrThrow("KV_REST_API_READ_ONLY_TOKEN"),
-            KV_REST_API_URL: getEnvVarOrThrow("KV_REST_API_URL"),
           },
           {
             env: { account: "985111089818", region: "us-east-1" },
