@@ -496,6 +496,14 @@ paths:
 
     // Expected YAML output - should include properties from extended types
     const expectedYaml = `openapi: 3.1.1
+components:
+  schemas:
+    ChatStreamEvent:
+      type: object
+      required: [event_timestamp]
+      properties:
+        event_timestamp:
+          type: string
 paths:
   /api/events:
     post:
@@ -507,33 +515,40 @@ paths:
             schema:
               oneOf:
                 -
-                  type: object
-                  description: Message Start variant
-                  required: [event_type, event_timestamp, message_id]
-                  properties:
-                    event_type:
-                      type: string
-                      description: "Discriminator value: message-start"
-                      enum: [message-start]
-                    event_timestamp:
-                      type: string
-                    message_id:
-                      type: string
+                  allOf:
+                    - allOf:
+                        - $ref: '#/components/schemas/ChatStreamEvent'
+                        - type: object
+                          required: [message_id]
+                          properties:
+                            message_id:
+                              type: string
+                    - type: object
+                      description: Message Start variant
+                      required: [event_type]
+                      properties:
+                        event_type:
+                          type: string
+                          description: "Discriminator value: message-start"
+                          enum: [message-start]
                 -
-                  type: object
-                  description: Debug Event variant
-                  required: [event_type, event_timestamp, debug_info]
-                  properties:
-                    event_type:
-                      type: string
-                      description: "Discriminator value: debug"
-                      enum: [debug]
-                    event_timestamp:
-                      type: string
-                    prompt:
-                      type: string
-                    debug_info:
-                      type: string
+                  allOf:
+                    - allOf:
+                        - $ref: '#/components/schemas/ChatStreamEvent'
+                        - type: object
+                          properties:
+                            prompt:
+                              type: string
+                    - type: object
+                      description: Debug Event variant
+                      required: [event_type, debug_info]
+                      properties:
+                        event_type:
+                          type: string
+                          description: "Discriminator value: debug"
+                          enum: [debug]
+                        debug_info:
+                          type: string
               discriminator:
                 propertyName: event_type
       responses:
@@ -543,11 +558,14 @@ paths:
     // Assert - Compare complete YAML output
     expect(yamlOutput.trim()).toBe(expectedYaml.trim());
 
-    // Additional specific checks for extended properties
-    expect(yamlOutput).toContain("event_timestamp:"); // From ChatStreamEvent
-    expect(yamlOutput).toContain("message_id:"); // From ChatMessageStartEvent
-    expect(yamlOutput).toContain("prompt:"); // From ChatDebugEvent
+    // Additional specific checks for allOf patterns in discriminated unions
+    expect(yamlOutput).toContain("allOf:");
+    expect(yamlOutput).not.toContain("$ref: '#/components/schemas/ChatMessageStartEvent'"); // Should be inlined
+    expect(yamlOutput).not.toContain("$ref: '#/components/schemas/ChatDebugEvent'"); // Should be inlined
+    expect(yamlOutput).toContain("$ref: '#/components/schemas/ChatStreamEvent'");
     expect(yamlOutput).toContain("debug_info:"); // From variant itself
+    expect(yamlOutput).toContain("message_id:"); // From ChatMessageStartEvent (inlined)
+    expect(yamlOutput).toContain("prompt:"); // From ChatDebugEvent (inlined)
   });
 
   it("should handle object types that extend other object types", () => {
@@ -564,6 +582,19 @@ paths:
             {
               key: "email",
               valueShape: { type: "primitive", value: { type: "string" } }
+            }
+          ]
+        }
+      }],
+      responses: [{
+        statusCode: 200,
+        body: {
+          type: "object",
+          extends: ["BaseUser"], // Reference BaseUser again
+          properties: [
+            {
+              key: "created",
+              valueShape: { type: "primitive", value: { type: "boolean" } }
             }
           ]
         }
@@ -615,8 +646,159 @@ paths:
     // Act
     const yamlOutput = formatter.generateYamlFromEndpoint(mockEndpoint as any, mockApiDefinition);
 
-    // Expected YAML output - should include properties from all extended types
+    // Expected YAML output - should use allOf for extends
     const expectedYaml = `openapi: 3.1.1
+components:
+  schemas:
+    BaseUser:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+paths:
+  /api/users:
+    post:
+      operationId: test-endpoint
+      summary: test-endpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/BaseUser'
+                - type: object
+                  required: [created_at, email]
+                  properties:
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    email:
+                      type: string
+      responses:
+        200:
+          description: Response with status 200
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BaseUser'
+                  - type: object
+                    required: [created]
+                    properties:
+                      created:
+                        type: boolean`;
+
+    // Assert - Compare complete YAML output
+    expect(yamlOutput.trim()).toBe(expectedYaml.trim());
+
+    // Additional specific checks for allOf pattern
+    expect(yamlOutput).toContain("allOf:");
+    expect(yamlOutput).toContain("$ref: '#/components/schemas/BaseUser'");
+    expect(yamlOutput).not.toContain("$ref: '#/components/schemas/TimestampFields'"); // TimestampFields should be inline (only referenced once)
+    expect(yamlOutput).toContain("components:");
+    expect(yamlOutput).toContain("schemas:");
+    expect(yamlOutput).toContain("email:"); // From object itself
+    expect(yamlOutput).toContain("created_at:"); // From TimestampFields (inlined)
+  });
+
+  it("should use components and $ref for frequently referenced types", () => {
+    // Arrange - Mock with types that are referenced multiple times
+    const mockEndpoint = {
+      id: "test-endpoint",
+      method: "POST",
+      path: [{ type: "literal", value: "/api/users" }],
+      requests: [{
+        body: {
+          type: "object",
+          properties: [
+            {
+              key: "user",
+              valueShape: { type: "id", id: "User" }
+            },
+            {
+              key: "backup_user",
+              valueShape: { type: "id", id: "User" } // Same type referenced again
+            },
+            {
+              key: "profile",
+              valueShape: { type: "id", id: "Profile" } // Different type, only referenced once
+            }
+          ]
+        }
+      }],
+      responses: [{
+        statusCode: 200,
+        body: {
+          type: "object",
+          properties: [
+            {
+              key: "created_user",
+              valueShape: { type: "id", id: "User" } // User referenced a third time
+            }
+          ]
+        }
+      }]
+    };
+
+    const mockApiDefinition = {
+      types: {
+        "User": {
+          name: "User",
+          description: "A user in the system",
+          shape: {
+            type: "object",
+            extends: [],
+            properties: [
+              {
+                key: "id",
+                valueShape: { type: "primitive", value: { type: "string" } }
+              },
+              {
+                key: "name",
+                valueShape: { type: "primitive", value: { type: "string" } }
+              }
+            ]
+          }
+        },
+        "Profile": {
+          name: "Profile",
+          description: "A user profile",
+          shape: {
+            type: "object",
+            extends: [],
+            properties: [
+              {
+                key: "bio",
+                valueShape: { type: "primitive", value: { type: "string" } }
+              }
+            ]
+          }
+        }
+      }
+    };
+
+    // Act
+    const yamlOutput = formatter.generateYamlFromEndpoint(mockEndpoint as any, mockApiDefinition);
+
+    // Expected YAML output - User should be in components, Profile should be inline
+    const expectedYaml = `openapi: 3.1.1
+components:
+  schemas:
+    User:
+      type: object
+      description: A user in the system
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
 paths:
   /api/users:
     post:
@@ -627,33 +809,40 @@ paths:
           application/json:
             schema:
               type: object
-              required: [id, name, created_at, email]
+              required: [user, backup_user, profile]
               properties:
-                id:
-                  type: string
-                name:
-                  type: string
-                created_at:
-                  type: string
-                  format: date-time
-                updated_at:
-                  type: string
-                  format: date-time
-                email:
-                  type: string
+                user:
+                  $ref: '#/components/schemas/User'
+                backup_user:
+                  $ref: '#/components/schemas/User'
+                profile:
+                  type: object
+                  description: A user profile
+                  required: [bio]
+                  properties:
+                    bio:
+                      type: string
       responses:
         200:
-          description: Successful response`;
+          description: Response with status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [created_user]
+                properties:
+                  created_user:
+                    $ref: '#/components/schemas/User'`;
 
     // Assert - Compare complete YAML output
     expect(yamlOutput.trim()).toBe(expectedYaml.trim());
 
-    // Additional specific checks for extended properties
-    expect(yamlOutput).toContain("id:"); // From BaseUser
-    expect(yamlOutput).toContain("name:"); // From BaseUser
-    expect(yamlOutput).toContain("created_at:"); // From TimestampFields
-    expect(yamlOutput).toContain("updated_at:"); // From TimestampFields (optional)
-    expect(yamlOutput).toContain("email:"); // From object itself
-    expect(yamlOutput).toContain("required: [id, name, created_at, email]"); // Only required fields
+    // Additional specific checks for component references
+    expect(yamlOutput).toContain("components:");
+    expect(yamlOutput).toContain("schemas:");
+    expect(yamlOutput).toContain('$ref: \'#/components/schemas/User\'');
+    expect(yamlOutput).not.toContain('$ref: \'#/components/schemas/Profile\''); // Profile should be inline
+    expect(yamlOutput).toContain("A user in the system"); // User description in components
+    expect(yamlOutput).toContain("A user profile"); // Profile description inline
   });
 });

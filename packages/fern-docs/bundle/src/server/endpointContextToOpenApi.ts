@@ -1,9 +1,64 @@
 import { ApiDefinition } from "@fern-api/fdr-sdk";
+import { unwrapReference } from "@fern-api/fdr-sdk/api-definition";
 
 /**
  * Utility to convert EndpointContext to OpenAPI spec, mirroring frontend rendering logic
  * This ensures consistency between frontend display and OpenAPI generation
  */
+
+/**
+ * Tracks type references to determine which types should be moved to components
+ */
+class TypeReferenceTracker {
+  private referenceCounts: Map<string, number> = new Map();
+  private processedTypes: Set<string> = new Set();
+
+  /**
+   * Record a reference to a type by its ID
+   */
+  recordReference(typeId: string): void {
+    const currentCount = this.referenceCounts.get(typeId) || 0;
+    this.referenceCounts.set(typeId, currentCount + 1);
+  }
+
+  /**
+   * Check if a type should be moved to components (referenced more than once)
+   */
+  shouldUseReference(typeId: string): boolean {
+    return (this.referenceCounts.get(typeId) || 0) > 1;
+  }
+
+  /**
+   * Get all types that should be moved to components
+   */
+  getComponentTypes(): string[] {
+    return Array.from(this.referenceCounts.entries())
+      .filter(([_, count]) => count > 1)
+      .map(([typeId, _]) => typeId);
+  }
+
+  /**
+   * Reset the tracker for a new analysis
+   */
+  reset(): void {
+    this.referenceCounts.clear();
+    this.processedTypes.clear();
+  }
+
+  /**
+   * Mark a type as processed to avoid circular references
+   */
+  markProcessed(typeId: string): void {
+    this.processedTypes.add(typeId);
+  }
+
+  /**
+   * Check if a type has already been processed
+   */
+  isProcessed(typeId: string): boolean {
+    return this.processedTypes.has(typeId);
+  }
+}
 
 /**
  * Class to handle OpenAPI spec to YAML formatting
@@ -23,7 +78,26 @@ export class OpenApiYamlFormatter {
    */
   private addKeyValue(lines: string[], key: string, value: any, level: number): void {
     if (value === undefined || value === null) return;
-    lines.push(`${this.indent(level)}${key}: ${value}`);
+
+    // Handle arrays properly for YAML formatting
+    if (Array.isArray(value)) {
+      const formattedArray = value.map(item => {
+        // Only quote strings that need quoting (like "null"), not primitive types
+        if (typeof item === 'string' && (item === 'null' || item.includes(' ') || item.includes(':'))) {
+          return `"${item}"`;
+        }
+        return String(item);
+      }).join(', ');
+      lines.push(`${this.indent(level)}${key}: [${formattedArray}]`);
+    } else {
+      // Special handling for certain string values that need to be quoted in YAML
+      // But don't quote actual boolean values
+      if (typeof value === 'string' && (value === 'null')) {
+        lines.push(`${this.indent(level)}${key}: "${value}"`);
+      } else {
+        lines.push(`${this.indent(level)}${key}: ${value}`);
+      }
+    }
   }
 
   /**
@@ -99,11 +173,25 @@ export class OpenApiYamlFormatter {
    * Helper function to format schema as YAML with smart formatting
    */
   private formatSchemaYaml(schema: any, lines: string[], level: number): void {
+    // Handle $ref references first
+    if (schema.$ref) {
+      this.addKeyValue(lines, '$ref', schema.$ref, level);
+      return;
+    }
+
     this.addKeyValue(lines, 'type', schema.type, level);
     this.addKeyValue(lines, 'format', schema.format, level);
 
     if (schema.description) {
       this.addDescription(lines, schema.description, level);
+    }
+
+    if (schema.default !== undefined) {
+      this.addKeyValue(lines, 'default', schema.default, level);
+    }
+
+    if (schema.deprecated === true) {
+      this.addKeyValue(lines, 'deprecated', true, level);
     }
 
     if (schema.enum && Array.isArray(schema.enum)) {
@@ -144,6 +232,14 @@ export class OpenApiYamlFormatter {
     if (schema.oneOf) {
       lines.push(`${this.indent(level)}oneOf:`);
       schema.oneOf.forEach((item: any) => {
+        lines.push(`${this.indent(level + 1)}-`);
+        this.formatSchemaYaml(item, lines, level + 2);
+      });
+    }
+
+    if (schema.allOf) {
+      lines.push(`${this.indent(level)}allOf:`);
+      schema.allOf.forEach((item: any) => {
         lines.push(`${this.indent(level + 1)}-`);
         this.formatSchemaYaml(item, lines, level + 2);
       });
@@ -247,6 +343,12 @@ export class OpenApiYamlFormatter {
     const lines: string[] = [];
 
     lines.push('openapi: 3.1.1');
+
+    // Add components section if present
+    if (spec.components) {
+      this.formatComponents(spec.components, lines, 0);
+    }
+
     lines.push('paths:');
 
     Object.entries(spec.paths).forEach(([path, pathSpec]: [string, any]) => {
@@ -261,6 +363,23 @@ export class OpenApiYamlFormatter {
   }
 
   /**
+   * Format components section for YAML
+   */
+  private formatComponents(components: any, lines: string[], level: number): void {
+    if (!components) return;
+
+    lines.push(`${this.indent(level)}components:`);
+
+    if (components.schemas && Object.keys(components.schemas).length > 0) {
+      lines.push(`${this.indent(level + 1)}schemas:`);
+      Object.entries(components.schemas).forEach(([schemaName, schema]: [string, any]) => {
+        lines.push(`${this.indent(level + 2)}${schemaName}:`);
+        this.formatSchemaYaml(schema, lines, level + 3);
+      });
+    }
+  }
+
+  /**
    * Generate OpenAPI YAML from an EndpointDefinition
    */
   public generateYamlFromEndpoint(
@@ -269,20 +388,103 @@ export class OpenApiYamlFormatter {
   ): string {
     const path = ApiDefinition.toCurlyBraceEndpointPathLiteral(endpoint.path);
     const method = endpoint.method.toLowerCase();
-    
+
     const context = {
       endpoint,
       types: apiDefinition?.types || {},
-      auth: apiDefinition?.auths && endpoint.auth && endpoint.auth.length > 0 && endpoint.auth[0] 
-        ? apiDefinition.auths[endpoint.auth[0]] 
+      auth: apiDefinition?.auths && endpoint.auth && endpoint.auth.length > 0 && endpoint.auth[0]
+        ? apiDefinition.auths[endpoint.auth[0]]
         : undefined,
       globalHeaders: apiDefinition?.globalHeaders
     };
-    
-    const openApiSpec = generateOpenApiFromEndpointContext(context, path, method);
-    
+
+    // Two-pass approach for component generation
+    // Pass 1: Analyze type references
+    const tracker = new TypeReferenceTracker();
+    this.analyzeEndpointTypeReferences(endpoint, apiDefinition, tracker);
+
+    // Pass 2: Generate OpenAPI spec with component references
+    const openApiSpec = generateOpenApiFromEndpointContext(context, path, method, tracker);
+
+    // Add components section for reused types
+    const componentTypes = tracker.getComponentTypes();
+    if (componentTypes.length > 0) {
+      openApiSpec.components = {
+        schemas: this.generateComponentSchemas(componentTypes, apiDefinition, tracker)
+      };
+    }
+
     // Convert to YAML
     return this.formatOpenApiAsYaml(openApiSpec);
+  }
+
+  /**
+   * Analyze an endpoint to find all type references
+   */
+  private analyzeEndpointTypeReferences(
+    endpoint: ApiDefinition.EndpointDefinition,
+    apiDefinition?: any,
+    tracker?: TypeReferenceTracker
+  ): void {
+    if (!tracker) return;
+
+    // Analyze request body
+    if (endpoint.requests?.[0]?.body) {
+      analyzeTypeReferences(endpoint.requests[0].body, apiDefinition, tracker);
+    }
+
+    // Analyze response body
+    if (endpoint.responses?.[0]?.body) {
+      analyzeTypeReferences(endpoint.responses[0].body, apiDefinition, tracker);
+    }
+
+    // Analyze path parameters
+    endpoint.pathParameters?.forEach(param => {
+      analyzeTypeReferences(param.valueShape, apiDefinition, tracker);
+    });
+
+    // Analyze query parameters
+    endpoint.queryParameters?.forEach(param => {
+      analyzeTypeReferences(param.valueShape, apiDefinition, tracker);
+    });
+
+    // Analyze request headers
+    endpoint.requestHeaders?.forEach(header => {
+      analyzeTypeReferences(header.valueShape, apiDefinition, tracker);
+    });
+
+    // Analyze global headers if available
+    apiDefinition?.globalHeaders?.forEach((header: any) => {
+      analyzeTypeReferences(header.valueShape, apiDefinition, tracker);
+    });
+  }
+
+  /**
+   * Generate component schemas for reused types
+   */
+  private generateComponentSchemas(
+    componentTypes: string[],
+    apiDefinition?: any,
+    tracker?: TypeReferenceTracker
+  ): Record<string, any> {
+    const schemas: Record<string, any> = {};
+
+    componentTypes.forEach(typeId => {
+      if (apiDefinition?.types?.[typeId]) {
+        const typeDef = apiDefinition.types[typeId];
+        // Generate the schema with tracker to allow $ref in component definitions
+        const schema = convertToOpenApiSchema(typeDef.shape, apiDefinition, tracker);
+
+        // Add description from the type definition if available
+        if (typeDef.description && !schema.description) {
+          schema.description = typeDef.description;
+        }
+
+        schemas[typeId] = schema;
+      }
+    });
+
+    return schemas;
   }
 }
 
@@ -299,14 +501,15 @@ export interface EndpointContext {
 export function createOpenApiParameter(
   property: ApiDefinition.ObjectProperty,
   location: "query" | "header" | "path",
-  apiDefinition?: any
+  apiDefinition?: any,
+  tracker?: TypeReferenceTracker
 ): any {
   return {
     name: property.key,
     in: location,
     description: property.description,
     required: !isOptional(property.valueShape),
-    schema: convertToOpenApiSchema(property.valueShape, apiDefinition)
+    schema: convertToOpenApiSchema(property.valueShape, apiDefinition, tracker)
   };
 }
 
@@ -340,7 +543,7 @@ export function createAuthHeaderParameter(
       in: "header",
       description: auth.description ?? "Basic authentication of the form `Basic <username:password>`.",
       required: true,
-      schema: convertToOpenApiSchema(stringShape, apiDefinition)
+      schema: convertToOpenApiSchema(stringShape, apiDefinition, undefined)
     };
   } else if (auth.type === "bearerAuth") {
     return {
@@ -348,7 +551,7 @@ export function createAuthHeaderParameter(
       in: "header",
       description: auth.description ?? "Bearer authentication of the form `Bearer <token>`, where token is your auth token.",
       required: true,
-      schema: convertToOpenApiSchema(stringShape, apiDefinition)
+      schema: convertToOpenApiSchema(stringShape, apiDefinition, undefined)
     };
   } else if (auth.type === "header") {
     return {
@@ -358,7 +561,7 @@ export function createAuthHeaderParameter(
         ? `Header authentication of the form \`${auth.prefix} <token>\``
         : undefined,
       required: true,
-      schema: convertToOpenApiSchema(stringShape, apiDefinition)
+      schema: convertToOpenApiSchema(stringShape, apiDefinition, undefined)
     };
   } else if (auth.type === "oAuth") {
     // Mirror the complex OAuth handling from lines 95-115
@@ -371,7 +574,7 @@ export function createAuthHeaderParameter(
           description: clientCredentials.description ??
             `OAuth authentication of the form \`${clientCredentials.tokenPrefix ? `${clientCredentials.tokenPrefix ?? "Bearer"} ` : ""}<token>\`.`,
           required: true,
-          schema: convertToOpenApiSchema(stringShape, apiDefinition)
+          schema: convertToOpenApiSchema(stringShape, apiDefinition, undefined)
         };
       }
     }
@@ -380,7 +583,7 @@ export function createAuthHeaderParameter(
       in: "header",
       description: "OAuth authentication",
       required: true,
-      schema: convertToOpenApiSchema(stringShape, apiDefinition)
+      schema: convertToOpenApiSchema(stringShape, apiDefinition, undefined)
     };
   }
 
@@ -401,9 +604,117 @@ function isOptional(shape: any): boolean {
 }
 
 /**
+ * Analyzes a shape to count type references for component generation
+ */
+function analyzeTypeReferences(shape: any, apiDefinition?: any, tracker?: TypeReferenceTracker): void {
+  if (!shape || !tracker) return;
+
+  if (shape.type === "id") {
+    tracker.recordReference(shape.id);
+    // Also analyze the referenced type if we haven't processed it yet
+    if (!tracker.isProcessed(shape.id) && apiDefinition?.types?.[shape.id]) {
+      tracker.markProcessed(shape.id);
+      analyzeTypeReferences(apiDefinition.types[shape.id].shape, apiDefinition, tracker);
+    }
+    return;
+  }
+
+  if (shape.type === "alias") {
+    analyzeTypeReferences(shape.value, apiDefinition, tracker);
+    return;
+  }
+
+  if (shape.type === "object") {
+    // Analyze extended types
+    if (shape.extends && shape.extends.length > 0) {
+      shape.extends.forEach((extendedTypeName: string) => {
+        tracker.recordReference(extendedTypeName);
+        if (!tracker.isProcessed(extendedTypeName) && apiDefinition?.types?.[extendedTypeName]) {
+          tracker.markProcessed(extendedTypeName);
+          analyzeTypeReferences(apiDefinition.types[extendedTypeName].shape, apiDefinition, tracker);
+        }
+      });
+    }
+
+    // Analyze property types
+    if (shape.properties) {
+      shape.properties.forEach((prop: any) => {
+        analyzeTypeReferences(prop.valueShape, apiDefinition, tracker);
+      });
+    }
+    return;
+  }
+
+  if (shape.type === "discriminatedUnion") {
+    const variants = shape.variants || shape.union;
+    if (variants) {
+      variants.forEach((variant: any) => {
+        // Analyze extended types in variants
+        if (variant.extends && variant.extends.length > 0) {
+          variant.extends.forEach((extendedTypeName: string) => {
+            tracker.recordReference(extendedTypeName);
+            if (!tracker.isProcessed(extendedTypeName) && apiDefinition?.types?.[extendedTypeName]) {
+              tracker.markProcessed(extendedTypeName);
+              analyzeTypeReferences(apiDefinition.types[extendedTypeName].shape, apiDefinition, tracker);
+            }
+          });
+        }
+
+        // Analyze variant properties
+        const variantProps = variant.properties || variant.shape?.properties;
+        if (variantProps) {
+          variantProps.forEach((prop: any) => {
+            analyzeTypeReferences(prop.valueShape, apiDefinition, tracker);
+          });
+        }
+      });
+    }
+    return;
+  }
+
+  if (shape.type === "list") {
+    analyzeTypeReferences(shape.itemShape, apiDefinition, tracker);
+    return;
+  }
+
+  if (shape.type === "set") {
+    analyzeTypeReferences(shape.itemShape, apiDefinition, tracker);
+    return;
+  }
+
+  if (shape.type === "map") {
+    analyzeTypeReferences(shape.valueShape, apiDefinition, tracker);
+    if (shape.keyShape) {
+      analyzeTypeReferences(shape.keyShape, apiDefinition, tracker);
+    }
+    return;
+  }
+
+  if (shape.type === "optional") {
+    analyzeTypeReferences(shape.shape, apiDefinition, tracker);
+    return;
+  }
+
+  if (shape.type === "nullable") {
+    analyzeTypeReferences(shape.shape, apiDefinition, tracker);
+    return;
+  }
+
+  if (shape.type === "union" || shape.type === "undiscriminatedUnion") {
+    const variants = shape.union || shape.variants;
+    if (variants) {
+      variants.forEach((variant: any) => {
+        analyzeTypeReferences(variant.shape || variant, apiDefinition, tracker);
+      });
+    }
+    return;
+  }
+}
+
+/**
  * Converts Fern type shape to OpenAPI schema, mirroring frontend type handling
  */
-function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
+function convertToOpenApiSchema(shape: any, apiDefinition?: any, tracker?: TypeReferenceTracker): any {
   if (!shape) {
     // Frontend shows "any" for unknown types, we'll use a flexible schema
     return {};
@@ -431,37 +742,136 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
   }
 
   if (shape.type === "alias") {
-    return convertToOpenApiSchema(shape.value, apiDefinition);
+    return convertToOpenApiSchema(shape.value, apiDefinition, tracker);
   }
 
   if (shape.type === "object") {
-    const properties: any = {};
-    const required: string[] = [];
-
-    // First, resolve properties from extended types
+    // If this object extends other types, use allOf pattern
     if (shape.extends && shape.extends.length > 0 && apiDefinition?.types) {
+      const allOfItems: any[] = [];
+
+      // Add $ref for each extended type
       shape.extends.forEach((extendedTypeName: string) => {
-        const extendedType = apiDefinition.types[extendedTypeName];
-        if (extendedType && extendedType.shape) {
-          const extendedSchema = convertToOpenApiSchema(extendedType.shape, apiDefinition);
-          if (extendedSchema.properties) {
-            // Merge extended properties (current object properties will override these)
-            Object.assign(properties, extendedSchema.properties);
-          }
-          if (extendedSchema.required) {
-            required.push(...extendedSchema.required);
+        if (apiDefinition.types[extendedTypeName]) {
+          if (tracker && tracker.shouldUseReference(extendedTypeName)) {
+            allOfItems.push({ $ref: `'#/components/schemas/${extendedTypeName}'` });
+          } else {
+            // If not using $ref, inline the extended type
+            const extendedType = apiDefinition.types[extendedTypeName];
+            const extendedSchema = convertToOpenApiSchema(extendedType.shape, apiDefinition, tracker);
+            allOfItems.push(extendedSchema);
           }
         }
       });
+
+      // Add all inlined properties (from extends that should be inlined + current object's properties)
+      const inlinedProperties: any = {};
+      const inlinedRequired: string[] = [];
+
+      // Process extended types that should be inlined
+      shape.extends.forEach((extendedTypeName: string) => {
+        if (apiDefinition.types[extendedTypeName]) {
+          if (!tracker || !tracker.shouldUseReference(extendedTypeName)) {
+            // Inline this extended type's properties
+            const extendedType = apiDefinition.types[extendedTypeName];
+            if (extendedType.shape.type === "object" && extendedType.shape.properties) {
+              extendedType.shape.properties.forEach((prop: any) => {
+                const propSchema = convertToOpenApiSchema(prop.valueShape, apiDefinition, tracker);
+                if (prop.description) {
+                  propSchema.description = prop.description;
+                }
+
+                // Add default value if present
+                const unwrapped = apiDefinition?.types ? unwrapReference(prop.valueShape, apiDefinition.types) : { shape: prop.valueShape };
+                if (unwrapped.default != null) {
+                  propSchema.default = unwrapped.default;
+                }
+
+                // Add deprecated status if availability indicates deprecation
+                if (prop.availability && prop.availability.status === "deprecated") {
+                  propSchema.deprecated = true;
+                }
+
+                inlinedProperties[prop.key] = propSchema;
+
+                // Add to required array if not optional
+                if (!isOptional(prop.valueShape)) {
+                  inlinedRequired.push(prop.key);
+                }
+              });
+            }
+          }
+        }
+      });
+
+      // Add the current object's own properties
+      if (shape.properties && shape.properties.length > 0) {
+        shape.properties.forEach((prop: any) => {
+          const propSchema = convertToOpenApiSchema(prop.valueShape, apiDefinition, tracker);
+          if (prop.description) {
+            propSchema.description = prop.description;
+          }
+
+          // Add default value if present
+          const unwrapped = apiDefinition?.types ? unwrapReference(prop.valueShape, apiDefinition.types) : { shape: prop.valueShape };
+          if (unwrapped.default != null) {
+            propSchema.default = unwrapped.default;
+          }
+
+          // Add deprecated status if availability indicates deprecation
+          if (prop.availability && prop.availability.status === "deprecated") {
+            propSchema.deprecated = true;
+          }
+
+          inlinedProperties[prop.key] = propSchema;
+
+          // Add to required array if not optional
+          if (!isOptional(prop.valueShape)) {
+            inlinedRequired.push(prop.key);
+          }
+        });
+      }
+
+      // Add the combined inlined properties as a single schema if there are any
+      if (Object.keys(inlinedProperties).length > 0) {
+        const currentSchema: any = { type: "object", properties: inlinedProperties };
+        if (inlinedRequired.length > 0) {
+          currentSchema.required = inlinedRequired;
+        }
+        allOfItems.push(currentSchema);
+      }
+
+      // Only use allOf if there are multiple items
+      if (allOfItems.length === 1) {
+        return allOfItems[0];
+      } else if (allOfItems.length > 1) {
+        return { allOf: allOfItems };
+      }
+      // If no items, fall through to regular object handling
     }
 
-    // Then, add/override with current object's properties
+    // No extends - handle as regular object
+    const properties: any = {};
+    const required: string[] = [];
+
     if (shape.properties) {
       shape.properties.forEach((prop: any) => {
-        const propSchema = convertToOpenApiSchema(prop.valueShape, apiDefinition);
+        const propSchema = convertToOpenApiSchema(prop.valueShape, apiDefinition, tracker);
         if (prop.description) {
           propSchema.description = prop.description;
         }
+
+        // Add default value if present
+        const unwrapped = apiDefinition?.types ? unwrapReference(prop.valueShape, apiDefinition.types) : { shape: prop.valueShape };
+        if (unwrapped.default != null) {
+          propSchema.default = unwrapped.default;
+        }
+
+        // Add deprecated status if availability indicates deprecation
+        if (prop.availability && prop.availability.status === "deprecated") {
+          propSchema.deprecated = true;
+        }
+
         properties[prop.key] = propSchema;
 
         // Add to required array if not optional
@@ -473,14 +883,13 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
 
     const result: any = { type: "object", properties };
     if (required.length > 0) {
-      // Remove duplicates from required array
-      result.required = [...new Set(required)];
+      result.required = required;
     }
     return result;
   }
 
   if (shape.type === "list") {
-    return { type: "array", items: convertToOpenApiSchema(shape.itemShape, apiDefinition) };
+    return { type: "array", items: convertToOpenApiSchema(shape.itemShape, apiDefinition, tracker) };
   }
 
   if (shape.type === "set") {
@@ -488,12 +897,12 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
     return {
       type: "array",
       uniqueItems: true,
-      items: convertToOpenApiSchema(shape.itemShape, apiDefinition)
+      items: convertToOpenApiSchema(shape.itemShape, apiDefinition, tracker)
     };
   }
 
   if (shape.type === "map") {
-    const valueSchema = convertToOpenApiSchema(shape.valueShape, apiDefinition);
+    const valueSchema = convertToOpenApiSchema(shape.valueShape, apiDefinition, tracker);
     if (shape.keyShape && shape.keyShape.type !== "primitive" ||
         (shape.keyShape?.value?.type && shape.keyShape.value.type !== "string")) {
       valueSchema.description = `Map from ${shape.keyShape?.type || "unknown"} keys to values${valueSchema.description ? `: ${valueSchema.description}` : ""}`;
@@ -505,11 +914,29 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
   }
 
   if (shape.type === "optional") {
-    return convertToOpenApiSchema(shape.shape, apiDefinition);
+    return convertToOpenApiSchema(shape.shape, apiDefinition, tracker);
   }
 
   if (shape.type === "nullable") {
-    const baseSchema = convertToOpenApiSchema(shape.shape, apiDefinition);
+    const baseSchema = convertToOpenApiSchema(shape.shape, apiDefinition, tracker);
+
+    // For OpenAPI 3.1.1, use array format for nullable primitives only
+    // Complex types (objects with properties, arrays with items, etc.) should use oneOf
+    const isPrimitiveType = baseSchema.type &&
+      typeof baseSchema.type === "string" &&
+      !baseSchema.properties &&
+      !baseSchema.items &&
+      !baseSchema.oneOf &&
+      !baseSchema.allOf;
+
+    if (isPrimitiveType) {
+      return {
+        ...baseSchema,
+        type: [baseSchema.type, "null"]
+      };
+    }
+
+    // For complex types, fall back to oneOf
     return {
       oneOf: [
         baseSchema,
@@ -547,7 +974,7 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
     // variants are displayed as "type1 or type2"
     const variants = shape.union || shape.variants;
     if (variants && variants.length > 0) {
-      return { oneOf: variants.map((variant: any) => convertToOpenApiSchema(variant.shape || variant, apiDefinition)) };
+      return { oneOf: variants.map((variant: any) => convertToOpenApiSchema(variant.shape || variant, apiDefinition, tracker)) };
     }
     return {};
   }
@@ -559,7 +986,87 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
     }
 
     const oneOfSchemas = variants.map((variant: any) => {
-      // Build properties object with discriminator + variant properties
+      // If variant extends other types, use allOf pattern
+      if (variant.extends && variant.extends.length > 0 && apiDefinition?.types) {
+        const allOfItems: any[] = [];
+
+        // Add $ref for each extended type
+        variant.extends.forEach((extendedTypeName: string) => {
+          if (apiDefinition.types[extendedTypeName]) {
+            if (tracker && tracker.shouldUseReference(extendedTypeName)) {
+              allOfItems.push({ $ref: `'#/components/schemas/${extendedTypeName}'` });
+            } else {
+              // If not using $ref, inline the extended type
+              const extendedType = apiDefinition.types[extendedTypeName];
+              const extendedSchema = convertToOpenApiSchema(extendedType.shape, apiDefinition, tracker);
+              allOfItems.push(extendedSchema);
+            }
+          }
+        });
+
+        // Add the discriminator and variant-specific properties
+        const variantProperties: Record<string, any> = {
+          [shape.discriminant]: {
+            type: "string",
+            enum: [variant.discriminantValue],
+            description: `Discriminator value: ${variant.discriminantValue}`
+          }
+        };
+        const variantRequired = [shape.discriminant];
+
+        const variantProps = variant.properties || variant.shape?.properties;
+        if (variantProps) {
+          variantProps.forEach((prop: any) => {
+            const propSchema = convertToOpenApiSchema(prop.valueShape, apiDefinition, tracker);
+            if (prop.description) {
+              propSchema.description = prop.description;
+            }
+
+            // Add default value if present
+            const unwrapped = apiDefinition?.types ? unwrapReference(prop.valueShape, apiDefinition.types) : { shape: prop.valueShape };
+            if (unwrapped.default != null) {
+              propSchema.default = unwrapped.default;
+            }
+
+            // Add deprecated status if availability indicates deprecation
+            if (prop.availability && prop.availability.status === "deprecated") {
+              propSchema.deprecated = true;
+            }
+
+            variantProperties[prop.key] = propSchema;
+
+            // Add to required array if not optional
+            if (!isOptional(prop.valueShape)) {
+              variantRequired.push(prop.key);
+            }
+          });
+        }
+
+        const variantSchema: any = {
+          type: "object",
+          properties: variantProperties,
+          required: variantRequired
+        };
+
+        // Add description if available
+        const description = variant.description ||
+                          (variant.displayName ? `${variant.displayName} variant` : undefined);
+        if (description) {
+          variantSchema.description = description;
+        }
+
+        allOfItems.push(variantSchema);
+
+        // Only use allOf if there are multiple items
+        if (allOfItems.length === 1) {
+          return allOfItems[0];
+        } else if (allOfItems.length > 1) {
+          return { allOf: allOfItems };
+        }
+        // If no items, fall through to regular variant handling
+      }
+
+      // No extends - handle as regular discriminated union variant
       const properties: Record<string, any> = {
         [shape.discriminant]: {
           type: "string",
@@ -569,30 +1076,26 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
       };
       const required = [shape.discriminant];
 
-      // First, resolve properties from extended types
-      if (variant.extends && variant.extends.length > 0 && apiDefinition?.types) {
-        variant.extends.forEach((extendedTypeName: string) => {
-          const extendedType = apiDefinition.types[extendedTypeName];
-          if (extendedType && extendedType.shape) {
-            const extendedSchema = convertToOpenApiSchema(extendedType.shape, apiDefinition);
-            if (extendedSchema.properties) {
-              // Merge extended properties (variant properties will override these)
-              Object.assign(properties, extendedSchema.properties);
-            }
-            if (extendedSchema.required) {
-              required.push(...extendedSchema.required);
-            }
-          }
-        });
-      }
-
-      // Then, add/override with variant-specific properties
       if (variant.properties) {
         variant.properties.forEach((prop: any) => {
-          properties[prop.key] = convertToOpenApiSchema(prop.valueShape, apiDefinition);
+          const propSchema = convertToOpenApiSchema(prop.valueShape, apiDefinition, tracker);
           if (prop.description) {
-            properties[prop.key].description = prop.description;
+            propSchema.description = prop.description;
           }
+
+          // Add default value if present
+          const unwrapped = apiDefinition?.types ? unwrapReference(prop.valueShape, apiDefinition.types) : { shape: prop.valueShape };
+          if (unwrapped.default != null) {
+            propSchema.default = unwrapped.default;
+          }
+
+          // Add deprecated status if availability indicates deprecation
+          if (prop.availability && prop.availability.status === "deprecated") {
+            propSchema.deprecated = true;
+          }
+
+          properties[prop.key] = propSchema;
+
           // Add to required array if not optional
           if (!isOptional(prop.valueShape)) {
             required.push(prop.key);
@@ -607,7 +1110,7 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
       return {
         type: "object",
         properties,
-        required: [...new Set(required)], // Remove duplicates
+        required,
         ...(description && { description })
       };
     });
@@ -623,8 +1126,14 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
   // Handle id references - look up the actual type definition
   if (shape.type === "id") {
     if (apiDefinition && apiDefinition.types && apiDefinition.types[shape.id]) {
+      // If we have a tracker and this type should use a reference, return $ref
+      if (tracker && tracker.shouldUseReference(shape.id)) {
+        return { $ref: `'#/components/schemas/${shape.id}'` };
+      }
+
+      // Otherwise, inline the type as before
       const typeDef = apiDefinition.types[shape.id];
-      const resolvedSchema = convertToOpenApiSchema(typeDef.shape, apiDefinition);
+      const resolvedSchema = convertToOpenApiSchema(typeDef.shape, apiDefinition, tracker);
       // Add description from the type definition if available
       if (typeDef.description && !resolvedSchema.description) {
         resolvedSchema.description = typeDef.description;
@@ -650,7 +1159,8 @@ function convertToOpenApiSchema(shape: any, apiDefinition?: any): any {
 export function generateOpenApiFromEndpointContext(
   context: EndpointContext,
   path: string,
-  method: string
+  method: string,
+  tracker?: TypeReferenceTracker
 ): any {
   const { endpoint, types, auth, globalHeaders } = context;
   
@@ -673,7 +1183,7 @@ export function generateOpenApiFromEndpointContext(
   if (endpoint.pathParameters && endpoint.pathParameters.length > 0) {
     endpoint.pathParameters.forEach(param => {
       openApiSpec.paths[path][method].parameters.push(
-        createOpenApiParameter(param, "path", { types })
+        createOpenApiParameter(param, "path", { types }, tracker)
       );
     });
   }
@@ -681,7 +1191,7 @@ export function generateOpenApiFromEndpointContext(
   if (endpoint.queryParameters && endpoint.queryParameters.length > 0) {
     endpoint.queryParameters.forEach(param => {
       openApiSpec.paths[path][method].parameters.push(
-        createOpenApiParameter(param, "query", { types })
+        createOpenApiParameter(param, "query", { types }, tracker)
       );
     });
   }
@@ -704,7 +1214,7 @@ export function generateOpenApiFromEndpointContext(
     } else {
       // Convert ObjectProperty to OpenAPI parameter
       openApiSpec.paths[path][method].parameters.push(
-        createOpenApiParameter(header, "header", { types })
+        createOpenApiParameter(header, "header", { types }, tracker)
       );
     }
   });
@@ -721,11 +1231,11 @@ export function generateOpenApiFromEndpointContext(
 
       if (body.type === "object") {
         requestBody.content["application/json"] = {
-          schema: convertToOpenApiSchema(body, { types })
+          schema: convertToOpenApiSchema(body, { types }, tracker)
         };
       } else if (body.type === "alias") {
         requestBody.content["application/json"] = {
-          schema: convertToOpenApiSchema(body.value, { types })
+          schema: convertToOpenApiSchema(body.value, { types }, tracker)
         };
       } else if (body.type === "bytes") {
         requestBody.content["application/octet-stream"] = {
@@ -736,14 +1246,14 @@ export function generateOpenApiFromEndpointContext(
           schema: {
             type: "object",
             properties: body.fields?.reduce((acc: any, field: any) => {
-              acc[field.key] = convertToOpenApiSchema(field.valueShape, { types });
+              acc[field.key] = convertToOpenApiSchema(field.valueShape, { types }, tracker);
               return acc;
             }, {}) || {}
           }
         };
       } else {
         requestBody.content["application/json"] = {
-          schema: convertToOpenApiSchema(body, { types })
+          schema: convertToOpenApiSchema(body, { types }, tracker)
         };
       }
 
@@ -764,11 +1274,11 @@ export function generateOpenApiFromEndpointContext(
       const body = response.body as any;
       if (body.type === "object") {
         responseBody.content["application/json"] = {
-          schema: convertToOpenApiSchema(body, { types })
+          schema: convertToOpenApiSchema(body, { types }, tracker)
         };
       } else if (body.type === "alias") {
         responseBody.content["application/json"] = {
-          schema: convertToOpenApiSchema(body.value, { types })
+          schema: convertToOpenApiSchema(body.value, { types }, tracker)
         };
       } else if (body.type === "empty") {
         // No content for empty responses
@@ -782,13 +1292,13 @@ export function generateOpenApiFromEndpointContext(
         };
       } else if (body.type === "stream") {
         // Handle stream responses - resolve the shape properly
-        const streamSchema = body.shape ? convertToOpenApiSchema(body.shape, { types }) : convertToOpenApiSchema(body.payload, { types });
+        const streamSchema = body.shape ? convertToOpenApiSchema(body.shape, { types }, tracker) : convertToOpenApiSchema(body.payload, { types }, tracker);
         responseBody.content["text/event-stream"] = {
           schema: streamSchema
         };
       } else {
         responseBody.content["application/json"] = {
-          schema: convertToOpenApiSchema(body, { types })
+          schema: convertToOpenApiSchema(body, { types }, tracker)
         };
       }
     }

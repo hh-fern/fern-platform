@@ -106,11 +106,7 @@ paths:
               required: [nullable_field]
               properties:
                 nullable_field:
-                  oneOf:
-                    -
-                      type: string
-                    -
-                      type: null
+                  type: [string, "null"]
       responses:
         200:
           description: Successful response`;
