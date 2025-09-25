@@ -1,6 +1,6 @@
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import { DocsSiteNavBarItem } from "@/components/docs-page/DocsSiteNavBarItem";
 import { AskAiEnabledServerSide } from "@/components/analytics/ServerSideAskAiEnabled";
+import { DocsSiteNavBarItem } from "@/components/docs-page/DocsSiteNavBarItem";
 import { DocsUrl } from "@/utils/types";
 
 export default async function DocsSiteNavbar({
@@ -10,9 +10,7 @@ export default async function DocsSiteNavbar({
   return (
     <div className="flex">
       <DocsSiteNavBarItem title="Overview" href="" />
-      <AskAiEnabledServerSide
-        docsUrl={docsUrl}
-      >
+      <AskAiEnabledServerSide docsUrl={docsUrl}>
         <DocsSiteNavBarItem title="Ask Fern" href="ask-fern" />
       </AskAiEnabledServerSide>
       <DocsSiteNavBarItem title="Settings" href="settings" />
