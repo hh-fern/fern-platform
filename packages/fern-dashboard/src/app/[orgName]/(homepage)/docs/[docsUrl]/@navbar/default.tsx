@@ -1,21 +1,20 @@
 import { Auth0OrgName } from "@/app/services/auth0/types";
 import { DocsSiteNavBarItem } from "@/components/docs-page/DocsSiteNavBarItem";
-import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
-import { FeatureFlaggedServerSide } from "@/components/posthog/feature-flags/server-side";
+import { AskAiEnabledServerSide } from "@/components/analytics/ServerSideAskAiEnabled";
+import { DocsUrl } from "@/utils/types";
 
 export default async function DocsSiteNavbar({
   params,
-}: Readonly<{ params: Promise<{ orgName: Auth0OrgName }> }>) {
-  const { orgName } = await params;
+}: Readonly<{ params: Promise<{ orgName: Auth0OrgName; docsUrl: DocsUrl }> }>) {
+  const { orgName, docsUrl } = await params;
   return (
     <div className="flex">
       <DocsSiteNavBarItem title="Overview" href="" />
-      <FeatureFlaggedServerSide
-        flag={PosthogFeatureFlag.ENABLE_DOCS_ASK_FERN_TAB}
-        orgName={orgName}
+      <AskAiEnabledServerSide
+        docsUrl={docsUrl}
       >
         <DocsSiteNavBarItem title="Ask Fern" href="ask-fern" />
-      </FeatureFlaggedServerSide>
+      </AskAiEnabledServerSide>
       <DocsSiteNavBarItem title="Settings" href="settings" />
     </div>
   );
