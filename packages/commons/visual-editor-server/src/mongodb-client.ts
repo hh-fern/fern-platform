@@ -3,7 +3,7 @@ import {
   type Collection,
   type Db,
   MongoClient,
-  type MongoClientOptions,
+  MongoClientOptions,
 } from "mongodb";
 
 import { DocsV2Read } from "@fern-api/fdr-sdk";
@@ -124,5 +124,4 @@ class VisualEditorMongoClient {
   }
 }
 
-export const mongoClient: VisualEditorMongoClient =
-  new VisualEditorMongoClient();
+export const mongoClient = new VisualEditorMongoClient();

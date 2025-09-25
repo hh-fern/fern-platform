@@ -1,8 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { applyOrgMappings } from "@/orgMappings";
-
 import { createPersonalProject } from "./actions/createPersonalProject";
 import {
   Auth0SessionData,
@@ -25,11 +23,10 @@ export default async function Page() {
   if (pendingOrgRedirect) {
     // Redirect to the invited organization (cookie will be cleared by middleware on next request)
     redirect(`/${pendingOrgRedirect}`);
-  } else {
-    await applyOrgMappings();
-    const firstOrg = await getOrCreateFirstOrgForUser(session);
-    redirect(`/${firstOrg.orgName}/docs`);
   }
+
+  const firstOrg = await getOrCreateFirstOrgForUser(session);
+  redirect(`/${firstOrg.orgName}/docs`);
 }
 
 async function getOrCreateFirstOrgForUser(

@@ -14,4 +14,3 @@ export * from "./explorer-route";
 export * from "./layout";
 export * from "./changelog";
 export * from "./string";
-export * from "./isLikelyBrowser";

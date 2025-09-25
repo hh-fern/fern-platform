@@ -1,7 +1,6 @@
 import uuid
 
 from sqlalchemy import (
-    JSON,
     Column,
     DateTime,
     String,
@@ -29,8 +28,6 @@ class SlackIntegrationDb(Base):
     created_at = Column(DateTime(timezone=True), nullable=False)
     installed_at = Column(DateTime(timezone=True), nullable=True)
 
-    settings = Column(JSON, nullable=True, default=dict)
-
     def to_api(self) -> SlackIntegration:
         return SlackIntegration(
             integration_id=self.integration_id,
@@ -42,5 +39,4 @@ class SlackIntegrationDb(Base):
             slack_app_id=self.slack_app_id,
             created_at=self.created_at,
             installed_at=self.installed_at,
-            settings=self.settings,
         )

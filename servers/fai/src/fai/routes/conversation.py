@@ -8,10 +8,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.fai.app import fai_app
-from src.fai.dependencies import (
-    get_db,
-    verify_token,
-)
+from src.fai.dependencies import get_db
 from src.fai.models.api.conversation_api import GetConversationResponse
 from src.fai.models.db.feedback_db import FeedbackDb
 from src.fai.models.db.query_db import QueryDb
@@ -23,16 +20,11 @@ from src.fai.models.types.conversation_types import (
 from src.settings import LOGGER
 
 
-@fai_app.get(
-    "/conversation/{domain}/{conversation_id}",
-    response_model=GetConversationResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
-)
+@fai_app.get("/conversation/{domain}/{conversation_id}", response_model=GetConversationResponse)
 async def get_conversation_by_id(
     domain: str,
     conversation_id: str,
     db: AsyncSession = Depends(get_db),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     LOGGER.info(f"Retrieving conversation {conversation_id} for domain {domain}")
     try:

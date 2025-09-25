@@ -62,11 +62,6 @@ class FAIApp(FastAPI):
             {"url": "http://localhost:8080", "x-fern-server-name": "Local"},
         ]
 
-        openapi_schema["components"] = openapi_schema.get("components", {})
-        openapi_schema["components"]["securitySchemes"] = {
-            "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
-        }
-
         self.openapi_schema = openapi_schema
         return self.openapi_schema
 
@@ -91,9 +86,9 @@ origins = [
 ]
 
 fai_app.add_middleware(
-    CORSMiddleware,
-    allow_origins="*",
-    allow_credentials=False,
+    CORSMiddleware,  # type: ignore
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

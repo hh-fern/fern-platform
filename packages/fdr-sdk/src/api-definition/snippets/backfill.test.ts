@@ -112,6 +112,7 @@ describe("backfillSnippets", () => {
     const flags = {
       usesApplicationJsonInFormDataValue: false,
       isHttpSnippetsEnabled: true,
+      isDynamicSnippetsEnabled: false,
       alwaysEnableJavaScriptFetch: true,
     };
 

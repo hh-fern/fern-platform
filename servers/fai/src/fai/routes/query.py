@@ -15,10 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.fai.app import fai_app
-from src.fai.dependencies import (
-    get_db,
-    verify_token,
-)
+from src.fai.dependencies import get_db
 from src.fai.models.api.commons.pagination import PaginationResponse
 from src.fai.models.api.query_api import (
     CreateQueryResponse,
@@ -29,14 +26,8 @@ from src.fai.models.types.query_types import Query
 from src.settings import LOGGER
 
 
-@fai_app.post(
-    "/queries",
-    response_model=CreateQueryResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
-)
-async def create_query(
-    domain: str, query: Query, db: AsyncSession = Depends(get_db), _: None = Depends(verify_token)
-) -> JSONResponse:
+@fai_app.post("/queries", response_model=CreateQueryResponse, openapi_extra={"x-fern-audiences": ["internal"]})
+async def create_query(query: Query, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     LOGGER.info("Creating new query")
     try:
         db_query = QueryDb(
@@ -59,11 +50,7 @@ async def create_query(
         return JSONResponse(status_code=500, content={"detail": str(e)})
 
 
-@fai_app.get(
-    "/queries/{domain}",
-    response_model=GetQueriesResponse,
-    openapi_extra={"x-fern-audiences": ["internal"], "security": [{"bearerAuth": []}]},
-)
+@fai_app.get("/queries/{domain}", response_model=GetQueriesResponse, openapi_extra={"x-fern-audiences": ["internal"]})
 async def get_recent_queries(
     domain: str,
     db: AsyncSession = Depends(get_db),
@@ -79,7 +66,6 @@ async def get_recent_queries(
     end_date: datetime | None = QueryParam(
         default=None, description="The end date of the period to retrieve analytics for"
     ),
-    _: None = Depends(verify_token),
 ) -> JSONResponse:
     LOGGER.info("Listing queries")
 

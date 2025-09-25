@@ -1,5 +1,5 @@
+import { getCurrentSessionOrThrow } from "@/app/services/auth0/getCurrentSession";
 import { Auth0OrgName } from "@/app/services/auth0/types";
-import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
 import AnalyticsPage from "@/components/analytics/AnalyticsPage";
 import { PosthogFeatureFlag } from "@/components/posthog/feature-flags/flags";
 import {
@@ -11,8 +11,7 @@ export default async function Page(props: {
   params: Promise<{ orgName: Auth0OrgName; docsUrl: string }>;
 }) {
   const params = await props.params;
-  const session = await getAuthenticatedSessionOrRedirect(params.orgName);
-
+  const session = await getCurrentSessionOrThrow();
   const analyticsBillingEnabled = await isFeatureFlagEnabledForUser(
     PosthogFeatureFlag.ENABLE_DOCS_ASK_FERN_BILLING,
     session.user.sub,

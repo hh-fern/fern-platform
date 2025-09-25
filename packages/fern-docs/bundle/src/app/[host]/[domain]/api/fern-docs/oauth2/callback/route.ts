@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { SignJWT } from "jose";
 
-import { type FernUser, OAuthTokenResponseSchema } from "@fern-api/docs-auth";
 import {
   getAllowedRedirectUrls,
   getDocsDomainEdge,
@@ -132,47 +131,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const refresh_token = data.refresh_token;
     const expires_in = data.expires_in;
 
-    let payload: FernUser = {
-      playground: {
-        initial_state: {
-          auth: {
-            bearer_token: bearer_token,
-          },
-        },
-      },
-    };
-
-    try {
-      console.log("Attempting to safely parse data...");
-      const parsedToken = OAuthTokenResponseSchema.safeParse(data);
-
-      if (parsedToken.data) {
-        console.log("Successfully parsed data.");
-
-        if (parsedToken.data.scope) {
-          console.log("Found scope:", parsedToken.data.scope);
-          const roles = parsedToken.data.scope
-            .split(" ")
-            .filter((scope) => scope.startsWith("fern:"));
-
-          payload = {
-            playground: {
-              initial_state: {
-                auth: {
-                  bearer_token: parsedToken.data.access_token,
-                },
-              },
-            },
-            roles,
-          };
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-
     const fern_token = await mintJwtToken({
-      payload,
+      bearer_token,
       refresh_token,
       issuer,
       expires_in,
@@ -211,19 +171,27 @@ function getJwtTokenSecret(secret?: string): Uint8Array {
 }
 
 async function mintJwtToken({
-  payload,
+  bearer_token,
   refresh_token,
   issuer,
   expires_in,
 }: {
-  payload: Record<string, any>;
+  bearer_token: string;
   refresh_token: string;
   issuer: string;
   expires_in: number;
 }) {
   return await new SignJWT({
-    fern: payload,
-    refresh_token,
+    fern: {
+      playground: {
+        initial_state: {
+          auth: {
+            bearer_token: bearer_token,
+          },
+        },
+      },
+    },
+    refresh_token: refresh_token,
   })
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setIssuedAt()

@@ -20,7 +20,6 @@ export interface JSXElement {
   type: "jsxElement";
   value: {
     richTextContent: boolean;
-    contentDraggingDisabled: boolean;
     name: string;
     keyedAttributes: KeyedAttributes;
     expressionAttributes: MdxJsxExpressionAttribute[];

@@ -6,7 +6,6 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from tests.conftest import TEST_FERN_TOKEN
 from tests.factories import create_test_domain
 
 
@@ -30,9 +29,7 @@ class TestAnalyticsHistogram:
             mock_fetch.return_value = []
             mock_fill.return_value = mock_histogram_data
 
-            response = test_client.get(
-                f"/analytics/histogram/{domain}", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-            )
+            response = test_client.get(f"/analytics/histogram/{domain}")
 
             assert response.status_code == 200
             data = response.json()
@@ -63,7 +60,6 @@ class TestAnalyticsHistogram:
             response = test_client.get(
                 f"/analytics/histogram/{domain}",
                 params={"start_date": start_date.isoformat(), "end_date": end_date.isoformat(), "group_by": "WEEK"},
-                headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
             )
 
             assert response.status_code == 200
@@ -73,11 +69,7 @@ class TestAnalyticsHistogram:
     def test_get_analytics_histogram_invalid_group_by(self, test_client: TestClient) -> None:
         domain = create_test_domain()
 
-        response = test_client.get(
-            f"/analytics/histogram/{domain}",
-            params={"group_by": "INVALID"},
-            headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"},
-        )
+        response = test_client.get(f"/analytics/histogram/{domain}", params={"group_by": "INVALID"})
 
         assert response.status_code == 422
         data = response.json()
@@ -89,9 +81,7 @@ class TestAnalyticsHistogram:
         with patch("src.fai.routes.analytics.fetch_grouped_data") as mock_fetch:
             mock_fetch.side_effect = Exception("Database error")
 
-            response = test_client.get(
-                f"/analytics/histogram/{domain}", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-            )
+            response = test_client.get(f"/analytics/histogram/{domain}")
 
             assert response.status_code == 500
             data = response.json()
@@ -104,9 +94,7 @@ class TestAnalyticsInsights:
         """Test that the endpoint returns 400 when there are insufficient queries"""
         domain = create_test_domain()
 
-        response = test_client.get(
-            f"/analytics/insights/{domain}", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-        )
+        response = test_client.get(f"/analytics/insights/{domain}")
 
         assert response.status_code == 400
         data = response.json()

@@ -6,7 +6,6 @@ from unittest.mock import (
 
 from fastapi.testclient import TestClient
 
-from tests.conftest import TEST_FERN_TOKEN
 from tests.factories import create_test_domain
 
 
@@ -17,9 +16,8 @@ class TestIndexReconstruct:
         with patch("src.fai.routes.index.reconstruct_query_index_for_domain") as mock_reconstruct:
             mock_reconstruct.return_value = None
 
-            response = test_client.post(
-                f"/index/{domain}/reconstruct", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-            )
+            response = test_client.post(f"/index/{domain}/reconstruct")
+
             assert response.status_code == 200
             data = response.json()
             assert data["success"] is True
@@ -31,9 +29,7 @@ class TestIndexReconstruct:
         with patch("src.fai.routes.index.reconstruct_query_index_for_domain") as mock_reconstruct:
             mock_reconstruct.side_effect = Exception("Reconstruction failed")
 
-            response = test_client.post(
-                f"/index/{domain}/reconstruct", headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-            )
+            response = test_client.post(f"/index/{domain}/reconstruct")
 
             assert response.status_code == 500
             data = response.json()
@@ -64,9 +60,8 @@ class TestIndexSync:
             mock_job = JobDb(id="test-job-id-123", status="pending", created_at=datetime.now(UTC))
             mock_get_job_status.return_value = mock_job
 
-            response = test_client.post(
-                f"/index/{domain}/sync", json=request_body, headers={"Authorization": f"Bearer {TEST_FERN_TOKEN}"}
-            )
+            response = test_client.post(f"/index/{domain}/sync", json=request_body)
+
             assert response.status_code == 200
             data = response.json()
             assert data["job_id"] == "test-job-id-123"

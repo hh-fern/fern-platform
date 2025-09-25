@@ -32,8 +32,6 @@ export interface FernAiEnvVariables {
   SLACK_CLIENT_ID: string;
   SLACK_CLIENT_SECRET: string;
   SLACK_SIGNING_SECRET: string;
-  KV_REST_API_READ_ONLY_TOKEN: string;
-  KV_REST_API_URL: string;
   [key: string]: string;
 }
 

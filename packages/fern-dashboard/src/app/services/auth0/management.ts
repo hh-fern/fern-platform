@@ -7,7 +7,7 @@ import {
   GetMembers200ResponseOneOfInner,
   ManagementClient,
 } from "auth0";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "node:crypto";
 
 import { AsyncRedisCache } from "../redis/AsyncRedisCache";
 import {
@@ -130,7 +130,7 @@ export async function createInviteToken(
   orgName: Auth0OrgName,
   inviterId: string
 ) {
-  const token = uuidv4();
+  const token = randomUUID();
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
   const inviteToken: InviteToken = {
@@ -314,23 +314,14 @@ export async function ensureUserBelongsToOrg(
   }
 }
 
-export async function doesOrgExist(orgName: Auth0OrgName) {
-  try {
-    const org = await getOrganization(orgName);
-    return org != null;
-  } catch (_error) {
-    return false;
-  }
-}
-
 export async function doesUserBelongToOrg(
   userId: Auth0UserID,
   orgName: Auth0OrgName
 ) {
   // a fern employee is considered to be in every org, but we need to check if the org exists
   if (await isFernEmployee(userId)) {
-    const orgExists = await doesOrgExist(orgName);
-    if (!orgExists) {
+    const org = await getOrganization(orgName);
+    if (org == null) {
       return false;
     }
     return true;
@@ -355,28 +346,4 @@ export async function getUserGithubToken(
   const user = (await auth0.users.get({ id: userId })).data;
   return user.identities.find((identity) => identity.provider === "github")
     ?.access_token;
-}
-export async function getUserGoogleOauth2EmailInfo(
-  userId: Auth0UserID
-): Promise<{ email: string | undefined; isEmailVerified: boolean }> {
-  const auth0 = getAuth0ManagementClient();
-  const user = (await auth0.users.get({ id: userId })).data;
-
-  // Find the google-oauth2 connection
-  const googleIdentity = user.identities?.find(
-    (identity) => identity.connection === "google-oauth2"
-  );
-
-  // Only return email info if the user has a google-oauth2 connection
-  if (googleIdentity == null) {
-    return {
-      email: undefined,
-      isEmailVerified: false,
-    };
-  }
-
-  return {
-    email: user.email,
-    isEmailVerified: user.email_verified ?? false,
-  };
 }
