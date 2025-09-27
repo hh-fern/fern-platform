@@ -127,6 +127,14 @@ export const middleware: NextMiddleware = async (request) => {
   }
 
   /**
+   * Rewrite /favicon.ico to favicon CDN
+   */
+  if (pathname.endsWith("/favicon.ico")) {
+    return rewrite(withDomain("/api/fern-docs/favicon"));
+  }
+
+
+  /**
    * Rewrite /_search/* to MeiliSearch
    */
   if (pathname.includes("/_search/")) {
@@ -334,9 +342,8 @@ export const config: MiddlewareConfig = {
      * - api/fern-docs (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
      */
-    "/((?!.well-known|_next|_vercel|favicon.ico|manifest.webmanifest).*)",
+    "/((?!.well-known|_next|_vercel|manifest.webmanifest).*)",
   ],
 };
 
