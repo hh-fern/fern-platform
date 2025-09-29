@@ -168,9 +168,6 @@ class VisualEditorMongoClient {
         return this.decompressData(document.data);
       }
       throw new Error(`Unsupported compressed type: ${document.originalType}`);
-    } else {
-      // If there's no version, update the document to the latest (compressed) version
-      await this.set(domain, branchName, document.data);
     }
 
     return document.data;
