@@ -1,22 +1,37 @@
 import { attachDatabasePool } from "@vercel/functions";
 import {
+  Binary,
   type Collection,
   type Db,
   MongoClient,
   type MongoClientOptions,
 } from "mongodb";
+import { gunzipSync, gzipSync } from "zlib";
 
 import { DocsV2Read } from "@fern-api/fdr-sdk";
 
-export interface VisualEditorDocument {
+type EditorDocument = {
   _id: string;
   domain: string;
   branchName: string;
-  data: DocsV2Read.LoadDocsForUrlResponse;
   createdAt: Date;
   updatedAt: Date;
   expiresAt?: Date;
-}
+} & (
+  | {
+      // Old type for backwards compatibility
+      data: DocsV2Read.LoadDocsForUrlResponse;
+    }
+  | {
+      data: Binary;
+      originalType: string;
+      version: number;
+    }
+);
+
+export type UnzippedEditorDocument = EditorDocument & {
+  data: DocsV2Read.LoadDocsForUrlResponse;
+};
 
 const uri = process.env.MONGODB_URI;
 const options: MongoClientOptions = {
@@ -52,9 +67,9 @@ if (uri) {
 
 class VisualEditorMongoClient {
   private db: Db | null = null;
-  private collection: Collection<VisualEditorDocument> | null = null;
+  private collection: Collection<EditorDocument> | null = null;
 
-  private async ensureConnection(): Promise<Collection<VisualEditorDocument>> {
+  private async ensureConnection(): Promise<Collection<EditorDocument>> {
     if (this.collection) {
       return this.collection;
     }
@@ -65,7 +80,7 @@ class VisualEditorMongoClient {
 
     const client = await clientPromise;
     this.db = client.db("visual-editor");
-    this.collection = this.db.collection<VisualEditorDocument>("fdr-data");
+    this.collection = this.db.collection<EditorDocument>("fdr-data");
 
     await this.collection.createIndex(
       { domain: 1, branchName: 1 },
@@ -83,6 +98,32 @@ class VisualEditorMongoClient {
     return `${domain}::${branchName}`;
   }
 
+  private compressData(data: DocsV2Read.LoadDocsForUrlResponse): Binary {
+    const serialized = JSON.stringify(data);
+    return new Binary(gzipSync(Buffer.from(serialized, "utf8")));
+  }
+
+  private decompressData(data: Binary): DocsV2Read.LoadDocsForUrlResponse {
+    try {
+      // Ensure we have a proper Buffer from the Binary data
+      const buffer = Buffer.isBuffer(data.buffer)
+        ? data.buffer
+        : Buffer.from(data.buffer);
+
+      // Decompress the gzipped data
+      const decompressed = gunzipSync(buffer);
+
+      // Parse the JSON
+      const jsonString = decompressed.toString("utf8");
+      return JSON.parse(jsonString) as DocsV2Read.LoadDocsForUrlResponse;
+    } catch (error) {
+      console.error("Failed to decompress data:", error);
+      throw new Error(
+        `Failed to decompress data: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
   async set(
     domain: string,
     branchName: string,
@@ -92,11 +133,13 @@ class VisualEditorMongoClient {
 
     const now = new Date();
 
-    const document: VisualEditorDocument = {
+    const document: EditorDocument = {
       _id: this.getDocumentId(domain, branchName),
       domain,
       branchName,
-      data,
+      data: this.compressData(data),
+      originalType: "DocsV2Read.LoadDocsForUrlResponse",
+      version: 2,
       createdAt: now,
       updatedAt: now,
     };
@@ -120,12 +163,22 @@ class VisualEditorMongoClient {
       return null;
     }
 
+    if ("version" in document) {
+      if (document.originalType === "DocsV2Read.LoadDocsForUrlResponse") {
+        return this.decompressData(document.data);
+      }
+      throw new Error(`Unsupported compressed type: ${document.originalType}`);
+    } else {
+      // If there's no version, update the document to the latest (compressed) version
+      await this.set(domain, branchName, document.data);
+    }
+
     return document.data;
   }
 
   async findDocumentsForBranches(
     branchNames: string[]
-  ): Promise<VisualEditorDocument[]> {
+  ): Promise<UnzippedEditorDocument[]> {
     const collection = await this.ensureConnection();
 
     const documents = await collection
@@ -138,7 +191,15 @@ class VisualEditorMongoClient {
       return [];
     }
 
-    return documents;
+    return documents.map((document) => {
+      return {
+        ...document,
+        data:
+          "version" in document
+            ? this.decompressData(document.data)
+            : document.data,
+      };
+    });
   }
 }
 
