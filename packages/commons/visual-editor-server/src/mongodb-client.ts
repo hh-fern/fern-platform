@@ -129,6 +129,7 @@ class VisualEditorMongoClient {
     branchName: string,
     data: DocsV2Read.LoadDocsForUrlResponse
   ): Promise<void> {
+    console.log("Setting document", domain, branchName);
     const collection = await this.ensureConnection();
 
     const now = new Date();
@@ -159,6 +160,8 @@ class VisualEditorMongoClient {
       _id: this.getDocumentId(domain, branchName),
     });
 
+    console.log("[1]DOCUMENT", document);
+
     if (!document) {
       return null;
     }
@@ -168,9 +171,31 @@ class VisualEditorMongoClient {
         return this.decompressData(document.data);
       }
       throw new Error(`Unsupported compressed type: ${document.originalType}`);
+    } else {
+      // If there's no version, update the document to the latest (compressed) version
+      await this.update(domain, branchName, document.data);
     }
 
     return document.data;
+  }
+
+  async update(
+    domain: string,
+    branchName: string,
+    data: DocsV2Read.LoadDocsForUrlResponse
+  ): Promise<void> {
+    const collection = await this.ensureConnection();
+    await collection.updateOne(
+      { _id: this.getDocumentId(domain, branchName) },
+      {
+        $set: {
+          data: this.compressData(data),
+          version: 2,
+          originalType: "DocsV2Read.LoadDocsForUrlResponse",
+          updatedAt: new Date(),
+        },
+      }
+    );
   }
 
   async findDocumentsForBranches(
