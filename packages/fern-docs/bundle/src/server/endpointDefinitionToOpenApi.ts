@@ -495,7 +495,8 @@ function convertDiscriminatedUnionToSchema(
  */
 function convertToOpenApiSchema(
   shape: ApiShapeTypes,
-  apiDefinition?: ApiDefinition.ApiDefinition
+  apiDefinition?: ApiDefinition.ApiDefinition,
+  visitedIds: Set<string> = new Set()
 ): OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject {
   if (!shape) {
     return {} as OpenAPIV3_1.SchemaObject;
@@ -574,12 +575,13 @@ function convertToOpenApiSchema(
     case "discriminatedUnion":
       return convertDiscriminatedUnionToSchema(shape, apiDefinition);
     case "id":
-      if (apiDefinition?.types?.[shape.id]) {
+      if (apiDefinition?.types?.[shape.id] && !visitedIds.has(shape.id)) {
         const typeDef = apiDefinition.types[shape.id];
         if (typeDef) {
           const resolvedSchema = convertToOpenApiSchema(
             typeDef.shape,
-            apiDefinition
+            apiDefinition,
+            new Set([...visitedIds, shape.id])
           );
           if (typeDef.description) {
             // It's a schema object, we can safely add description
