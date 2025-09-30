@@ -12,12 +12,18 @@ export async function GET(
 
   const fernToken = (await cookies()).get(COOKIE_FERN_TOKEN)?.value;
 
+  console.log("host:", host);
+  console.log("domain:", domain);
+
   try {
     const loader = await createCachedDocsLoader(host, domain, fernToken);
-    const [config, files] = await Promise.all([
+    const [config, files, metadata] = await Promise.all([
       loader.getConfig(),
       loader.getFiles(),
+      loader.getMetadata(),
     ]);
+
+    console.log("metadata domain:", metadata.domain);
 
     if (config.favicon) {
       const faviconUrl = files[config.favicon]?.src;
