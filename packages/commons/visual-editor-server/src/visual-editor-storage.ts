@@ -2,7 +2,17 @@ import type { DocsV2Read } from "@fern-api/fdr-sdk";
 
 import { type UnzippedEditorDocument, mongoClient } from "./mongodb-client";
 
+const inflightRequests = new Map<string, Promise<any>>();
+
 export class VisualEditorStorage {
+  private _generateInflightRequestKey(
+    domain: string,
+    branchName: string,
+    type: "store" | "get"
+  ): string {
+    return `${domain}::${branchName}::${type}`;
+  }
+
   async storeFdrSnapshot(
     domain: string,
     branchName: string,
@@ -19,17 +29,27 @@ export class VisualEditorStorage {
     );
 
     try {
-      await mongoClient.set(domain, branchName, fdrResponse);
+      const key = this._generateInflightRequestKey(domain, branchName, "store");
+      if (inflightRequests.has(key)) {
+        console.log("[storeFdrSnapshot] Returning inflight request");
+        return await inflightRequests.get(key);
+      }
+
+      const promiseResponse = mongoClient.set(domain, branchName, fdrResponse);
+      console.log(
+        "[storeFdrSnapshot] Inflight request not found: reaching out to mongo"
+      );
+      inflightRequests.set(key, promiseResponse);
       const endTimestamp = Date.now();
       const duration = endTimestamp - startTimestamp;
       console.log(
         `[VisualEditorStorage] FDR successfully stored for ${domain}:${branchName}`,
         {
           uniqueRunId,
-          timestamp: endTimestamp,
           duration,
         }
       );
+      return await promiseResponse;
     } catch (error) {
       console.error(
         `[VisualEditorStorage] Failed to store FDR for ${domain}:${branchName}`,
@@ -53,7 +73,17 @@ export class VisualEditorStorage {
     );
 
     try {
-      const fdrResponse = await mongoClient.get(domain, branchName);
+      const key = this._generateInflightRequestKey(domain, branchName, "get");
+      if (inflightRequests.has(key)) {
+        console.log("[getFdrSnapshot] Returning inflight request");
+        return await inflightRequests.get(key);
+      }
+
+      const promiseResponse = mongoClient.get(domain, branchName);
+      console.log(
+        "[getFdrSnapshot] Inflight request not found: reaching out to mongo"
+      );
+      inflightRequests.set(key, promiseResponse);
       const endTimestamp = Date.now();
       const duration = endTimestamp - startTimestamp;
       console.log(
@@ -63,7 +93,7 @@ export class VisualEditorStorage {
           duration,
         }
       );
-      return fdrResponse;
+      return await promiseResponse;
     } catch (error) {
       const endTimestamp = Date.now();
       const duration = endTimestamp - startTimestamp;
