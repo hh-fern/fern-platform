@@ -31,8 +31,10 @@ export class VisualEditorStorage {
     try {
       const key = this._generateInflightRequestKey(domain, branchName, "store");
       if (inflightRequests.has(key)) {
-        console.log("[storeFdrSnapshot] Returning inflight request");
-        return await inflightRequests.get(key);
+        console.log(
+          "[storeFdrSnapshot] Inflight request found, returning nothing"
+        );
+        return;
       }
 
       const promiseResponse = mongoClient.set(domain, branchName, fdrResponse);
