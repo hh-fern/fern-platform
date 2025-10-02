@@ -551,7 +551,6 @@ const getApi = async (domainKey: string, id: string) => {
       notFound();
     }
   }
-  console.log("CALLING V1 TO LATEST")
   const flags = await cachedGetEdgeFlags(domainKey);
   return ApiDefinitionV1ToLatest.from(v1, flags).migrate();
 };
@@ -570,12 +569,11 @@ const createGetPrunedApiCached = (
       try {
         if (nodes.length === 1 && nodes[0]) {
           const key = `api:${id}:${createEndpointCacheKey(nodes[0])}`;
-          // const cached = await kvGet<ApiDefinition.ApiDefinition>(
-          //   domainKey,
-          //   key,
-          //   cacheConfig.cacheKeySuffix
-          // );
-          const cached = null;
+          const cached = await kvGet<ApiDefinition.ApiDefinition>(
+            domainKey,
+            key,
+            cacheConfig.cacheKeySuffix
+          );
           if (cached != null) {
             const metadata = await getMetadata(cacheConfig)(domainKey);
             const dynamicIr = await getDynamicIr(id)(

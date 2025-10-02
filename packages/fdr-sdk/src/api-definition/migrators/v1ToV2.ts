@@ -149,8 +149,6 @@ export class ApiDefinitionV1ToLatest {
         this.migrateSubpackage(subpackage);
     });
 
-    console.log("v1 has authSchemes?", this.v1.authSchemes);
-
     return {
       id: this.v1.id,
       endpoints: this.endpoints,
@@ -197,9 +195,6 @@ export class ApiDefinitionV1ToLatest {
     v1: APIV1Read.EndpointDefinition,
     namespace: V2.SubpackageId[]
   ): V2.EndpointDefinition => {
-    console.log("KENNY HERE", id);
-    console.log("v1.authV2", v1.authV2);
-    console.log("v1.authed", v1.authed);
     const toRet: V2.EndpointDefinition = {
       id,
       namespace,
