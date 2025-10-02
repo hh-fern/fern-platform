@@ -495,10 +495,10 @@ const createGetPrunedApiCached = (
           );
           if (cached != null) {
             const metadata = await getMetadata(cacheConfig)(domainKey);
-            const dynamicIr = await getDynamicIr(id)(
+            const dynamicIr = await getDynamicIr(
               metadata.org,
-              metadata.domain
-            );
+              id
+            )(metadata.domain);
             return await backfillSnippets(
               cached,
               dynamicIr,
@@ -540,7 +540,7 @@ const createGetPrunedApiCached = (
         );
       }
       const metadata = await getMetadata(cacheConfig)(domainKey);
-      const dynamicIr = await getDynamicIr(id)(metadata.org, metadata.domain);
+      const dynamicIr = await getDynamicIr(metadata.org, id)(metadata.domain);
       return backfillSnippets(pruned, dynamicIr, await flagsPromise);
     },
     [domainKey, cacheSeed(), cacheConfig.cacheKeySuffix],
@@ -1113,8 +1113,8 @@ const getLayout = (cacheConfig: Required<CacheConfig>) =>
     };
   });
 
-const getDynamicIr = (apiName: string) =>
-  cache(async (orgId: string, domain: string) => {
+const getDynamicIr = (orgId: string, apiName: string) =>
+  cache(async (domain: string) => {
     "use cache";
     const api = await getApi(domain, apiName);
 
@@ -1332,10 +1332,8 @@ export const createCachedDocsLoader = async (
       const m = await metadata;
       return `https://${m.domain}${m.basePath}`;
     },
-    getDynamicIr: async (apiName: string) => {
-      const m = await metadata;
-      return getDynamicIr(apiName)(m.org, m.domain);
-    },
+    getDynamicIr: (orgId: string, apiName: string) =>
+      getDynamicIr(orgId, apiName)(domainKey),
     clearKvCache: () => clearKvCache(domainKey),
     isAskAiEnabled: () => getAskAiEnabled(config)(domainKey),
   };

@@ -41,7 +41,11 @@ export async function ExplorerContent({
   }
 
   try {
-    dynamicIRsByLanguage = await loader.getDynamicIr(node.apiDefinitionId);
+    const metadata = await loader.getMetadata();
+    dynamicIRsByLanguage = await loader.getDynamicIr(
+      metadata.org,
+      node.apiDefinitionId
+    );
   } catch (error) {
     console.error(`[explorer-content:getDynamicIr] ${JSON.stringify(error)}`);
   }
