@@ -42,6 +42,7 @@ export async function ExplorerContent({
 
   try {
     const metadata = await loader.getMetadata();
+    console.log("[explorer-content:getDynamicIr] metadata:", metadata);
     dynamicIRsByLanguage = await loader.getDynamicIr(
       metadata.org,
       node.apiDefinitionId
