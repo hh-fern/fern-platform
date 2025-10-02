@@ -48,8 +48,7 @@ function authSchemeToDisplay(
         clientCredentials: (clientCredentialsValue) =>
           visitDiscriminatedUnion(clientCredentialsValue.value, "type")._visit({
             referencedEndpoint: (oauth) => ({
-              name:
-                clientCredentialsValue.value.headerName || "Authorization",
+              name: clientCredentialsValue.value.headerName || "Authorization",
               description:
                 oauth.description ??
                 `OAuth authentication of the form \`${clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix ?? "Bearer"} ` : ""}<token>\`.`,
@@ -62,11 +61,7 @@ function authSchemeToDisplay(
   });
 }
 
-function AuthSchemeVariant({
-  auth,
-}: {
-  auth: ApiDefinition.AuthScheme;
-}) {
+function AuthSchemeVariant({ auth }: { auth: ApiDefinition.AuthScheme }) {
   const display = authSchemeToDisplay(auth);
   return (
     <PropertyRenderer
@@ -74,7 +69,7 @@ function AuthSchemeVariant({
       description={display.description}
       availability={display.availability}
       typeShorthand={
-        <span className="fern-api-property-type font-mono text-xs text-(color:--grayscale-a11)">
+        <span className="fern-api-property-type text-(color:--grayscale-a11) font-mono text-xs">
           {display.typeShorthand}
         </span>
       }
@@ -82,7 +77,11 @@ function AuthSchemeVariant({
   );
 }
 
-export function EndpointAuthSection({ auths }: { auths: ApiDefinition.AuthScheme[] }) {
+export function EndpointAuthSection({
+  auths,
+}: {
+  auths: ApiDefinition.AuthScheme[];
+}) {
   if (auths.length === 0) {
     return null;
   }

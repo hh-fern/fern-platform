@@ -35,10 +35,7 @@ export async function EndpointContentLeft({
   showAuth: boolean;
   showErrors: boolean;
 }) {
-  const headers = [
-    ...globalHeaders,
-    ...(endpoint.requestHeaders ?? []),
-  ];
+  const headers = [...globalHeaders, ...(endpoint.requestHeaders ?? [])];
 
   return (
     <>

@@ -40,7 +40,10 @@ export function createEndpointContext(
   return {
     node,
     endpoint,
-    auths: endpoint.auth?.map((id) => api.auths[id]).filter((auth): auth is AuthScheme => auth != null) ?? [],
+    auths:
+      endpoint.auth
+        ?.map((id) => api.auths[id])
+        .filter((auth): auth is AuthScheme => auth != null) ?? [],
     globalHeaders: api.globalHeaders ?? [],
     types: api.types,
   };
@@ -69,7 +72,10 @@ export function createWebSocketContext(
   return {
     node,
     channel,
-    auths: channel.auth?.map((id) => api.auths[id]).filter((auth): auth is AuthScheme => auth != null) ?? [],
+    auths:
+      channel.auth
+        ?.map((id) => api.auths[id])
+        .filter((auth): auth is AuthScheme => auth != null) ?? [],
     globalHeaders: api.globalHeaders ?? [],
     types: api.types,
   };

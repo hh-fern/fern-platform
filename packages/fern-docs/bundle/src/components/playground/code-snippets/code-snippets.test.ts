@@ -136,7 +136,7 @@ describe("PlaygroundCodeSnippetBuilder", () => {
   const context: EndpointContext = {
     node,
     endpoint,
-    auth: undefined,
+    auths: [],
     types: {},
     globalHeaders: [],
   };

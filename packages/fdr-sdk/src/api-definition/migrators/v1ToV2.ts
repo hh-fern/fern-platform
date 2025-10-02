@@ -156,7 +156,11 @@ export class ApiDefinitionV1ToLatest {
       webhooks: this.webhooks,
       types: this.types,
       subpackages: this.subpackages,
-      auths: this.v1.authSchemes ? this.v1.authSchemes : this.v1.auth ? { [AUTH_SCHEME_ID]: this.v1.auth } : {},
+      auths: this.v1.authSchemes
+        ? this.v1.authSchemes
+        : this.v1.auth
+          ? { [AUTH_SCHEME_ID]: this.v1.auth }
+          : {},
       globalHeaders: this.migrateParameters(this.v1.globalHeaders),
       snippetsConfiguration: this.v1.snippetsConfiguration,
     };
