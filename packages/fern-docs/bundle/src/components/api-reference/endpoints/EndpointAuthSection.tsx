@@ -1,7 +1,86 @@
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 
+import { FernCollapseWithButtonUncontrolled } from "../type-definitions/FernCollapseWithButtonUncontrolled";
+import { PropertyRenderer } from "../type-definitions/ObjectProperty";
+import { WithSeparator } from "../type-definitions/TypeDefinitionDetails";
 import { EndpointSection } from "./EndpointSection";
+
+interface AuthSchemeDisplay {
+  name: string;
+  description: string;
+  availability: ApiDefinition.Availability | undefined;
+  typeShorthand: string;
+}
+
+function authSchemeToDisplay(
+  auth: ApiDefinition.AuthScheme
+): AuthSchemeDisplay {
+  return visitDiscriminatedUnion(auth)._visit<AuthSchemeDisplay>({
+    basicAuth: (basicAuth) => ({
+      name: "Authorization",
+      description:
+        basicAuth.description ??
+        "Basic authentication of the form `Basic <username:password>`.",
+      availability: undefined,
+      typeShorthand: "Basic",
+    }),
+    bearerAuth: (bearerAuth) => ({
+      name: "Authorization",
+      description:
+        bearerAuth.description ??
+        "Bearer authentication of the form `Bearer <token>`, where token is your auth token.",
+      availability: undefined,
+      typeShorthand: "Bearer",
+    }),
+    header: (value) => ({
+      name: value.headerWireValue,
+      description:
+        value.description ??
+        (value.prefix != null
+          ? `Header authentication of the form \`${value.prefix} <token>\``
+          : "API Key authentication via header"),
+      availability: undefined,
+      typeShorthand: value.prefix || "string",
+    }),
+    oAuth: (value) =>
+      visitDiscriminatedUnion(value.value, "type")._visit({
+        clientCredentials: (clientCredentialsValue) =>
+          visitDiscriminatedUnion(clientCredentialsValue.value, "type")._visit({
+            referencedEndpoint: (oauth) => ({
+              name:
+                clientCredentialsValue.value.headerName || "Authorization",
+              description:
+                oauth.description ??
+                `OAuth authentication of the form \`${clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix ?? "Bearer"} ` : ""}<token>\`.`,
+              availability: undefined,
+              typeShorthand:
+                clientCredentialsValue.value.tokenPrefix || "Bearer",
+            }),
+          }),
+      }),
+  });
+}
+
+function AuthSchemeVariant({
+  auth,
+}: {
+  auth: ApiDefinition.AuthScheme;
+}) {
+  const display = authSchemeToDisplay(auth);
+  return (
+    <PropertyRenderer
+      name={display.name}
+      description={display.description}
+      availability={display.availability}
+      typeShorthand={
+        <span className="fern-api-property-type font-mono text-xs text-(color:--grayscale-a11)">
+          {display.typeShorthand}
+        </span>
+      }
+    />
+  );
+}
 
 export function EndpointAuthSection({ auths }: { auths: ApiDefinition.AuthScheme[] }) {
   if (auths.length === 0) {
@@ -10,75 +89,16 @@ export function EndpointAuthSection({ auths }: { auths: ApiDefinition.AuthScheme
 
   return (
     <EndpointSection title="Authentication">
-      <div className="space-y-4">
-        {auths.length > 1 && (
-          <div className="text-sm text-(color:--grayscale-a11)">
-            This endpoint supports multiple authentication methods. Use any one of the following:
-          </div>
-        )}
-        {auths.map((auth, index) => (
-          <div key={index} className="rounded-lg border border-(color:--grayscale-a6) p-4">
-            {visitDiscriminatedUnion(auth)._visit({
-              basicAuth: (basicAuth) => (
-                <>
-                  <div className="font-semibold mb-2">Basic Authentication</div>
-                  <div className="text-sm text-(color:--grayscale-a11)">
-                    {basicAuth.description ?? "Basic authentication of the form `Basic <username:password>`."}
-                  </div>
-                  <div className="mt-2 text-sm font-mono bg-(color:--grayscale-a3) p-2 rounded">
-                    Authorization: Basic {"<username:password>"}
-                  </div>
-                </>
-              ),
-              bearerAuth: (bearerAuth) => (
-                <>
-                  <div className="font-semibold mb-2">Bearer Token</div>
-                  <div className="text-sm text-(color:--grayscale-a11)">
-                    {bearerAuth.description ?? "Bearer authentication of the form `Bearer <token>`, where token is your auth token."}
-                  </div>
-                  <div className="mt-2 text-sm font-mono bg-(color:--grayscale-a3) p-2 rounded">
-                    Authorization: Bearer {"<token>"}
-                  </div>
-                </>
-              ),
-              header: (value) => (
-                <>
-                  <div className="font-semibold mb-2">{value.headerWireValue} Header</div>
-                  <div className="text-sm text-(color:--grayscale-a11)">
-                    {value.description ??
-                      (value.prefix != null
-                        ? `Header authentication of the form \`${value.prefix} <token>\``
-                        : "API Key authentication via header")}
-                  </div>
-                  <div className="mt-2 text-sm font-mono bg-(color:--grayscale-a3) p-2 rounded">
-                    {value.headerWireValue}: {value.prefix ? `${value.prefix} ` : ""}{"<token>"}
-                  </div>
-                </>
-              ),
-              oAuth: (value) =>
-                visitDiscriminatedUnion(value.value, "type")._visit({
-                  clientCredentials: (clientCredentialsValue) =>
-                    visitDiscriminatedUnion(clientCredentialsValue.value, "type")._visit({
-                      referencedEndpoint: (oauth) => (
-                        <>
-                          <div className="font-semibold mb-2">OAuth 2.0</div>
-                          <div className="text-sm text-(color:--grayscale-a11)">
-                            {oauth.description ??
-                              `OAuth authentication of the form \`${clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix ?? "Bearer"} ` : ""}<token>\`.`}
-                          </div>
-                          <div className="mt-2 text-sm font-mono bg-(color:--grayscale-a3) p-2 rounded">
-                            {clientCredentialsValue.value.headerName || "Authorization"}:{" "}
-                            {clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix} ` : ""}
-                            {"<token>"}
-                          </div>
-                        </>
-                      ),
-                    }),
-                }),
-            })}
-          </div>
-        ))}
-      </div>
+      <FernCollapseWithButtonUncontrolled
+        showText={`Show ${auths.length} ${auths.length === 1 ? "method" : "methods"}`}
+        hideText={`Hide ${auths.length} ${auths.length === 1 ? "method" : "methods"}`}
+      >
+        <WithSeparator separatorText={auths.length > 1 ? "OR" : undefined}>
+          {auths.map((auth, index) => (
+            <AuthSchemeVariant key={index} auth={auth} />
+          ))}
+        </WithSeparator>
+      </FernCollapseWithButtonUncontrolled>
     </EndpointSection>
   );
 }
