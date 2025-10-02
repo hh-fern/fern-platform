@@ -28,7 +28,7 @@ export interface HoveringProps {
 }
 
 export async function EndpointContentLeft({
-  context: { endpoint, types, auth, globalHeaders },
+  context: { endpoint, types, auths, globalHeaders },
   showAuth,
   showErrors,
 }: {
@@ -36,8 +36,14 @@ export async function EndpointContentLeft({
   showAuth: boolean;
   showErrors: boolean;
 }) {
-  let authHeader: ApiDefinition.ObjectProperty | undefined;
-  if (auth && showAuth) {
+  console.log("EndpointContentLeft")
+  console.log("kenny")
+  console.log(JSON.stringify({ endpoint, types, auths, globalHeaders }, null, 2))
+  console.log("endpoint.auth raw:", endpoint.auth);
+  console.log("context.auths:", auths);
+
+  const authHeaders: ApiDefinition.ObjectProperty[] = [];
+  if (showAuth && auths.length > 0) {
     const stringShape: ApiDefinition.TypeShape = {
       type: "alias",
       value: {
@@ -52,73 +58,77 @@ export async function EndpointContentLeft({
         },
       },
     };
-    authHeader = visitDiscriminatedUnion(
-      auth
-    )._visit<ApiDefinition.ObjectProperty>({
-      basicAuth: (basicAuth) => {
-        return {
-          key: ApiDefinition.PropertyKey("Authorization"),
-          description:
-            basicAuth.description ??
-            "Basic authentication of the form `Basic <username:password>`.",
-          hidden: false,
-          valueShape: stringShape,
-          availability: undefined,
-          propertyAccess: undefined,
-        };
-      },
-      bearerAuth: (bearerAuth) => {
-        return {
-          key: ApiDefinition.PropertyKey("Authorization"),
-          description:
-            bearerAuth.description ??
-            "Bearer authentication of the form `Bearer <token>`, where token is your auth token.",
-          hidden: false,
-          valueShape: stringShape,
-          availability: undefined,
-          propertyAccess: undefined,
-        };
-      },
-      header: (value) => {
-        return {
-          key: ApiDefinition.PropertyKey(value.headerWireValue),
-          description:
-            (value.description ?? value.prefix != null)
-              ? `Header authentication of the form \`${value.prefix} <token>\``
-              : undefined,
-          hidden: false,
-          valueShape: stringShape,
-          availability: undefined,
-          propertyAccess: undefined,
-        };
-      },
-      oAuth: (value) => {
-        return visitDiscriminatedUnion(value.value, "type")._visit({
-          clientCredentials: (clientCredentialsValue) =>
-            visitDiscriminatedUnion(
-              clientCredentialsValue.value,
-              "type"
-            )._visit({
-              referencedEndpoint: (oauth) => ({
-                key: ApiDefinition.PropertyKey(
-                  clientCredentialsValue.value.headerName || "Authorization"
-                ),
-                description:
-                  oauth.description ??
-                  `OAuth authentication of the form \`${clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix ?? "Bearer"} ` : ""}<token>\`.`,
-                hidden: false,
-                valueShape: stringShape,
-                availability: undefined,
-                propertyAccess: undefined,
+
+    for (const auth of auths) {
+      const authHeader = visitDiscriminatedUnion(
+        auth
+      )._visit<ApiDefinition.ObjectProperty>({
+        basicAuth: (basicAuth) => {
+          return {
+            key: ApiDefinition.PropertyKey("Authorization"),
+            description:
+              basicAuth.description ??
+              "Basic authentication of the form `Basic <username:password>`.",
+            hidden: false,
+            valueShape: stringShape,
+            availability: undefined,
+            propertyAccess: undefined,
+          };
+        },
+        bearerAuth: (bearerAuth) => {
+          return {
+            key: ApiDefinition.PropertyKey("Authorization"),
+            description:
+              bearerAuth.description ??
+              "Bearer authentication of the form `Bearer <token>`, where token is your auth token.",
+            hidden: false,
+            valueShape: stringShape,
+            availability: undefined,
+            propertyAccess: undefined,
+          };
+        },
+        header: (value) => {
+          return {
+            key: ApiDefinition.PropertyKey(value.headerWireValue),
+            description:
+              (value.description ?? value.prefix != null)
+                ? `Header authentication of the form \`${value.prefix} <token>\``
+                : undefined,
+            hidden: false,
+            valueShape: stringShape,
+            availability: undefined,
+            propertyAccess: undefined,
+          };
+        },
+        oAuth: (value) => {
+          return visitDiscriminatedUnion(value.value, "type")._visit({
+            clientCredentials: (clientCredentialsValue) =>
+              visitDiscriminatedUnion(
+                clientCredentialsValue.value,
+                "type"
+              )._visit({
+                referencedEndpoint: (oauth) => ({
+                  key: ApiDefinition.PropertyKey(
+                    clientCredentialsValue.value.headerName || "Authorization"
+                  ),
+                  description:
+                    oauth.description ??
+                    `OAuth authentication of the form \`${clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix ?? "Bearer"} ` : ""}<token>\`.`,
+                  hidden: false,
+                  valueShape: stringShape,
+                  availability: undefined,
+                  propertyAccess: undefined,
+                }),
               }),
-            }),
-        });
-      },
-    });
+          });
+        },
+      });
+      authHeaders.push(authHeader);
+    }
   }
 
   const headers = [
-    ...(authHeader ? [authHeader] : []),
+    ...authHeaders,
     ...globalHeaders,
     ...(endpoint.requestHeaders ?? []),
   ];
@@ -149,8 +159,10 @@ export async function EndpointContentLeft({
                 {headers.map((parameter) => {
                   // let isAuth = false;
                   if (
-                    (auth?.type === "header" &&
-                      parameter.key === auth?.headerWireValue) ||
+                    auths.some((auth) =>
+                      auth.type === "header" &&
+                      parameter.key === auth.headerWireValue
+                    ) ||
                     parameter.key === "Authorization"
                   ) {
                     // isAuth = true;
