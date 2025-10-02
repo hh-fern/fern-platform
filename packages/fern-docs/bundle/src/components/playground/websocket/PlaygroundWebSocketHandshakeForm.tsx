@@ -56,7 +56,7 @@ export const PlaygroundWebSocketHandshakeForm: FC<
 
   if (
     error == null &&
-    context.auth == null &&
+    context.auths.length === 0 &&
     (context.channel.requestHeaders == null ||
       context.channel.requestHeaders.length === 0) &&
     (context.channel.pathParameters == null ||
