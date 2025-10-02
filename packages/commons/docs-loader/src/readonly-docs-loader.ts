@@ -217,6 +217,9 @@ function kvSet(
 
 const getMonitor = new Semaphore(10);
 
+// In-flight request deduplication cache
+const kvGetCache = new Map<string, Promise<any>>();
+
 async function kvGet<T>(
   domainKey: string,
   key: string,
@@ -227,68 +230,151 @@ async function kvGet<T>(
   }
 
   const finalKey = cacheKeySuffix ? `${key}:${cacheKeySuffix}` : key;
+  const cacheKey = `${domainKey}:${finalKey}`;
+
+  // Check if there's already an in-flight request for this key
+  if (kvGetCache.has(cacheKey)) {
+    console.log(
+      `[Upstash] GET deduplicated - domain: ${domainKey}, key: ${finalKey}`
+    );
+    return kvGetCache.get(cacheKey);
+  }
 
   console.log(
     `[Upstash] GET operation - domain: ${domainKey}, key: ${finalKey}`
   );
 
-  await getMonitor.acquire();
-  const start = Date.now();
-  try {
-    // Check if the key has expired
-    const ttlKey = `${domainKey}:ttl:${finalKey}`;
-    const expiration = await kv.get<number>(ttlKey);
+  const promise = (async () => {
+    await getMonitor.acquire();
+    const start = Date.now();
+    try {
+      // Check if the key has expired
+      const ttlKey = `${domainKey}:ttl:${finalKey}`;
+      const expiration = await kv.get<number>(ttlKey);
 
-    if (expiration && Date.now() > expiration) {
-      // Key has expired, delete it
-      await kv.hdel(domainKey, finalKey);
-      await kv.del(ttlKey);
+      if (expiration && Date.now() > expiration) {
+        // Key has expired, delete it
+        await kv.hdel(domainKey, finalKey);
+        await kv.del(ttlKey);
+        const duration = Date.now() - start;
+        console.log(
+          `[Upstash] GET expired - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
+        );
+
+        track("upstash_cache_get", {
+          domain: domainKey,
+          cacheKey: finalKey,
+          hit: false,
+          expired: true,
+          duration,
+        });
+        return null;
+      }
+
+      const result = await kv.hget<T>(domainKey, finalKey);
       const duration = Date.now() - start;
+      const isHit = result != null;
+
       console.log(
-        `[Upstash] GET expired - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
+        `[Upstash] GET ${isHit ? "hit" : "miss"} - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
       );
 
       track("upstash_cache_get", {
         domain: domainKey,
         cacheKey: finalKey,
-        hit: false,
-        expired: true,
+        hit: isHit,
+        expired: false,
+        duration,
+      });
+
+      return result;
+    } catch (error) {
+      const duration = Date.now() - start;
+      console.warn(
+        `[Upstash] GET failed - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`,
+        error
+      );
+
+      track("upstash_cache_get_error", {
+        domain: domainKey,
+        cacheKey: finalKey,
+        error: String(error),
         duration,
       });
       return null;
+    } finally {
+      getMonitor.release();
+      // Clean up the cache entry after the request completes
+      kvGetCache.delete(cacheKey);
     }
+  })();
 
-    const result = await kv.hget<T>(domainKey, finalKey);
+  kvGetCache.set(cacheKey, promise);
+  return promise;
+}
+
+async function kvGetMultiple<T = unknown>(
+  domainKey: string,
+  keys: string[],
+  cacheKeySuffix?: string
+): Promise<Map<string, T | null>> {
+  if (isLocal() || isSelfHosted()) {
+    return new Map();
+  }
+
+  if (keys.length === 0) {
+    return new Map();
+  }
+
+  const finalKeys = keys.map((k) =>
+    cacheKeySuffix ? `${k}:${cacheKeySuffix}` : k
+  );
+
+  console.log(
+    `[Upstash] HMGET operation - domain: ${domainKey}, keys: ${finalKeys.join(", ")}`
+  );
+
+  await getMonitor.acquire();
+  const start = Date.now();
+  try {
+    const values = (await kv.hmget(
+      domainKey,
+      ...finalKeys
+    )) as unknown as (T | null)[];
     const duration = Date.now() - start;
-    const isHit = result != null;
 
     console.log(
-      `[Upstash] GET ${isHit ? "hit" : "miss"} - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
+      `[Upstash] HMGET completed - domain: ${domainKey}, keys: ${finalKeys.length}, duration: ${duration}ms`
     );
 
-    track("upstash_cache_get", {
+    track("upstash_cache_hmget", {
       domain: domainKey,
-      cacheKey: finalKey,
-      hit: isHit,
-      expired: false,
+      keyCount: finalKeys.length,
       duration,
+    });
+
+    const result = new Map<string, T | null>();
+    finalKeys.forEach((key, i) => {
+      result.set(key, values?.[i] ?? null);
     });
 
     return result;
   } catch (error) {
     const duration = Date.now() - start;
     console.warn(
-      `[Upstash] GET failed - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`,
+      `[Upstash] HMGET failed - domain: ${domainKey}, keys: ${finalKeys.join(", ")}, duration: ${duration}ms`,
       error
     );
 
-    track("upstash_cache_get_error", {
+    track("upstash_cache_hmget_error", {
       domain: domainKey,
-      cacheKey: finalKey,
+      keyCount: finalKeys.length,
       error: String(error),
       duration,
     });
-    return null;
+
+    // Return empty map on error
+    return new Map();
   } finally {
     getMonitor.release();
   }
