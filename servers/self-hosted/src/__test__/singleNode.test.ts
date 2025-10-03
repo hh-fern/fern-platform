@@ -132,15 +132,12 @@ describe("FDR server in traditional environment", () => {
         expect(containerId).toBeTruthy();
 
         // Check container logs for traditional su messages
-        const { stdout: containerLogs } = await execa("docker", [
-            "logs",
-            containerId
-        ]);
+        const { stdout: containerLogs } = await execa("docker", ["logs", containerId]);
 
         // Should contain traditional su messages
         expect(containerLogs).toContain("Attempting to start PostgreSQL with su");
         expect(containerLogs).toContain("PostgreSQL started successfully using su");
-        
+
         // Should NOT contain fallback messages
         expect(containerLogs).not.toContain("su failed (likely due to permission restrictions)");
         expect(containerLogs).not.toContain("trying direct approach");

@@ -4,7 +4,13 @@ import path from "path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { SELF_HOSTED_IMAGE_TAG_NAME } from "./setupSharedDocker";
-import { testFdrDatabase, testFdrHealth, testMinioBucket, testMinioHealth, testPostgresConnection } from "./testHelpers";
+import {
+    testFdrDatabase,
+    testFdrHealth,
+    testMinioBucket,
+    testMinioHealth,
+    testPostgresConnection
+} from "./testHelpers";
 
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
@@ -27,7 +33,12 @@ async function removeContainer(containerName: string) {
 }
 
 async function getRestrictedContainerId() {
-    const { stdout: containerId } = await execa("docker", ["ps", "-q", "--filter", "name=" + RESTRICTED_CONTAINER_NAME]);
+    const { stdout: containerId } = await execa("docker", [
+        "ps",
+        "-q",
+        "--filter",
+        "name=" + RESTRICTED_CONTAINER_NAME
+    ]);
     return containerId;
 }
 
@@ -49,21 +60,17 @@ beforeAll(async () => {
         `${FERN_DIR}:/fern`,
         SELF_HOSTED_IMAGE_TAG_NAME
     ]);
-    
+
     // Step 2: Simulate initContainer - fix PostgreSQL data directory permissions
     console.log("Simulating initContainer: fixing PostgreSQL permissions...");
     const containerId = await getRestrictedContainerId();
-    await execa("docker", [
-        "exec",
-        containerId,
-        "chown", "-R", "65532:65532", "/var/lib/postgresql/data"
-    ]);
-    
+    await execa("docker", ["exec", containerId, "chown", "-R", "65532:65532", "/var/lib/postgresql/data"]);
+
     // Step 3: Stop the container and restart as UID 65532 (simulating main container)
     console.log("Restarting container as UID 65532...");
     await execa("docker", ["stop", RESTRICTED_CONTAINER_NAME]);
     await execa("docker", ["rm", RESTRICTED_CONTAINER_NAME]);
-    
+
     // Start as restricted user with fixed permissions
     await execa("docker", [
         "run",
@@ -74,11 +81,13 @@ beforeAll(async () => {
         `${RESTRICTED_CONTAINER_PORT}:5432`,
         "-v",
         `${FERN_DIR}:/fern`,
-        "--user", "65532:65532",  // Run as non-root user
-        "--security-opt", "no-new-privileges:true",  // Prevent privilege escalation
+        "--user",
+        "65532:65532", // Run as non-root user
+        "--security-opt",
+        "no-new-privileges:true", // Prevent privilege escalation
         SELF_HOSTED_IMAGE_TAG_NAME
     ]);
-    
+
     // Wait for container to start and services to initialize
     await sleep(15000);
 }, 90000); // 90 second timeout for setup (longer due to restart)
@@ -106,11 +115,7 @@ describe("Self-hosted docs in restricted environment (UID 65532)", () => {
         expect(containerId).toBeTruthy();
 
         // Check that the container is running as UID 65532
-        const { stdout: whoamiOutput } = await execa("docker", [
-            "exec",
-            containerId,
-            "id", "-u"
-        ]);
+        const { stdout: whoamiOutput } = await execa("docker", ["exec", containerId, "id", "-u"]);
         expect(whoamiOutput.trim()).toBe("65532");
     });
 
@@ -122,9 +127,11 @@ describe("Self-hosted docs in restricted environment (UID 65532)", () => {
         const { stdout: lsOutput } = await execa("docker", [
             "exec",
             containerId,
-            "ls", "-ld", "/var/lib/postgresql/data"
+            "ls",
+            "-ld",
+            "/var/lib/postgresql/data"
         ]);
-        
+
         // Should show ownership as 65532:65532
         expect(lsOutput).toContain("65532");
     });
@@ -135,11 +142,7 @@ describe("Self-hosted docs in restricted environment (UID 65532)", () => {
 
         // Try to run su command - it should fail
         try {
-            await execa("docker", [
-                "exec",
-                containerId,
-                "su", "-", "postgres", "-c", "echo 'test'"
-            ]);
+            await execa("docker", ["exec", containerId, "su", "-", "postgres", "-c", "echo 'test'"]);
             // If we get here, su worked, which means our test environment isn't properly restricted
             throw new Error("su command unexpectedly succeeded - test environment not properly restricted");
         } catch (error) {
@@ -153,22 +156,16 @@ describe("Self-hosted docs in restricted environment (UID 65532)", () => {
         expect(containerId).toBeTruthy();
 
         // Check PostgreSQL logs to verify it started via fallback method
-        const { stdout: logs } = await execa("docker", [
-            "exec",
-            containerId,
-            "cat", "/var/log/postgresql.log"
-        ], { reject: false }); // Don't fail if log file doesn't exist
+        const { stdout: logs } = await execa("docker", ["exec", containerId, "cat", "/var/log/postgresql.log"], {
+            reject: false
+        }); // Don't fail if log file doesn't exist
 
         // Check if PostgreSQL is running
         await testPostgresConnection(containerId);
-        
+
         // Verify it's running as the correct user
-        const { stdout: postgresProcess } = await execa("docker", [
-            "exec",
-            containerId,
-            "ps", "aux"
-        ]);
-        
+        const { stdout: postgresProcess } = await execa("docker", ["exec", containerId, "ps", "aux"]);
+
         // PostgreSQL process should be running as UID 65532
         expect(postgresProcess).toContain("postgres");
     });
@@ -214,10 +211,7 @@ describe("PostgreSQL startup method verification", () => {
         expect(containerId).toBeTruthy();
 
         // Check container logs for our fallback messages
-        const { stdout: containerLogs } = await execa("docker", [
-            "logs",
-            containerId
-        ]);
+        const { stdout: containerLogs } = await execa("docker", ["logs", containerId]);
 
         // Should contain our fallback messages
         expect(containerLogs).toContain("su failed (likely due to permission restrictions)");
@@ -235,25 +229,23 @@ describe("PostgreSQL startup method verification", () => {
         // 2. Main container runs as UID 65532
         // 3. su fails due to restricted permissions
         // 4. Fallback method succeeds because permissions were fixed
-        
+
         // Check that PostgreSQL is actually running
         await testPostgresConnection(containerId);
-        
+
         // Check that it's running as the correct user
-        const { stdout: postgresProcess } = await execa("docker", [
-            "exec",
-            containerId,
-            "ps", "aux"
-        ]);
-        
+        const { stdout: postgresProcess } = await execa("docker", ["exec", containerId, "ps", "aux"]);
+
         // PostgreSQL process should be running as UID 65532
         expect(postgresProcess).toContain("postgres");
-        
+
         // Verify the data directory ownership is correct
         const { stdout: lsOutput } = await execa("docker", [
             "exec",
             containerId,
-            "ls", "-ld", "/var/lib/postgresql/data"
+            "ls",
+            "-ld",
+            "/var/lib/postgresql/data"
         ]);
         expect(lsOutput).toContain("65532");
     });
