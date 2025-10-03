@@ -4,147 +4,132 @@ import path from "path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { SELF_HOSTED_IMAGE_TAG_NAME } from "./setupSharedDocker";
-import {
-    testFdrDatabase,
-    testFdrHealth,
-    testMinioBucket,
-    testMinioHealth,
-    testPostgresConnection
-} from "./testHelpers";
+import { testFdrDatabase, testFdrHealth, testMinioBucket, testMinioHealth, testPostgresConnection } from "./testHelpers";
 
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
-const RESTRICTED_CONTAINER_NAME = "fern-self-hosted-restricted";
+const K8S_NAMESPACE = "fern-test";
+const POD_NAME = "fern-restricted-test";
 const RESTRICTED_CONTAINER_PORT = 5434;
+const MANIFEST_PATH = path.join(__dirname, "restricted-environment-pod.yaml");
 
 // we have a fern folder we use for testing
 const FERN_DIR = path.join(__dirname, "../../fern");
 
-async function stopContainer(containerName: string) {
+async function deleteKubernetesResources() {
     try {
-        await execa("docker", ["stop", "-t", "10", containerName]);
-    } catch (_) {}
+        // Delete pod
+        await execa("kubectl", ["delete", "pod", POD_NAME, "-n", K8S_NAMESPACE, "--ignore-not-found=true"]);
+        // Delete namespace
+        await execa("kubectl", ["delete", "namespace", K8S_NAMESPACE, "--ignore-not-found=true"]);
+    } catch (error) {
+        console.error("Error cleaning up Kubernetes resources:", error);
+    }
 }
 
-async function removeContainer(containerName: string) {
+async function getPodStatus() {
     try {
-        await execa("docker", ["rm", "-f", containerName]);
-    } catch (_) {}
+        const { stdout } = await execa("kubectl", [
+            "get", "pod", POD_NAME, "-n", K8S_NAMESPACE, "-o", "jsonpath={.status.phase}"
+        ]);
+        return stdout.trim();
+    } catch (error) {
+        return "NotFound";
+    }
 }
 
-async function getRestrictedContainerId() {
-    const { stdout: containerId } = await execa("docker", [
-        "ps",
-        "-q",
-        "--filter",
-        "name=" + RESTRICTED_CONTAINER_NAME
-    ]);
-    return containerId;
+async function getPodLogs() {
+    try {
+        const { stdout } = await execa("kubectl", [
+            "logs", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs"
+        ]);
+        return stdout;
+    } catch (error) {
+        return `Error getting logs: ${error}`;
+    }
 }
 
-// Setup restricted environment container before tests
+// Setup Kubernetes pod before tests
 beforeAll(async () => {
-    // Remove any existing container
-    await removeContainer(RESTRICTED_CONTAINER_NAME);
+    console.log("Setting up Kubernetes pod with restricted security context...");
+    
+    // Clean up any existing resources
+    await deleteKubernetesResources();
+    await sleep(2000);
+    
+    // Apply manifest
+    await execa("kubectl", ["apply", "-f", MANIFEST_PATH]);
+    
+    // Wait for pod to be ready
+    console.log("Waiting for pod to start...");
+    let attempts = 0;
+    const maxAttempts = 60; // 5 minutes
+    
+    while (attempts < maxAttempts) {
+        const status = await getPodStatus();
+        console.log(`Pod status: ${status}`);
+        
+        if (status === "Running") {
+            console.log("Pod is running!");
+            break;
+        } else if (status === "Failed" || status === "Error") {
+            const logs = await getPodLogs();
+            console.error("Pod failed to start. Logs:", logs);
+            throw new Error(`Pod failed to start: ${status}`);
+        }
+        
+        await sleep(5000);
+        attempts++;
+    }
+    
+    if (attempts >= maxAttempts) {
+        const logs = await getPodLogs();
+        console.error("Pod did not start in time. Logs:", logs);
+        throw new Error("Pod did not start within timeout");
+    }
+    
+    // Additional wait for services to initialize
+    console.log("Waiting for services to initialize...");
+    await sleep(30000);
+}, 600000); // 10 minute timeout
 
-    // Step 1: Start container as root to simulate initContainer behavior
-    console.log("Starting container as root to simulate initContainer...");
-    await execa("docker", [
-        "run",
-        "--name",
-        RESTRICTED_CONTAINER_NAME,
-        "-d",
-        "-p",
-        `${RESTRICTED_CONTAINER_PORT}:5432`,
-        "-v",
-        `${FERN_DIR}:/fern`,
-        SELF_HOSTED_IMAGE_TAG_NAME
-    ]);
-
-    // Step 2: Simulate initContainer - fix PostgreSQL data directory permissions
-    console.log("Simulating initContainer: fixing PostgreSQL permissions...");
-    const containerId = await getRestrictedContainerId();
-    await execa("docker", ["exec", containerId, "chown", "-R", "65532:65532", "/var/lib/postgresql/data"]);
-
-    // Step 3: Stop the container and restart as UID 65532 (simulating main container)
-    console.log("Restarting container as UID 65532...");
-    await execa("docker", ["stop", RESTRICTED_CONTAINER_NAME]);
-    await execa("docker", ["rm", RESTRICTED_CONTAINER_NAME]);
-
-    // Start as restricted user with fixed permissions
-    await execa("docker", [
-        "run",
-        "--name",
-        RESTRICTED_CONTAINER_NAME,
-        "-d",
-        "-p",
-        `${RESTRICTED_CONTAINER_PORT}:5432`,
-        "-v",
-        `${FERN_DIR}:/fern`,
-        "--user",
-        "65532:65532", // Run as non-root user
-        "--security-opt",
-        "no-new-privileges:true", // Prevent privilege escalation
-        SELF_HOSTED_IMAGE_TAG_NAME
-    ]);
-
-    // Wait for container to start and services to initialize
-    await sleep(15000);
-}, 90000); // 90 second timeout for setup (longer due to restart)
-
-// Cleanup restricted environment container after tests
+// Cleanup Kubernetes resources after tests
 afterAll(async () => {
     try {
-        console.log("Cleaning up restricted environment container...");
-        await stopContainer(RESTRICTED_CONTAINER_NAME);
-        await removeContainer(RESTRICTED_CONTAINER_NAME);
-        console.log("Restricted environment cleanup complete");
+        console.log("Cleaning up Kubernetes resources...");
+        await deleteKubernetesResources();
+        console.log("Kubernetes cleanup complete");
     } catch (error) {
-        console.error("Failed to cleanup restricted environment container:", error);
+        console.error("Failed to cleanup Kubernetes resources:", error);
         throw error;
     }
-}, 30000); // 30 second timeout for cleanup
+}, 60000); // 1 minute timeout for cleanup
 
 function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe("Self-hosted docs in restricted environment (UID 65532)", () => {
-    it("Container runs as non-root user", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
+describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
+    it("Pod runs with correct security context", async () => {
+        const status = await getPodStatus();
+        expect(status).toBe("Running");
+        console.log(`Pod ${POD_NAME} is running with status: ${status}`);
+    });
 
-        // Check that the container is running as UID 65532
-        const { stdout: whoamiOutput } = await execa("docker", ["exec", containerId, "id", "-u"]);
+    it("Container runs as UID 65532", async () => {
+        const { stdout: whoamiOutput } = await execa("kubectl", [
+            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--", "id", "-u"
+        ]);
         expect(whoamiOutput.trim()).toBe("65532");
     });
 
-    it("PostgreSQL data directory has correct ownership (initContainer simulation worked)", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        // Check that PostgreSQL data directory is owned by UID 65532
-        const { stdout: lsOutput } = await execa("docker", [
-            "exec",
-            containerId,
-            "ls",
-            "-ld",
-            "/var/lib/postgresql/data"
-        ]);
-
-        // Should show ownership as 65532:65532
-        expect(lsOutput).toContain("65532");
-    });
-
     it("su command fails due to restricted permissions", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        // Try to run su command - it should fail
         try {
-            await execa("docker", ["exec", containerId, "su", "-", "postgres", "-c", "echo 'test'"]);
-            // If we get here, su worked, which means our test environment isn't properly restricted
-            throw new Error("su command unexpectedly succeeded - test environment not properly restricted");
+            await execa("kubectl", [
+                "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--", 
+                "su", "-", "postgres", "-c", "echo 'test'"
+            ]);
+            throw new Error("su command unexpectedly succeeded - security context not properly restricted");
         } catch (error) {
             // This is expected - su should fail in restricted environment
             expect(error).toBeDefined();
@@ -152,101 +137,72 @@ describe("Self-hosted docs in restricted environment (UID 65532)", () => {
     });
 
     it("PostgreSQL starts successfully via fallback method", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        // Check PostgreSQL logs to verify it started via fallback method
-        const { stdout: logs } = await execa("docker", ["exec", containerId, "cat", "/var/log/postgresql.log"], {
-            reject: false
-        }); // Don't fail if log file doesn't exist
-
-        // Check if PostgreSQL is running
-        await testPostgresConnection(containerId);
-
-        // Verify it's running as the correct user
-        const { stdout: postgresProcess } = await execa("docker", ["exec", containerId, "ps", "aux"]);
-
-        // PostgreSQL process should be running as UID 65532
-        expect(postgresProcess).toContain("postgres");
+        // Test PostgreSQL connection
+        const { stdout: postgresStatus } = await execa("kubectl", [
+            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
+            "pg_isready", "-U", "postgres", "-d", "postgres"
+        ]);
+        expect(postgresStatus).toContain("accepting connections");
     });
 
     it("PostgreSQL database is accessible", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        await testFdrDatabase(containerId);
+        const { stdout: dbList } = await execa("kubectl", [
+            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
+            "-e", "PGPASSWORD=postgres",
+            "psql", "-U", "postgres", "-d", "postgres", "-t", "-c",
+            "SELECT 1 FROM pg_database WHERE datname='fdr'"
+        ]);
+        expect(dbList.trim()).toBe("1");
     });
 
     it("MinIO is running and accessible", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        await testMinioHealth(containerId);
-        await testMinioBucket(containerId);
+        const { stdout: curlOutput } = await execa("kubectl", [
+            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
+            "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            "http://localhost:9000/minio/health/live"
+        ]);
+        expect(curlOutput).toBe("200");
     });
 
     it("FDR server is running and accessible", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        await testFdrHealth(containerId);
-    });
-
-    it("All services work together in restricted environment", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        // Test all services are working
-        await testPostgresConnection(containerId);
-        await testFdrDatabase(containerId);
-        await testMinioHealth(containerId);
-        await testMinioBucket(containerId);
-        await testFdrHealth(containerId);
-    });
-});
-
-describe("PostgreSQL startup method verification", () => {
-    it("Verifies fallback startup method was used", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        // Check container logs for our fallback messages
-        const { stdout: containerLogs } = await execa("docker", ["logs", containerId]);
-
-        // Should contain our fallback messages
-        expect(containerLogs).toContain("su failed (likely due to permission restrictions)");
-        expect(containerLogs).toContain("trying direct approach");
-        expect(containerLogs).toContain("Starting PostgreSQL as current user (UID 65532)");
-        expect(containerLogs).toContain("PostgreSQL started successfully as current user");
-    });
-
-    it("Verifies complete initContainer → main container flow", async () => {
-        const containerId = await getRestrictedContainerId();
-        expect(containerId).toBeTruthy();
-
-        // This test verifies the complete flow:
-        // 1. initContainer (simulated) fixed permissions
-        // 2. Main container runs as UID 65532
-        // 3. su fails due to restricted permissions
-        // 4. Fallback method succeeds because permissions were fixed
-
-        // Check that PostgreSQL is actually running
-        await testPostgresConnection(containerId);
-
-        // Check that it's running as the correct user
-        const { stdout: postgresProcess } = await execa("docker", ["exec", containerId, "ps", "aux"]);
-
-        // PostgreSQL process should be running as UID 65532
-        expect(postgresProcess).toContain("postgres");
-
-        // Verify the data directory ownership is correct
-        const { stdout: lsOutput } = await execa("docker", [
-            "exec",
-            containerId,
-            "ls",
-            "-ld",
-            "/var/lib/postgresql/data"
+        const { stdout: curlOutput } = await execa("kubectl", [
+            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
+            "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            "http://localhost:8080/health"
         ]);
-        expect(lsOutput).toContain("65532");
+        expect(curlOutput).toBe("200");
+    });
+
+    it("Verifies fallback startup method was used", async () => {
+        const logs = await getPodLogs();
+        
+        // Should contain our fallback messages
+        expect(logs).toContain("su failed (likely due to permission restrictions)");
+        expect(logs).toContain("trying direct approach");
+        expect(logs).toContain("Starting PostgreSQL as current user (UID 65532)");
+        expect(logs).toContain("PostgreSQL started successfully as current user");
+    });
+
+    it("All services work together in Kubernetes security context", async () => {
+        // Test all services are working
+        const { stdout: postgresStatus } = await execa("kubectl", [
+            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
+            "pg_isready", "-U", "postgres", "-d", "postgres"
+        ]);
+        expect(postgresStatus).toContain("accepting connections");
+
+        const { stdout: minioStatus } = await execa("kubectl", [
+            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
+            "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            "http://localhost:9000/minio/health/live"
+        ]);
+        expect(minioStatus).toBe("200");
+
+        const { stdout: fdrStatus } = await execa("kubectl", [
+            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
+            "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            "http://localhost:8080/health"
+        ]);
+        expect(fdrStatus).toBe("200");
     });
 });
