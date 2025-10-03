@@ -9,7 +9,7 @@ import { Semaphore, mapValues } from "es-toolkit";
 import { type AsyncOrSync, UnreachableCaseError } from "ts-essentials";
 
 import type { AuthEdgeConfig } from "@fern-api/docs-auth";
-import { track } from "@fern-api/docs-server";
+// import { track } from "@fern-api/docs-server";
 import {
   type AuthState,
   type FernFonts,
@@ -192,23 +192,25 @@ function kvSet(
         `[Upstash] SET completed - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
       );
 
-      track("upstash_cache_set", {
-        domain: domainKey,
-        cacheKey: finalKey,
-        hasTtl: Boolean(ttl && ttl > 0),
-        ttl: ttl,
-        duration,
-      });
+      // Disabled PostHog tracking for performance reasons
+      // track("upstash_cache_set", {
+      //   domain: domainKey,
+      //   cacheKey: finalKey,
+      //   hasTtl: Boolean(ttl && ttl > 0),
+      //   ttl: ttl,
+      //   duration,
+      // });
     } catch (error) {
       console.warn(
         `[Upstash] SET failed - domain: ${domainKey}, key: ${finalKey}`,
         error
       );
-      track("upstash_cache_set_error", {
-        domain: domainKey,
-        cacheKey: finalKey,
-        error: String(error),
-      });
+      // Disabled PostHog tracking for performance reasons
+      // track("upstash_cache_set_error", {
+      //   domain: domainKey,
+      //   cacheKey: finalKey,
+      //   error: String(error),
+      // });
     } finally {
       setMonitor.release();
     }
@@ -216,6 +218,9 @@ function kvSet(
 }
 
 const getMonitor = new Semaphore(10);
+
+// Deduplicate simultaneous requests for the same key
+const inFlightRequests = new Map<string, Promise<any>>();
 
 async function kvGet<T>(
   domainKey: string,
@@ -227,74 +232,155 @@ async function kvGet<T>(
   }
 
   const finalKey = cacheKeySuffix ? `${key}:${cacheKeySuffix}` : key;
+  const requestKey = `${domainKey}:${finalKey}`;
+
+  // If there's already an in-flight request, wait for it
+  if (inFlightRequests.has(requestKey)) {
+    console.log(
+      `[Upstash] Waiting for in-flight request - domain: ${domainKey}, key: ${finalKey}`
+    );
+    return inFlightRequests.get(requestKey) as Promise<T | null>;
+  }
 
   console.log(
     `[Upstash] GET operation - domain: ${domainKey}, key: ${finalKey}`
   );
 
-  await getMonitor.acquire();
-  const start = Date.now();
-  try {
-    // Check if the key has expired
-    const ttlKey = `${domainKey}:ttl:${finalKey}`;
-    const expiration = await kv.get<number>(ttlKey);
+  // Create the request promise
+  const requestPromise = (async () => {
+    await getMonitor.acquire();
+    const start = Date.now();
+    try {
+      // Check if the key has expired
+      const ttlKey = `${domainKey}:ttl:${finalKey}`;
+      const expiration = await kv.get<number>(ttlKey);
 
-    if (expiration && Date.now() > expiration) {
-      // Key has expired, delete it
-      await kv.hdel(domainKey, finalKey);
-      await kv.del(ttlKey);
+      if (expiration && Date.now() > expiration) {
+        // Key has expired, delete it
+        await kv.hdel(domainKey, finalKey);
+        await kv.del(ttlKey);
+        const duration = Date.now() - start;
+        console.log(
+          `[Upstash] GET expired - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
+        );
+
+        // Disabled PostHog tracking for performance reasons
+        // track("upstash_cache_get", {
+        //   domain: domainKey,
+        //   cacheKey: finalKey,
+        //   hit: false,
+        //   expired: true,
+        //   duration,
+        // });
+        return null;
+      }
+
+      const result = await kv.hget<T>(domainKey, finalKey);
       const duration = Date.now() - start;
+      const isHit = result != null;
+
       console.log(
-        `[Upstash] GET expired - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
+        `[Upstash] GET ${isHit ? "hit" : "miss"} - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
       );
 
-      track("upstash_cache_get", {
-        domain: domainKey,
-        cacheKey: finalKey,
-        hit: false,
-        expired: true,
-        duration,
-      });
+      // Disabled PostHog tracking for performance reasons
+      // track("upstash_cache_get", {
+      //   domain: domainKey,
+      //   cacheKey: finalKey,
+      //   hit: isHit,
+      //   expired: false,
+      //   duration,
+      // });
+
+      return result;
+    } catch (error) {
+      const duration = Date.now() - start;
+      console.warn(
+        `[Upstash] GET failed - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`,
+        error
+      );
+
+      // Disabled PostHog tracking for performance reasons
+      // track("upstash_cache_get_error", {
+      //   domain: domainKey,
+      //   cacheKey: finalKey,
+      //   error: String(error),
+      //   duration,
+      // });
       return null;
+    } finally {
+      getMonitor.release();
     }
+  })();
 
-    const result = await kv.hget<T>(domainKey, finalKey);
-    const duration = Date.now() - start;
-    const isHit = result != null;
-
-    console.log(
-      `[Upstash] GET ${isHit ? "hit" : "miss"} - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`
-    );
-
-    track("upstash_cache_get", {
-      domain: domainKey,
-      cacheKey: finalKey,
-      hit: isHit,
-      expired: false,
-      duration,
+  // Store the promise and remove it when done
+  inFlightRequests.set(requestKey, requestPromise);
+  requestPromise
+    .finally(() => {
+      inFlightRequests.delete(requestKey);
+    })
+    .catch(() => {
+      // Errors are already handled in the main promise, this is just for cleanup
     });
 
-    return result;
-  } catch (error) {
-    const duration = Date.now() - start;
-    console.warn(
-      `[Upstash] GET failed - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`,
-      error
-    );
+  return requestPromise;
+}
 
-    track("upstash_cache_get_error", {
-      domain: domainKey,
-      cacheKey: finalKey,
-      error: String(error),
-      duration,
-    });
+// In-memory cache for config to reduce Upstash calls
+interface InMemoryCacheEntry<T> {
+  value: T;
+  timestamp: number;
+}
+
+const IN_MEMORY_CONFIG_CACHE = new Map<
+  string,
+  InMemoryCacheEntry<
+    Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">
+  >
+>();
+const IN_MEMORY_CACHE_TTL_MS = 60_000; // 60 seconds
+
+function getFromInMemoryCache<T>(
+  key: string
+): InMemoryCacheEntry<T>["value"] | null {
+  const entry = IN_MEMORY_CONFIG_CACHE.get(key) as
+    | InMemoryCacheEntry<T>
+    | undefined;
+  if (!entry) {
     return null;
-  } finally {
-    getMonitor.release();
   }
+  // Check if entry is expired
+  if (Date.now() - entry.timestamp > IN_MEMORY_CACHE_TTL_MS) {
+    IN_MEMORY_CONFIG_CACHE.delete(key);
+    return null;
+  }
+  return entry.value;
+}
+
+function setInMemoryCache<T>(key: string, value: T): void {
+  IN_MEMORY_CONFIG_CACHE.set(key, {
+    value,
+    timestamp: Date.now(),
+  } as InMemoryCacheEntry<any>);
 }
 
 async function clearKvCache(domainKey: string) {
+  // Clear in-memory cache entries for this domain
+  const keysToDelete: string[] = [];
+  for (const key of IN_MEMORY_CONFIG_CACHE.keys()) {
+    if (key.startsWith(`${domainKey}:`)) {
+      keysToDelete.push(key);
+    }
+  }
+  for (const key of keysToDelete) {
+    IN_MEMORY_CONFIG_CACHE.delete(key);
+  }
+  if (keysToDelete.length > 0) {
+    console.log(
+      `In-memory cache cleared for domainKey: ${domainKey} (${keysToDelete.length} entries)`
+    );
+  }
+
   if (isLocal() || isSelfHosted()) {
     return;
   }
@@ -823,11 +909,26 @@ const getNavigationNode = (cacheConfig: Required<CacheConfig>) =>
 
 const getConfig = (cacheConfig: Required<CacheConfig>) =>
   cache(async (domainKey: string) => {
+    // Check in-memory cache first
+    const cacheKey = cacheConfig.cacheKeySuffix
+      ? `${domainKey}:config:${cacheConfig.cacheKeySuffix}`
+      : `${domainKey}:config`;
+    const inMemoryCached =
+      getFromInMemoryCache<
+        Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">
+      >(cacheKey);
+    if (inMemoryCached != null) {
+      console.log(`[getConfig] in-memory cache hit for ${domainKey}`);
+      return inMemoryCached;
+    }
+
     try {
       const cached = await kvGet<
         Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">
       >(domainKey, "config", cacheConfig.cacheKeySuffix);
       if (cached != null) {
+        // Store in in-memory cache for future requests
+        setInMemoryCache(cacheKey, cached);
         return cached;
       }
     } catch (error) {
@@ -839,6 +940,8 @@ const getConfig = (cacheConfig: Required<CacheConfig>) =>
 
     const response = await loadWithUrl(domainKey);
     const { navigation, root, ...config } = response.definition.config;
+
+    // Store in both Upstash and in-memory cache
     kvSet(
       domainKey,
       "config",
@@ -846,6 +949,8 @@ const getConfig = (cacheConfig: Required<CacheConfig>) =>
       cacheConfig.kvTtl,
       cacheConfig.cacheKeySuffix
     );
+    setInMemoryCache(cacheKey, config);
+
     return config;
   });
 
@@ -1185,7 +1290,7 @@ const getAuthConfig = getAuthEdgeConfig;
 const getAskAiEnabled = (cacheConfig: Required<CacheConfig>) =>
   cache(async (domain: string) => {
     "use cache";
-    unstable_cacheTag(`${domain}_askAiEnabled`);
+    unstable_cacheTag(domain, "askAiEnabled");
 
     if (isLocal() || isSelfHosted()) {
       return false;

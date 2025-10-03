@@ -22,6 +22,7 @@ from fai.settings import LOGGER
 from fai.utils.chat.response.anthropic import get_anthropic_response
 from fai.utils.chat.retrieve.retrieve import retrieve
 from fai.utils.integration import get_discord_integration
+from src.message.channel_not_configured import channel_not_configured
 
 MESSAGE_CACHE_TTL = 30
 
@@ -64,29 +65,67 @@ async def mark_message_processed(team_id: str, message_id: str) -> None:
         await session.commit()
 
 
-async def get_thread_history(channel: discord.Thread) -> list[dict[str, str]]:
-    return []
+async def get_thread_history(channel: discord.Thread, bot_user_id: str | None = None) -> list[dict[str, str]]:
+    try:
+        messages = []
+        starter_msg = None
+
+        try:
+            if isinstance(channel.parent, discord.TextChannel):
+                starter_msg = await channel.parent.fetch_message(channel.id)
+                LOGGER.info(f"Fetched starter message: {starter_msg.content}")
+        except Exception as e:
+            LOGGER.warning(f"Could not fetch starter message: {e}")
+
+        if starter_msg:
+            LOGGER.info(f"Adding starter message from {starter_msg.author.name}: {starter_msg.content}")
+            if starter_msg.author.bot and str(starter_msg.author.id) == bot_user_id:
+                if starter_msg.content:
+                    messages.append({"role": "assistant", "content": starter_msg.content})
+            else:
+                text = starter_msg.content
+                if bot_user_id and text:
+                    text = text.replace(f"<@{bot_user_id}>", "").strip()
+                if text:
+                    messages.append({"role": "user", "content": text})
+
+        # Get all replies in the thread
+        async for msg in channel.history(limit=100, oldest_first=True):
+            if msg.author.bot and str(msg.author.id) == bot_user_id:
+                if msg.content:
+                    messages.append({"role": "assistant", "content": msg.content})
+            else:
+                text = msg.content
+                if bot_user_id and text:
+                    text = text.replace(f"<@{bot_user_id}>", "").strip()
+                if text:
+                    messages.append({"role": "user", "content": text})
+
+        return messages
+    except Exception as e:
+        LOGGER.error(f"Error retrieving thread history: {e}")
+        return []
 
 
-async def handle_discord_message(message: discord.Message) -> DiscordMessageResponse:
+async def handle_discord_message(message: discord.Message) -> None:
     if message.guild is None:
-        return DiscordMessageResponse("", "", None, None)
+        return
 
     await cleanup_message_cache()
 
     is_processed = await is_message_processed(str(message.guild.id), str(message.id))
     if is_processed:
-        return DiscordMessageResponse("", "", None, None)
+        return
 
     await mark_message_processed(str(message.guild.id), str(message.id))
 
     integration = await get_discord_integration(str(message.guild.id))
 
     if not integration:
-        return DiscordMessageResponse("", "", None, None)
+        return
 
     if not integration.discord_guild_id:
-        return DiscordMessageResponse("", "", None, None)
+        return
 
     channel_settings = None
     domain_to_use = integration.domain
@@ -102,9 +141,13 @@ async def handle_discord_message(message: discord.Message) -> DiscordMessageResp
                 domain_to_use = channel_settings.domain_override
                 LOGGER.info(f"Using domain override for channel {message.channel.id}: {domain_to_use}")
 
+    if channel_settings is None:
+        await channel_not_configured(channel_settings, message, is_in_thread)
+        return
+
     should_respond = await should_respond_to_message(channel_settings, message, is_in_thread)
     if not should_respond:
-        return DiscordMessageResponse("", "", None, None)
+        return
 
     async with message.channel.typing():
         await message.add_reaction("👀")
@@ -112,7 +155,8 @@ async def handle_discord_message(message: discord.Message) -> DiscordMessageResp
 
         message_history = None
         if is_in_thread:
-            message_history = await get_thread_history(message.channel)
+            message_history = await get_thread_history(message.channel, str(message.guild.me.id))
+            LOGGER.info(f"Retrieved {len(message_history)} messages from thread history")
 
         conversation_id = f"discord_{message.guild.id}_{message.channel.id}_{message.id}"
 
@@ -129,17 +173,17 @@ async def handle_discord_message(message: discord.Message) -> DiscordMessageResp
 
                 if isinstance(message.channel, discord.Thread):
                     for chunk in chunks:
-                        await message.channel.send(chunk)
+                        await message.channel.send(chunk, mention_author=True)
                 else:
                     if hasattr(message, "thread") and message.thread:
                         for chunk in chunks:
-                            await message.thread.send(chunk)
+                            await message.thread.send(chunk, mention_author=True)
                     else:
                         thread = await message.create_thread(
                             name=f"Discussion: {message.content.replace(f'<@{message.guild.me.id}>', '').strip()[:100]}"
                         )
                         for chunk in chunks:
-                            await thread.send(chunk)
+                            await thread.send(chunk, mention_author=True)
 
             except discord.HTTPException as e:
                 LOGGER.error(f"Failed to send message: {e}")
@@ -147,15 +191,10 @@ async def handle_discord_message(message: discord.Message) -> DiscordMessageResp
         await message.remove_reaction("👀", message.guild.me)
         await message.add_reaction("✅")
 
-        return DiscordMessageResponse(response_text, str(message.channel.id), query_id, str(message.author.id))
-
 
 async def should_respond_to_message(
-    channel_settings: ChannelSettings | None, message: discord.Message, is_in_thread: bool
+    channel_settings: ChannelSettings, message: discord.Message, is_in_thread: bool
 ) -> bool:
-    if channel_settings is None:
-        return False
-
     if not is_in_thread:
         if channel_settings.channel_response == "all_messages":
             return True
