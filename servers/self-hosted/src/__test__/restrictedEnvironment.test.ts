@@ -94,10 +94,10 @@ async function getPodLogs() {
 
 async function generateManifestWithFernPath() {
     // Read the template manifest
-    const manifestContent = fs.readFileSync(MANIFEST_PATH, 'utf8');
+    const manifestContent = fs.readFileSync(MANIFEST_PATH, "utf8");
 
     // Replace placeholder with actual fern directory path
-    const updatedManifest = manifestContent.replace('__FERN_DIR_PLACEHOLDER__', FERN_DIR);
+    const updatedManifest = manifestContent.replace("__FERN_DIR_PLACEHOLDER__", FERN_DIR);
 
     // Write generated manifest
     fs.writeFileSync(GENERATED_MANIFEST_PATH, updatedManifest);
