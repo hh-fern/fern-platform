@@ -16,23 +16,6 @@ spec:
     fsGroup: 65532
     seccompProfile:
       type: RuntimeDefault
-  initContainers:
-    - name: fix-permissions
-      image: busybox:latest
-      command: ["sh", "-c"]
-      args:
-        - |
-          echo "Fixing PostgreSQL data directory permissions..."
-          mkdir -p /var/lib/postgresql/data
-          chown -R 65532:65532 /var/lib/postgresql/data
-          chmod 700 /var/lib/postgresql/data
-          echo "Permissions fixed successfully"
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-      volumeMounts:
-        - name: postgres-data
-          mountPath: /var/lib/postgresql/data
   containers:
     - name: fern-docs
       image: fern-self-hosted:latest
