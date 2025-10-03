@@ -19,7 +19,7 @@ export async function getErrorResponseBody(response: Response): Promise<unknown>
         case "text/json": {
             const text = await response.text();
             return text.length > 0 ? fromJson(text) : undefined;
-        }    
+        }
         default:
             if (contentType.startsWith("application/vnd.") && contentType.endsWith("+json")) {
                 const text = await response.text();
