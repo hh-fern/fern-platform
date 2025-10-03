@@ -11,6 +11,6 @@ export default defineConfig({
             }
         },
         globalSetup: ["./src/__test__/setupSharedDocker.ts"],
-        include: ["./src/__test__/singleNode.test.ts", "./src/__test__/multiNode.test.ts"]
+        include: ["./src/__test__/singleNode.test.ts", "./src/__test__/multiNode.test.ts", "./src/__test__/restrictedEnvironment.test.ts"]
     }
 });
