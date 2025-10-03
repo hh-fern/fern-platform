@@ -15,6 +15,7 @@ async function startRestrictedContainer() {
         console.log(`Starting container ${CONTAINER_NAME} with restricted user (UID ${TEST_UID})...`);
 
         // Run container as restricted user with minimal capabilities
+        // Use tmpfs for directories that need to be writable
         await execa("docker", [
             "run",
             "-d",
@@ -28,6 +29,16 @@ async function startRestrictedContainer() {
             "no-new-privileges",
             "-v",
             `${FERN_DIR}:/fern:ro`,
+            "--tmpfs",
+            "/var/lib/postgresql/data:rw,exec,uid=65532,gid=65532",
+            "--tmpfs",
+            "/var/log:rw,uid=65532,gid=65532",
+            "--tmpfs",
+            "/run:rw,uid=65532,gid=65532",
+            "--tmpfs",
+            "/tmp:rw,uid=65532,gid=65532",
+            "--tmpfs",
+            "/data:rw,uid=65532,gid=65532",
             "-e",
             "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fdr",
             DOCKER_IMAGE_NAME
