@@ -16,8 +16,25 @@ fi
 
 # -----------  Start Postgres setup  -----------
 echo "Starting PostgreSQL service..."
-# Use pg_ctl instead of service command (which doesn't exist in Wolfi)
-pg_ctl -D /var/lib/postgresql/data start
+
+# Try to start PostgreSQL using su (for environments with postgres user)
+# If that fails, fall back to running as current user
+echo "Attempting to start PostgreSQL with su..."
+if su - postgres -c "pg_ctl -D /var/lib/postgresql/data start" 2>/dev/null; then
+    echo "PostgreSQL started successfully using su."
+else
+    echo "su failed (likely due to permission restrictions), trying direct approach..."
+    
+    # Check if PostgreSQL data directory exists and is initialized for current user
+    if [ ! -f "/var/lib/postgresql/data/PG_VERSION" ]; then
+        echo "Initializing PostgreSQL data directory for current user..."
+        initdb -D /var/lib/postgresql/data
+    fi
+    
+    echo "Starting PostgreSQL as current user (UID $(id -u))..."
+    pg_ctl -D /var/lib/postgresql/data start
+    echo "PostgreSQL started successfully as current user."
+fi
 echo "PostgreSQL service started."
 
 # Use pidof or ps to get postgres PID (pgrep might not be available)

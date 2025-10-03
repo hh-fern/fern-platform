@@ -24,7 +24,7 @@ afterAll(async () => {
     await teardown();
 }, 30000); // 30 second timeout for cleanup
 
-describe("Self-hosted docs has a running Postgres instance", () => {
+describe("Self-hosted docs in traditional environment (with su permissions)", () => {
     it("Postgres is running", async () => {
         const containerId = await getSingleNodeContainerId();
         expect(containerId).toBeTruthy();
@@ -88,7 +88,7 @@ describe("Self-hosted docs has a running Postgres instance", () => {
     });
 });
 
-describe("Self-hosted docs has a running MinIO instance", () => {
+describe("Self-hosted docs MinIO in traditional environment", () => {
     it("health check passes", async () => {
         const containerId = await getSingleNodeContainerId();
         expect(containerId).toBeTruthy();
@@ -108,7 +108,7 @@ describe("Self-hosted docs has a running MinIO instance", () => {
     });
 });
 
-describe("FDR server is running and api endpoints are available", () => {
+describe("FDR server in traditional environment", () => {
     it("health check passes", async () => {
         const containerId = await getSingleNodeContainerId();
         expect(containerId).toBeTruthy();
@@ -125,5 +125,24 @@ describe("FDR server is running and api endpoints are available", () => {
             "http://localhost:8080/health"
         ]);
         expect(curlOutput).toBe("200");
+    });
+
+    it("Verifies traditional su startup method was used", async () => {
+        const containerId = await getSingleNodeContainerId();
+        expect(containerId).toBeTruthy();
+
+        // Check container logs for traditional su messages
+        const { stdout: containerLogs } = await execa("docker", [
+            "logs",
+            containerId
+        ]);
+
+        // Should contain traditional su messages
+        expect(containerLogs).toContain("Attempting to start PostgreSQL with su");
+        expect(containerLogs).toContain("PostgreSQL started successfully using su");
+        
+        // Should NOT contain fallback messages
+        expect(containerLogs).not.toContain("su failed (likely due to permission restrictions)");
+        expect(containerLogs).not.toContain("trying direct approach");
     });
 });
