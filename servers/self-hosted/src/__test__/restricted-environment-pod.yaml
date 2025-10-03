@@ -19,6 +19,7 @@ spec:
   containers:
     - name: fern-docs
       image: fern-self-hosted:latest
+      imagePullPolicy: Never
       securityContext:
         allowPrivilegeEscalation: false
         capabilities:
