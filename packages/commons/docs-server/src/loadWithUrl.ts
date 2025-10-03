@@ -26,19 +26,15 @@ setGlobalDispatcher(
   })
 );
 
-export const loadWithUrl = cache(
-  async (
-    domain: string
-  ): Promise<FdrAPI.docs.v2.read.LoadDocsForUrlResponse> => {
-    return unstable_cache(
-      async () => {
-        return uncachedLoadWithUrl(domain);
-      },
-      [domain],
-      { tags: ["loadWithUrl", domain] }
-    )();
-  }
-);
+// Use "use cache" directive instead of unstable_cache
+// This is the modern Next.js caching API that handles size limits more gracefully
+const loadWithUrlCached = cache(async (domain: string) => {
+  "use cache";
+  unstable_cacheTag(domain, "loadWithUrl");
+  return uncachedLoadWithUrl(domain);
+});
+
+export const loadWithUrl = loadWithUrlCached;
 
 /**
  * - If the token is a WorkOS token, we need to use the getPrivateDocsForUrl endpoint.
