@@ -17,7 +17,7 @@ fi
 # -----------  Start Postgres setup  -----------
 echo "Starting PostgreSQL service..."
 # Use pg_ctl instead of service command (which doesn't exist in Wolfi)
-su - postgres -c "pg_ctl -D /var/lib/postgresql/data start"
+pg_ctl -D /var/lib/postgresql/data start
 echo "PostgreSQL service started."
 
 # Use pidof or ps to get postgres PID (pgrep might not be available)
