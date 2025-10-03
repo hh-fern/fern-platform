@@ -8,6 +8,7 @@ This repo contains a Dockerfile for self-hosting Fern's docs product. This proje
 
 - Make sure Node.js 22+ and pnpm are installed on your machine
 - Have Docker installed and have the daemon open on your machine
+- For running tests: kubectl and a local Kubernetes cluster (e.g., Docker Desktop with Kubernetes enabled, Minikube, or kind)
 
 ## Building the Docker Image:
 
@@ -37,8 +38,36 @@ When the Docker container is built, FDR’s database migrations are automaticall
 
 ## Testing
 
+### Prerequisites for Testing
+
+The test suite requires:
+- Docker daemon running (for building and running containers)
+- kubectl installed and configured
+- A local Kubernetes cluster running (Docker Desktop with Kubernetes enabled, Minikube, or kind)
+
+### Running Tests
+
 To run the test suite from this directory:
-`pnpm test:self-hosted`
+```bash
+pnpm test:self-hosted
+```
+
+### Test Scenarios
+
+The test suite includes two main scenarios:
+
+1. **Traditional Environment Tests** (`singleNode.test.ts`)
+   - Tests the container running with standard Docker permissions
+   - Verifies PostgreSQL starts using the `su` command (traditional method)
+   - Ensures all services (PostgreSQL, MinIO, FDR) work correctly
+
+2. **Restricted Environment Tests** (`restrictedEnvironment.test.ts`)
+   - Tests the container in a Kubernetes pod with restricted security context (UID 65532, no root)
+   - Verifies PostgreSQL starts using the fallback method (without `su`)
+   - Validates that the application works in security-hardened environments
+   - Requires kubectl and a running Kubernetes cluster
+
+These tests ensure the self-hosted image works in both traditional deployments and security-restricted environments like Kubernetes with pod security policies.
 
 ## Recommended Developer Workflow
 

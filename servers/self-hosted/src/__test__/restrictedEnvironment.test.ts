@@ -3,18 +3,52 @@ import { execa } from "execa";
 import path from "path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { SELF_HOSTED_IMAGE_TAG_NAME } from "./setupSharedDocker";
-import { testFdrDatabase, testFdrHealth, testMinioBucket, testMinioHealth, testPostgresConnection } from "./testHelpers";
-
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
 const K8S_NAMESPACE = "fern-test";
 const POD_NAME = "fern-restricted-test";
-const RESTRICTED_CONTAINER_PORT = 5434;
 const MANIFEST_PATH = path.join(__dirname, "restricted-environment-pod.yaml");
+const KIND_CLUSTER_NAME = "fern-test-cluster";
+const DOCKER_IMAGE_NAME = "fern-self-hosted:latest";
 
-// we have a fern folder we use for testing
-const FERN_DIR = path.join(__dirname, "../../fern");
+async function createKindCluster() {
+    try {
+        // Check if cluster already exists
+        const { stdout: clusterList } = await execa("kind", ["get", "clusters"]);
+        if (clusterList.includes(KIND_CLUSTER_NAME)) {
+            console.log(`Kind cluster ${KIND_CLUSTER_NAME} already exists, using existing cluster`);
+            return;
+        }
+
+        console.log(`Creating kind cluster: ${KIND_CLUSTER_NAME}...`);
+        await execa("kind", ["create", "cluster", "--name", KIND_CLUSTER_NAME, "--wait", "60s"]);
+        console.log(`Kind cluster ${KIND_CLUSTER_NAME} created successfully`);
+    } catch (error) {
+        console.error("Error creating kind cluster:", error);
+        throw error;
+    }
+}
+
+async function deleteKindCluster() {
+    try {
+        console.log(`Deleting kind cluster: ${KIND_CLUSTER_NAME}...`);
+        await execa("kind", ["delete", "cluster", "--name", KIND_CLUSTER_NAME]);
+        console.log(`Kind cluster ${KIND_CLUSTER_NAME} deleted successfully`);
+    } catch (error) {
+        console.error("Error deleting kind cluster:", error);
+    }
+}
+
+async function loadImageToKind() {
+    try {
+        console.log(`Loading Docker image ${DOCKER_IMAGE_NAME} into kind cluster...`);
+        await execa("kind", ["load", "docker-image", DOCKER_IMAGE_NAME, "--name", KIND_CLUSTER_NAME]);
+        console.log(`Docker image ${DOCKER_IMAGE_NAME} loaded successfully`);
+    } catch (error) {
+        console.error("Error loading image to kind:", error);
+        throw error;
+    }
+}
 
 async function deleteKubernetesResources() {
     try {
@@ -51,12 +85,18 @@ async function getPodLogs() {
 
 // Setup Kubernetes pod before tests
 beforeAll(async () => {
-    console.log("Setting up Kubernetes pod with restricted security context...");
-    
+    console.log("Setting up kind cluster and Kubernetes pod with restricted security context...");
+
+    // Create kind cluster
+    await createKindCluster();
+
+    // Load Docker image into kind cluster
+    await loadImageToKind();
+
     // Clean up any existing resources
     await deleteKubernetesResources();
     await sleep(2000);
-    
+
     // Apply manifest
     await execa("kubectl", ["apply", "-f", MANIFEST_PATH]);
     
@@ -99,8 +139,12 @@ afterAll(async () => {
         console.log("Cleaning up Kubernetes resources...");
         await deleteKubernetesResources();
         console.log("Kubernetes cleanup complete");
+
+        console.log("Cleaning up kind cluster...");
+        await deleteKindCluster();
+        console.log("Kind cluster cleanup complete");
     } catch (error) {
-        console.error("Failed to cleanup Kubernetes resources:", error);
+        console.error("Failed to cleanup resources:", error);
         throw error;
     }
 }, 60000); // 1 minute timeout for cleanup
