@@ -18,12 +18,18 @@ async function startRestrictedContainer() {
         await execa("docker", [
             "run",
             "-d",
-            "--name", CONTAINER_NAME,
-            "--user", `${TEST_UID}:${TEST_UID}`,
-            "--cap-drop", "ALL",
-            "--security-opt", "no-new-privileges",
-            "-v", `${FERN_DIR}:/fern:ro`,
-            "-e", "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fdr",
+            "--name",
+            CONTAINER_NAME,
+            "--user",
+            `${TEST_UID}:${TEST_UID}`,
+            "--cap-drop",
+            "ALL",
+            "--security-opt",
+            "no-new-privileges",
+            "-v",
+            `${FERN_DIR}:/fern:ro`,
+            "-e",
+            "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fdr",
             DOCKER_IMAGE_NAME
         ]);
 
@@ -87,26 +93,13 @@ function sleep(ms: number) {
 
 describe("Self-hosted docs in restricted Docker environment (UID 65532)", () => {
     it("Container runs as UID 65532", async () => {
-        const { stdout: whoamiOutput } = await execa("docker", [
-            "exec",
-            CONTAINER_NAME,
-            "id",
-            "-u"
-        ]);
+        const { stdout: whoamiOutput } = await execa("docker", ["exec", CONTAINER_NAME, "id", "-u"]);
         expect(whoamiOutput.trim()).toBe(TEST_UID);
     });
 
     it("su command fails due to restricted permissions", async () => {
         try {
-            await execa("docker", [
-                "exec",
-                CONTAINER_NAME,
-                "su",
-                "-",
-                "postgres",
-                "-c",
-                "echo 'test'"
-            ]);
+            await execa("docker", ["exec", CONTAINER_NAME, "su", "-", "postgres", "-c", "echo 'test'"]);
             throw new Error("su command unexpectedly succeeded - security context not properly restricted");
         } catch (error) {
             // This is expected - su should fail in restricted environment
