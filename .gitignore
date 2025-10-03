@@ -80,3 +80,6 @@ test-results
 
 # Local folder for temp files
 .local
+
+# Test artifacts
+servers/self-hosted/src/__test__/*-generated.yaml
