@@ -64,7 +64,13 @@ async function deleteKubernetesResources() {
 async function getPodStatus() {
     try {
         const { stdout } = await execa("kubectl", [
-            "get", "pod", POD_NAME, "-n", K8S_NAMESPACE, "-o", "jsonpath={.status.phase}"
+            "get",
+            "pod",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-o",
+            "jsonpath={.status.phase}"
         ]);
         return stdout.trim();
     } catch (error) {
@@ -74,9 +80,7 @@ async function getPodStatus() {
 
 async function getPodLogs() {
     try {
-        const { stdout } = await execa("kubectl", [
-            "logs", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs"
-        ]);
+        const { stdout } = await execa("kubectl", ["logs", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs"]);
         return stdout;
     } catch (error) {
         return `Error getting logs: ${error}`;
@@ -99,16 +103,16 @@ beforeAll(async () => {
 
     // Apply manifest
     await execa("kubectl", ["apply", "-f", MANIFEST_PATH]);
-    
+
     // Wait for pod to be ready
     console.log("Waiting for pod to start...");
     let attempts = 0;
     const maxAttempts = 60; // 5 minutes
-    
+
     while (attempts < maxAttempts) {
         const status = await getPodStatus();
         console.log(`Pod status: ${status}`);
-        
+
         if (status === "Running") {
             console.log("Pod is running!");
             break;
@@ -117,17 +121,17 @@ beforeAll(async () => {
             console.error("Pod failed to start. Logs:", logs);
             throw new Error(`Pod failed to start: ${status}`);
         }
-        
+
         await sleep(5000);
         attempts++;
     }
-    
+
     if (attempts >= maxAttempts) {
         const logs = await getPodLogs();
         console.error("Pod did not start in time. Logs:", logs);
         throw new Error("Pod did not start within timeout");
     }
-    
+
     // Additional wait for services to initialize
     console.log("Waiting for services to initialize...");
     await sleep(30000);
@@ -162,7 +166,15 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
 
     it("Container runs as UID 65532", async () => {
         const { stdout: whoamiOutput } = await execa("kubectl", [
-            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--", "id", "-u"
+            "exec",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-c",
+            "fern-docs",
+            "--",
+            "id",
+            "-u"
         ]);
         expect(whoamiOutput.trim()).toBe("65532");
     });
@@ -170,8 +182,18 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
     it("su command fails due to restricted permissions", async () => {
         try {
             await execa("kubectl", [
-                "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--", 
-                "su", "-", "postgres", "-c", "echo 'test'"
+                "exec",
+                POD_NAME,
+                "-n",
+                K8S_NAMESPACE,
+                "-c",
+                "fern-docs",
+                "--",
+                "su",
+                "-",
+                "postgres",
+                "-c",
+                "echo 'test'"
             ]);
             throw new Error("su command unexpectedly succeeded - security context not properly restricted");
         } catch (error) {
@@ -183,17 +205,40 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
     it("PostgreSQL starts successfully via fallback method", async () => {
         // Test PostgreSQL connection
         const { stdout: postgresStatus } = await execa("kubectl", [
-            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
-            "pg_isready", "-U", "postgres", "-d", "postgres"
+            "exec",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-c",
+            "fern-docs",
+            "--",
+            "pg_isready",
+            "-U",
+            "postgres",
+            "-d",
+            "postgres"
         ]);
         expect(postgresStatus).toContain("accepting connections");
     });
 
     it("PostgreSQL database is accessible", async () => {
         const { stdout: dbList } = await execa("kubectl", [
-            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
-            "-e", "PGPASSWORD=postgres",
-            "psql", "-U", "postgres", "-d", "postgres", "-t", "-c",
+            "exec",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-c",
+            "fern-docs",
+            "--",
+            "-e",
+            "PGPASSWORD=postgres",
+            "psql",
+            "-U",
+            "postgres",
+            "-d",
+            "postgres",
+            "-t",
+            "-c",
             "SELECT 1 FROM pg_database WHERE datname='fdr'"
         ]);
         expect(dbList.trim()).toBe("1");
@@ -201,8 +246,19 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
 
     it("MinIO is running and accessible", async () => {
         const { stdout: curlOutput } = await execa("kubectl", [
-            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
-            "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            "exec",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-c",
+            "fern-docs",
+            "--",
+            "curl",
+            "-s",
+            "-o",
+            "/dev/null",
+            "-w",
+            "%{http_code}",
             "http://localhost:9000/minio/health/live"
         ]);
         expect(curlOutput).toBe("200");
@@ -210,8 +266,19 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
 
     it("FDR server is running and accessible", async () => {
         const { stdout: curlOutput } = await execa("kubectl", [
-            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
-            "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            "exec",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-c",
+            "fern-docs",
+            "--",
+            "curl",
+            "-s",
+            "-o",
+            "/dev/null",
+            "-w",
+            "%{http_code}",
             "http://localhost:8080/health"
         ]);
         expect(curlOutput).toBe("200");
@@ -219,7 +286,7 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
 
     it("Verifies fallback startup method was used", async () => {
         const logs = await getPodLogs();
-        
+
         // Should contain our fallback messages
         expect(logs).toContain("su failed (likely due to permission restrictions)");
         expect(logs).toContain("trying direct approach");
@@ -230,21 +297,53 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
     it("All services work together in Kubernetes security context", async () => {
         // Test all services are working
         const { stdout: postgresStatus } = await execa("kubectl", [
-            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
-            "pg_isready", "-U", "postgres", "-d", "postgres"
+            "exec",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-c",
+            "fern-docs",
+            "--",
+            "pg_isready",
+            "-U",
+            "postgres",
+            "-d",
+            "postgres"
         ]);
         expect(postgresStatus).toContain("accepting connections");
 
         const { stdout: minioStatus } = await execa("kubectl", [
-            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
-            "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            "exec",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-c",
+            "fern-docs",
+            "--",
+            "curl",
+            "-s",
+            "-o",
+            "/dev/null",
+            "-w",
+            "%{http_code}",
             "http://localhost:9000/minio/health/live"
         ]);
         expect(minioStatus).toBe("200");
 
         const { stdout: fdrStatus } = await execa("kubectl", [
-            "exec", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs", "--",
-            "curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",
+            "exec",
+            POD_NAME,
+            "-n",
+            K8S_NAMESPACE,
+            "-c",
+            "fern-docs",
+            "--",
+            "curl",
+            "-s",
+            "-o",
+            "/dev/null",
+            "-w",
+            "%{http_code}",
             "http://localhost:8080/health"
         ]);
         expect(fdrStatus).toBe("200");
