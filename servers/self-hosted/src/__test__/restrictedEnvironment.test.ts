@@ -1,222 +1,106 @@
 import dotenv from "dotenv";
 import { execa } from "execa";
-import fs from "fs";
 import path from "path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
-const K8S_NAMESPACE = "fern-test";
-const POD_NAME = "fern-restricted-test";
-const MANIFEST_PATH = path.join(__dirname, "restricted-environment-pod.yaml");
-const GENERATED_MANIFEST_PATH = path.join(__dirname, "restricted-environment-pod-generated.yaml");
-const KIND_CLUSTER_NAME = "fern-test-cluster";
+const CONTAINER_NAME = "fern-restricted-test";
 const DOCKER_IMAGE_NAME = "fern-self-hosted:latest";
 const FERN_DIR = path.join(__dirname, "../../fern");
+const TEST_UID = "65532";
 
-async function createKindCluster() {
+async function startRestrictedContainer() {
     try {
-        // Check if cluster already exists and delete it to ensure clean state
-        const { stdout: clusterList } = await execa("kind", ["get", "clusters"]);
-        if (clusterList.includes(KIND_CLUSTER_NAME)) {
-            console.log(`Kind cluster ${KIND_CLUSTER_NAME} already exists, deleting for clean state...`);
-            await execa("kind", ["delete", "cluster", "--name", KIND_CLUSTER_NAME]);
-        }
+        console.log(`Starting container ${CONTAINER_NAME} with restricted user (UID ${TEST_UID})...`);
 
-        console.log(`Creating kind cluster: ${KIND_CLUSTER_NAME}...`);
-        await execa("kind", ["create", "cluster", "--name", KIND_CLUSTER_NAME, "--wait", "60s"]);
-        console.log(`Kind cluster ${KIND_CLUSTER_NAME} created successfully`);
-    } catch (error) {
-        console.error("Error creating kind cluster:", error);
-        throw error;
-    }
-}
-
-async function deleteKindCluster() {
-    try {
-        console.log(`Deleting kind cluster: ${KIND_CLUSTER_NAME}...`);
-        await execa("kind", ["delete", "cluster", "--name", KIND_CLUSTER_NAME]);
-        console.log(`Kind cluster ${KIND_CLUSTER_NAME} deleted successfully`);
-    } catch (error) {
-        console.error("Error deleting kind cluster:", error);
-    }
-}
-
-async function loadImageToKind() {
-    try {
-        console.log(`Loading Docker image ${DOCKER_IMAGE_NAME} into kind cluster...`);
-        await execa("kind", ["load", "docker-image", DOCKER_IMAGE_NAME, "--name", KIND_CLUSTER_NAME], {
-            timeout: 120000 // 2 minute timeout
-        });
-        console.log(`Docker image ${DOCKER_IMAGE_NAME} loaded successfully`);
-    } catch (error) {
-        console.error("Error loading image to kind:", error);
-        throw error;
-    }
-}
-
-async function deleteKubernetesResources() {
-    try {
-        // Delete pod
-        await execa("kubectl", ["delete", "pod", POD_NAME, "-n", K8S_NAMESPACE, "--ignore-not-found=true"]);
-        // Delete namespace
-        await execa("kubectl", ["delete", "namespace", K8S_NAMESPACE, "--ignore-not-found=true"]);
-    } catch (error) {
-        console.error("Error cleaning up Kubernetes resources:", error);
-    }
-}
-
-async function getPodStatus() {
-    try {
-        const { stdout } = await execa("kubectl", [
-            "get",
-            "pod",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-o",
-            "jsonpath={.status.phase}"
+        // Run container as restricted user with minimal capabilities
+        await execa("docker", [
+            "run",
+            "-d",
+            "--name", CONTAINER_NAME,
+            "--user", `${TEST_UID}:${TEST_UID}`,
+            "--cap-drop", "ALL",
+            "--security-opt", "no-new-privileges",
+            "-v", `${FERN_DIR}:/fern:ro`,
+            "-e", "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fdr",
+            DOCKER_IMAGE_NAME
         ]);
-        return stdout.trim();
+
+        console.log(`Container ${CONTAINER_NAME} started successfully`);
     } catch (error) {
-        return "NotFound";
+        console.error("Error starting container:", error);
+        throw error;
     }
 }
 
-async function getPodLogs() {
+async function stopContainer() {
     try {
-        const { stdout } = await execa("kubectl", ["logs", POD_NAME, "-n", K8S_NAMESPACE, "-c", "fern-docs"]);
+        console.log(`Stopping and removing container ${CONTAINER_NAME}...`);
+        await execa("docker", ["stop", CONTAINER_NAME]);
+        await execa("docker", ["rm", CONTAINER_NAME]);
+        console.log(`Container ${CONTAINER_NAME} removed successfully`);
+    } catch (error) {
+        console.error("Error stopping container:", error);
+    }
+}
+
+async function getContainerLogs() {
+    try {
+        const { stdout } = await execa("docker", ["logs", CONTAINER_NAME]);
         return stdout;
     } catch (error) {
         return `Error getting logs: ${error}`;
     }
 }
 
-async function generateManifestWithFernPath() {
-    // Read the template manifest
-    const manifestContent = fs.readFileSync(MANIFEST_PATH, "utf8");
-
-    // Replace placeholder with actual fern directory path
-    const updatedManifest = manifestContent.replace("__FERN_DIR_PLACEHOLDER__", FERN_DIR);
-
-    // Write generated manifest
-    fs.writeFileSync(GENERATED_MANIFEST_PATH, updatedManifest);
-    console.log(`Generated manifest with fern directory: ${FERN_DIR}`);
-}
-
-// Setup Kubernetes pod before tests
+// Setup container before tests
 beforeAll(async () => {
-    console.log("Setting up kind cluster and Kubernetes pod with restricted security context...");
+    console.log("Setting up Docker container with restricted security context...");
 
-    // Generate manifest with correct fern path
-    await generateManifestWithFernPath();
+    // Clean up any existing container
+    await stopContainer();
 
-    // Create kind cluster
-    await createKindCluster();
+    // Start container with restricted user
+    await startRestrictedContainer();
 
-    // Load Docker image into kind cluster
-    await loadImageToKind();
-
-    // Clean up any existing resources
-    await deleteKubernetesResources();
-    await sleep(2000);
-
-    // Apply generated manifest
-    await execa("kubectl", ["apply", "-f", GENERATED_MANIFEST_PATH]);
-
-    // Wait for pod to be ready
-    console.log("Waiting for pod to start...");
-    let attempts = 0;
-    const maxAttempts = 60; // 5 minutes
-
-    while (attempts < maxAttempts) {
-        const status = await getPodStatus();
-        console.log(`Pod status: ${status}`);
-
-        if (status === "Running") {
-            console.log("Pod is running!");
-            break;
-        } else if (status === "Failed" || status === "Error") {
-            const logs = await getPodLogs();
-            console.error("Pod failed to start. Logs:", logs);
-            throw new Error(`Pod failed to start: ${status}`);
-        }
-
-        await sleep(5000);
-        attempts++;
-    }
-
-    if (attempts >= maxAttempts) {
-        const logs = await getPodLogs();
-        console.error("Pod did not start in time. Logs:", logs);
-        throw new Error("Pod did not start within timeout");
-    }
-
-    // Additional wait for services to initialize
+    // Wait for services to initialize
     console.log("Waiting for services to initialize...");
-    await sleep(30000);
-}, 600000); // 10 minute timeout
+    await sleep(60000); // 1 minute for all services to start
+}, 120000); // 2 minute timeout
 
-// Cleanup Kubernetes resources after tests
+// Cleanup container after tests
 afterAll(async () => {
     try {
-        console.log("Cleaning up Kubernetes resources...");
-        await deleteKubernetesResources();
-        console.log("Kubernetes cleanup complete");
-
-        console.log("Cleaning up kind cluster...");
-        await deleteKindCluster();
-        console.log("Kind cluster cleanup complete");
-
-        // Clean up generated manifest
-        try {
-            fs.unlinkSync(GENERATED_MANIFEST_PATH);
-            console.log("Generated manifest cleaned up");
-        } catch (error) {
-            // Ignore if file doesn't exist
-        }
+        console.log("Cleaning up Docker container...");
+        await stopContainer();
+        console.log("Container cleanup complete");
     } catch (error) {
-        console.error("Failed to cleanup resources:", error);
+        console.error("Failed to cleanup container:", error);
         throw error;
     }
-}, 60000); // 1 minute timeout for cleanup
+}, 30000); // 30 second timeout for cleanup
 
 function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
-    it("Pod runs with correct security context", async () => {
-        const status = await getPodStatus();
-        expect(status).toBe("Running");
-        console.log(`Pod ${POD_NAME} is running with status: ${status}`);
-    });
-
+describe("Self-hosted docs in restricted Docker environment (UID 65532)", () => {
     it("Container runs as UID 65532", async () => {
-        const { stdout: whoamiOutput } = await execa("kubectl", [
+        const { stdout: whoamiOutput } = await execa("docker", [
             "exec",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-c",
-            "fern-docs",
-            "--",
+            CONTAINER_NAME,
             "id",
             "-u"
         ]);
-        expect(whoamiOutput.trim()).toBe("65532");
+        expect(whoamiOutput.trim()).toBe(TEST_UID);
     });
 
     it("su command fails due to restricted permissions", async () => {
         try {
-            await execa("kubectl", [
+            await execa("docker", [
                 "exec",
-                POD_NAME,
-                "-n",
-                K8S_NAMESPACE,
-                "-c",
-                "fern-docs",
-                "--",
+                CONTAINER_NAME,
                 "su",
                 "-",
                 "postgres",
@@ -232,14 +116,9 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
 
     it("PostgreSQL starts successfully via fallback method", async () => {
         // Test PostgreSQL connection
-        const { stdout: postgresStatus } = await execa("kubectl", [
+        const { stdout: postgresStatus } = await execa("docker", [
             "exec",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-c",
-            "fern-docs",
-            "--",
+            CONTAINER_NAME,
             "pg_isready",
             "-U",
             "postgres",
@@ -250,16 +129,11 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
     });
 
     it("PostgreSQL database is accessible", async () => {
-        const { stdout: dbList } = await execa("kubectl", [
+        const { stdout: dbList } = await execa("docker", [
             "exec",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-c",
-            "fern-docs",
-            "--",
-            "env",
+            "-e",
             "PGPASSWORD=postgres",
+            CONTAINER_NAME,
             "psql",
             "-U",
             "postgres",
@@ -273,14 +147,9 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
     });
 
     it("MinIO is running and accessible", async () => {
-        const { stdout: curlOutput } = await execa("kubectl", [
+        const { stdout: curlOutput } = await execa("docker", [
             "exec",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-c",
-            "fern-docs",
-            "--",
+            CONTAINER_NAME,
             "curl",
             "-s",
             "-o",
@@ -293,14 +162,9 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
     });
 
     it("FDR server is running and accessible", async () => {
-        const { stdout: curlOutput } = await execa("kubectl", [
+        const { stdout: curlOutput } = await execa("docker", [
             "exec",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-c",
-            "fern-docs",
-            "--",
+            CONTAINER_NAME,
             "curl",
             "-s",
             "-o",
@@ -313,25 +177,20 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
     });
 
     it("Verifies fallback startup method was used", async () => {
-        const logs = await getPodLogs();
+        const logs = await getContainerLogs();
 
         // Should contain our fallback messages
         expect(logs).toContain("su failed (likely due to permission restrictions)");
         expect(logs).toContain("trying direct approach");
-        expect(logs).toContain("Starting PostgreSQL as current user (UID 65532)");
+        expect(logs).toContain(`Starting PostgreSQL as current user (UID ${TEST_UID})`);
         expect(logs).toContain("PostgreSQL started successfully as current user");
     });
 
-    it("All services work together in Kubernetes security context", async () => {
+    it("All services work together in restricted Docker environment", async () => {
         // Test all services are working
-        const { stdout: postgresStatus } = await execa("kubectl", [
+        const { stdout: postgresStatus } = await execa("docker", [
             "exec",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-c",
-            "fern-docs",
-            "--",
+            CONTAINER_NAME,
             "pg_isready",
             "-U",
             "postgres",
@@ -340,14 +199,9 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
         ]);
         expect(postgresStatus).toContain("accepting connections");
 
-        const { stdout: minioStatus } = await execa("kubectl", [
+        const { stdout: minioStatus } = await execa("docker", [
             "exec",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-c",
-            "fern-docs",
-            "--",
+            CONTAINER_NAME,
             "curl",
             "-s",
             "-o",
@@ -358,14 +212,9 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
         ]);
         expect(minioStatus).toBe("200");
 
-        const { stdout: fdrStatus } = await execa("kubectl", [
+        const { stdout: fdrStatus } = await execa("docker", [
             "exec",
-            POD_NAME,
-            "-n",
-            K8S_NAMESPACE,
-            "-c",
-            "fern-docs",
-            "--",
+            CONTAINER_NAME,
             "curl",
             "-s",
             "-o",
