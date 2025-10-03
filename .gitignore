@@ -77,3 +77,6 @@ analyze
 test-results
 
 **/*.tar.gz
+
+# Local folder for temp files
+.local
