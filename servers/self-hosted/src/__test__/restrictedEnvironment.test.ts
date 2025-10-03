@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { execa } from "execa";
+import fs from "fs";
 import path from "path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -8,8 +9,10 @@ dotenv.config({ path: path.join(__dirname, "../../.env") });
 const K8S_NAMESPACE = "fern-test";
 const POD_NAME = "fern-restricted-test";
 const MANIFEST_PATH = path.join(__dirname, "restricted-environment-pod.yaml");
+const GENERATED_MANIFEST_PATH = path.join(__dirname, "restricted-environment-pod-generated.yaml");
 const KIND_CLUSTER_NAME = "fern-test-cluster";
 const DOCKER_IMAGE_NAME = "fern-self-hosted:latest";
+const FERN_DIR = path.join(__dirname, "../../fern");
 
 async function createKindCluster() {
     try {
@@ -87,9 +90,24 @@ async function getPodLogs() {
     }
 }
 
+async function generateManifestWithFernPath() {
+    // Read the template manifest
+    const manifestContent = fs.readFileSync(MANIFEST_PATH, 'utf8');
+
+    // Replace placeholder with actual fern directory path
+    const updatedManifest = manifestContent.replace('__FERN_DIR_PLACEHOLDER__', FERN_DIR);
+
+    // Write generated manifest
+    fs.writeFileSync(GENERATED_MANIFEST_PATH, updatedManifest);
+    console.log(`Generated manifest with fern directory: ${FERN_DIR}`);
+}
+
 // Setup Kubernetes pod before tests
 beforeAll(async () => {
     console.log("Setting up kind cluster and Kubernetes pod with restricted security context...");
+
+    // Generate manifest with correct fern path
+    await generateManifestWithFernPath();
 
     // Create kind cluster
     await createKindCluster();
@@ -101,8 +119,8 @@ beforeAll(async () => {
     await deleteKubernetesResources();
     await sleep(2000);
 
-    // Apply manifest
-    await execa("kubectl", ["apply", "-f", MANIFEST_PATH]);
+    // Apply generated manifest
+    await execa("kubectl", ["apply", "-f", GENERATED_MANIFEST_PATH]);
 
     // Wait for pod to be ready
     console.log("Waiting for pod to start...");
@@ -147,6 +165,14 @@ afterAll(async () => {
         console.log("Cleaning up kind cluster...");
         await deleteKindCluster();
         console.log("Kind cluster cleanup complete");
+
+        // Clean up generated manifest
+        try {
+            fs.unlinkSync(GENERATED_MANIFEST_PATH);
+            console.log("Generated manifest cleaned up");
+        } catch (error) {
+            // Ignore if file doesn't exist
+        }
     } catch (error) {
         console.error("Failed to cleanup resources:", error);
         throw error;

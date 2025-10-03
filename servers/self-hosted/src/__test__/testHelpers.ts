@@ -10,7 +10,16 @@ export interface TestContainer {
  */
 export async function getContainerId(nameFilter: string): Promise<string> {
     const { stdout: containerId } = await execa("docker", ["ps", "-q", "--filter", nameFilter]);
-    return containerId;
+    // If multiple containers match, take the first one
+    // Split by newlines and filter out empty strings
+    const ids = containerId.split('\n').filter(id => id.trim().length > 0);
+    if (ids.length === 0) {
+        throw new Error(`No containers found matching filter: ${nameFilter}`);
+    }
+    if (ids.length > 1) {
+        console.warn(`Multiple containers found matching filter ${nameFilter}, using first one: ${ids[0]}`);
+    }
+    return ids[0];
 }
 
 /**

@@ -41,10 +41,16 @@ spec:
       volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
+        - name: fern-config
+          mountPath: /fern
       env:
         - name: DATABASE_URL
           value: "postgresql://postgres:postgres@localhost:5432/fdr"
   volumes:
     - name: postgres-data
       emptyDir: {}
+    - name: fern-config
+      hostPath:
+        path: __FERN_DIR_PLACEHOLDER__
+        type: Directory
   restartPolicy: Never
