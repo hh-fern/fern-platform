@@ -34,14 +34,18 @@ export async function GET(
         // Disable caching for FERN_DOCS_ORIGINS hosts and localhost:3000
         const isFernDocsOrigin = FERN_DOCS_ORIGINS.includes(host);
         const isLocalhost = host === "localhost:3000";
-        const cacheControl = (isFernDocsOrigin || isLocalhost)
-          ? "no-cache, no-store, must-revalidate" 
-          : "public, max-age=31536000";
+        const cacheControl =
+          isFernDocsOrigin || isLocalhost
+            ? "no-cache, no-store, must-revalidate"
+            : "public, max-age=31536000";
 
-        console.log(`[favicon:${domain}] Host: ${host}, Cache-Control: ${cacheControl}`, {
-          isFernDocsOrigin,
-          isLocalhost,
-        });
+        console.log(
+          `[favicon:${domain}] Host: ${host}, Cache-Control: ${cacheControl}`,
+          {
+            isFernDocsOrigin,
+            isLocalhost,
+          }
+        );
 
         return new NextResponse(faviconBuffer, {
           status: 200,
