@@ -30,6 +30,9 @@ export async function upgradeFernVersionAction(
         return { success: false, error: "No session found" };
     }
 
+    const a = 5;
+    const b = "foo";
+
     return withGithubAuth(
         session.user.sub,
         session.accessToken,
