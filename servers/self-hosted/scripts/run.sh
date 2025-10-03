@@ -30,18 +30,20 @@ else
         echo "Initializing PostgreSQL data directory for current user..."
         initdb -D /var/lib/postgresql/data
     fi
-    
+
     echo "Starting PostgreSQL as current user (UID $(id -u))..."
     pg_ctl -D /var/lib/postgresql/data start
     echo "PostgreSQL started successfully as current user."
+
+    # Create fdr database if it doesn't exist (fallback path needs this)
+    echo "Creating fdr database..."
+    psql -U postgres -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'fdr'" | grep -q 1 || psql -U postgres -d postgres -c "CREATE DATABASE fdr"
 fi
 echo "PostgreSQL service started."
 
 # Use pidof or ps to get postgres PID (pgrep might not be available)
 postgres_pid=$(pidof postgres || ps aux | grep postgres | grep -v grep | awk '{print $2}' | head -1 || true)
 echo "PostgreSQL PID: $postgres_pid"
-
-echo "Creating Postgres database..."
 
 echo "Running database migrations..."
 DATABASE_URL=${DATABASE_URL} prisma migrate deploy --schema /prisma/schema.prisma
