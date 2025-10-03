@@ -34,6 +34,7 @@ export const LoginPage = () => {
             href="https://buildwithfern.com/terms-of-service"
             target="_blank"
             className="underline"
+            rel="noopener"
           >
             Terms of Service
           </a>{" "}
@@ -42,6 +43,7 @@ export const LoginPage = () => {
             href="https://buildwithfern.com/privacy-policy"
             target="_blank"
             className="underline"
+            rel="noopener"
           >
             Privacy Policy
           </a>
@@ -80,7 +82,7 @@ export const LoginPage = () => {
       <div className="absolute right-4 top-4 flex gap-2">
         <ThemeToggle />
         <Button asChild variant="outline">
-          <a href="https://buildwithfern.com/learn" target="_blank">
+          <a href="https://buildwithfern.com/learn" target="_blank" rel="noopener">
             <BookOpen />
             Documentation
           </a>

@@ -34,6 +34,7 @@ export async function SDKsZeroState({ user }: SDKsZeroState.Props) {
                 href="https://buildwithfern.com/learn/sdks/overview/quickstart"
                 target="_blank"
                 className="flex items-center gap-2"
+                rel="noopener"
               >
                 <PlusIcon className="h-4 w-4" />
                 Create your first SDK

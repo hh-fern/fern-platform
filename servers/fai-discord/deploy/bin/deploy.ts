@@ -20,7 +20,7 @@ async function main() {
   const app = new cdk.App();
   for (const environmentType of Object.keys(environments)) {
     switch (environmentType) {
-      case EnvironmentType.Dev:
+      case EnvironmentType.Dev: {
         const devInfo = environments[environmentType];
         if (devInfo == null) {
           throw new Error("Unexpected error: devInfo is undefined");
@@ -52,7 +52,8 @@ async function main() {
           }
         );
         break;
-      case EnvironmentType.Dev2:
+      }
+      case EnvironmentType.Dev2: {
         const dev2Info = environments[environmentType];
         if (dev2Info == null) {
           throw new Error("Unexpected error: dev2Info is undefined");
@@ -84,7 +85,8 @@ async function main() {
           }
         );
         break;
-      case EnvironmentType.Prod:
+      }
+      case EnvironmentType.Prod: {
         const prodInfo = environments[environmentType];
         if (prodInfo == null) {
           throw new Error("Unexpected error: prodInfo is undefined");
@@ -116,6 +118,7 @@ async function main() {
           }
         );
         break;
+      }
       default:
         return;
     }

@@ -43,6 +43,7 @@ export function Footer() {
               href="https://buildwithfern.com/privacy-policy"
               target="_blank"
               className="cursor-pointer"
+              rel="noopener"
             >
               Privacy Policy
             </a>
@@ -52,6 +53,7 @@ export function Footer() {
               href="https://buildwithfern.com/terms-of-service"
               target="_blank"
               className="cursor-pointer"
+              rel="noopener"
             >
               Terms of Service
             </a>

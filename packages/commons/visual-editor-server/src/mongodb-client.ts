@@ -103,8 +103,8 @@ class VisualEditorMongoClient {
     err: unknown,
     result: Buffer
   ) => {
-    if (err) reject(err);
-    else resolve(result);
+    if (err) { reject(err); }
+    else { resolve(result); }
   };
 
   private async compressData(

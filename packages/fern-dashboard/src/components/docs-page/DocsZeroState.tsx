@@ -32,6 +32,7 @@ export async function DocsZeroState({ user }: DocsZeroState.Props) {
                 href="https://buildwithfern.com/learn/docs/getting-started/quickstart"
                 target="_blank"
                 className="flex items-center gap-2"
+                rel="noopener"
               >
                 <PlusIcon className="h-4 w-4" />
                 Create your first Docs site

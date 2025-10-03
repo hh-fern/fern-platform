@@ -11,7 +11,7 @@ const POSTHOG_ASSETS_HOST = "us-assets.i.posthog.com";
  * - Only forward ASCII-safe cookies to PostHog.
  */
 function filterAsciiCookies(cookieHeader: string | null): string | undefined {
-  if (!cookieHeader) return undefined;
+  if (!cookieHeader) { return undefined; }
   // Split cookies by ';', filter out any with non-ASCII chars in name or value
   return (
     cookieHeader
