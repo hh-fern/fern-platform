@@ -16,11 +16,11 @@ const FERN_DIR = path.join(__dirname, "../../fern");
 
 async function createKindCluster() {
     try {
-        // Check if cluster already exists
+        // Check if cluster already exists and delete it to ensure clean state
         const { stdout: clusterList } = await execa("kind", ["get", "clusters"]);
         if (clusterList.includes(KIND_CLUSTER_NAME)) {
-            console.log(`Kind cluster ${KIND_CLUSTER_NAME} already exists, using existing cluster`);
-            return;
+            console.log(`Kind cluster ${KIND_CLUSTER_NAME} already exists, deleting for clean state...`);
+            await execa("kind", ["delete", "cluster", "--name", KIND_CLUSTER_NAME]);
         }
 
         console.log(`Creating kind cluster: ${KIND_CLUSTER_NAME}...`);
@@ -45,7 +45,9 @@ async function deleteKindCluster() {
 async function loadImageToKind() {
     try {
         console.log(`Loading Docker image ${DOCKER_IMAGE_NAME} into kind cluster...`);
-        await execa("kind", ["load", "docker-image", DOCKER_IMAGE_NAME, "--name", KIND_CLUSTER_NAME]);
+        await execa("kind", ["load", "docker-image", DOCKER_IMAGE_NAME, "--name", KIND_CLUSTER_NAME], {
+            timeout: 120000 // 2 minute timeout
+        });
         console.log(`Docker image ${DOCKER_IMAGE_NAME} loaded successfully`);
     } catch (error) {
         console.error("Error loading image to kind:", error);
