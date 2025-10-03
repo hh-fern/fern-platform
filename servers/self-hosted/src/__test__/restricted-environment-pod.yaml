@@ -10,18 +10,12 @@ metadata:
   namespace: fern-test
 spec:
   securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
-    privileged: false
-    readOnlyRootFilesystem: true
     runAsGroup: 65532
     runAsNonRoot: true
     runAsUser: 65532
+    fsGroup: 65532
     seccompProfile:
       type: RuntimeDefault
-    fsGroup: 65532
   initContainers:
     - name: fix-permissions
       image: busybox:latest
@@ -42,6 +36,13 @@ spec:
   containers:
     - name: fern-docs
       image: fern-self-hosted:latest
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        privileged: false
+        readOnlyRootFilesystem: false
       ports:
         - containerPort: 5432
           hostPort: 5434
@@ -56,16 +57,10 @@ spec:
       volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
-        - name: fern-config
-          mountPath: /fern
       env:
         - name: DATABASE_URL
           value: "postgresql://postgres:postgres@localhost:5432/fdr"
   volumes:
     - name: postgres-data
       emptyDir: {}
-    - name: fern-config
-      hostPath:
-        path: /Users/jsklan/git/fern-platform/servers/self-hosted/fern
-        type: Directory
   restartPolicy: Never
