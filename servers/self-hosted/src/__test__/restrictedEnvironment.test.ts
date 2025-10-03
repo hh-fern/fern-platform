@@ -230,7 +230,7 @@ describe("Self-hosted docs in Kubernetes security context (UID 65532)", () => {
             "-c",
             "fern-docs",
             "--",
-            "-e",
+            "env",
             "PGPASSWORD=postgres",
             "psql",
             "-U",
