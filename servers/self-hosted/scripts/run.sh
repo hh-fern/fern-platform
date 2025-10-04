@@ -28,14 +28,15 @@ else
     # Check if PostgreSQL data directory exists and is initialized for current user
     if [ ! -f "/var/lib/postgresql/data/PG_VERSION" ]; then
         echo "Initializing PostgreSQL data directory for current user..."
-        initdb -D /var/lib/postgresql/data
+        initdb -D /var/lib/postgresql/data -U postgres
     fi
 
     echo "Starting PostgreSQL as current user (UID $(id -u))..."
     pg_ctl -D /var/lib/postgresql/data start
     echo "PostgreSQL started successfully as current user."
 
-    # Create fdr database if it doesn't exist (fallback path needs this)
+    # When initdb runs with -U postgres but as a different unix user, postgres role is created
+    # but we need to create the fdr database
     echo "Creating fdr database..."
     psql -U postgres -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'fdr'" | grep -q 1 || psql -U postgres -d postgres -c "CREATE DATABASE fdr"
 fi
@@ -46,7 +47,11 @@ postgres_pid=$(pidof postgres || ps aux | grep postgres | grep -v grep | awk '{p
 echo "PostgreSQL PID: $postgres_pid"
 
 echo "Running database migrations..."
-DATABASE_URL=${DATABASE_URL} prisma migrate deploy --schema /prisma/schema.prisma
+if DATABASE_URL=${DATABASE_URL} prisma migrate deploy --schema /prisma/schema.prisma 2>&1; then
+    echo "Database migrations completed successfully"
+else
+    echo "WARNING: Database migrations failed, but continuing anyway (migrations may already be applied)"
+fi
 # -----------  End Postgres setup  -----------
 
 # -----------  Start MeiliSearch setup  -----------

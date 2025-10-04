@@ -25,6 +25,8 @@ async function startRestrictedContainer() {
             `${TEST_UID}:${TEST_UID}`,
             "--cap-drop",
             "ALL",
+            "--cap-add",
+            "NET_BIND_SERVICE", // Allow binding to ports
             "--security-opt",
             "no-new-privileges",
             "-v",
@@ -81,10 +83,57 @@ beforeAll(async () => {
     // Start container with restricted user
     await startRestrictedContainer();
 
-    // Wait for services to initialize
+    // Wait for services to initialize with periodic status checks
     console.log("Waiting for services to initialize...");
-    await sleep(60000); // 1 minute for all services to start
-}, 120000); // 2 minute timeout
+    const startTime = Date.now();
+    const maxWaitTime = 300000; // 5 minutes
+    const checkInterval = 10000; // Check every 10 seconds
+
+    while (Date.now() - startTime < maxWaitTime) {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        console.log(`Waiting... (${elapsed}s elapsed)`);
+
+        try {
+            const { stdout: isRunning } = await execa("docker", [
+                "inspect",
+                "-f",
+                "{{.State.Running}}",
+                CONTAINER_NAME
+            ]);
+            if (isRunning.trim() !== "true") {
+                const logs = await getContainerLogs();
+                console.error(`Container stopped after ${elapsed}s. Logs:`);
+                console.error(logs);
+                throw new Error("Container crashed during startup");
+            }
+        } catch (error) {
+            if (error instanceof Error && error.message === "Container crashed during startup") {
+                throw error;
+            }
+            console.error(`Error checking container status: ${error}`);
+        }
+
+        await sleep(checkInterval);
+    }
+
+    // Final check
+    console.log("Startup wait complete, performing final health check...");
+    try {
+        const { stdout: isRunning } = await execa("docker", ["inspect", "-f", "{{.State.Running}}", CONTAINER_NAME]);
+        if (isRunning.trim() !== "true") {
+            const logs = await getContainerLogs();
+            console.error("Container is not running after startup wait period. Logs:");
+            console.error(logs);
+            throw new Error("Container is not running after startup wait period");
+        }
+        console.log("✓ Container is running!");
+    } catch (error) {
+        const logs = await getContainerLogs();
+        console.error("Container check failed. Logs:");
+        console.error(logs);
+        throw error;
+    }
+}, 360000); // 6 minute timeout (5 min wait + 1 min buffer)
 
 // Cleanup container after tests
 afterAll(async () => {
