@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -371,7 +371,10 @@
       }
     },
     {
-      "includes": ["packages/commons/docs-server/src/generateRadixColors.ts", "servers/fern-bot/src/libs/env.ts"],
+      "includes": [
+        "packages/commons/docs-server/src/generateRadixColors.ts",
+        "servers/fern-bot/src/libs/env.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
@@ -508,7 +511,9 @@
       }
     },
     {
-      "includes": ["servers/fdr/src/services/docs-cache/RedisDocsDefinitionStore.ts"],
+      "includes": [
+        "servers/fdr/src/services/docs-cache/RedisDocsDefinitionStore.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
