@@ -134,28 +134,9 @@ fi
 # -----------  End MINIO setup  -----------
 
 echo "Starting FDR server..."
-echo "Checking if FDR server files exist..."
-if [ ! -f /fdr/server.cjs ]; then
-    echo "ERROR: FDR server file /fdr/server.cjs not found!"
-    ls -la /fdr/ || echo "Cannot list /fdr directory"
-else
-    echo "FDR server file found at /fdr/server.cjs"
-fi
-
-echo "Starting node process for FDR server..."
 node /fdr/server.cjs > /var/log/fdr.log 2>&1 &
 fdr_pid=$!
 echo "FDR server PID: $fdr_pid"
-
-# Check if the process is still running after a brief pause
-sleep 1
-if kill -0 $fdr_pid 2>/dev/null; then
-    echo "FDR server process $fdr_pid is running"
-else
-    echo "ERROR: FDR server process $fdr_pid died immediately after starting!"
-    echo "Last 50 lines of FDR log:"
-    tail -n 50 /var/log/fdr.log 2>/dev/null || echo "No FDR log available"
-fi
 
 echo "Waiting for FDR to start at localhost:8080/health..."
 max_attempts=30
@@ -164,7 +145,6 @@ until curl -f http://localhost:8080/health 2>/dev/null; do
     attempt=$((attempt + 1))
     if [ $attempt -gt $max_attempts ]; then
         echo "ERROR: FDR failed to start after $max_attempts attempts"
-        echo "Checking if FDR process is still running..."
         if kill -0 $fdr_pid 2>/dev/null; then
             echo "FDR process is still running but not responding on port 8080"
         else
@@ -174,7 +154,7 @@ until curl -f http://localhost:8080/health 2>/dev/null; do
         tail -n 50 /var/log/fdr.log 2>/dev/null || echo "No FDR log available"
         break
     fi
-    echo "FDR not ready yet (attempt $attempt/$max_attempts), waiting 2 seconds..."
+    echo "FDR not ready yet, waiting 2 seconds..."
     sleep 2
 done
 
@@ -185,18 +165,11 @@ fi
 
 # --------------  Generate docs and insert into MinIO via FDR --------------
 
-echo "Starting docs generation process..."
-echo "Checking if fern command is available..."
-which fern || echo "WARNING: fern command not found in PATH"
-
 echo "running fern generate --docs"
 
-if FERN_SELF_HOSTED=true FERN_TOKEN=dummy OVERRIDE_FDR_ORIGIN=http://localhost:8080  FERN_NO_VERSION_REDIRECTION=true fern generate --docs; then
-    echo "docs generated successfully"
-else
-    echo "ERROR: fern generate --docs failed with exit code $?"
-    echo "Continuing anyway..."
-fi
+FERN_SELF_HOSTED=true FERN_TOKEN=dummy OVERRIDE_FDR_ORIGIN=http://localhost:8080  FERN_NO_VERSION_REDIRECTION=true fern generate --docs
+
+echo " docs generated successfully"
 
 # --------------  Finish generate docs --------------
 
@@ -235,43 +208,5 @@ until curl -f -X GET http://localhost:3000/api/fern-docs/search/v2/reindex/meili
 done
 echo "Successfully called /api/fern-docs/search/v2/reindex/meilisearch"
 
-echo "All services started. Monitoring services to keep the container running."
-echo "Service PIDs:"
-echo "  PostgreSQL: $postgres_pid"
-echo "  MeiliSearch: $meili_pid"
-echo "  MinIO: $minio_pid"
-echo "  FDR: $fdr_pid"
-echo "  Docs: ${docs_pid:-not set}"
-
-# Monitor services and keep container running
-while true; do
-    # Check if critical services are still running
-    all_running=true
-
-    if [ -n "$postgres_pid" ] && ! pidof postgres > /dev/null 2>&1; then
-        echo "WARNING: PostgreSQL is not running anymore"
-        all_running=false
-    fi
-
-    if [ -n "$meili_pid" ] && ! kill -0 $meili_pid 2>/dev/null; then
-        echo "WARNING: MeiliSearch (PID $meili_pid) is not running anymore"
-        all_running=false
-    fi
-
-    if [ -n "$minio_pid" ] && ! kill -0 $minio_pid 2>/dev/null; then
-        echo "WARNING: MinIO (PID $minio_pid) is not running anymore"
-        all_running=false
-    fi
-
-    if [ -n "$fdr_pid" ] && ! kill -0 $fdr_pid 2>/dev/null; then
-        echo "WARNING: FDR server (PID $fdr_pid) is not running anymore"
-        all_running=false
-    fi
-
-    if [ "$all_running" = false ]; then
-        echo "One or more critical services have stopped. Container will continue running for debugging."
-    fi
-
-    # Keep the container running
-    sleep 10
-done
+echo "All services started. Tailing logs to keep the container running."
+tail -f /dev/null
