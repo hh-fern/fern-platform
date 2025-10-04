@@ -16,9 +16,7 @@ export async function getContainerId(nameFilter: string): Promise<string> {
     if (ids.length === 0) {
         throw new Error(`No containers found matching filter: ${nameFilter}`);
     }
-    if (ids.length > 1) {
-        console.warn(`Multiple containers found matching filter ${nameFilter}, using first one: ${ids[0]}`);
-    }
+    // If multiple containers match, use the first one
     return ids[0];
 }
 
