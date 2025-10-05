@@ -16,7 +16,10 @@
         "paths": {
             "@/*": ["./src/*"]
         },
-        "baseUrl": "."
+        "baseUrl": ".",
+        "experimental": {
+            "plugins": [["@swc/plugin-styled-jsx", {}]]
+        }
     },
     "module": {
         "type": "es6"

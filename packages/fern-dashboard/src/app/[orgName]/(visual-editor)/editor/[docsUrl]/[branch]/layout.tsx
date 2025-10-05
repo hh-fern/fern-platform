@@ -11,8 +11,7 @@ import {
     HeaderToolbar,
     OrgNameProvider,
     PagesStoreProvider,
-    PreviewOnlyNotification,
-    VisualEditorApiClientProvider
+    PreviewOnlyNotification
 } from "@fern-dashboard/visual-editor/client";
 import { NavigationStoreProvider } from "@fern-docs/components/navigation/NavigationStoreContext";
 import { ThemeProvider } from "next-themes";
@@ -93,37 +92,35 @@ export default async function EditorLayout({
     return (
         <EditorShell>
             <ThemeProvider attribute="class" forcedTheme="light" enableSystem={false} disableTransitionOnChange>
-                <VisualEditorApiClientProvider value={DashboardApiClient}>
-                    <OrgNameProvider orgName={orgName}>
-                        <BranchProvider branch={branch} branchFailed={branchFailed}>
-                            <GitHubRepoProvider branch={branch} sourceRepo={sourceRepo}>
-                                <NavigationStoreProvider branchName={branch} orgName={orgName} docsUrl={docsUrl}>
-                                    <PagesStoreProvider branchName={branch}>
-                                        <CurrentPageProvider>
-                                            <ClientMDXProvider>
-                                                <DevModeProvider>
-                                                    <EditorProvider>
-                                                        <GitPRProvider
-                                                            owner={sourceRepo.owner}
-                                                            repo={sourceRepo.repo}
-                                                            baseBranch={sourceRepo.baseBranch}
-                                                            branch={branch}
-                                                            site={docsUrl}
-                                                        >
-                                                            <HeaderToolbar session={session} docsUrl={docsUrl} />
-                                                            <PreviewOnlyNotification />
-                                                            {children}
-                                                        </GitPRProvider>
-                                                    </EditorProvider>
-                                                </DevModeProvider>
-                                            </ClientMDXProvider>
-                                        </CurrentPageProvider>
-                                    </PagesStoreProvider>
-                                </NavigationStoreProvider>
-                            </GitHubRepoProvider>
-                        </BranchProvider>
-                    </OrgNameProvider>
-                </VisualEditorApiClientProvider>
+                <OrgNameProvider orgName={orgName}>
+                    <BranchProvider branch={branch} branchFailed={branchFailed}>
+                        <GitHubRepoProvider branch={branch} sourceRepo={sourceRepo}>
+                            <NavigationStoreProvider branchName={branch} orgName={orgName} docsUrl={docsUrl}>
+                                <PagesStoreProvider branchName={branch}>
+                                    <CurrentPageProvider>
+                                        <ClientMDXProvider>
+                                            <DevModeProvider>
+                                                <EditorProvider>
+                                                    <GitPRProvider
+                                                        owner={sourceRepo.owner}
+                                                        repo={sourceRepo.repo}
+                                                        baseBranch={sourceRepo.baseBranch}
+                                                        branch={branch}
+                                                        site={docsUrl}
+                                                    >
+                                                        <HeaderToolbar session={session} docsUrl={docsUrl} />
+                                                        <PreviewOnlyNotification />
+                                                        {children}
+                                                    </GitPRProvider>
+                                                </EditorProvider>
+                                            </DevModeProvider>
+                                        </ClientMDXProvider>
+                                    </CurrentPageProvider>
+                                </PagesStoreProvider>
+                            </NavigationStoreProvider>
+                        </GitHubRepoProvider>
+                    </BranchProvider>
+                </OrgNameProvider>
             </ThemeProvider>
         </EditorShell>
     );

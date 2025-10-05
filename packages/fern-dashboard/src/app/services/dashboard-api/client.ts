@@ -1,3 +1,5 @@
+"use client";
+
 import type { generatePrDescription } from "@/app/api/generate-pr-description/route";
 import type { getDocsUrlOwner } from "@/app/api/get-docs-url-owner/route";
 import type { getGithubSourceMetadata } from "@/app/api/get-github-source-metadata/route";

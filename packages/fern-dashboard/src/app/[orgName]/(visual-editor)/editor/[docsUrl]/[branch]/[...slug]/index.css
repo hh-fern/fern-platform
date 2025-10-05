@@ -21,7 +21,6 @@
   @import "../../../../../../../../../fern-docs/bundle/src/components/css/components.scss";
   @import "../../../../../../../../../fern-docs/bundle/src/components/FernAnchor.scss";
   @import "../../../../../../../../../fern-docs/bundle/src/components/css/rmiz.scss";
-  @import "../../../../../../../docs/mdx/components/index.scss";
 
   @apply font-body text-body bg-background text-base;
   @apply h-full;

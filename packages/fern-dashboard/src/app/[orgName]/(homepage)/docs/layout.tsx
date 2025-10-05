@@ -13,5 +13,5 @@ export default async function DocsLayout({
 
     await getAuthenticatedSessionOrRedirect(orgName);
 
-    return <>{children}</>;
+    return children;
 }
