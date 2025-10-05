@@ -42,6 +42,7 @@ export function applyTemplates(code: string, data?: Record<string, string>) {
     try {
         return template(code, { interpolate: /{{([^}]+)}}/g })(data);
     } catch (error) {
+        // biome-ignore lint/suspicious/noConsole: allow console.error for now
         console.error(`[templates] ${JSON.stringify(error)}`);
         return code;
     }

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/** biome-ignore-all lint/suspicious/noConsole: allow console.log for now */
 import { mdxToAST, mdxToHtml } from "@fern-docs/mdx";
 
 // Sample MDX content for testing

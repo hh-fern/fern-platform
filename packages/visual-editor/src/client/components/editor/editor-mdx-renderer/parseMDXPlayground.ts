@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/** biome-ignore-all lint/suspicious/noConsole: allow console.log for now */
 import { editableComponents, parseMDX, richTextComponents } from "./parse";
 
 // Sample MDX content for testing

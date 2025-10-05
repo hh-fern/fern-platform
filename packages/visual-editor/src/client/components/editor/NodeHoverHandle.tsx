@@ -5,7 +5,9 @@ import { GripVertical } from "lucide-react";
 export default function NodeHoverHandle() {
     const { editor } = useCurrentEditor();
 
-    if (!editor) return null;
+    if (!editor) {
+        return null;
+    }
 
     return (
         <DragHandle editor={editor} computePositionConfig={{ placement: "left-start", strategy: "absolute" }}>

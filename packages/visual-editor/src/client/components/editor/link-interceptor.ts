@@ -9,10 +9,14 @@ export const getInterceptedLink = (
     const target = event.target as HTMLElement;
     const link = target.closest("a");
 
-    if (!link) return;
+    if (!link) {
+        return;
+    }
 
     const href = link.getAttribute("href");
-    if (!href) return;
+    if (!href) {
+        return;
+    }
 
     // Skip external links, anchors, and already modified links
     if (href.startsWith("http") || href.startsWith("mailto:") || href.startsWith("#") || href.includes("/editor/")) {

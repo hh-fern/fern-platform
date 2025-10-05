@@ -47,6 +47,7 @@ export const TwoSlash: React.FC<TwoSlashProps> = ({ content }) => {
 
             // Ensure we have a valid React component
             if (typeof Component !== "function") {
+                // biome-ignore lint/suspicious/noConsole: allow console.error for now
                 console.error("Invalid component type:", typeof Component);
                 throw new Error(`Invalid component type: ${typeof Component}`);
             }
@@ -54,6 +55,7 @@ export const TwoSlash: React.FC<TwoSlashProps> = ({ content }) => {
             Component.displayName = "TwoSlashComponent";
             return Component;
         } catch (error) {
+            // biome-ignore lint/suspicious/noConsole: allow console.error for now
             console.error("Failed to evaluate serialized component:", error);
             const ErrorComponent = () => (
                 <div style={{ color: "red", padding: "1rem" }}>
