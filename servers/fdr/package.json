@@ -6,7 +6,9 @@
   "author": "Deep Singhvi <deep@buildwithfern.com>",
   "type": "module",
   "main": "dist/index.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build:tsup:cjs": "tsup src/server.ts --config tsup.config.ts --format cjs --out-dir cjs",
     "build:tsup:esm": "tsup src/server.ts --format esm --out-dir dist/esm",
@@ -84,13 +86,13 @@
     "prisma": "5.13.0",
     "redis": "^4.6.13",
     "semver": "^7.6.2",
-    "tsup": "^8.3.5",
+    "tsup": "catalog:",
     "tsx": "^4.7.1",
-    "typescript": "^5",
+    "typescript": "catalog:",
     "undici": "^6.20.1",
     "url-join": "catalog:",
-    "uuid": "^11.1.0",
-    "vitest": "^3.2.4",
+    "uuid": "catalog:",
+    "vitest": "catalog:",
     "winston": "^3.10.0"
   }
 }

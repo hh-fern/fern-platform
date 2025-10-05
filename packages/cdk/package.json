@@ -12,7 +12,9 @@
   "main": "dist/cdk.js",
   "source": "src/cdk.ts",
   "types": "dist/cdk.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "cdk": "cdk",
@@ -34,9 +36,9 @@
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
     "@types/archiver": "^6.0.2",
-    "@types/node": "^22.0.0",
+    "@types/node": "catalog:",
     "aws-cdk": "^2.1029.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "catalog:"
   }
 }

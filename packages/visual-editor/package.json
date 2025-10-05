@@ -1,16 +1,19 @@
 {
-  "name": "@fern-docs/search-utils",
+  "name": "@fern-dashboard/visual-editor",
   "version": "0.0.0",
   "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/fern-api/fern-platform.git",
-    "directory": "packages/fern-docs/search-server/utils"
+    "directory": "packages/visual-editor"
   },
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/js/index.js"
+    }
   },
   "files": [
     "dist"
@@ -19,31 +22,27 @@
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "tsc --build",
     "depcheck": "depcheck",
-    "dev": "tsc --watch",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "lint:eslint": "eslint --max-warnings 0 .",
     "lint:eslint:fix": "pnpm lint:eslint --fix",
     "lint:style": "stylelint 'src/**/*.scss' --allow-empty-input --max-warnings 0",
     "lint:style:fix": "pnpm lint:style --fix",
-    "test": "vitest --run --passWithNoTests --globals",
-    "test:update": "vitest --run -u --passWithNoTests --globals"
+    "test": "vitest --run --passWithNoTests --globals"
   },
-  "dependencies": {
-    "@fern-api/docs-utils": "workspace:*",
-    "@fern-api/fdr-sdk": "workspace:*",
-    "@fern-api/ui-core-utils": "workspace:*",
-    "@fern-docs/mdx": "workspace:*",
-    "es-toolkit": "^1.32.0",
-    "html-entities": "^2.5.2",
-    "zod": "catalog:"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
-    "@types/node": "^22.0.0",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "depcheck": "^1.4.7",
-    "stylelint": "^16.1.0",
+    "react": "catalog:",
+    "tsup": "catalog:",
     "typescript": "catalog:",
+    "vite": "^6.1.0",
     "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^19"
   }
 }

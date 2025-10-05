@@ -17,7 +17,9 @@
   },
   "main": "src/index.ts",
   "module": "src/index.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "pnpm compile:js && pnpm compile:types",
@@ -41,7 +43,7 @@
     "@swc/core": "catalog:",
     "@types/node": "^22.0.0",
     "depcheck": "^1.4.7",
-    "typescript": "^5",
-    "vitest": "^3.2.4"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

@@ -19,7 +19,9 @@
   "module": "src/index.ts",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "tsc --build",
@@ -42,7 +44,7 @@
     "depcheck": "^1.4.7",
     "simple-git": "^3.24.0",
     "stylelint": "^16.1.0",
-    "typescript": "^5",
-    "vitest": "^3.2.4"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

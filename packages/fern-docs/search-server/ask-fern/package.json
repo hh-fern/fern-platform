@@ -12,7 +12,9 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "tsc --build",
@@ -51,7 +53,7 @@
     "depcheck": "^1.4.7",
     "stylelint": "^16.1.0",
     "tmp-promise": "^3.0.3",
-    "typescript": "^5",
-    "vitest": "^3.2.4"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

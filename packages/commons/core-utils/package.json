@@ -40,7 +40,9 @@
   },
   "main": "dist/index.js",
   "source": "src/index.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "tsc --build",
@@ -62,12 +64,12 @@
   },
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
-    "@types/node": "^22.0.0",
+    "@types/node": "catalog:",
     "@types/title": "^3.4.3",
     "@types/ua-parser-js": "^0.7.39",
-    "depcheck": "^1.4.7",
-    "stylelint": "^16.1.0",
-    "typescript": "^5",
-    "vitest": "^3.2.4"
+    "depcheck": "catalog:",
+    "stylelint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
