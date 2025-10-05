@@ -21,7 +21,6 @@ import {
     TextInputControl
 } from "./controls";
 import { useEditorComponent } from "./EditorComponentContext";
-import "./controls.scss";
 
 // Context types with generics
 interface EditorComponentPopoverContextValue<T extends AttributeConfig = AttributeConfig> {

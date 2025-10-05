@@ -1,4 +1,4 @@
-import type { Auth0OrgName } from "@fern-dashboard/visual-editor/shared/auth0";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import type { VisualEditorApiClient } from "../providers/VisualEditorApiClientContext";
 
 export const DEFAULT_PR_TITLE = "Visual Editor: Update";

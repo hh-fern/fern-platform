@@ -6,8 +6,6 @@ import type React from "react";
 
 import { useResolvedTheme } from "@/client/docs/hooks/use-theme";
 
-import "./index.scss";
-
 const JsonView = dynamic(() => import("@microlink/react-json-view"), {
     ssr: false
 });
