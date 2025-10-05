@@ -1,13 +1,13 @@
 "use client";
 
 import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import { CSSProvider } from "@fern-dashboard/visual-editor";
+import type { SerializableFoundNode } from "@fern-docs/components/navigation/types";
 import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 import type { MdxToHtmlResponse } from "@fern-docs/mdx";
 import { useMemo } from "react";
-import { CSSProvider } from "@/components/editor/extension-custom-element/CSSContext";
 import { UnsupportedContent } from "@/components/editor/UnsupportedContent";
 import { usePages } from "@/providers/PagesStoreContext";
-
 import PageContents from "./PageContents";
 
 export declare namespace PageNode {
