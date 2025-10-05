@@ -9,7 +9,7 @@
       "cache": false
     },
     "compile": {
-      "outputs": ["dist/**"],
+      "outputs": ["dist/**", "tsconfig.tsbuildinfo"],
       "dependsOn": ["^compile"],
       "env": ["NODE_ENV", "VERCEL_ENV"]
     },
@@ -44,7 +44,13 @@
     "docs:dev": {
       "persistent": true,
       "dependsOn": ["^build", "^compile"],
-      "inputs": ["$TURBO_DEFAULT$", ".env.production.local", ".env.local", ".env.production", ".env"]
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env.production.local",
+        ".env.local",
+        ".env.production",
+        ".env"
+      ]
     },
     "docs:build": {
       "dependsOn": ["^build", "^compile", "^docs:build"],
@@ -102,6 +108,22 @@
         "VERCEL_URL",
         "NEXT_DEPLOYMENT_ID"
       ]
+    },
+    "dashboard:build": {
+      "dependsOn": ["compile"],
+      "outputs": [".next/**", "!.next/cache/**"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "env": ["SENTRY_AUTH_TOKEN", "EMAIL_ORG_MAPPINGS"]
+    },
+    "dashboard:dev": {
+      "persistent": true,
+      "dependsOn": ["^build", "^compile"]
+    },
+    "dashboard:start": {
+      "dependsOn": ["dashboard:build"]
+    },
+    "dashboard:lint": {
+      "dependsOn": ["^build", "^compile"]
     }
   },
   "globalDependencies": ["eslint.config.mjs", ".prettierrc.json"]

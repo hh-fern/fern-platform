@@ -26,12 +26,15 @@
       "default": "./src/client/styles.scss"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "pnpm compile:js && pnpm compile:types",
     "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
     "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
+    "dashboard:dev": "pnpm dev",
     "depcheck": "depcheck",
     "dev": "swc ./src --out-dir ./dist/js --watch --copy-files --strip-leading-paths",
     "format": "prettier --write --ignore-unknown \"**\"",

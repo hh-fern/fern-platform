@@ -12,25 +12,6 @@
         "FERN_BOT_PRIVATE_KEY",
         "VE_IMAGES_PUBLIC_S3_BUCKET_NAME"
       ]
-    },
-    "compile": {
-      "outputs": ["tsconfig.tsbuildinfo"],
-      "dependsOn": ["^build", "^compile", "codegen"]
-    },
-    "dashboard:build": {
-      "dependsOn": ["compile"],
-      "outputs": [".next/**", "!.next/cache/**"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": ["SENTRY_AUTH_TOKEN", "EMAIL_ORG_MAPPINGS"]
-    },
-    "dashboard:dev": {
-      "dependsOn": ["^build", "^compile"]
-    },
-    "dashboard:start": {
-      "dependsOn": ["dashboard:build"]
-    },
-    "dashboard:lint": {
-      "dependsOn": ["^build", "^compile"]
     }
   }
 }
