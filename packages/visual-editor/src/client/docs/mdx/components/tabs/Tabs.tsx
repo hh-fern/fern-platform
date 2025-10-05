@@ -16,8 +16,8 @@ import React, {
     useRef,
     useState
 } from "react";
-import { useEditorComponentChildren } from "@/client/components/editor/editor-component";
 import { TextInputControl } from "@/client/components/editor/editor-component/controls";
+import { useEditorComponentChildren } from "@/client/components/editor/editor-component/EditorComponentChildrenContext";
 import {
     type EditorComponentContextValue,
     EditorComponentProvider,

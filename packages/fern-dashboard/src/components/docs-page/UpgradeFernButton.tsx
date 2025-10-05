@@ -1,7 +1,7 @@
 "use client";
 
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
-import { ErrorUpgradeFernCliVersionToast } from "@fern-dashboard/visual-editor/client";
+import { ErrorUpgradeFernCliVersionToast } from "@fern-dashboard/visual-editor/client/components/editor/EditorToasts";
 import SparklesIcon from "@heroicons/react/24/outline/SparklesIcon";
 import { ExternalLink, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";

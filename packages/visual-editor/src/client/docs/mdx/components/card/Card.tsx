@@ -14,7 +14,7 @@ import {
 import { DisableFernAnchor } from "@/client/docs/components/FernAnchor";
 import { FernLinkCard } from "@/client/docs/components/FernLinkCard";
 
-import { Badge } from "../badge";
+import { Badge } from "../badge/Badge";
 import { useCardGroup } from "./CardGroupContext";
 
 export declare namespace Card {

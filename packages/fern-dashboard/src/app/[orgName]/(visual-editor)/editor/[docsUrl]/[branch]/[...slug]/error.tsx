@@ -1,6 +1,6 @@
 "use client";
 
-import { UnsupportedContent } from "@fern-dashboard/visual-editor/client";
+import { UnsupportedContent } from "@fern-dashboard/visual-editor/client/components/editor/UnsupportedContent";
 
 export default function Error({ error: _error }: { error: Error }) {
     // TODO: We should make this error message more specific to the error thrown. Right now this

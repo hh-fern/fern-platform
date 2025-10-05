@@ -14,19 +14,20 @@ import {
     MousePointerClick,
     Square
 } from "lucide-react";
-
-import { EMPTY_ACCORDION_CONTENT, EMPTY_ACCORDION_GROUP_CONTENT } from "@/client/docs/mdx/components/accordion";
-import { EMPTY_BUTTON_CONTENT } from "@/client/docs/mdx/components/button";
+import {
+    EMPTY_ACCORDION_CONTENT,
+    EMPTY_ACCORDION_GROUP_CONTENT
+} from "@/client/docs/mdx/components/accordion/AccordionGroup";
+import { EMPTY_BUTTON_CONTENT } from "@/client/docs/mdx/components/button/Button";
 import { EMPTY_CALLOUT_CONTENT } from "@/client/docs/mdx/components/callout/Callout";
 import { EMPTY_CARD_CONTENT, EMPTY_CARD_GROUP_CONTENT } from "@/client/docs/mdx/components/card/CardGroup";
 import { EMPTY_PARAM_FIELD_CONTENT } from "@/client/docs/mdx/components/parameters/ParamField";
 import { EMPTY_ENDPOINT_REQUEST_SNIPPET } from "@/client/docs/mdx/components/snippets/EndpointRequestSnippet";
 import { EMPTY_ENDPOINT_RESPONSE_SNIPPET } from "@/client/docs/mdx/components/snippets/EndpointResponseSnippet";
 import { EMPTY_ENDPOINT_SCHEMA_SNIPPET } from "@/client/docs/mdx/components/snippets/EndpointSchemaSnippet";
-import { EMPTY_STEPS_CONTENT } from "@/client/docs/mdx/components/steps";
+import { EMPTY_STEPS_CONTENT } from "@/client/docs/mdx/components/steps/Steps";
 import { EMPTY_TABS_CONTENT } from "@/client/docs/mdx/components/tabs/Tabs";
 import { EMPTY_EMBED_CONTENT } from "@/client/editor/components/Embed";
-
 import type { SuggestionItem } from "../tiptap-ui-utils/suggestion-menu";
 import { createCustomElementNode } from "./extension-custom-element/create-custom-element-node";
 

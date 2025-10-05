@@ -1,6 +1,7 @@
 "use client";
 
-import { useEditingDisabled, usePages } from "@fern-dashboard/visual-editor/client";
+import { useEditingDisabled } from "@fern-dashboard/visual-editor/client/hooks/useEditingDisabled";
+import { usePages } from "@fern-dashboard/visual-editor/client/providers/PagesStoreContext";
 import { cn } from "@fern-docs/components/cn";
 import { useEffect, useState } from "react";
 import { AutoResizingInput } from "@/components/input/AutoResizingInput";

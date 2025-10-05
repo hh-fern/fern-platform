@@ -6,11 +6,12 @@ import type { ComponentProps } from "react";
 import { UnsupportedContent } from "@/client/components/editor/UnsupportedContent";
 import { ErrorBoundary, ErrorBoundaryFallback } from "@/client/docs/components/error-boundary";
 import { Embed } from "@/client/editor/components/Embed";
-import { Accordion, AccordionGroup } from "./accordion";
-import { Availability } from "./availability";
-import { Badge } from "./badge";
-import { Bleed } from "./bleed";
-import { Button, ButtonGroup } from "./button";
+import { Accordion, AccordionGroup } from "./accordion/AccordionGroup";
+import { Availability } from "./availability/Availability";
+import { Badge } from "./badge/Badge";
+import { Bleed } from "./bleed/Bleed";
+import { Button } from "./button/Button";
+import { ButtonGroup } from "./button/ButtonGroup";
 import {
     Callout,
     CheckCallout,
@@ -21,30 +22,32 @@ import {
     SuccessCallout,
     TipCallout,
     WarningCallout
-} from "./callout";
-import { Card, CardGroup } from "./card";
-import { ClientLibraries } from "./client-libraries";
+} from "./callout/Callout";
+import { Card } from "./card/Card";
+import { CardGroup } from "./card/CardGroup";
+import { ClientLibraries } from "./client-libraries/ClientLibraries";
 import { CodeBlock } from "./code/CodeBlock";
 import { CodeBlocks } from "./code/CodeBlocks";
 import { CodeGroup } from "./code/CodeGroup";
 import { Template } from "./code/Template";
-import { Column, ColumnGroup } from "./columns";
+import { Column, ColumnGroup } from "./columns/ColumnGroup";
 import { Feature } from "./feature";
-import { Frame } from "./frame";
+import { Frame } from "./frame/Frame";
 import { A, HeadingRenderer, Image, Li, Ol, Strong, Ul } from "./html";
-import { Table } from "./html-table";
+import { Table } from "./html-table/Table";
 import { Icon } from "./icon/Icon";
-import { If } from "./if";
-import { Json } from "./json";
-import { Mermaid } from "./mermaid";
+import { If } from "./if/If";
+import { Json } from "./json/JSON";
+import { Mermaid } from "./mermaid/Mermaid";
 import { ParamField } from "./parameters/ParamField";
 import { EndpointRequestSnippet } from "./snippets/EndpointRequestSnippet";
 import { EndpointResponseSnippet } from "./snippets/EndpointResponseSnippet";
 import { EndpointSchemaSnippet } from "./snippets/EndpointSchemaSnippet";
+import { Step } from "./steps/Step";
+import { StepGroup } from "./steps/Steps";
 // import { EndpointRequestSnippet, EndpointResponseSnippet } from "./snippets";
 // import { EndpointSchemaSnippet } from "./snippets/EndpointSchemaSnippet";
-import { Step, StepGroup } from "./steps";
-import { Tab, TabGroup } from "./tabs";
+import { Tab, TabGroup } from "./tabs/Tabs";
 
 // const ElevenLabsWaveform = dynamic(
 //   () => import("./waveform/WaveformComplex").then((mod) => mod.default),

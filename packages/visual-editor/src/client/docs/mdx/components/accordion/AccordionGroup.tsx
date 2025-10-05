@@ -6,8 +6,8 @@ import { cn } from "@fern-docs/components/cn";
 import { useCurrentAnchor } from "@fern-docs/components/hooks/use-anchor";
 import { CirclePlusIcon } from "lucide-react";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useEditorComponentChildren } from "@/client/components/editor/editor-component";
 import { TextInputControl } from "@/client/components/editor/editor-component/controls";
+import { useEditorComponentChildren } from "@/client/components/editor/editor-component/EditorComponentChildrenContext";
 import { useEditorComponent } from "@/client/components/editor/editor-component/EditorComponentContext";
 import {
     EditorComponentPopoverButton,
@@ -288,9 +288,11 @@ export function Accordion(props: AccordionProps) {
                 <AccordionItem
                     {...props}
                     registerAccordion={() => {
+                        // biome-ignore lint/suspicious/noConsole: allow console.error for now
                         console.error("[registerAccordion] AccordionItem is not within an AccordionContext");
                     }}
                     unregisterAccordion={() => {
+                        // biome-ignore lint/suspicious/noConsole: allow console.error for now
                         console.error("[unregisterAccordion] AccordionItem is not within an AccordionContext");
                     }}
                     accordions={[{ id: props.id || "", title: props.title || "" }]}

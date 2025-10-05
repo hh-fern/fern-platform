@@ -1,5 +1,5 @@
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
-import { OrgNameProvider } from "@fern-dashboard/visual-editor/client";
+import { OrgNameProvider } from "@fern-dashboard/visual-editor/client/providers/OrgNameContext";
 import { ThemeProvider } from "next-themes";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { SidepanelProvider } from "@/components/layout/SidepanelContext";

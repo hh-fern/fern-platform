@@ -1,7 +1,9 @@
 "use client";
 
 import type { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { CSSProvider, UnsupportedContent, usePages } from "@fern-dashboard/visual-editor/client";
+import { CSSProvider } from "@fern-dashboard/visual-editor/client/components/editor/extension-custom-element/CSSContext";
+import { UnsupportedContent } from "@fern-dashboard/visual-editor/client/components/editor/UnsupportedContent";
+import { usePages } from "@fern-dashboard/visual-editor/client/providers/PagesStoreContext";
 import type { SerializableFoundNode } from "@fern-docs/components/navigation/types";
 import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 import type { MdxToHtmlResponse } from "@fern-docs/mdx";

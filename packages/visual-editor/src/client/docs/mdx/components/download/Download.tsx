@@ -3,8 +3,8 @@ import type { FernLink } from "@fern-docs/components/FernLink";
 import { last } from "es-toolkit/array";
 import React, { type ComponentProps, type PropsWithChildren } from "react";
 
-import { Button } from "../button";
-import { Card } from "../card";
+import { Button } from "../button/Button";
+import { Card } from "../card/Card";
 import { A } from "../html";
 
 export function Download({ children, src, filename }: PropsWithChildren<{ src?: string; filename?: string }>) {

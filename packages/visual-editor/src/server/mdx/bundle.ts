@@ -1,4 +1,4 @@
-import "server-only";
+"use server";
 
 import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
 import { bundleMDX as internalBundleMDX } from "mdx-bundler";

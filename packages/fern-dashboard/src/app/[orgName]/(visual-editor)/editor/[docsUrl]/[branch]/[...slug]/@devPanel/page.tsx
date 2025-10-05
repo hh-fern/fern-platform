@@ -1,6 +1,9 @@
 "use client";
 
-import { useDevMode, useEditingDisabled, usePages, WarningValidationToast } from "@fern-dashboard/visual-editor/client";
+import { WarningValidationToast } from "@fern-dashboard/visual-editor/client/components/editor/EditorToasts";
+import { useEditingDisabled } from "@fern-dashboard/visual-editor/client/hooks/useEditingDisabled";
+import { useDevMode } from "@fern-dashboard/visual-editor/client/providers/DevModeProvider";
+import { usePages } from "@fern-dashboard/visual-editor/client/providers/PagesStoreContext";
 import { mdxToHtml } from "@fern-docs/mdx";
 import type { Monaco } from "@monaco-editor/react";
 import { Code2 } from "lucide-react";

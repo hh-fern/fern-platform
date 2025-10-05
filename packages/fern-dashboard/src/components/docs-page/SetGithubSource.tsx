@@ -3,7 +3,7 @@ import {
     ErrorEditSourceToast,
     ErrorInvalidGithubUrlToast,
     SuccessfulEditSourceToast
-} from "@fern-dashboard/visual-editor/client";
+} from "@fern-dashboard/visual-editor/client/components/editor/EditorToasts";
 import { validateUrlIsGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 import ExclamationCircleIcon from "@heroicons/react/24/outline/ExclamationCircleIcon";
 import { useQueryClient } from "@tanstack/react-query";

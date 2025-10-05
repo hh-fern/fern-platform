@@ -1,18 +1,16 @@
 import "server-only";
 
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
-import {
-    BranchProvider,
-    ClientMDXProvider,
-    DevModeProvider,
-    EditorProvider,
-    GitHubRepoProvider,
-    GitPRProvider,
-    HeaderToolbar,
-    OrgNameProvider,
-    PagesStoreProvider,
-    PreviewOnlyNotification
-} from "@fern-dashboard/visual-editor/client";
+import { HeaderToolbar } from "@fern-dashboard/visual-editor/client/components/editor/HeaderToolbar";
+import { PreviewOnlyNotification } from "@fern-dashboard/visual-editor/client/components/editor/PreviewOnlyNotification";
+import { BranchProvider } from "@fern-dashboard/visual-editor/client/providers/BranchContext";
+import { ClientMDXProvider } from "@fern-dashboard/visual-editor/client/providers/ClientMDXProvider";
+import { DevModeProvider } from "@fern-dashboard/visual-editor/client/providers/DevModeProvider";
+import { EditorProvider } from "@fern-dashboard/visual-editor/client/providers/EditorContext";
+import { GitHubRepoProvider } from "@fern-dashboard/visual-editor/client/providers/GitHubRepoContext";
+import { GitPRProvider } from "@fern-dashboard/visual-editor/client/providers/GitPRContext";
+import { OrgNameProvider } from "@fern-dashboard/visual-editor/client/providers/OrgNameContext";
+import { PagesStoreProvider } from "@fern-dashboard/visual-editor/client/providers/PagesStoreContext";
 import { NavigationStoreProvider } from "@fern-docs/components/navigation/NavigationStoreContext";
 import { ThemeProvider } from "next-themes";
 import type React from "react";
@@ -20,7 +18,6 @@ import getGithubSourceMetadata from "@/app/api/get-github-source-metadata/handle
 import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import createBranchIfNotExists from "@/app/services/dal/github/createBranchIfNotExists";
 import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
-import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { CurrentPageProvider } from "@/providers/CurrentPageContext";
 import { throwDigestibleError } from "@/utils/errors";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";

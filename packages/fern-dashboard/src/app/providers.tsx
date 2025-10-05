@@ -1,7 +1,7 @@
 "use client";
 
 import type { Auth0SessionData } from "@fern-dashboard/services/auth/getCurrentSession";
-import { VisualEditorApiClientProvider } from "@fern-dashboard/visual-editor/client";
+import { VisualEditorApiClientProvider } from "@fern-dashboard/visual-editor/client/providers/VisualEditorApiClientContext";
 import CheckCircleIcon from "@heroicons/react/24/outline/CheckCircleIcon";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";

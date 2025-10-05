@@ -10,20 +10,20 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    "./client": {
-      "types": "./dist/types/client/index.d.ts",
-      "default": "./dist/js/client/index.js"
+    "./client/*": {
+      "types": "./dist/types/client/*.d.ts",
+      "default": "./dist/js/client/*.js"
     },
-    "./server": {
-      "types": "./dist/types/server/index.d.ts",
-      "default": "./dist/js/server/index.js"
+    "./server/*": {
+      "types": "./dist/types/server/*.d.ts",
+      "default": "./dist/js/server/*.js"
     },
     "./shared/*": {
       "types": "./dist/types/shared/*.d.ts",
       "default": "./dist/js/shared/*.js"
     },
     "./styles": {
-      "default": "./dist/js/client/styles.scss"
+      "default": "./src/client/styles.scss"
     }
   },
   "files": [

@@ -1,4 +1,16 @@
 {
-  "ignores": ["@fern-platform/configs", "@types/node", "vite", "@types/react"],
+  "ignores": [
+    "@fern-platform/configs",
+    "@monaco-editor/react",
+    "@swc/core",
+    "@swc/cli",
+    "@swc/plugin-styled-jsx",
+    "@types/node",
+    "@types/react",
+    "glslify-import",
+    "glslify-loader",
+    "styled-jsx",
+    "vite"
+  ],
   "ignore-patterns": ["dist"]
 }

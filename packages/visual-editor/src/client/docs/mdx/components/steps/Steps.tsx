@@ -13,8 +13,8 @@ import {
     useRef,
     useState
 } from "react";
-import { useEditorComponentChildren } from "@/client/components/editor/editor-component";
 import { CheckboxControl } from "@/client/components/editor/editor-component/controls";
+import { useEditorComponentChildren } from "@/client/components/editor/editor-component/EditorComponentChildrenContext";
 import {
     type EditorComponentContextValue,
     useEditorComponent

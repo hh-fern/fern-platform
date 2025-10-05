@@ -7,7 +7,7 @@
 @import "@fern-dashboard/visual-editor/styles";
 
 @source "../../../../../../../components";
-@source "../../../../../../../../../visual-editor";
+@source "../../../../../../../../../visual-editor/src";
 
 :root {
   --header-toolbar-height: 54px;

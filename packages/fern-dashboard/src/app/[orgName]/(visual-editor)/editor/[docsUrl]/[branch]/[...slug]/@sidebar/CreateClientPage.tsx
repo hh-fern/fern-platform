@@ -3,7 +3,9 @@
 import { useRouter } from "@bprogress/next/app";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
-import { useGitHubRepo, useGitPrInfo, usePages } from "@fern-dashboard/visual-editor/client";
+import { useGitHubRepo } from "@fern-dashboard/visual-editor/client/providers/GitHubRepoContext";
+import { useGitPrInfo } from "@fern-dashboard/visual-editor/client/providers/GitPRContext";
+import { usePages } from "@fern-dashboard/visual-editor/client/providers/PagesStoreContext";
 import { createMdxFrontmatter } from "@fern-docs/components/navigation/mdxUtils";
 import { getAllSections, UNNAMED_SECTION_DISPLAY_NAMES } from "@fern-docs/components/navigation/pageUtils";
 import type { NavigationContext, SectionWithHierarchy } from "@fern-docs/components/navigation/types";
