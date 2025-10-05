@@ -1054,9 +1054,6 @@ importers:
       '@bprogress/next':
         specifier: ^3.2.11
         version: 3.2.12(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@fern-api/docs-auth':
-        specifier: workspace:*
-        version: link:../commons/docs-auth
       '@fern-api/docs-loader':
         specifier: workspace:*
         version: link:../commons/docs-loader
@@ -1066,18 +1063,12 @@ importers:
       '@fern-api/docs-utils':
         specifier: workspace:*
         version: link:../commons/docs-utils
-      '@fern-api/endpoint-snippet-dependencies':
-        specifier: workspace:*
-        version: link:endpoint-snippet-dependencies
       '@fern-api/fai-sdk':
         specifier: workspace:*
         version: link:../fai-sdk
       '@fern-api/fdr-sdk':
         specifier: workspace:*
         version: link:../fdr-sdk
-      '@fern-api/ui-core-utils':
-        specifier: workspace:*
-        version: link:../commons/core-utils
       '@fern-api/venus-api-sdk':
         specifier: ^0.13.4-7-g5ff8ee8
         version: 0.13.4-7-g5ff8ee8
@@ -1105,36 +1096,18 @@ importers:
       '@fern-ui/loadable':
         specifier: workspace:*
         version: link:../commons/loadable
-      '@fern-ui/react-commons':
-        specifier: workspace:*
-        version: link:../commons/react-commons
       '@floating-ui/react':
         specifier: ^0.27.16
         version: 0.27.16(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.0.0)
-      '@mdx-js/react':
-        specifier: ^3.1.0
-        version: 3.1.0(@types/react@19.0.10)(react@19.0.0)
-      '@microlink/react-json-view':
-        specifier: ^1.26.1
-        version: 1.26.1(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.53.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@octokit/auth-app':
-        specifier: ^8.1.0
-        version: 8.1.0
       '@octokit/core':
         specifier: ^7.0.4
         version: 7.0.4
-      '@radix-ui/primitive':
-        specifier: 'catalog:'
-        version: 1.1.1
-      '@radix-ui/react-compose-refs':
-        specifier: 'catalog:'
-        version: 1.1.1(@types/react@19.0.10)(react@19.0.0)
       '@radix-ui/react-dialog':
         specifier: 'catalog:'
         version: 1.1.6(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -1156,18 +1129,9 @@ importers:
       '@radix-ui/react-tabs':
         specifier: 'catalog:'
         version: 1.1.3(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@radix-ui/react-tooltip':
-        specifier: 'catalog:'
-        version: 1.1.8(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@react-three/drei':
-        specifier: 10.0.3
-        version: 10.0.3(@react-three/fiber@9.0.4(@types/react@19.0.10)(immer@10.1.1)(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.28.4)(@react-native-community/cli@13.6.4(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@types/react@19.0.10)(bufferutil@4.0.9)(react@19.0.0)(utf-8-validate@5.0.10))(react@19.0.0)(three@0.173.0))(@types/react@19.0.10)(@types/three@0.173.0)(immer@10.1.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.173.0)
-      '@react-three/fiber':
-        specifier: 9.0.4
-        version: 9.0.4(@types/react@19.0.10)(immer@10.1.1)(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.28.4)(@react-native-community/cli@13.6.4(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@types/react@19.0.10)(bufferutil@4.0.9)(react@19.0.0)(utf-8-validate@5.0.10))(react@19.0.0)(three@0.173.0)
       '@sentry/nextjs':
         specifier: ^10.12.0
-        version: 10.12.0(@opentelemetry/context-async-hooks@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.1.0(@opentelemetry/api@1.9.0))(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react@19.0.0)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+        version: 10.12.0(@opentelemetry/context-async-hooks@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.1.0(@opentelemetry/api@1.9.0))(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react@19.0.0)(webpack@5.98.0(@swc/core@1.13.5))
       '@sparticuz/chromium':
         specifier: ^133.0.0
         version: 133.0.0
@@ -1186,21 +1150,6 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@testing-library/react':
-        specifier: ^16.3.0
-        version: 16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@types/css-tree':
-        specifier: ^2.3.10
-        version: 2.3.10
-      '@types/three':
-        specifier: ^0.173.0
-        version: 0.173.0
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
-      '@upstash/redis':
-        specifier: ^1.34.6
-        version: 1.34.6
       '@vercel/analytics':
         specifier: ^1.5.0
         version: 1.5.0(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react@19.0.0)(svelte@5.19.2)
@@ -1219,42 +1168,18 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-      css-tree:
-        specifier: ^3.1.0
-        version: 3.1.0
       dayjs:
         specifier: ^1.11.18
         version: 1.11.18
-      es-toolkit:
-        specifier: ^1.39.7
-        version: 1.39.7
-      fastdom:
-        specifier: ^1.0.12
-        version: 1.0.12
-      github-slugger:
-        specifier: ^2.0.0
-        version: 2.0.0
       jotai:
         specifier: 'catalog:'
         version: 2.12.1(@types/react@19.0.10)(react@19.0.0)
       js-yaml:
         specifier: 'catalog:'
         version: 4.1.0
-      jsonwebtoken:
-        specifier: ^9.0.2
-        version: 9.0.2
-      lowlight:
-        specifier: ^3.3.0
-        version: 3.3.0
       lucide-react:
         specifier: ^0.460.0
         version: 0.460.0(react@19.0.0)
-      mdx-bundler:
-        specifier: ^10.1.1
-        version: 10.1.1(esbuild@0.25.10)
-      motion:
-        specifier: ^12.4.7
-        version: 12.4.7(@emotion/is-prop-valid@1.3.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next:
         specifier: 'catalog:'
         version: 15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0)
@@ -1276,15 +1201,6 @@ importers:
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
-      react-error-boundary:
-        specifier: ^5.0.0
-        version: 5.0.0(react@19.0.0)
-      react-hotkeys-hook:
-        specifier: ^5.1.0
-        version: 5.1.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      react-medium-image-zoom:
-        specifier: ^5.2.14
-        version: 5.2.14(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       recharts:
         specifier: ^2.15.4
         version: 2.15.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -1303,49 +1219,28 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@4.0.9)
-      three:
-        specifier: ^0.173.0
-        version: 0.173.0
-      ts-essentials:
-        specifier: 'catalog:'
-        version: 10.0.4(typescript@5.7.3)
-      url-join:
-        specifier: ^5.0.0
-        version: 5.0.0
-      uuid:
-        specifier: ^11.1.0
-        version: 11.1.0
       zod:
         specifier: 'catalog:'
         version: 3.25.49
-      zustand:
-        specifier: ^5.0.2
-        version: 5.0.3(@types/react@19.0.10)(immer@10.1.1)(react@19.0.0)(use-sync-external-store@1.5.0(react@19.0.0))
     devDependencies:
       '@fern-platform/configs':
         specifier: workspace:*
         version: link:../configs
       '@rsdoctor/cli':
         specifier: ^1.2.3
-        version: 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+        version: 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))
       '@rsdoctor/rspack-plugin':
         specifier: ^1.2.3
-        version: 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+        version: 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))
       '@rspack/core':
         specifier: ^1.2.3
         version: 1.4.5(@swc/helpers@0.5.15)
       '@tailwindcss/postcss':
         specifier: ^4.0.9
         version: 4.0.9
-      '@types/hast':
-        specifier: ^3.0.0
-        version: 3.0.4
       '@types/js-yaml':
         specifier: 'catalog:'
         version: 4.0.9
-      '@types/jsonwebtoken':
-        specifier: ^9.0.9
-        version: 9.0.9
       '@types/node':
         specifier: ^22.0.0
         version: 22.18.8
@@ -1367,9 +1262,6 @@ importers:
       glslify-loader:
         specifier: ^2.0.0
         version: 2.0.0
-      mermaid:
-        specifier: 'catalog:'
-        version: 11.12.0
       monaco-editor:
         specifier: 0.53.0
         version: 0.53.0
@@ -1381,7 +1273,7 @@ importers:
         version: 5.13.0
       raw-loader:
         specifier: ^4.0.2
-        version: 4.0.2(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+        version: 4.0.2(webpack@5.98.0(@swc/core@1.13.5))
       sass:
         specifier: ^1.77.0
         version: 1.77.0
@@ -1396,7 +1288,7 @@ importers:
         version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.4.2)(jsdom@24.0.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(less@4.2.0)(lightningcss@1.30.1)(msw@2.10.3(@types/node@22.18.8)(typescript@5.7.3))(sass@1.77.0)(stylus@0.62.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.8.0)
       webpack:
         specifier: 5.98.0
-        version: 5.98.0(@swc/core@1.13.5)(esbuild@0.25.10)
+        version: 5.98.0(@swc/core@1.13.5)
 
   packages/fern-dashboard-services:
     dependencies:
@@ -27247,12 +27139,12 @@ snapshots:
       picocolors: 1.1.1
       source-map: 0.7.4
 
-  '@rsdoctor/cli@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))':
+  '@rsdoctor/cli@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))':
     dependencies:
-      '@rsdoctor/core': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/sdk': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+      '@rsdoctor/core': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/sdk': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
       axios: 1.12.2
       ora: 5.4.1
       picocolors: 1.1.1
@@ -27268,13 +27160,13 @@ snapshots:
 
   '@rsdoctor/client@1.2.3': {}
 
-  '@rsdoctor/core@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))':
+  '@rsdoctor/core@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))':
     dependencies:
       '@rsbuild/plugin-check-syntax': 1.3.0
-      '@rsdoctor/graph': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/sdk': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+      '@rsdoctor/graph': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/sdk': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
       axios: 1.12.2
       browserslist-load-config: 1.0.1
       enhanced-resolve: 5.12.0
@@ -27293,10 +27185,10 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/graph@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))':
+  '@rsdoctor/graph@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))':
     dependencies:
-      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
       lodash.unionby: 4.8.0
       source-map: 0.7.4
     transitivePeerDependencies:
@@ -27304,13 +27196,13 @@ snapshots:
       - supports-color
       - webpack
 
-  '@rsdoctor/rspack-plugin@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))':
+  '@rsdoctor/rspack-plugin@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))':
     dependencies:
-      '@rsdoctor/core': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/graph': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/sdk': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+      '@rsdoctor/core': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/graph': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/sdk': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
       lodash: 4.17.21
     optionalDependencies:
       '@rspack/core': 1.4.5(@swc/helpers@0.5.15)
@@ -27322,12 +27214,12 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/sdk@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))':
+  '@rsdoctor/sdk@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(bufferutil@4.0.9)(utf-8-validate@5.0.10)(webpack@5.98.0(@swc/core@1.13.5))':
     dependencies:
       '@rsdoctor/client': 1.2.3
-      '@rsdoctor/graph': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
-      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+      '@rsdoctor/graph': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
+      '@rsdoctor/utils': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
       '@types/fs-extra': 11.0.4
       body-parser: 1.20.3
       cors: 2.8.5
@@ -27346,7 +27238,7 @@ snapshots:
       - utf-8-validate
       - webpack
 
-  '@rsdoctor/types@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))':
+  '@rsdoctor/types@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))':
     dependencies:
       '@types/connect': 3.4.38
       '@types/estree': 1.0.6
@@ -27354,12 +27246,12 @@ snapshots:
       source-map: 0.7.4
     optionalDependencies:
       '@rspack/core': 1.4.5(@swc/helpers@0.5.15)
-      webpack: 5.98.0(@swc/core@1.13.5)(esbuild@0.25.10)
+      webpack: 5.98.0(@swc/core@1.13.5)
 
-  '@rsdoctor/utils@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))':
+  '@rsdoctor/utils@1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))':
     dependencies:
       '@babel/code-frame': 7.26.2
-      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
+      '@rsdoctor/types': 1.2.3(@rspack/core@1.4.5(@swc/helpers@0.5.15))(webpack@5.98.0(@swc/core@1.13.5))
       '@types/estree': 1.0.6
       acorn: 8.15.0
       acorn-import-attributes: 1.9.5(acorn@8.15.0)
@@ -27687,6 +27579,33 @@ snapshots:
       - supports-color
       - webpack
 
+  '@sentry/nextjs@10.12.0(@opentelemetry/context-async-hooks@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.1.0(@opentelemetry/api@1.9.0))(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react@19.0.0)(webpack@5.98.0(@swc/core@1.13.5))':
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/semantic-conventions': 1.37.0
+      '@rollup/plugin-commonjs': 28.0.1(rollup@4.35.0)
+      '@sentry-internal/browser-utils': 10.12.0
+      '@sentry/bundler-plugin-core': 4.3.0
+      '@sentry/core': 10.12.0
+      '@sentry/node': 10.12.0
+      '@sentry/opentelemetry': 10.12.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)
+      '@sentry/react': 10.12.0(react@19.0.0)
+      '@sentry/vercel-edge': 10.12.0
+      '@sentry/webpack-plugin': 4.3.0(webpack@5.98.0(@swc/core@1.13.5))
+      chalk: 3.0.0
+      next: 15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0)
+      resolve: 1.22.8
+      rollup: 4.35.0
+      stacktrace-parser: 0.1.11
+    transitivePeerDependencies:
+      - '@opentelemetry/context-async-hooks'
+      - '@opentelemetry/core'
+      - '@opentelemetry/sdk-trace-base'
+      - encoding
+      - react
+      - supports-color
+      - webpack
+
   '@sentry/node-core@10.12.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.204.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.37.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
@@ -27787,6 +27706,16 @@ snapshots:
       unplugin: 1.0.1
       uuid: 11.1.0
       webpack: 5.98.0(@swc/core@1.13.5)(esbuild@0.25.10)
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@sentry/webpack-plugin@4.3.0(webpack@5.98.0(@swc/core@1.13.5))':
+    dependencies:
+      '@sentry/bundler-plugin-core': 4.3.0
+      unplugin: 1.0.1
+      uuid: 11.1.0
+      webpack: 5.98.0(@swc/core@1.13.5)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -40068,6 +39997,12 @@ snapshots:
       loader-utils: 2.0.4
       schema-utils: 3.3.0
       webpack: 5.98.0(@swc/core@1.13.5)(esbuild@0.25.10)
+
+  raw-loader@4.0.2(webpack@5.98.0(@swc/core@1.13.5)):
+    dependencies:
+      loader-utils: 2.0.4
+      schema-utils: 3.3.0
+      webpack: 5.98.0(@swc/core@1.13.5)
 
   rc@1.2.8:
     dependencies:

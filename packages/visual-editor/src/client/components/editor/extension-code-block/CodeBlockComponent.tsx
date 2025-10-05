@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNodeViewProps } from "@tiptap/react";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import { ChevronDown } from "lucide-react";
