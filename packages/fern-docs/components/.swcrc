@@ -1,0 +1,26 @@
+{
+    "$schema": "https://swc.rs/schema.json",
+    "exclude": [".*\\.test\\.tsx?"],
+    "jsc": {
+        "parser": {
+            "decorators": true,
+            "syntax": "typescript",
+            "tsx": true
+        },
+        "transform": {
+            "verbatimModuleSyntax": true,
+            "react": {
+                "runtime": "automatic",
+                "importSource": "react"
+            }
+        },
+        "experimental": {
+            "plugins": [["@swc/plugin-styled-jsx", {}]]
+        }
+    },
+    "module": {
+        "type": "es6"
+    },
+    "sourceMaps": true,
+    "inlineSourcesContent": false
+}

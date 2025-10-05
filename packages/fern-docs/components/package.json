@@ -11,59 +11,64 @@
     "url": "git+https://github.com/fern-api/fern-platform.git",
     "directory": "packages/components"
   },
-  "sideEffects": ["*.css", "*.scss"],
+  "sideEffects": [
+    "*.css",
+    "*.scss"
+  ],
   "type": "module",
   "exports": {
-    "./cn": "./src/cn.ts",
-    "./src/index.css": "./src/index.css",
-    "./badges": "./src/badges/index.ts",
-    "./button": "./src/FernButtonV2.tsx",
-    "./kbd": "./src/kbd.tsx",
-    "./src/colors.css": "./src/colors.css",
-    "./src/fern-accent.scss": "./src/fern-accent.scss",
-    "./src/badges/index.scss": "./src/badges/index.scss",
-    "./src/kbd.css": "./src/kbd.css",
-    "./fa-icon": "./src/fa-icon.tsx",
-    "./util/fa": "./src/util/fa.ts",
-    "./syntax-highlighter": "./src/syntax-highlighter/index.ts",
-    "./src/syntax-highlighter/index.css": "./src/syntax-highlighter/index.css",
-    "./abstract/*": "./src/abstract/*.tsx",
-    "./styles": "./src/index.css",
-    "./constants": "./src/constants.ts",
-    "./colors": "./src/colors.ts",
-    "./navigation/NavigationStore": "./src/navigation/NavigationStore.ts",
-    "./navigation/NavigationStorage": "./src/navigation/NavigationStorage.ts",
-    "./navigation/types": "./src/navigation/types.ts",
-    "./navigation/pageUtils": "./src/navigation/pageUtils.ts",
-    "./navigation/mdxUtils": "./src/navigation/mdxUtils.ts",
-    "./*": "./src/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts",
-    "./state/*": "./src/state/*.tsx",
-    "./contexts/*": "./src/contexts/*.tsx",
-    "./sidebar/*": "./src/sidebar/*.{ts,tsx}",
-    "./sidebar/nodes": "./src/sidebar/nodes/index.ts",
-    "./sidebar/nodes/ClientPageManager": "./src/sidebar/nodes/ClientPageManager.tsx",
-    "./sidebar/nodes/SidebarClientNavigationProvider": "./src/sidebar/nodes/SidebarClientNavigationProvider.tsx",
-    "./sidebar/nodes/SidebarClientRootNode": "./src/sidebar/nodes/SidebarClientRootNode.tsx",
-    "./sidebar/nodes/SidebarRootNode": "./src/sidebar/nodes/SidebarRootNode.tsx",
-    "./sidebar/SidebarClientTabsRoot": "./src/sidebar/SidebarClientTabsRoot.tsx",
-    "./sidebar/SidebarContainer": "./src/sidebar/SidebarContainer.tsx",
-    "./sidebar/SidebarTabsList": "./src/sidebar/SidebarTabsList.tsx",
-    "./sidebar/SidebarTabsRoot": "./src/sidebar/SidebarTabsRoot.tsx",
-    "./feature-flags/*": "./src/feature-flags/*.tsx",
-    "./layouts": "./src/layouts/index.ts",
-    "./layouts/*": "./src/layouts/*.tsx",
-    "./providers/*": "./src/providers/*.tsx",
-    "./mdx/*": "./src/mdx/*.tsx",
-    "./navigation/local-storage": "./src/navigation/localStorageUtils.ts"
+    "./index.css": "./dist/js/index.css",
+    "./badges": {
+      "types": "./dist/types/badges/index.d.ts",
+      "default": "./dist/js/badges/index.js"
+    },
+    "./button": {
+      "types": "./dist/types/FernButtonV2.d.ts",
+      "default": "./dist/js/FernButtonV2.js"
+    },
+    "./kbd": {
+      "types": "./dist/types/kbd.d.ts",
+      "default": "./dist/js/kbd.js"
+    },
+    "./colors.css": "./dist/js/colors.css",
+    "./fern-accent.scss": "./dist/js/fern-accent.scss",
+    "./badges/index.scss": "./dist/js/badges/index.scss",
+    "./kbd.css": "./dist/js/kbd.css",
+    "./util/fa": {
+      "types": "./dist/types/util/fa.d.ts",
+      "default": "./dist/js/util/fa.js"
+    },
+    "./syntax-highlighter": {
+      "types": "./dist/types/syntax-highlighter/index.d.ts",
+      "default": "./dist/js/syntax-highlighter/index.js"
+    },
+    "./syntax-highlighter/index.css": "./dist/js/syntax-highlighter/index.css",
+    "./styles": "./dist/js/index.css",
+    "./*": {
+      "types": "./dist/types/*.d.ts",
+      "default": "./dist/js/*.js"
+    },
+    "./layouts": {
+      "types": "./dist/types/layouts/index.d.ts",
+      "default": "./dist/js/layouts/index.js"
+    },
+    "./navigation/local-storage": {
+      "types": "./dist/types/navigation/localStorageUtils.d.ts",
+      "default": "./dist/js/navigation/localStorageUtils.js"
+    }
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build-storybook": "storybook build",
     "chromatic": "pnpx chromatic --project-token=chpt_48b3c560025e978",
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
-    "compile": "tsc --build",
+    "compile": "pnpm compile:js && pnpm compile:types",
+    "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
+    "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
     "depcheck": "depcheck",
+    "dev": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths --watch",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "lint:eslint": "eslint --max-warnings 0 .",
@@ -74,7 +79,9 @@
     "test": "vitest --run --passWithNoTests --globals --disable-console-intercept"
   },
   "eslintConfig": {
-    "extends": ["plugin:storybook/recommended"]
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
   },
   "dependencies": {
     "@bprogress/next": "^3.2.12",
@@ -146,6 +153,9 @@
     "@storybook/addon-themes": "^9.1.6",
     "@storybook/nextjs": "^9.1.6",
     "@storybook/react-vite": "^9.1.6",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
+    "@swc/plugin-styled-jsx": "^9.1.0",
     "@tailwindcss/postcss": "^4.0.9",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.0.9",

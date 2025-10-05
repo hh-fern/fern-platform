@@ -8,6 +8,14 @@
     "codegen": {
       "cache": false
     },
+    "compile:js": {
+      "outputs": ["dist/js/**"],
+      "dependsOn": ["^compile:js"]
+    },
+    "compile:types": {
+      "outputs": ["dist/types/**"],
+      "dependsOn": ["^compile:types"]
+    },
     "compile": {
       "outputs": ["dist/**", "tsconfig.tsbuildinfo"],
       "dependsOn": ["^compile"],

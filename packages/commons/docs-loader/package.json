@@ -12,20 +12,16 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./client": {
       "types": "./dist/index.client.d.ts",
-      "import": "./dist/index.client.js",
-      "require": "./dist/index.client.js"
+      "default": "./dist/index.client.js"
     }
   },
-  "main": "src/index.ts",
-  "module": "src/index.ts",
-  "source": "src/index.ts",
-  "types": "src/index.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "tsc --build",

@@ -5,6 +5,7 @@ import rspack from "@rspack/core";
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 import withRspack from "next-rspack";
+import path from "path";
 import webpack from "webpack";
 
 const isRspackEnabled = process.env.NODE_ENV === "development";
@@ -23,10 +24,10 @@ const CSP_HEADER = `
 `.replace(/\n/g, "");
 
 let nextConfig: NextConfig = {
+    outputFileTracingRoot: path.join(__dirname, "../../"),
     outputFileTracingExcludes: {
         "./": ["**/*.map"]
     },
-    transpilePackages: ["@fern-api/docs-utils", "@fern-docs/components", "@fern-ui/loadable"],
     experimental: {
         webpackBuildWorker: true,
         optimizePackageImports: [
@@ -58,7 +59,7 @@ let nextConfig: NextConfig = {
             }
         ]
     },
-    webpack: (config, { isServer }) => {
+    webpack: (config) => {
         config.externals.push(
             "sharp",
             "esbuild",

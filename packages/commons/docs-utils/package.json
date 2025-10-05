@@ -10,19 +10,25 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./types/*": "./src/types/*.ts"
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/js/index.js"
+    },
+    "./types/*": {
+      "types": "./dist/types/types/*.d.ts",
+      "default": "./dist/js/types/*.js"
+    }
   },
-  "main": "src/index.ts",
-  "module": "src/index.ts",
-  "source": "src/index.ts",
-  "types": "src/index.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
-    "compile": "tsc --build",
+    "compile": "pnpm compile:js && pnpm compile:types",
+    "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
+    "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
     "depcheck": "depcheck",
-    "dev": "tsc --watch",
+    "dev": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths --watch",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "lint:eslint": "eslint --max-warnings 0 .",
@@ -39,6 +45,8 @@
   },
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
     "@types/node": "^22.0.0",
     "depcheck": "^1.4.7",
     "next": "catalog:",

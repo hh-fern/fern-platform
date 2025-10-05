@@ -9,16 +9,22 @@
   },
   "sideEffects": false,
   "type": "module",
-  "main": "dist/index.js",
-  "module": "src/index.ts",
-  "source": "src/index.ts",
-  "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/js/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
-    "compile": "tsc --build",
+    "compile": "pnpm compile:js && pnpm compile:types",
+    "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
+    "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
     "depcheck": "depcheck",
-    "dev": "tsc --watch",
+    "dev": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths --watch",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "lint:eslint": "eslint --max-warnings 0 .",
@@ -33,6 +39,8 @@
   },
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
     "@types/node": "catalog:",
     "depcheck": "catalog:",
     "stylelint": "catalog:",
