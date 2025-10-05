@@ -6,6 +6,8 @@ import type React from "react";
 import { InterceptedChildren } from "@/client/components/editor/editor-component/EditorComponentChildrenContext";
 import { MDX_COMPONENTS } from "@/client/docs/mdx/components";
 
+// due to how many modules this file imports, we should export this separately from the other providers
+
 export function ClientMDXProvider({ children }: React.PropsWithChildren) {
     const editorComponents = {
         ...MDX_COMPONENTS,

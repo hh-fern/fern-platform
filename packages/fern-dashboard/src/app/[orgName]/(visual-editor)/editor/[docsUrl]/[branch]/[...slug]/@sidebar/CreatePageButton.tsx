@@ -1,9 +1,9 @@
 "use client";
 
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { DashboardTooltip } from "@fern-dashboard/visual-editor/client/components/editor/DashboardTooltip";
+import { DashboardTooltip } from "@fern-dashboard/visual-editor/client/components/editor";
 import { useEditingDisabled } from "@fern-dashboard/visual-editor/client/hooks/useEditingDisabled";
-import { useGitPrInfo } from "@fern-dashboard/visual-editor/client/providers/GitPRContext";
+import { useGitPrInfo } from "@fern-dashboard/visual-editor/client/providers";
 import { getAllSections } from "@fern-docs/components/navigation/pageUtils";
 import type { NavigationContext } from "@fern-docs/components/navigation/types";
 import { Icon } from "@/components/icon/Icon";

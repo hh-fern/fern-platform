@@ -1,8 +1,7 @@
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
-import { EditorLinkInterceptor } from "@fern-dashboard/visual-editor/client/components/editor/EditorLinkInterceptor";
-import { EditorRoutingProvider } from "@fern-dashboard/visual-editor/client/providers/EditorRoutingContext";
-import { FileResolverProvider } from "@fern-dashboard/visual-editor/client/providers/FileResolverContext";
+import { EditorLinkInterceptor } from "@fern-dashboard/visual-editor/client/components/editor";
+import { EditorRoutingProvider, FileResolverProvider } from "@fern-dashboard/visual-editor/client/providers";
 import { AbstractHeaderTabsRoot } from "@fern-docs/components/abstract/AbstractHeaderTabsRoot";
 import { FERN_SEARCH_BUTTON_ID } from "@fern-docs/components/constants";
 import { NavbarLinks } from "@fern-docs/components/header/NavbarLinks";

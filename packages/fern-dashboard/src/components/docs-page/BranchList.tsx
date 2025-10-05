@@ -2,7 +2,7 @@
 
 import { useRouter } from "@bprogress/next/app";
 import type { Auth0SessionData } from "@fern-dashboard/services/auth/getCurrentSession";
-import { useOrgName } from "@fern-dashboard/visual-editor/client/providers/OrgNameContext";
+import { useOrgName } from "@fern-dashboard/visual-editor/client/providers";
 import type { GithubSourceRepo } from "@fern-dashboard/visual-editor/shared/github";
 import { createNavigationLocalStorage } from "@fern-docs/components/navigation/NavigationStorage";
 import { useState } from "react";

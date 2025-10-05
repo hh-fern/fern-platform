@@ -1,15 +1,16 @@
 import "server-only";
 
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
-import { HeaderToolbar } from "@fern-dashboard/visual-editor/client/components/editor/HeaderToolbar";
-import { PreviewOnlyNotification } from "@fern-dashboard/visual-editor/client/components/editor/PreviewOnlyNotification";
-import { BranchProvider } from "@fern-dashboard/visual-editor/client/providers/BranchContext";
+import { HeaderToolbar, PreviewOnlyNotification } from "@fern-dashboard/visual-editor/client/components/editor";
+import {
+    BranchProvider,
+    DevModeProvider,
+    EditorProvider,
+    GitHubRepoProvider,
+    GitPRProvider,
+    OrgNameProvider
+} from "@fern-dashboard/visual-editor/client/providers";
 import { ClientMDXProvider } from "@fern-dashboard/visual-editor/client/providers/ClientMDXProvider";
-import { DevModeProvider } from "@fern-dashboard/visual-editor/client/providers/DevModeProvider";
-import { EditorProvider } from "@fern-dashboard/visual-editor/client/providers/EditorContext";
-import { GitHubRepoProvider } from "@fern-dashboard/visual-editor/client/providers/GitHubRepoContext";
-import { GitPRProvider } from "@fern-dashboard/visual-editor/client/providers/GitPRContext";
-import { OrgNameProvider } from "@fern-dashboard/visual-editor/client/providers/OrgNameContext";
 import { PagesStoreProvider } from "@fern-dashboard/visual-editor/client/providers/PagesStoreContext";
 import { NavigationStoreProvider } from "@fern-docs/components/navigation/NavigationStoreContext";
 import { ThemeProvider } from "next-themes";

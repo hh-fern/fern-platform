@@ -1,7 +1,7 @@
 "use client";
 
 import type { Auth0SessionData } from "@fern-dashboard/services/auth/getCurrentSession";
-import { useOrgName } from "@fern-dashboard/visual-editor/client/providers/OrgNameContext";
+import { useOrgName } from "@fern-dashboard/visual-editor/client/providers";
 import { FernTooltip, FernTooltipProvider } from "@fern-docs/components/FernTooltip";
 import { generateBranchName } from "@fern-docs/components/navigation/local-storage";
 import { Loader2, Plus } from "lucide-react";

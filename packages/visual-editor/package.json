@@ -10,23 +10,49 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    "./client/*": {
-      "types": "./dist/types/client/*.d.ts",
-      "default": "./dist/js/client/*.js"
+    "./client/components/editor": {
+      "types": "./dist/types/client/components/editor/index.d.ts",
+      "default": "./dist/js/client/components/editor/index.js"
     },
-    "./server/*": {
-      "types": "./dist/types/server/*.d.ts",
-      "default": "./dist/js/server/*.js"
+    "./client/components/editor/EditorToasts": {
+      "types": "./dist/types/client/components/editor/EditorToasts.d.ts",
+      "default": "./dist/js/client/components/editor/EditorToasts.js"
     },
-    "./shared/*": {
-      "types": "./dist/types/shared/*.d.ts",
-      "default": "./dist/js/shared/*.js"
+    "./client/components/editor/PageEditor": {
+      "types": "./dist/types/client/components/editor/PageEditor.d.ts",
+      "default": "./dist/js/client/components/editor/PageEditor.js"
+    },
+    "./client/components/editor/extension-custom-element/CSSContext": {
+      "types": "./dist/types/client/components/editor/extension-custom-element/CSSContext.d.ts",
+      "default": "./dist/js/client/components/editor/extension-custom-element/CSSContext.js"
+    },
+    "./client/hooks/useEditingDisabled": {
+      "types": "./dist/types/client/hooks/useEditingDisabled.d.ts",
+      "default": "./dist/js/client/hooks/useEditingDisabled.js"
+    },
+    "./client/providers": {
+      "types": "./dist/types/client/providers/index.d.ts",
+      "default": "./dist/js/client/providers/index.js"
+    },
+    "./client/providers/ClientMDXProvider": {
+      "types": "./dist/types/client/providers/ClientMDXProvider.d.ts",
+      "default": "./dist/js/client/providers/ClientMDXProvider.js"
+    },
+    "./client/providers/PagesStoreContext": {
+      "types": "./dist/types/client/providers/PagesStoreContext.d.ts",
+      "default": "./dist/js/client/providers/PagesStoreContext.js"
+    },
+    "./shared/github": {
+      "types": "./dist/types/shared/github.d.ts",
+      "default": "./dist/js/shared/github.js"
     },
     "./styles": {
       "default": "./src/client/styles.scss"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
     "compile": "pnpm compile:js && pnpm compile:types",

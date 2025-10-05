@@ -1,8 +1,7 @@
 "use client";
 
-import { ClickablePrNumber } from "@fern-dashboard/visual-editor/client/components/editor/ClickablePrNumber";
-import { PRTitleEditor } from "@fern-dashboard/visual-editor/client/components/editor/PRTitleEditor";
-import { GitPRProvider, useGitPrInfo } from "@fern-dashboard/visual-editor/client/providers/GitPRContext";
+import { ClickablePrNumber, PRTitleEditor } from "@fern-dashboard/visual-editor/client/components/editor";
+import { GitPRProvider, useGitPrInfo } from "@fern-dashboard/visual-editor/client/providers";
 import type { GithubSourceRepo } from "@fern-dashboard/visual-editor/shared/github";
 import { GitPullRequest, GitPullRequestDraft } from "lucide-react";
 import { StatusBadge } from "@/components/ui/StatusBadge";
