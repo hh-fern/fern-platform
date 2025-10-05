@@ -13,8 +13,6 @@ import StarterKit from "@tiptap/starter-kit";
 import { createLowlight } from "lowlight";
 import { useEffect } from "react";
 
-import "@fern-visual-editor/components/editor/tiptap-node/node-focus/node-focus.scss";
-
 import { createCodeBlockComponent } from "./extension-code-block/CodeBlockComponent";
 import type { LowlightInstance } from "./extension-code-block/types";
 import { CustomElement } from "./extension-custom-element/custom-element";

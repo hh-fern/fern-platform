@@ -1,5 +1,4 @@
-import type * as React from "react";
-import { cn } from "../../utils/tiptap-utils";
+import { cn } from "@fern-docs/components/cn";
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
     return (

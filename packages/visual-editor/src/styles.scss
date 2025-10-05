@@ -1,0 +1,21 @@
+/* Visual Editor Styles */
+/* This file aggregates all component styles for the visual editor package */
+
+/* Tiptap Node Styles */
+@import "./components/editor/tiptap-node/node-focus/node-focus.scss";
+@import "./components/editor/tiptap-node/media-upload-node/media-upload-node.scss";
+
+/* Tiptap UI Primitive Styles */
+@import "./components/tiptap-ui-primitive/badge/badge-colors.scss";
+@import "./components/tiptap-ui-primitive/badge/badge-group.scss";
+@import "./components/tiptap-ui-primitive/badge/badge.scss";
+@import "./components/tiptap-ui-primitive/button/button-colors.scss";
+@import "./components/tiptap-ui-primitive/button/button-group.scss";
+@import "./components/tiptap-ui-primitive/button/button.scss";
+@import "./components/tiptap-ui-primitive/card/card.scss";
+@import "./components/tiptap-ui-primitive/separator/separator.scss";
+@import "./components/tiptap-ui-primitive/tooltip/tooltip.scss";
+
+/* Tiptap UI Styles */
+@import "./components/tiptap-ui/slash-dropdown-menu/slash-dropdown-menu.scss";
+

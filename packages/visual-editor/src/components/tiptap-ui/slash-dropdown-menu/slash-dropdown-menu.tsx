@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-
+// --- Lib ---
+import { getElementOverflowPosition } from "../../../utils/tiptap-collab-utils";
 // --- UI Primitives ---
 import { Button, ButtonGroup } from "../../tiptap-ui-primitive/button";
 import { Card, CardBody, CardGroupLabel, CardItemGroup } from "../../tiptap-ui-primitive/card";
@@ -13,9 +14,6 @@ import type {
     SuggestionMenuRenderProps
 } from "../../tiptap-ui-utils/suggestion-menu";
 import { filterSuggestionItems, SuggestionMenu } from "../../tiptap-ui-utils/suggestion-menu";
-import "@/components/tiptap-ui/slash-dropdown-menu/slash-dropdown-menu.scss";
-// --- Lib ---
-import { getElementOverflowPosition } from "../../../utils/tiptap-collab-utils";
 // --- Hooks ---
 import type { SlashMenuConfig } from "./use-slash-dropdown-menu";
 import { useSlashDropdownMenu } from "./use-slash-dropdown-menu";

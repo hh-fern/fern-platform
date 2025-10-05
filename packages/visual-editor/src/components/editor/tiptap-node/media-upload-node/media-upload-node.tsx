@@ -4,8 +4,6 @@ import type { NodeViewProps } from "@tiptap/react";
 import { NodeViewWrapper } from "@tiptap/react";
 import * as React from "react";
 
-import "@fern-visual-editor/components/editor/tiptap-node/media-upload-node/media-upload-node.scss";
-
 import { createCustomElementNode } from "../../extension-custom-element/create-custom-element-node";
 
 export interface FileItem {

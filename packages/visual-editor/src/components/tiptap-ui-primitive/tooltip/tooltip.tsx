@@ -19,8 +19,6 @@ import {
 } from "@floating-ui/react";
 import * as React from "react";
 
-import "@/components/tiptap-ui-primitive/tooltip/tooltip.scss";
-
 interface TooltipProviderProps {
     children: React.ReactNode;
     initialOpen?: boolean;

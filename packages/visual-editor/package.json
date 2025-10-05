@@ -9,10 +9,15 @@
   },
   "sideEffects": false,
   "type": "module",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
-  "source": "src/index.ts",
-  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/js/index.js"
+    },
+    "./styles": {
+      "default": "./dist/js/styles.scss"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -31,6 +36,7 @@
     "test": "vitest --run --passWithNoTests --globals"
   },
   "dependencies": {
+    "@fern-docs/components": "workspace:*",
     "@floating-ui/react": "^0.27.16",
     "@heroicons/react": "^2.2.0",
     "@radix-ui/react-popover": "catalog:",

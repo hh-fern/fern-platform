@@ -2,9 +2,6 @@
 
 import * as React from "react";
 
-import "./button-colors.scss";
-import "./button-group.scss";
-import "./button.scss";
 // --- Lib ---
 import { cn, parseShortcutKeys } from "../../../utils/tiptap-utils";
 // --- Tiptap UI Primitive ---

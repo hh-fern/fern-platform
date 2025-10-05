@@ -1,9 +1,7 @@
 "use client";
 
+import { cn } from "@fern-docs/components/cn";
 import * as React from "react";
-
-import "./separator.scss";
-import { cn } from "../../../utils/tiptap-utils";
 
 export type Orientation = "horizontal" | "vertical";
 

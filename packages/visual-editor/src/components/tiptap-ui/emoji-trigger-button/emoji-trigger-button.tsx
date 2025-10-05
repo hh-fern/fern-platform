@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { forwardRef, useCallback } from "react";
 // --- Hooks ---
 import { useTiptapEditor } from "../../../hooks/use-tiptap-editor";
 // --- Lib ---
@@ -34,7 +34,7 @@ export function EmojiTriggerShortcutBadge({ shortcutKeys = EMOJI_TRIGGER_SHORTCU
  *
  * For custom button implementations, use the `useEmojiTrigger` hook instead.
  */
-export const EmojiTriggerButton = React.forwardRef<HTMLButtonElement, EmojiTriggerButtonProps>(
+export const EmojiTriggerButton = forwardRef<HTMLButtonElement, EmojiTriggerButtonProps>(
     (
         {
             editor: providedEditor,
@@ -61,7 +61,7 @@ export const EmojiTriggerButton = React.forwardRef<HTMLButtonElement, EmojiTrigg
             onTriggerApplied
         });
 
-        const handleClick = React.useCallback(
+        const handleClick = useCallback(
             (event: React.MouseEvent<HTMLButtonElement>) => {
                 onClick?.(event);
                 if (event.defaultPrevented) {

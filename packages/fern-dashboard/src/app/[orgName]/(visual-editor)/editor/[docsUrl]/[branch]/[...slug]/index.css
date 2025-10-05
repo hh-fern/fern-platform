@@ -4,8 +4,10 @@
 @plugin "@tailwindcss/typography";
 @import "@fern-docs/components/styles";
 @import "@fern-docs/search-ui/styles";
+@import "@fern-dashboard/visual-editor/styles";
 
 @source "../../../../../../../components";
+@source "../../../../../../../../../visual-editor";
 
 :root {
   --header-toolbar-height: 54px;

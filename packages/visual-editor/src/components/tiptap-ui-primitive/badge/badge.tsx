@@ -2,10 +2,6 @@
 
 import * as React from "react";
 
-import "./badge-colors.scss";
-import "./badge-group.scss";
-import "./badge.scss";
-
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
     variant?: "ghost" | "white" | "gray" | "green" | "default";
     size?: "default" | "small";
