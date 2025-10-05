@@ -2,9 +2,8 @@
 
 import { fernToken_admin } from "@fern-api/docs-server";
 import { z } from "zod";
-
+import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
 import { getDocsUrlMetadata } from "../api/utils/getDocsUrlMetadata";
-import { getCurrentSessionOrThrow } from "../services/auth0/getCurrentSession";
 import getDocsSitesForOrg from "../services/dal/fdr/getDocsSitesForOrg";
 import { getAnalyticsService } from "../services/posthog";
 import type { DateRangeOptions } from "../services/posthog/types";

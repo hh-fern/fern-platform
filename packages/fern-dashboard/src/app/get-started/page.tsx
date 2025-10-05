@@ -3,9 +3,8 @@ import { redirect } from "next/navigation";
 import { DocsZeroState } from "@/components/docs-page/DocsZeroState";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { SidepanelProvider } from "@/components/layout/SidepanelContext";
-
+import { getCurrentSession } from "../../../../fern-dashboard-services/src/getCurrentSession";
 import HeaderLayout from "../[orgName]/(homepage)/@header/default";
-import { getCurrentSession } from "../services/auth0/getCurrentSession";
 
 export default async function Page({ params }: { params: Promise<{}> }) {
     const session = await getCurrentSession();

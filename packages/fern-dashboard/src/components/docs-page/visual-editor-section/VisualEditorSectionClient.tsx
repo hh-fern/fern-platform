@@ -1,11 +1,11 @@
 "use client";
 
+import type { Auth0SessionData } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
+import type { GithubSourceRepo } from "@fern-dashboard/visual-editor/shared/github";
 import { createNavigationLocalStorage } from "@fern-docs/components/navigation/NavigationStorage";
 import { useEffect, useState } from "react";
-import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { getRelevantUserBranchesForSite } from "@/app/services/dal/mongodb/getRelevantUserBranchesForSite";
-import type { GithubSourceRepo } from "@/app/services/github/types";
 import Card from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { DocsUrl } from "@/utils/types";

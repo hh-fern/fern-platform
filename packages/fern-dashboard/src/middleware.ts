@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-
+import { getAuth0Client } from "../../fern-dashboard-services/src/auth0";
 import { buildErrorPageSearchParams } from "./app/error/searchParams";
-import { getAuth0Client } from "./app/services/auth0/auth0";
 
 export async function middleware(req: NextRequest) {
     if (req.nextUrl.pathname.startsWith("/ingest")) {

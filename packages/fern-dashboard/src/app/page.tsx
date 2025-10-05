@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 
 import { applyOrgMappings } from "@/orgMappings";
 
-import { type Auth0SessionData, getCurrentSession } from "./services/auth0/getCurrentSession";
-import { getMyOrganizations } from "./services/auth0/management";
+import { type Auth0SessionData, getCurrentSession } from "../../../fern-dashboard-services/src/getCurrentSession";
+import { getMyOrganizations } from "../../../fern-dashboard-services/src/management";
 import { Auth0OrgName } from "./services/auth0/types";
 
 export default async function Page() {

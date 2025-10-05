@@ -1,7 +1,7 @@
 "use server";
 
-import { getCurrentSessionOrThrow } from "../services/auth0/getCurrentSession";
-import { createInviteToken } from "../services/auth0/management";
+import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
+import { createInviteToken } from "../../../../fern-dashboard-services/src/management";
 import type { Auth0OrgName } from "../services/auth0/types";
 import { assertUserHasOrganizationAccess } from "../services/dal/organization";
 

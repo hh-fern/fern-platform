@@ -3,7 +3,7 @@ import { cache } from "react";
 
 import type { DocsUrl } from "@/utils/types";
 
-import { getCurrentSession } from "../../auth0/getCurrentSession";
+import { getCurrentSession } from "../../../../../../fern-dashboard-services/src/getCurrentSession";
 import type { Auth0OrgName } from "../../auth0/types";
 import { assertUserHasOrganizationAccess } from "../organization";
 import getDocsGithubUrl from "./getDocsGithubUrl";

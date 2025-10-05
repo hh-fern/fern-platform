@@ -8,11 +8,10 @@ import type {
     GitLoader,
     UpdateDocsYmlResult
 } from "@fern-api/docs-loader";
+import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
 import type { Octokit } from "@octokit/core";
 import yaml from "js-yaml";
 import z from "zod";
-
-import { getFernBotOctokitForRepo } from "../auth0/fernBotOctokit";
 import { getOwnerAndRepoFromGithubUrl } from "./github";
 
 // Types and interfaces

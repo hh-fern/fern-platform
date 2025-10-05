@@ -1,8 +1,8 @@
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import CheckCircleIcon from "@heroicons/react/24/outline/CheckCircleIcon";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
-
 import { NoiseOverlay } from "@/components/NoiseOverlay";
 import { HIDE_PYLON_CLASS_NAME } from "@/components/pylon/constants";
 import { PylonScript } from "@/components/pylon/PylonScript";
@@ -16,7 +16,6 @@ import { cn } from "@/utils/utils";
 
 import { gtPlanar } from "./fonts";
 import "./globals.css";
-import { getCurrentSession } from "./services/auth0/getCurrentSession";
 
 export const metadata: Metadata = {
     title: "Fern Dashboard"

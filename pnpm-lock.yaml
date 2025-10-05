@@ -1084,6 +1084,9 @@ importers:
       '@fern-api/visual-editor-server':
         specifier: workspace:*
         version: link:../commons/visual-editor-server
+      '@fern-dashboard/services':
+        specifier: workspace:*
+        version: link:../fern-dashboard-services
       '@fern-dashboard/visual-editor':
         specifier: workspace:*
         version: link:../visual-editor
@@ -1394,6 +1397,58 @@ importers:
       webpack:
         specifier: 5.98.0
         version: 5.98.0(@swc/core@1.13.5)(esbuild@0.25.10)
+
+  packages/fern-dashboard-services:
+    dependencies:
+      '@auth0/nextjs-auth0':
+        specifier: ^4.6.1
+        version: 4.6.1(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@octokit/auth-app':
+        specifier: ^8.1.0
+        version: 8.1.0
+      '@octokit/core':
+        specifier: ^7.0.4
+        version: 7.0.4
+      '@upstash/redis':
+        specifier: ^1.34.6
+        version: 1.34.6
+      auth0:
+        specifier: ^4.20.0
+        version: 4.20.0
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
+      next:
+        specifier: 'catalog:'
+        version: 15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0)
+      uuid:
+        specifier: ^11.1.0
+        version: 11.1.0
+    devDependencies:
+      '@fern-platform/configs':
+        specifier: workspace:*
+        version: link:../configs
+      '@swc/cli':
+        specifier: 'catalog:'
+        version: 0.7.8(@swc/core@1.13.5)(chokidar@4.0.3)
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.13.5
+      '@types/jsonwebtoken':
+        specifier: ^9.0.9
+        version: 9.0.9
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.18.8
+      depcheck:
+        specifier: 'catalog:'
+        version: 1.4.7
+      typescript:
+        specifier: ^5
+        version: 5.7.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.4.2)(jsdom@24.0.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(less@4.2.0)(lightningcss@1.30.1)(msw@2.10.3(@types/node@22.18.8)(typescript@5.7.3))(sass@1.77.0)(stylus@0.62.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.8.0)
 
   packages/fern-dashboard/endpoint-snippet-dependencies:
     dependencies:
@@ -2091,8 +2146,8 @@ importers:
         specifier: 3.2.1
         version: 3.2.1
       sonner:
-        specifier: ^1.5.0
-        version: 1.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^2.0.3
+        version: 2.0.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       styled-jsx:
         specifier: ^5.1.7
         version: 5.1.7(@babel/core@7.28.4)(react@19.0.0)
@@ -2849,55 +2904,6 @@ importers:
         specifier: ^5
         version: 5.7.3
 
-  packages/generator-cli:
-    dependencies:
-      '@octokit/rest':
-        specifier: ^20.1.2
-        version: 20.1.2
-      es-toolkit:
-        specifier: ^1.32.0
-        version: 1.39.7
-    devDependencies:
-      '@fern-api/fs-utils':
-        specifier: 0.15.0-rc63
-        version: 0.15.0-rc63
-      '@fern-api/github':
-        specifier: workspace:*
-        version: link:../commons/github
-      '@types/jest':
-        specifier: ^29.5.11
-        version: 29.5.14
-      '@types/node':
-        specifier: ^22.0.0
-        version: 22.18.8
-      '@types/yargs':
-        specifier: ^17.0.32
-        version: 17.0.32
-      depcheck:
-        specifier: ^1.4.7
-        version: 1.4.7
-      esbuild:
-        specifier: 0.25.10
-        version: 0.25.10
-      execa:
-        specifier: ^9.5.1
-        version: 9.5.1
-      tmp-promise:
-        specifier: ^3.0.3
-        version: 3.0.3
-      tsup:
-        specifier: 'catalog:'
-        version: 8.3.5(@swc/core@1.13.5)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.8.0)
-      typescript:
-        specifier: ^5
-        version: 5.7.3
-      vitest:
-        specifier: 'catalog:'
-        version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.8)(jiti@2.4.2)(jsdom@24.0.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(less@4.2.0)(lightningcss@1.30.1)(msw@2.10.3(@types/node@22.18.8)(typescript@5.7.3))(sass@1.77.0)(stylus@0.62.0)(terser@5.39.0)(tsx@4.19.3)(yaml@2.8.0)
-      yargs:
-        specifier: ^17.4.1
-        version: 17.7.2
-
   packages/snippets:
     dependencies:
       '@fern-api/csharp-dynamic-snippets':
@@ -2973,18 +2979,87 @@ importers:
 
   packages/visual-editor:
     dependencies:
+      '@fern-api/docs-auth':
+        specifier: workspace:*
+        version: link:../commons/docs-auth
+      '@fern-api/docs-loader':
+        specifier: workspace:*
+        version: link:../commons/docs-loader
+      '@fern-api/docs-utils':
+        specifier: workspace:*
+        version: link:../commons/docs-utils
+      '@fern-api/endpoint-snippet-dependencies':
+        specifier: workspace:*
+        version: link:../fern-dashboard/endpoint-snippet-dependencies
+      '@fern-api/fdr-sdk':
+        specifier: workspace:*
+        version: link:../fdr-sdk
+      '@fern-api/ui-core-utils':
+        specifier: workspace:*
+        version: link:../commons/core-utils
+      '@fern-dashboard/services':
+        specifier: workspace:*
+        version: link:../fern-dashboard-services
       '@fern-docs/components':
         specifier: workspace:*
         version: link:../fern-docs/components
+      '@fern-docs/mdx':
+        specifier: workspace:*
+        version: link:../fern-docs/mdx
+      '@fern-docs/search-ui':
+        specifier: workspace:*
+        version: link:../fern-docs/search-ui
+      '@fern-ui/react-commons':
+        specifier: workspace:*
+        version: link:../commons/react-commons
       '@floating-ui/react':
         specifier: ^0.27.16
         version: 0.27.16(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.0.0)
+      '@mdx-js/react':
+        specifier: ^3.1.0
+        version: 3.1.0(@types/react@19.0.10)(react@19.0.0)
+      '@microlink/react-json-view':
+        specifier: ^1.26.1
+        version: 1.26.1(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/primitive':
+        specifier: 'catalog:'
+        version: 1.1.1
+      '@radix-ui/react-compose-refs':
+        specifier: 'catalog:'
+        version: 1.1.1(@types/react@19.0.10)(react@19.0.0)
+      '@radix-ui/react-dialog':
+        specifier: 'catalog:'
+        version: 1.1.6(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-popover':
         specifier: 'catalog:'
         version: 1.1.6(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-select':
+        specifier: 'catalog:'
+        version: 2.1.6(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-slot':
+        specifier: 'catalog:'
+        version: 1.1.2(@types/react@19.0.10)(react@19.0.0)
+      '@radix-ui/react-switch':
+        specifier: 'catalog:'
+        version: 1.1.3(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-tabs':
+        specifier: 'catalog:'
+        version: 1.1.3(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-tooltip':
+        specifier: 'catalog:'
+        version: 1.1.8(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@react-three/drei':
+        specifier: 10.0.3
+        version: 10.0.3(@react-three/fiber@9.0.4(@types/react@19.0.10)(immer@10.1.1)(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.28.4)(@react-native-community/cli@13.6.4(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@types/react@19.0.10)(bufferutil@4.0.9)(react@19.0.0)(utf-8-validate@5.0.10))(react@19.0.0)(three@0.173.0))(@types/react@19.0.10)(@types/three@0.173.0)(immer@10.1.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.173.0)
+      '@react-three/fiber':
+        specifier: 9.0.4
+        version: 9.0.4(@types/react@19.0.10)(immer@10.1.1)(react-dom@19.0.0(react@19.0.0))(react-native@0.79.2(@babel/core@7.28.4)(@react-native-community/cli@13.6.4(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@types/react@19.0.10)(bufferutil@4.0.9)(react@19.0.0)(utf-8-validate@5.0.10))(react@19.0.0)(three@0.173.0)
+      '@sentry/nextjs':
+        specifier: ^10.12.0
+        version: 10.12.0(@opentelemetry/context-async-hooks@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.1.0(@opentelemetry/api@1.9.0))(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react@19.0.0)(webpack@5.98.0(@swc/core@1.13.5)(esbuild@0.25.10))
       '@tiptap/core':
         specifier: 3.4.4
         version: 3.4.4(@tiptap/pm@3.4.4)
@@ -3015,28 +3090,88 @@ importers:
       '@tiptap/suggestion':
         specifier: 3.4.4
         version: 3.4.4(@tiptap/core@3.4.4(@tiptap/pm@3.4.4))(@tiptap/pm@3.4.4)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
       css-tree:
         specifier: ^3.1.0
         version: 3.1.0
+      es-toolkit:
+        specifier: 'catalog:'
+        version: 1.39.7
+      fastdom:
+        specifier: ^1.0.12
+        version: 1.0.12
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
       lowlight:
         specifier: ^3.3.0
         version: 3.3.0
       lucide-react:
         specifier: ^0.460.0
         version: 0.460.0(react@19.0.0)
+      mdx-bundler:
+        specifier: ^10.1.1
+        version: 10.1.1(esbuild@0.25.10)
+      motion:
+        specifier: ^12.4.7
+        version: 12.4.7(@emotion/is-prop-valid@1.3.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next-themes:
+        specifier: ^0.4.4
+        version: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-dom:
+        specifier: 19.0.0
+        version: 19.0.0(react@19.0.0)
+      react-error-boundary:
+        specifier: ^5.0.0
+        version: 5.0.0(react@19.0.0)
       react-hotkeys-hook:
         specifier: ^5.1.0
         version: 5.1.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-medium-image-zoom:
+        specifier: ^5.2.14
+        version: 5.2.14(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      sonner:
+        specifier: ^2.0.3
+        version: 2.0.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      three:
+        specifier: ^0.173.0
+        version: 0.173.0
+      ts-essentials:
+        specifier: 'catalog:'
+        version: 10.0.4(typescript@5.7.3)
+      url-join:
+        specifier: ^5.0.0
+        version: 5.0.0
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.49
+      zustand:
+        specifier: ^5.0.2
+        version: 5.0.3(@types/react@19.0.10)(immer@10.1.1)(react@19.0.0)(use-sync-external-store@1.5.0(react@19.0.0))
     devDependencies:
+      '@bprogress/next':
+        specifier: ^3.2.11
+        version: 3.2.12(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@fern-api/docs-server':
+        specifier: workspace:*
+        version: link:../commons/docs-server
       '@fern-platform/configs':
         specifier: workspace:*
         version: link:../configs
+      '@monaco-editor/react':
+        specifier: ^4.7.0
+        version: 4.7.0(monaco-editor@0.53.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@swc/cli':
         specifier: 'catalog:'
         version: 0.7.8(@swc/core@1.13.5)(chokidar@4.0.3)
       '@swc/core':
         specifier: 'catalog:'
         version: 1.13.5
+      '@testing-library/react':
+        specifier: ^16.3.0
+        version: 16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@types/css-tree':
         specifier: ^2.3.10
         version: 2.3.10
@@ -3049,12 +3184,24 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.0.10
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.0.4(@types/react@19.0.10)
+      '@types/three':
+        specifier: ^0.173.0
+        version: 0.173.0
+      auth0:
+        specifier: ^4.20.0
+        version: 4.20.0
       depcheck:
         specifier: 'catalog:'
         version: 1.4.7
       jotai:
         specifier: 'catalog:'
         version: 2.12.1(@types/react@19.0.10)(react@19.0.0)
+      mermaid:
+        specifier: 'catalog:'
+        version: 11.12.0
       next:
         specifier: 'catalog:'
         version: 15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0)
@@ -5606,9 +5753,6 @@ packages:
   '@fern-api/dynamic-ir-sdk@57.0.0':
     resolution: {integrity: sha512-l0maf2uPPTuFWrPG+Rh7kWKF6smwO3vwZ7JdwmJeB4F8T7uNR/gMwIr/EpzmwJp4/CiyPGkO4KJfm23X2GTjNw==}
 
-  '@fern-api/fs-utils@0.15.0-rc63':
-    resolution: {integrity: sha512-lDbmFyGs9phjI0ewoijwYLB7dkEc59Gt/tg2l2um5E1Xmgfnt5EKFXNywnmDIXN1xb8aYhmo+N9ZKJje6/a+iw==}
-
   '@fern-api/go-dynamic-snippets@0.0.15':
     resolution: {integrity: sha512-KIRV3z/fjKFGx+nFIg5bJOGrqoaTgPCVMB/lpZ5hql948kbEERfQMahX5WBDgbh8E2/p+P8kY/N1LWCMrVQyEQ==}
 
@@ -6648,10 +6792,6 @@ packages:
     resolution: {integrity: sha512-GV9IW134PHsLhtUad21WIeP9mlJ+QNpFd6V9vuPWmaiN25HEJeEQUcS4y5oRuqCm9iWDLtfIs+9K8uczBXKr6A==}
     engines: {node: '>= 20'}
 
-  '@octokit/auth-token@4.0.0':
-    resolution: {integrity: sha512-tY/msAuJo6ARbK6SPIxZrPBms3xPbfwBrulZe0Wtr/DIY9lje2HeV1uoebShn6mx7SjCHif6EjMvoREj+gZ+SA==}
-    engines: {node: '>= 18'}
-
   '@octokit/auth-token@5.1.2':
     resolution: {integrity: sha512-JcQDsBdg49Yky2w2ld20IHAlwr8d/d8N6NiOXbtuoPCqzbsiJgF633mVUw3x4mo0H5ypataQIX7SFu3yy44Mpw==}
     engines: {node: '>= 18'}
@@ -6662,10 +6802,6 @@ packages:
 
   '@octokit/auth-unauthenticated@6.1.3':
     resolution: {integrity: sha512-d5gWJla3WdSl1yjbfMpET+hUSFCE15qM0KVSB0H1shyuJihf/RL1KqWoZMIaonHvlNojkL9XtLFp8QeLe+1iwA==}
-    engines: {node: '>= 18'}
-
-  '@octokit/core@5.2.2':
-    resolution: {integrity: sha512-/g2d4sW9nUDJOMz3mabVQvOGhVa4e/BN/Um7yca9Bb2XTzPPnfTWHWQg+IsEYO7M3Vx+EXvaM/I2pJWIMun1bg==}
     engines: {node: '>= 18'}
 
   '@octokit/core@6.1.6':
@@ -6683,14 +6819,6 @@ packages:
   '@octokit/endpoint@11.0.0':
     resolution: {integrity: sha512-hoYicJZaqISMAI3JfaDr1qMNi48OctWuOih1m80bkYow/ayPw6Jj52tqWJ6GEoFTk1gBqfanSoI1iY99Z5+ekQ==}
     engines: {node: '>= 20'}
-
-  '@octokit/endpoint@9.0.6':
-    resolution: {integrity: sha512-H1fNTMA57HbkFESSt3Y9+FBICv+0jFceJFPWDePYlR/iMGrwM5ph+Dd4XRQs+8X+PUFURLQgX9ChPfhJ/1uNQw==}
-    engines: {node: '>= 18'}
-
-  '@octokit/graphql@7.1.1':
-    resolution: {integrity: sha512-3mkDltSfcDUoa176nlGoA32RGjeWjl3K7F/BwHwRMJUW/IteSa4bnSV8p2ThNkcIcZU2umkZWxwETSSCJf2Q7g==}
-    engines: {node: '>= 18'}
 
   '@octokit/graphql@8.2.2':
     resolution: {integrity: sha512-Yi8hcoqsrXGdt0yObxbebHXFOiUA+2v3n53epuOg1QUgOB6c4XzvisBNVXJSl8RYA5KrDuSL2yq9Qmqe5N0ryA==}
@@ -6741,29 +6869,11 @@ packages:
     peerDependencies:
       '@octokit/core': '>=6'
 
-  '@octokit/plugin-paginate-rest@11.4.4-cjs.2':
-    resolution: {integrity: sha512-2dK6z8fhs8lla5PaOTgqfCGBxgAv/le+EhPs27KklPhm1bKObpu6lXzwfUEQ16ajXzqNrKMujsFyo9K2eaoISw==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      '@octokit/core': '5'
-
   '@octokit/plugin-paginate-rest@12.0.0':
     resolution: {integrity: sha512-MPd6WK1VtZ52lFrgZ0R2FlaoiWllzgqFHaSZxvp72NmoDeZ0m8GeJdg4oB6ctqMTYyrnDYp592Xma21mrgiyDA==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=6'
-
-  '@octokit/plugin-request-log@4.0.1':
-    resolution: {integrity: sha512-GihNqNpGHorUrO7Qa9JbAl0dbLnqJVrV8OXe2Zm5/Y4wFkZQDfTreBzVmiRfJVfE4mClXdihHnbpyyO9FSX4HA==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      '@octokit/core': '5'
-
-  '@octokit/plugin-rest-endpoint-methods@13.3.2-cjs.1':
-    resolution: {integrity: sha512-VUjIjOOvF2oELQmiFpWA1aOPdawpyaCUqcEBc/UOUnj3Xp6DJGrJ1+bjUIIDzdHjnFNO6q57ODMfdEZnoBkCwQ==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      '@octokit/core': ^5
 
   '@octokit/plugin-rest-endpoint-methods@14.0.0':
     resolution: {integrity: sha512-iQt6ovem4b7zZYZQtdv+PwgbL5VPq37th1m2x2TdkgimIDJpsi2A6Q/OI/23i/hR6z5mL0EgisNR4dcbmckSZQ==}
@@ -6783,10 +6893,6 @@ packages:
     peerDependencies:
       '@octokit/core': ^6.1.3
 
-  '@octokit/request-error@5.1.1':
-    resolution: {integrity: sha512-v9iyEQJH6ZntoENr9/yXxjuezh4My67CBSu9r6Ve/05Iu5gNgnisNWOsoJHTP6k0Rr0+HQIpnH+kyammu90q/g==}
-    engines: {node: '>= 18'}
-
   '@octokit/request-error@6.1.8':
     resolution: {integrity: sha512-WEi/R0Jmq+IJKydWlKDmryPcmdYSVjL3ekaiEL1L9eo1sUnqMJ+grqmC9cjk7CA7+b2/T397tO5d8YLOH3qYpQ==}
     engines: {node: '>= 18'}
@@ -6799,16 +6905,8 @@ packages:
     resolution: {integrity: sha512-iYj4SJG/2bbhh+iIpFmG5u49DtJ4lipQ+aPakjL9OKpsGY93wM8w06gvFbEQxcMsZcCvk5th5KkIm2m8o14aWA==}
     engines: {node: '>= 20'}
 
-  '@octokit/request@8.4.1':
-    resolution: {integrity: sha512-qnB2+SY3hkCmBxZsR/MPCybNmbJe4KAlfWErXq+rBKkQJlbjdJeS85VI9r8UqeLYLvnAenU8Q1okM/0MBsAGXw==}
-    engines: {node: '>= 18'}
-
   '@octokit/request@9.2.4':
     resolution: {integrity: sha512-q8ybdytBmxa6KogWlNa818r0k1wlqzNC+yNkcQDECHvQo8Vmstrg18JwqJHdJdUiHD2sjlwBgSm9kHkOKe2iyA==}
-    engines: {node: '>= 18'}
-
-  '@octokit/rest@20.1.2':
-    resolution: {integrity: sha512-GmYiltypkHHtihFwPRxlaorG5R9VAHuk/vbszVoRTGXnAsY60wYLkh/E2XiFmdZmqrisw+9FaazS1i5SbdWYgA==}
     engines: {node: '>= 18'}
 
   '@octokit/types@13.10.0':
@@ -11524,9 +11622,6 @@ packages:
   bech32@1.1.4:
     resolution: {integrity: sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==}
 
-  before-after-hook@2.2.3:
-    resolution: {integrity: sha512-NzUnlZexiaH/46WDhANlyR2bXRopNg4F/zuSA3OpZnllCUgRaOF2znDioDWrmbNVsuZk6l9pMquQB38cfBZwkQ==}
-
   before-after-hook@3.0.2:
     resolution: {integrity: sha512-Nik3Sc0ncrMK4UUdXQmAnRtzmNQTAAXmXIopizwZ1W1t8QmfJj+zL4OA2I7XPTPW5z5TDqv4hRo/JzouDJnX3A==}
 
@@ -12836,9 +12931,6 @@ packages:
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
-
-  deprecation@2.3.1:
-    resolution: {integrity: sha512-xmHIy4F3scKVwMsQ4WnVaS8bHOx0DmVwRywosKhaILI0ywMDWPtBSku2HNxRvF7jtwDRsoEwYQSfbxj8b7RlJQ==}
 
   deps-regex@0.2.0:
     resolution: {integrity: sha512-PwuBojGMQAYbWkMXOY9Pd/NWCDNHVH12pnS7WHqZkTSeMESe4hwnKKRp0yR87g37113x4JPbo/oIvXY+s/f56Q==}
@@ -15425,10 +15517,6 @@ packages:
 
   json-stream-stringify@3.0.1:
     resolution: {integrity: sha512-vuxs3G1ocFDiAQ/SX0okcZbtqXwgj1g71qE9+vrjJ2EkjKQlEFDAcUNRxRU8O+GekV4v5cM2qXP0Wyt/EMDBiQ==}
-
-  json-stream-stringify@3.1.4:
-    resolution: {integrity: sha512-oGoz05ft577LolnXFQHD2CjnXDxXVA5b8lHwfEZgRXQUZeCMo6sObQQRq+NXuHQ3oTeMZHHmmPY2rjVwyqR62A==}
-    engines: {node: '>=7.10.1'}
 
   json-stringify-safe@5.0.1:
     resolution: {integrity: sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==}
@@ -19011,12 +19099,6 @@ packages:
   sonic-boom@2.8.0:
     resolution: {integrity: sha512-kuonw1YOYYNOve5iHdSahXPOK49GqwA+LZhI6Wz/l0rP57iKyXXIHaRagOBHAPmGwJC6od2Z9zgvZ5loSgMlVg==}
 
-  sonner@1.5.0:
-    resolution: {integrity: sha512-FBjhG/gnnbN6FY0jaNnqZOMmB73R+5IiyYAw8yBj7L54ER7HB3fOSE5OFiQiE2iXWxeXKvg6fIP4LtVppHEdJA==}
-    peerDependencies:
-      react: 19.0.0
-      react-dom: 19.0.0
-
   sonner@2.0.3:
     resolution: {integrity: sha512-njQ4Hht92m0sMqqHVDL32V2Oun9W1+PHO9NDv9FHfJjT3JT22IG4Jpo3FPQy+mouRKCXFWO+r67v6MrHX2zeIA==}
     peerDependencies:
@@ -20249,9 +20331,6 @@ packages:
 
   universal-github-app-jwt@2.2.2:
     resolution: {integrity: sha512-dcmbeSrOdTnsjGjUfAlqNDJrhxXizjAz94ija9Qw8YkZ1uu0d+GoZzyH+Jb9tIIqvGsadUfwg+22k5aDqqwzbw==}
-
-  universal-user-agent@6.0.1:
-    resolution: {integrity: sha512-yCzhz6FN2wU1NiiQRogkTQszlQSlpWaw8SvVegAc+bDxbzHgh1vX8uIe8OYyMH6DwH+sdTJsgMl36+mSMdRJIQ==}
 
   universal-user-agent@7.0.2:
     resolution: {integrity: sha512-0JCqzSKnStlRRQfCdowvqy3cy0Dvtlb8xecj/H8JFZuCze4rwjPZQOgvFvn0Ws/usCHQFGpyr+pB9adaGwXn4Q==}
@@ -23815,12 +23894,6 @@ snapshots:
 
   '@fern-api/dynamic-ir-sdk@57.0.0': {}
 
-  '@fern-api/fs-utils@0.15.0-rc63':
-    dependencies:
-      '@fern-api/core-utils': 0.15.0-rc63
-      json-stream-stringify: 3.1.4
-      tmp-promise: 3.0.3
-
   '@fern-api/go-dynamic-snippets@0.0.15': {}
 
   '@fern-api/java-dynamic-snippets@0.0.3': {}
@@ -25101,8 +25174,6 @@ snapshots:
       '@octokit/types': 14.1.0
       universal-user-agent: 7.0.2
 
-  '@octokit/auth-token@4.0.0': {}
-
   '@octokit/auth-token@5.1.2': {}
 
   '@octokit/auth-token@6.0.0': {}
@@ -25111,16 +25182,6 @@ snapshots:
     dependencies:
       '@octokit/request-error': 6.1.8
       '@octokit/types': 14.1.0
-
-  '@octokit/core@5.2.2':
-    dependencies:
-      '@octokit/auth-token': 4.0.0
-      '@octokit/graphql': 7.1.1
-      '@octokit/request': 8.4.1
-      '@octokit/request-error': 5.1.1
-      '@octokit/types': 13.10.0
-      before-after-hook: 2.2.3
-      universal-user-agent: 6.0.1
 
   '@octokit/core@6.1.6':
     dependencies:
@@ -25151,17 +25212,6 @@ snapshots:
     dependencies:
       '@octokit/types': 14.1.0
       universal-user-agent: 7.0.2
-
-  '@octokit/endpoint@9.0.6':
-    dependencies:
-      '@octokit/types': 13.10.0
-      universal-user-agent: 6.0.1
-
-  '@octokit/graphql@7.1.1':
-    dependencies:
-      '@octokit/request': 8.4.1
-      '@octokit/types': 13.10.0
-      universal-user-agent: 6.0.1
 
   '@octokit/graphql@8.2.2':
     dependencies:
@@ -25218,24 +25268,10 @@ snapshots:
     dependencies:
       '@octokit/core': 6.1.6
 
-  '@octokit/plugin-paginate-rest@11.4.4-cjs.2(@octokit/core@5.2.2)':
-    dependencies:
-      '@octokit/core': 5.2.2
-      '@octokit/types': 13.10.0
-
   '@octokit/plugin-paginate-rest@12.0.0(@octokit/core@6.1.6)':
     dependencies:
       '@octokit/core': 6.1.6
       '@octokit/types': 14.1.0
-
-  '@octokit/plugin-request-log@4.0.1(@octokit/core@5.2.2)':
-    dependencies:
-      '@octokit/core': 5.2.2
-
-  '@octokit/plugin-rest-endpoint-methods@13.3.2-cjs.1(@octokit/core@5.2.2)':
-    dependencies:
-      '@octokit/core': 5.2.2
-      '@octokit/types': 13.10.0
 
   '@octokit/plugin-rest-endpoint-methods@14.0.0(@octokit/core@6.1.6)':
     dependencies:
@@ -25255,12 +25291,6 @@ snapshots:
       '@octokit/types': 14.1.0
       bottleneck: 2.19.5
 
-  '@octokit/request-error@5.1.1':
-    dependencies:
-      '@octokit/types': 13.10.0
-      deprecation: 2.3.1
-      once: 1.4.0
-
   '@octokit/request-error@6.1.8':
     dependencies:
       '@octokit/types': 14.1.0
@@ -25277,13 +25307,6 @@ snapshots:
       fast-content-type-parse: 3.0.0
       universal-user-agent: 7.0.2
 
-  '@octokit/request@8.4.1':
-    dependencies:
-      '@octokit/endpoint': 9.0.6
-      '@octokit/request-error': 5.1.1
-      '@octokit/types': 13.10.0
-      universal-user-agent: 6.0.1
-
   '@octokit/request@9.2.4':
     dependencies:
       '@octokit/endpoint': 10.1.4
@@ -25291,13 +25314,6 @@ snapshots:
       '@octokit/types': 14.1.0
       fast-content-type-parse: 2.0.1
       universal-user-agent: 7.0.2
-
-  '@octokit/rest@20.1.2':
-    dependencies:
-      '@octokit/core': 5.2.2
-      '@octokit/plugin-paginate-rest': 11.4.4-cjs.2(@octokit/core@5.2.2)
-      '@octokit/plugin-request-log': 4.0.1(@octokit/core@5.2.2)
-      '@octokit/plugin-rest-endpoint-methods': 13.3.2-cjs.1(@octokit/core@5.2.2)
 
   '@octokit/types@13.10.0':
     dependencies:
@@ -32063,8 +32079,6 @@ snapshots:
   bech32@1.1.4:
     optional: true
 
-  before-after-hook@2.2.3: {}
-
   before-after-hook@3.0.2: {}
 
   before-after-hook@4.0.0: {}
@@ -33512,8 +33526,6 @@ snapshots:
       - supports-color
 
   depd@2.0.0: {}
-
-  deprecation@2.3.1: {}
 
   deps-regex@0.2.0: {}
 
@@ -36857,8 +36869,6 @@ snapshots:
   json-stable-stringify-without-jsonify@1.0.1: {}
 
   json-stream-stringify@3.0.1: {}
-
-  json-stream-stringify@3.1.4: {}
 
   json-stringify-safe@5.0.1: {}
 
@@ -41481,11 +41491,6 @@ snapshots:
     dependencies:
       atomic-sleep: 1.0.0
 
-  sonner@1.5.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
-    dependencies:
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
-
   sonner@2.0.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       react: 19.0.0
@@ -42870,8 +42875,6 @@ snapshots:
       unist-util-visit-parents: 6.0.1
 
   universal-github-app-jwt@2.2.2: {}
-
-  universal-user-agent@6.0.1: {}
 
   universal-user-agent@7.0.2: {}
 

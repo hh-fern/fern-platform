@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { EnableNoiseAnimation } from "@/components/EnableNoiseAnimation";
 import { LoginPage } from "@/components/login-page/LoginPage";
 
-import { getCurrentSession } from "../services/auth0/getCurrentSession";
+import { getCurrentSession } from "../../../../fern-dashboard-services/src/getCurrentSession";
 
 export default async function Page() {
     const session = await getCurrentSession();

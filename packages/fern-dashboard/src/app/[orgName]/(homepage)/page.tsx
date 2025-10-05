@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getCurrentSession } from "../../services/auth0/getCurrentSession";
+import { getCurrentSession } from "../../../../../fern-dashboard-services/src/getCurrentSession";
 import type { Auth0OrgName } from "../../services/auth0/types";
 
 export default async function Page({ params }: { params: Promise<{ orgName: Auth0OrgName }> }) {

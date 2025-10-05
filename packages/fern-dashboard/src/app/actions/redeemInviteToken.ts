@@ -1,7 +1,12 @@
 "use server";
 
-import { getCurrentSessionOrThrow } from "../services/auth0/getCurrentSession";
-import { addUserToOrg, doesUserBelongToOrg, getInviteToken, invalidateInviteToken } from "../services/auth0/management";
+import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
+import {
+    addUserToOrg,
+    doesUserBelongToOrg,
+    getInviteToken,
+    invalidateInviteToken
+} from "../../../../fern-dashboard-services/src/management";
 import { type Auth0OrgName, Auth0UserID } from "../services/auth0/types";
 
 export type RedeemInviteTokenErrors =

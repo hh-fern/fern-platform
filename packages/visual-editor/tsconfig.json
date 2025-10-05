@@ -2,7 +2,11 @@
   "extends": "@fern-platform/configs/tsconfig/react-library.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": ["node", "next", "vitest/globals"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["./src/**/*"]
 }

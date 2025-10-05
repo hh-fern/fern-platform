@@ -9,7 +9,11 @@
         },
         "transform": {
             "verbatimModuleSyntax": true
-        }
+        },
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "baseUrl": "."
     },
     "module": {
         "type": "es6"

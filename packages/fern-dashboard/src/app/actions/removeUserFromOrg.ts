@@ -2,7 +2,7 @@
 
 import * as auth0Management from "@/app/services/auth0/management";
 
-import { getCurrentSessionOrThrow } from "../services/auth0/getCurrentSession";
+import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
 import type { Auth0OrgName, Auth0UserID } from "../services/auth0/types";
 import { assertUserHasOrganizationAccess } from "../services/dal/organization";
 

@@ -2,7 +2,7 @@
 
 import type { FernAI } from "@fern-api/fai-sdk";
 
-import { getCurrentSessionOrThrow } from "../services/auth0/getCurrentSession";
+import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
 import { getFaiClient } from "../services/fai/getFaiClient";
 
 export async function getConversation({

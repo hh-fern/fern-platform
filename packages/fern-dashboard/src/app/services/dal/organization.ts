@@ -5,7 +5,7 @@ import { cache } from "react";
 import * as auth0Management from "@/app/services/auth0/management";
 import { throwDigestibleError } from "@/utils/errors";
 
-import { getCurrentSession } from "../auth0/getCurrentSession";
+import { getCurrentSession } from "../../../../../fern-dashboard-services/src/getCurrentSession";
 import type { Auth0OrgName } from "../auth0/types";
 import { getVenusClient } from "../venus/getVenusClient";
 
