@@ -393,7 +393,10 @@
       }
     },
     {
-      "includes": ["packages/commons/docs-server/src/generateRadixColors.ts", "servers/fern-bot/src/libs/env.ts"],
+      "includes": [
+        "packages/commons/docs-server/src/generateRadixColors.ts",
+        "servers/fern-bot/src/libs/env.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
@@ -530,7 +533,9 @@
       }
     },
     {
-      "includes": ["servers/fdr/src/services/docs-cache/RedisDocsDefinitionStore.ts"],
+      "includes": [
+        "servers/fdr/src/services/docs-cache/RedisDocsDefinitionStore.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {

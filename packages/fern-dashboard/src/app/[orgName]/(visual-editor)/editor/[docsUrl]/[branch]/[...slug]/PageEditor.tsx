@@ -1,11 +1,9 @@
 "use client";
 
+import type { Editor, EditorEvents } from "@fern-dashboard/visual-editor";
+import { TiptapEditor } from "@fern-dashboard/visual-editor";
 import { getChangedNodesFromHtml } from "@fern-docs/mdx";
-
-import type { Editor, EditorEvents } from "@tiptap/react";
 import React, { useEffect, useRef, useState } from "react";
-
-import TiptapEditor from "@/components/editor/TiptapEditor";
 import { usePages } from "@/providers/PagesStoreContext";
 
 export declare namespace PageEditor {

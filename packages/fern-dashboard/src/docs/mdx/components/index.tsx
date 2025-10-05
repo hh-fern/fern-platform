@@ -1,8 +1,7 @@
 "use client";
 
+import { NodeViewWrapper } from "@fern-dashboard/visual-editor";
 import type { MDXComponents } from "@fern-docs/mdx";
-
-import { NodeViewWrapper } from "@tiptap/react";
 import React, { type ComponentProps } from "react";
 
 import { UnsupportedContent } from "@/components/editor/UnsupportedContent";

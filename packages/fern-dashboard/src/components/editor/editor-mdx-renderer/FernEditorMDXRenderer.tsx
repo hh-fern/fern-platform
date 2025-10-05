@@ -1,3 +1,4 @@
+import { TiptapEditor } from "@fern-dashboard/visual-editor";
 import {
     astToMDX,
     htmlToMdx,
@@ -6,7 +7,6 @@ import {
     type MdxJsxExpressionAttribute,
     mdxToHtml
 } from "@fern-docs/mdx";
-
 import { useMDXComponents } from "@mdx-js/react";
 import { getMDXComponent } from "mdx-bundler/client";
 import React, { useEffect, useMemo, useRef, useState } from "react";

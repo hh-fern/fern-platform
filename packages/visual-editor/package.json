@@ -1,0 +1,75 @@
+{
+  "name": "@fern-dashboard/visual-editor",
+  "version": "0.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fern-api/fern-platform.git",
+    "directory": "packages/visual-editor"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "source": "src/index.ts",
+  "types": "src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rm -rf ./lib ./dist && tsc --build --clean",
+    "compile": "pnpm compile:js && pnpm compile:types",
+    "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
+    "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
+    "depcheck": "depcheck",
+    "format": "prettier --write --ignore-unknown \"**\"",
+    "format:check": "prettier --check --ignore-unknown \"**\"",
+    "lint:eslint": "eslint --max-warnings 0 .",
+    "lint:eslint:fix": "pnpm lint:eslint --fix",
+    "lint:style": "stylelint 'src/**/*.scss' --allow-empty-input --max-warnings 0",
+    "lint:style:fix": "pnpm lint:style --fix",
+    "test": "vitest --run --passWithNoTests --globals"
+  },
+  "dependencies": {
+    "@floating-ui/react": "^0.27.16",
+    "@heroicons/react": "^2.2.0",
+    "@radix-ui/react-popover": "catalog:",
+    "@tiptap/core": "3.4.4",
+    "@tiptap/extension-code-block": "^3.4.4",
+    "@tiptap/extension-drag-handle": "^3.0.9",
+    "@tiptap/extension-drag-handle-react": "^3.0.9",
+    "@tiptap/extension-file-handler": "^3.4.1",
+    "@tiptap/extension-placeholder": "^3.0.5",
+    "@tiptap/pm": "3.4.4",
+    "@tiptap/react": "3.4.4",
+    "@tiptap/starter-kit": "3.4.4",
+    "@tiptap/suggestion": "3.4.4",
+    "css-tree": "^3.1.0",
+    "lowlight": "^3.3.0",
+    "lucide-react": "^0.460.0",
+    "react-hotkeys-hook": "^5.1.0"
+  },
+  "devDependencies": {
+    "@fern-platform/configs": "workspace:*",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
+    "@types/css-tree": "^2.3.10",
+    "@types/hast": "^3.0.0",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "depcheck": "catalog:",
+    "jotai": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "sass": "^1.77.0",
+    "stylelint": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vite": "^6.1.0",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "jotai": "^2",
+    "react": "^19"
+  }
+}
