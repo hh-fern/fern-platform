@@ -33,6 +33,7 @@
     "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
     "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
     "depcheck": "depcheck",
+    "dev": "swc ./src --out-dir ./dist/js --watch --copy-files --strip-leading-paths",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "lint:eslint": "eslint --max-warnings 0 .",
