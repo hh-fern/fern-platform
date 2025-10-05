@@ -1,3 +1,5 @@
+"use client";
+
 import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { Button } from "@fern-docs/components/button";
 import { cn } from "@fern-docs/components/cn";

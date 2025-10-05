@@ -1,3 +1,5 @@
+"use client";
+
 import { Prose } from "@fern-docs/components/mdx/prose";
 import type React from "react";
 import { useRef } from "react";

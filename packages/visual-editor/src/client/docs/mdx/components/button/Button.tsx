@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@fern-docs/components/cn";
 
 import { FernButton } from "@fern-docs/components/FernButton";

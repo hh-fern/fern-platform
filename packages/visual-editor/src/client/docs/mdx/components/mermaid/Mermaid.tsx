@@ -1,3 +1,5 @@
+"use client";
+
 import { type ReactElement, useEffect, useRef, useState } from "react";
 
 import { useResolvedTheme } from "@/client/docs/hooks/use-theme";

@@ -123,6 +123,7 @@
     "next": "catalog:",
     "react": "catalog:",
     "sass": "^1.77.0",
+    "styled-jsx": "^5.1.7",
     "stylelint": "catalog:",
     "typescript": "catalog:",
     "vite": "^6.1.0",

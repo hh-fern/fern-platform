@@ -1,3 +1,5 @@
+"use client";
+
 import { useMDXComponents } from "@mdx-js/react";
 import React, { useMemo } from "react";
 import * as jsxRuntime from "react/jsx-runtime";

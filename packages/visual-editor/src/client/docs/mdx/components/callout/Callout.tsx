@@ -1,3 +1,5 @@
+"use client";
+
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import { cn } from "@fern-docs/components/cn";
 import { FaIcon } from "@fern-docs/components/fa-icon";

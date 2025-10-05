@@ -8,7 +8,10 @@
             "tsx": true
         },
         "transform": {
-            "verbatimModuleSyntax": true
+            "verbatimModuleSyntax": true,
+            "react": {
+                "runtime": "preserve"
+            }
         },
         "paths": {
             "@/*": ["./src/*"]

@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@fern-docs/components/cn";
 
 import { composeRefs } from "@radix-ui/react-compose-refs";

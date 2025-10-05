@@ -1,3 +1,5 @@
+"use client";
+
 import * as AccordionComponent from "@fern-docs/components/accordion";
 import { Button } from "@fern-docs/components/button";
 import { cn } from "@fern-docs/components/cn";

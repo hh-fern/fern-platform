@@ -1132,9 +1132,6 @@ importers:
       '@sentry/nextjs':
         specifier: ^10.12.0
         version: 10.12.0(@opentelemetry/context-async-hooks@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.1.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.1.0(@opentelemetry/api@1.9.0))(next@15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.0))(react@19.0.0)(webpack@5.98.0(@swc/core@1.13.5))
-      '@sparticuz/chromium':
-        specifier: ^133.0.0
-        version: 133.0.0
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@4.0.9)
@@ -1192,9 +1189,6 @@ importers:
       posthog-node:
         specifier: ^4.5.0
         version: 4.5.0
-      puppeteer-core:
-        specifier: ^24.4.0
-        version: 24.4.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -1235,6 +1229,9 @@ importers:
       '@rspack/core':
         specifier: ^1.2.3
         version: 1.4.5(@swc/helpers@0.5.15)
+      '@sparticuz/chromium':
+        specifier: ^133.0.0
+        version: 133.0.0
       '@tailwindcss/postcss':
         specifier: ^4.0.9
         version: 4.0.9
@@ -1271,6 +1268,9 @@ importers:
       prisma:
         specifier: 5.13.0
         version: 5.13.0
+      puppeteer-core:
+        specifier: ^24.4.0
+        version: 24.4.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       raw-loader:
         specifier: ^4.0.2
         version: 4.0.2(webpack@5.98.0(@swc/core@1.13.5))
@@ -3103,6 +3103,9 @@ importers:
       sass:
         specifier: ^1.77.0
         version: 1.77.0
+      styled-jsx:
+        specifier: ^5.1.7
+        version: 5.1.7(@babel/core@7.28.4)(react@19.0.0)
       stylelint:
         specifier: 'catalog:'
         version: 16.14.1(typescript@5.7.3)

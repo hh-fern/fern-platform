@@ -1,3 +1,5 @@
+"use client";
+
 import { FernButton } from "@fern-docs/components/FernButton";
 import { usePrevious } from "@fern-ui/react-commons";
 import { composeRefs } from "@radix-ui/react-compose-refs";

@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef } from "react";
 import { TextInputControl } from "@/client/components/editor/editor-component/controls";
 import { useEditorComponent } from "@/client/components/editor/editor-component/EditorComponentContext";

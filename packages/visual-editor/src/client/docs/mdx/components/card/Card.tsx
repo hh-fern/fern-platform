@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@fern-docs/components/cn";
 import { NoZoom } from "@fern-docs/components/contexts/NoZoom";
 import { FernCard } from "@fern-docs/components/FernCard";
