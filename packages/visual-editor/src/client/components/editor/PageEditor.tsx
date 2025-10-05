@@ -1,10 +1,10 @@
 "use client";
 
-import type { Editor, EditorEvents } from "@fern-dashboard/visual-editor";
-import { TiptapEditor } from "@fern-dashboard/visual-editor";
 import { getChangedNodesFromHtml } from "@fern-docs/mdx";
-import React, { useEffect, useRef, useState } from "react";
-import { usePages } from "@/providers/PagesStoreContext";
+import type { Editor, EditorEvents } from "@tiptap/core";
+import { useEffect, useRef, useState } from "react";
+import { usePages } from "@/client/providers/PagesStoreContext";
+import TiptapEditor from "./TiptapEditor";
 
 export declare namespace PageEditor {
     export interface Props {
@@ -15,7 +15,7 @@ export declare namespace PageEditor {
 }
 
 // SEE: https://tiptap.dev/docs/editor/getting-started/install/react
-export default function PageEditor({ className, filename, initialHtml }: PageEditor.Props) {
+export function PageEditor({ className, filename, initialHtml }: PageEditor.Props) {
     const editorRef = useRef<Editor | null>(null);
     const skipNormalUpdateBecauseUpdateIsFromDevPanel = useRef(false);
     const latestTiptapHtml = useRef<string>(initialHtml || "");

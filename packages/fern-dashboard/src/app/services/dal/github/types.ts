@@ -1,8 +1,6 @@
+import type { Auth0UserID } from "@fern-dashboard/services/auth/types";
 import type { NextRequest, NextResponse } from "next/server";
-
 import { z } from "zod";
-
-import type { Auth0UserID } from "../../auth0/types";
 
 export type RepoIdentifier =
     | {

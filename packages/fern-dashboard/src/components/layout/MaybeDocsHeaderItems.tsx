@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
 import type { DocsUrl } from "@/utils/types";
 

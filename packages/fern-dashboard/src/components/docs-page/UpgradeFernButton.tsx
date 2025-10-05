@@ -1,15 +1,13 @@
 "use client";
 
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
+import { ErrorUpgradeFernCliVersionToast } from "@fern-dashboard/visual-editor/client";
 import SparklesIcon from "@heroicons/react/24/outline/SparklesIcon";
 import { ExternalLink, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
-
 import { upgradeFernVersionAction } from "@/app/actions/upgradeFernVersion";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import type { DocsUrl } from "@/utils/types";
 import { cn } from "@/utils/utils";
-
-import { ErrorUpgradeFernCliVersionToast } from "../editor/EditorToasts";
 import { Button } from "../ui/button";
 
 type UpgradeFernButtonVariant = "outline" | "black";

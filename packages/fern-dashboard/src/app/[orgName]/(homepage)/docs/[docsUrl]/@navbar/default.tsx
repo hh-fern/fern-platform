@@ -1,6 +1,6 @@
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import { isFernEmployee } from "@/app/services/auth0/management";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import { isFernEmployee } from "@fern-dashboard/services/auth/management";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { AskAiEnabledServerSide } from "@/components/ask-ai/AskAiEnabledServerSide";
 import { DocsSiteNavBarItem } from "@/components/docs-page/DocsSiteNavBarItem";
 

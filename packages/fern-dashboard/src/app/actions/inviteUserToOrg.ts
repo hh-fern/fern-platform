@@ -1,11 +1,10 @@
 "use server";
 
-import * as auth0Management from "@/app/services/auth0/management";
-
-import { getAuth0ClientId } from "../../../../fern-dashboard-services/src/auth0";
-import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
-import { getAuth0ManagementClient } from "../../../../fern-dashboard-services/src/management";
-import type { Auth0OrgName } from "../services/auth0/types";
+import { getAuth0ClientId } from "@fern-dashboard/services/auth/auth0";
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
+import * as auth0Management from "@fern-dashboard/services/auth/management";
+import { getAuth0ManagementClient } from "@fern-dashboard/services/auth/management";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { assertUserHasOrganizationAccess } from "../services/dal/organization";
 
 export async function inviteUserToOrg({ inviteeEmail, orgName }: { inviteeEmail: string; orgName: Auth0OrgName }) {

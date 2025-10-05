@@ -1,7 +1,6 @@
 import { Anthropic } from "@anthropic-ai/sdk";
+import { DEFAULT_PR_TITLE } from "@fern-dashboard/visual-editor/shared/github";
 import type { Octokit } from "@octokit/core";
-
-import { DEFAULT_PR_TITLE } from "../github/github";
 
 export interface PrDescriptionService {
     generateAndUpdatePrTitle: (params: {

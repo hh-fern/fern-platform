@@ -1,5 +1,5 @@
-import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
+import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 
 export default async function postCreatePr(request: {
     owner: string;

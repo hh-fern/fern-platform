@@ -1,7 +1,7 @@
 import "server-only";
 
-import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0SessionData } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import type { DocsUrl } from "@/utils/types";
 
 import type { GithubAuthState } from "../GithubSource";

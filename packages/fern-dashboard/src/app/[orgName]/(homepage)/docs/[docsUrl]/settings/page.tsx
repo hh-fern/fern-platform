@@ -1,7 +1,6 @@
+import { isFernEmployee } from "@fern-dashboard/services/auth/management";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { redirect } from "next/navigation";
-
-import { isFernEmployee } from "@/app/services/auth0/management";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
 import { Settings } from "@/components/settings/Settings";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";

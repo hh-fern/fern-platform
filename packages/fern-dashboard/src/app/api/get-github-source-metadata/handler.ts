@@ -1,8 +1,7 @@
+import { getFernBotInstallationId, getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
+import type { GithubSourceRepo } from "@fern-dashboard/visual-editor/shared/github";
+import { getOwnerAndRepoFromGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 import { unstable_cache } from "next/cache";
-
-import { getFernBotInstallationId, getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
-import { getOwnerAndRepoFromGithubUrl } from "@/app/services/github/github";
-import type { GithubSourceRepo } from "@/app/services/github/types";
 
 const EMPTY_RESPONSE: GithubSourceRepo = {
     githubUrl: undefined,

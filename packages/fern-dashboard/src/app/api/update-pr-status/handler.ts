@@ -1,5 +1,5 @@
-import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
-import type { GithubPrStatus } from "@/app/services/github/types";
+import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
+import type { GithubPrStatus } from "@fern-dashboard/visual-editor/shared/github";
 
 import getPrForBranch from "../get-pr-for-branch/handler";
 

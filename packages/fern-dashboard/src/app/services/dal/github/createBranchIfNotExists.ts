@@ -1,8 +1,8 @@
 "use server";
 
-import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
+import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { validateGithubRepoAccess } from "@/app/services/dal/github/validators";
 import type { DocsUrl } from "@/utils/types";
 

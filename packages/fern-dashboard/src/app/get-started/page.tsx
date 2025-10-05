@@ -1,9 +1,8 @@
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { redirect } from "next/navigation";
-
 import { DocsZeroState } from "@/components/docs-page/DocsZeroState";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { SidepanelProvider } from "@/components/layout/SidepanelContext";
-import { getCurrentSession } from "../../../../fern-dashboard-services/src/getCurrentSession";
 import HeaderLayout from "../[orgName]/(homepage)/@header/default";
 
 export default async function Page({ params }: { params: Promise<{}> }) {

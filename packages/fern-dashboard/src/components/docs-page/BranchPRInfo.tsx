@@ -1,14 +1,10 @@
 "use client";
 
+import { ClickablePrNumber, GitPRProvider, PRTitleEditor, useGitPrInfo } from "@fern-dashboard/visual-editor/client";
+import type { GithubSourceRepo } from "@fern-dashboard/visual-editor/shared/github";
 import { GitPullRequest, GitPullRequestDraft } from "lucide-react";
-
-import type { GithubSourceRepo } from "@/app/services/github/types";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { GitPRProvider, useGitPrInfo } from "@/providers/GitPRContext";
 import type { DocsUrl } from "@/utils/types";
-
-import { ClickablePrNumber } from "../editor/ClickablePrNumber";
-import { PRTitleEditor } from "../editor/PRTitleEditor";
 
 const getDisplayNameFromBranch = (branch: string) => {
     // Extracts date from branch name format: YYYY-MM-DD-*

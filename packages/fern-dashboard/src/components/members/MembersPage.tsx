@@ -1,6 +1,6 @@
 "use client";
 
-import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
+import type { Auth0SessionData } from "@fern-dashboard/services/auth/getCurrentSession";
 import { useCurrentOrganization } from "@/state/useOrganizations";
 import { useOrgInvitations } from "@/state/useOrgInvitations";
 import { useOrgMembers } from "@/state/useOrgMembers";

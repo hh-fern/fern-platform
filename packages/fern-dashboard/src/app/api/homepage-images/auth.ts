@@ -1,7 +1,6 @@
 import { FernVenusApi } from "@fern-api/venus-api-sdk";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { NextResponse } from "next/server";
-
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { getVenusClient } from "@/app/services/venus/getVenusClient";
 import { getDocsUrlOwner } from "../utils/getDocsUrlMetadata";
 import type { MaybeErrorResponse } from "../utils/MaybeErrorResponse";

@@ -1,6 +1,6 @@
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 
 export default async function preloadEditorData(request: { docsUrl: string; host: string }): Promise<{
     success: boolean;

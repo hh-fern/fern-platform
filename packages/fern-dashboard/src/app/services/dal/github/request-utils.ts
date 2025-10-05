@@ -1,4 +1,4 @@
-import { getOwnerAndRepoFromGithubUrl } from "../../github/github";
+import { getOwnerAndRepoFromGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 import type { RepoData, RepoIdentifier } from "./types";
 
 export async function deriveRepoIdentifier({

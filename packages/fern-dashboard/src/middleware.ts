@@ -1,5 +1,5 @@
+import { getAuth0Client } from "@fern-dashboard/services/auth/auth0";
 import { type NextRequest, NextResponse } from "next/server";
-import { getAuth0Client } from "../../fern-dashboard-services/src/auth0";
 import { buildErrorPageSearchParams } from "./app/error/searchParams";
 
 export async function middleware(req: NextRequest) {

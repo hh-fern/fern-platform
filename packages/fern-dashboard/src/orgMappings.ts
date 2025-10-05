@@ -1,7 +1,7 @@
-import { Auth0OrgName, type Auth0UserID } from "@fern-dashboard/visual-editor/shared/auth0";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import * as auth0Management from "@fern-dashboard/services/auth/management";
+import { Auth0OrgName, type Auth0UserID } from "@fern-dashboard/services/auth/types";
 import { z } from "zod";
-import * as auth0Management from "@/app/services/auth0/management";
-import { getCurrentSession } from "../../fern-dashboard-services/src/getCurrentSession";
 
 const inFlightPromises: Record<string, Promise<void>> = {};
 

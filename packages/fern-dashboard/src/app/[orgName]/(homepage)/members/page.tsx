@@ -1,6 +1,5 @@
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { redirect } from "next/navigation";
-
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { MembersPage } from "@/components/members/MembersPage";
 
 export default async function Page() {

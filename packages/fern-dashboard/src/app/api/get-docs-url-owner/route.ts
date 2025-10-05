@@ -1,8 +1,6 @@
+import * as auth0Management from "@fern-dashboard/services/auth/management";
 import { type NextRequest, NextResponse } from "next/server";
-
 import { z } from "zod";
-
-import * as auth0Management from "@/app/services/auth0/management";
 import type { ResolvedReturnType } from "@/utils/types";
 
 import { maybeGetCurrentSession } from "../utils/maybeGetCurrentSession";

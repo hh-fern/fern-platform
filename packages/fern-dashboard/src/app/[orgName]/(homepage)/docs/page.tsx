@@ -1,6 +1,5 @@
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { redirect } from "next/navigation";
-
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import getDocsSitesForOrg from "@/app/services/dal/fdr/getDocsSitesForOrg";
 import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
 import { DocsZeroState } from "@/components/docs-page/DocsZeroState";

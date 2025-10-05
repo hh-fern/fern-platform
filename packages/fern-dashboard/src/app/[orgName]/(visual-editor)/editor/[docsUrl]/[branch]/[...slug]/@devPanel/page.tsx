@@ -1,19 +1,15 @@
 "use client";
 
+import { useDevMode, useEditingDisabled, usePages, WarningValidationToast } from "@fern-dashboard/visual-editor/client";
 import { mdxToHtml } from "@fern-docs/mdx";
 import type { Monaco } from "@monaco-editor/react";
 import { Code2 } from "lucide-react";
 import type monaco from "monaco-editor";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-
-import { WarningValidationToast } from "@/components/editor/EditorToasts";
-import { defineAppTheme } from "@/components/editor/theme-utils";
 import { Button } from "@/components/ui/button";
-import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useCurrentPage } from "@/providers/CurrentPageContext";
-import { useDevMode } from "@/providers/DevModeProvider";
-import { usePages } from "@/providers/PagesStoreContext";
+import { defineAppTheme } from "@/utils/theme-utils";
 import { cn } from "@/utils/utils";
 
 const MonacoEditor = dynamic(() => import("./editor"), {

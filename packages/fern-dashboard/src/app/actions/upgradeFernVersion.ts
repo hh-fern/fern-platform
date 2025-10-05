@@ -1,12 +1,11 @@
 "use server";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import type { GithubCommitableFile } from "@/app/services/github/types";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
+import type { GithubCommitableFile } from "@fern-dashboard/visual-editor/shared/github";
 import type { DocsUrl } from "@/utils/types";
-
 import postGitCommit from "../api/post-git-commit/handler";
 import postCreatePr from "../api/post-git-create-pr/handler";
-import type { Auth0OrgName } from "../services/auth0/types";
 import createBranchIfNotExists from "../services/dal/github/createBranchIfNotExists";
 import { withGithubAuth } from "../services/dal/github/middleware";
 import { getUpgradePrBranchName } from "../services/dal/github/request-utils";

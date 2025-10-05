@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter } from "@bprogress/next/app";
+import type { Auth0OrgName, Auth0UserID } from "@fern-dashboard/services/auth/types";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
-
-import type { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 import Redirect from "@/components/Redirect";
 
 interface AcceptInviteSuccessProps {

@@ -1,12 +1,11 @@
 import "server-only";
 
 import { FdrAPI } from "@fern-api/fdr-sdk/client/types";
+import { doesOrgExist } from "@fern-dashboard/services/auth/management";
+
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { cache } from "react";
-
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { getFdrClient } from "@/app/services/fdr/getFdrClient";
-
-import { doesOrgExist } from "../../../../../../fern-dashboard-services/src/management";
 
 export type GetDocsSitesForOrgError = FdrAPI.dashboard.getDocsSitesForOrg.Error | "UNKNOWN_ERROR" | "ORG_NOT_FOUND";
 

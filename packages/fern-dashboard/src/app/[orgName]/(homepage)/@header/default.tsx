@@ -1,9 +1,8 @@
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { PopoverArrow } from "@radix-ui/react-popover";
 import { Book, RotateCcw } from "lucide-react";
 import { Suspense } from "react";
-
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { OrgSwitcher } from "@/components/auth/OrgSwitcher";
 import { HeaderLinkButton } from "@/components/layout/HeaderLinkButton";

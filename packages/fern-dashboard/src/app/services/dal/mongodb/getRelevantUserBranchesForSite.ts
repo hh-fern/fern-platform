@@ -2,12 +2,10 @@
 
 import { FdrAPI } from "@fern-api/fdr-sdk/client/types";
 import { type UnzippedEditorDocument, visualEditorStorage } from "@fern-api/visual-editor-server";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { branchMatchesUser } from "@fern-docs/components/navigation/local-storage";
-
 import type { DocsUrl } from "@/utils/types";
-
-import { getCurrentSession } from "../../../../../../fern-dashboard-services/src/getCurrentSession";
-import type { Auth0OrgName } from "../../auth0/types";
 import { assertUserHasOrganizationAccess } from "../organization";
 
 /**

@@ -1,4 +1,4 @@
-import type { Auth0Organization } from "@/app/services/auth0/types";
+import type { Auth0Organization } from "@fern-dashboard/services/auth/types";
 
 import { OrgLogoContent } from "./OrgLogoContent";
 

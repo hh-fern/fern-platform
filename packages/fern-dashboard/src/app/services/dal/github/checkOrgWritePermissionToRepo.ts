@@ -1,9 +1,8 @@
 import "server-only";
 
 import type { FernConfigJsonErrors } from "@fern-api/docs-loader";
-
-import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
-import { getOwnerAndRepoFromGithubUrl } from "@/app/services/github/github";
+import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
+import { getOwnerAndRepoFromGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 
 import { GitHubLoader } from "../../github/github-loader";
 

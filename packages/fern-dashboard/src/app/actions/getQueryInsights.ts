@@ -1,8 +1,7 @@
 "use server";
 
 import type { FernAI } from "@fern-api/fai-sdk";
-
-import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
 import { getFaiClient } from "../services/fai/getFaiClient";
 
 export async function getQueryInsights({ docsUrl }: { docsUrl: string }): Promise<FernAI.GetInsightsResponse> {

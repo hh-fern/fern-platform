@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter } from "@bprogress/next/app";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { useState } from "react";
 import { toast } from "sonner";
-
 import { archiveSite } from "@/app/actions/archiveSite";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { delay } from "@/utils/delay";
 import type { DocsUrl } from "@/utils/types";
 

@@ -1,6 +1,6 @@
-import type { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
+import { getRepoDisplayNameFromUrl } from "@fern-dashboard/visual-editor/shared/github";
 import type { GithubRepoValidationError } from "@/app/services/dal/github/validators";
-import { getRepoDisplayNameFromUrl } from "@/app/services/github/github";
 import { getValidationErrorMessage } from "@/utils/errors";
 
 import { InstallGithubAppButton } from "../InstallGithubAppButton";

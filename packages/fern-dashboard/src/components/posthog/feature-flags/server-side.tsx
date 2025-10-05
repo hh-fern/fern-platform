@@ -1,7 +1,6 @@
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName, Auth0UserID } from "@fern-dashboard/services/auth/types";
 import { redirect } from "next/navigation";
-
-import { getCurrentSessionOrThrow } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 
 import { getServerSidePosthog } from "../getServerSidePosthog";
 import type { PosthogFeatureFlag, PosthogFeatureFlags } from "./flags";

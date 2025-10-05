@@ -1,5 +1,5 @@
-import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
+import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { createPrDescriptionService } from "@/app/services/pr-description";
 
 export default async function generatePrDescription(request: {

@@ -1,8 +1,7 @@
 "use client";
 
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { useQuery } from "@tanstack/react-query";
-
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 

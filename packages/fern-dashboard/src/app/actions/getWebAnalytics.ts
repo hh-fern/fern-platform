@@ -1,8 +1,8 @@
 "use server";
 
 import { fernToken_admin } from "@fern-api/docs-server";
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
 import { z } from "zod";
-import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
 import { getDocsUrlMetadata } from "../api/utils/getDocsUrlMetadata";
 import getDocsSitesForOrg from "../services/dal/fdr/getDocsSitesForOrg";
 import { getAnalyticsService } from "../services/posthog";

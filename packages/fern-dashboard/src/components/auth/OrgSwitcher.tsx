@@ -1,7 +1,7 @@
 import "server-only";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0Organization, Auth0OrgName } from "@/app/services/auth0/types";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0Organization, Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { getAvailableOrgsForUser } from "@/app/services/dal/fdr/getAvailableOrgsForUser";
 
 import { OrgSwitcherClient } from "./OrgSwitcherClient";

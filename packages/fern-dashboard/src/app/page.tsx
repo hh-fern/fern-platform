@@ -1,11 +1,9 @@
+import { type Auth0SessionData, getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import { getMyOrganizations } from "@fern-dashboard/services/auth/management";
+import { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-
 import { applyOrgMappings } from "@/orgMappings";
-
-import { type Auth0SessionData, getCurrentSession } from "../../../fern-dashboard-services/src/getCurrentSession";
-import { getMyOrganizations } from "../../../fern-dashboard-services/src/management";
-import { Auth0OrgName } from "./services/auth0/types";
 
 export default async function Page() {
     const session = await getCurrentSession();

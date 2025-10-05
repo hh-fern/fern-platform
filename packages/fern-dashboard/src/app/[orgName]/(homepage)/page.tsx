@@ -1,7 +1,6 @@
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { redirect } from "next/navigation";
-
-import { getCurrentSession } from "../../../../../fern-dashboard-services/src/getCurrentSession";
-import type { Auth0OrgName } from "../../services/auth0/types";
 
 export default async function Page({ params }: { params: Promise<{ orgName: Auth0OrgName }> }) {
     const session = await getCurrentSession();

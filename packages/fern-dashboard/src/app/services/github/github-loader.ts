@@ -9,10 +9,10 @@ import type {
     UpdateDocsYmlResult
 } from "@fern-api/docs-loader";
 import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
+import { getOwnerAndRepoFromGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 import type { Octokit } from "@octokit/core";
 import yaml from "js-yaml";
 import z from "zod";
-import { getOwnerAndRepoFromGithubUrl } from "./github";
 
 // Types and interfaces
 interface DocsYmlConfig {

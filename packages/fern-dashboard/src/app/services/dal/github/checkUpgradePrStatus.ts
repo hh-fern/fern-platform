@@ -1,7 +1,7 @@
 import "server-only";
 
-import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
-import { getOwnerAndRepoFromGithubUrl } from "@/app/services/github/github";
+import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
+import { getOwnerAndRepoFromGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 
 import { getUpgradePrBranchName } from "./request-utils";
 

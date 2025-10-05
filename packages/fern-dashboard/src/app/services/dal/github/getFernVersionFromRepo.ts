@@ -2,7 +2,7 @@ import "server-only";
 
 import type { FernConfigJsonErrors } from "@fern-api/docs-loader";
 
-import { getOwnerAndRepoFromGithubUrl } from "@/app/services/github/github";
+import { getOwnerAndRepoFromGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 import type { DocsUrl } from "@/utils/types";
 
 import { GitHubLoader } from "../../github/github-loader";

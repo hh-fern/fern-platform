@@ -3,11 +3,10 @@ import "server-only";
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { getPageId, type NodeId, slugjoin } from "@fern-api/fdr-sdk/navigation";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 import { mdxToHtml } from "@fern-docs/mdx";
 import { notFound, redirect } from "next/navigation";
-
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { constructEditorSlug, ROOT_SLUG_ALIAS } from "@/utils/editor-routing";

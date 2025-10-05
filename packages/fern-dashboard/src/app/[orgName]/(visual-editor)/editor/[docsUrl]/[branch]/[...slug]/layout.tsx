@@ -1,4 +1,10 @@
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
+import {
+    EditorLinkInterceptor,
+    EditorRoutingProvider,
+    FileResolverProvider
+} from "@fern-dashboard/visual-editor/client";
 import { AbstractHeaderTabsRoot } from "@fern-docs/components/abstract/AbstractHeaderTabsRoot";
 import { FERN_SEARCH_BUTTON_ID } from "@fern-docs/components/constants";
 import { NavbarLinks } from "@fern-docs/components/header/NavbarLinks";
@@ -14,13 +20,9 @@ import AbstractDefaultDocs from "@fern-docs/components/theming/AbstractDefaultDo
 import { GlobalStyles } from "@fern-docs/components/theming/global-styles";
 import { DesktopSearchButton } from "@fern-docs/search-ui/components/desktop/desktop-search-button";
 import React from "react";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import { GitHubLoader } from "@/app/services/github/github-loader";
 import { PreviewHeader } from "@/components/docs-preview/PreviewHeader";
-import { EditorLinkInterceptor } from "@/components/editor/EditorLinkInterceptor";
-import { EditorRoutingProvider } from "@/providers/EditorRoutingContext";
-import { FileResolverProvider } from "@/providers/FileResolverContext";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import type { EncodedDocsUrl } from "@/utils/types";

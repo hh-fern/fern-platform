@@ -1,6 +1,5 @@
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { useParams } from "next/navigation";
-
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 
 export function useOrgNameFromPathname() {
     const params = useParams();

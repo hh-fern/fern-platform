@@ -1,7 +1,7 @@
+import { useGitPrInfo } from "@fern-dashboard/visual-editor/client";
+
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-
-import { useGitPrInfo } from "@/providers/GitPRContext";
 
 import { Button } from "../ui/button";
 import {

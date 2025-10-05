@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter } from "@bprogress/next/app";
+import type { Auth0SessionData } from "@fern-dashboard/services/auth/getCurrentSession";
+import { useOrgName } from "@fern-dashboard/visual-editor/client";
+import type { GithubSourceRepo } from "@fern-dashboard/visual-editor/shared/github";
 import { createNavigationLocalStorage } from "@fern-docs/components/navigation/NavigationStorage";
 import { useState } from "react";
-import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
-import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import type { GithubSourceRepo } from "@/app/services/github/types";
 import { Button } from "@/components/ui/button";
 import Card from "@/components/ui/card";
 import { constructEditorSlug, ROOT_SLUG_ALIAS } from "@/utils/editor-routing";

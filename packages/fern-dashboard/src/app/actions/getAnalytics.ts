@@ -1,10 +1,8 @@
 "use server";
 
 import type { FernAI } from "@fern-api/fai-sdk";
-
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
 import { getRequestParams, type TimeRange } from "@/components/analytics/utils/get-request-params";
-
-import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
 import { getFaiClient } from "../services/fai/getFaiClient";
 
 export async function getDomainAnalytics({

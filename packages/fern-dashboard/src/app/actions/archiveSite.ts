@@ -2,8 +2,8 @@
 
 import { FdrAPI } from "@fern-api/fdr-sdk/client/types";
 
-import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
-import type { Auth0OrgName } from "../services/auth0/types";
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { assertUserHasOrganizationAccess } from "../services/dal/organization";
 import { getFdrClient } from "../services/fdr/getFdrClient";
 

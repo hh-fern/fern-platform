@@ -4,9 +4,8 @@ import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import { getFallbackProduct } from "@fern-api/docs-server/handle-node-fallbacks";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { ProductDropdown } from "@fern-docs/components/header/ProductDropdown";
-
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import type { EncodedDocsUrl } from "@/utils/types";
 

@@ -1,14 +1,17 @@
 import { useRouter } from "@bprogress/next/app";
+import {
+    ErrorEditSourceToast,
+    ErrorInvalidGithubUrlToast,
+    SuccessfulEditSourceToast
+} from "@fern-dashboard/visual-editor/client";
+import { validateUrlIsGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 import ExclamationCircleIcon from "@heroicons/react/24/outline/ExclamationCircleIcon";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-
 import { DashboardApiClient } from "@/app/services/dashboard-api/client";
-import { validateUrlIsGithubUrl } from "@/app/services/github/github";
 import { ReactQueryKey } from "@/state/queryKeys";
 import type { DocsUrl } from "@/utils/types";
 
-import { ErrorEditSourceToast, ErrorInvalidGithubUrlToast, SuccessfulEditSourceToast } from "../editor/EditorToasts";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";

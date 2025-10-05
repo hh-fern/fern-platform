@@ -1,8 +1,8 @@
 "use server";
 
-import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
-import { createInviteToken } from "../../../../fern-dashboard-services/src/management";
-import type { Auth0OrgName } from "../services/auth0/types";
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
+import { createInviteToken } from "@fern-dashboard/services/auth/management";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { assertUserHasOrganizationAccess } from "../services/dal/organization";
 
 export async function createInviteLink({ orgName }: { orgName: Auth0OrgName }) {

@@ -1,11 +1,10 @@
 "use client";
 
+import type { GithubSourceRepo } from "@fern-dashboard/visual-editor/shared/github";
+import { getRepoDisplayNameFromUrl } from "@fern-dashboard/visual-editor/shared/github";
 import { Cog, Loader2 } from "lucide-react";
 import { useState } from "react";
-
 import type { GithubRepoValidationResult } from "@/app/services/dal/github/validators";
-import { getRepoDisplayNameFromUrl } from "@/app/services/github/github";
-import type { GithubSourceRepo } from "@/app/services/github/types";
 import type { DocsUrl } from "@/utils/types";
 
 import { GithubLogo } from "../auth/GithubLogo";

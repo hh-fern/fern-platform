@@ -1,6 +1,5 @@
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
 import { redirect } from "next/navigation";
-
-import { getCurrentSessionOrThrow } from "../../../../../../fern-dashboard-services/src/getCurrentSession";
 
 export default async function TokenPage() {
     const session = await getCurrentSessionOrThrow();

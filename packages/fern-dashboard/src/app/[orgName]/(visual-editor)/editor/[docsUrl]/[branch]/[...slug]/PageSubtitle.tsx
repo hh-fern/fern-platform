@@ -1,11 +1,9 @@
 "use client";
 
+import { useEditingDisabled, usePages } from "@fern-dashboard/visual-editor/client";
 import { cn } from "@fern-docs/components/cn";
 import { useEffect, useState } from "react";
-
 import { AutoResizingInput } from "@/components/input/AutoResizingInput";
-import { useEditingDisabled } from "@/hooks/useEditingDisabled";
-import { usePages } from "@/providers/PagesStoreContext";
 
 export declare namespace PageSubtitle {
     export interface Props {

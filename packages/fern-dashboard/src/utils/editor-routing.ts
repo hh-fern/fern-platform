@@ -1,4 +1,4 @@
-import type { Auth0OrgName } from "@/app/services/auth0/types";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 
 import type { EncodedDocsUrl } from "./types";
 

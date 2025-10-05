@@ -1,9 +1,8 @@
 "use server";
 
-import * as auth0Management from "@/app/services/auth0/management";
-
-import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
-import type { Auth0OrgName, Auth0UserID } from "../services/auth0/types";
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
+import * as auth0Management from "@fern-dashboard/services/auth/management";
+import type { Auth0OrgName, Auth0UserID } from "@fern-dashboard/services/auth/types";
 import { assertUserHasOrganizationAccess } from "../services/dal/organization";
 
 export async function removeUserFromOrg({

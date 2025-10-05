@@ -1,7 +1,6 @@
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { Suspense } from "react";
-
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { assertUserHasOrganizationAccess } from "@/app/services/dal/organization";
 import { DocsNavbarItem } from "@/components/navbar/DocsNavbarItem";
 import { DocsNavbarItems } from "@/components/navbar/DocsNavbarItems";

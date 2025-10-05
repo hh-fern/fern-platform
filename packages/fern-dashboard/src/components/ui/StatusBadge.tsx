@@ -1,4 +1,4 @@
-import type { GithubPrStatus } from "@/app/services/github/types";
+import type { GithubPrStatus } from "@fern-dashboard/visual-editor/shared/github";
 import { cn } from "@/utils/utils";
 
 export type StatusBadgeType = "live" | "loading" | "uncommitted" | GithubPrStatus;

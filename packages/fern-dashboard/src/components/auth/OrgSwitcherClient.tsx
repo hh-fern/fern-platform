@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter } from "@bprogress/next/app";
+import type { Auth0Organization, Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-
-import type { Auth0Organization, Auth0OrgName } from "@/app/services/auth0/types";
 import { Button } from "@/components/ui/button";
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { getOrgDisplayName } from "@/utils/getOrgDisplayName";

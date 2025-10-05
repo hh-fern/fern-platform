@@ -1,7 +1,6 @@
+import { decodeAccessToken, getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0UserID } from "@fern-dashboard/services/auth/types";
 import { type NextRequest, NextResponse } from "next/server";
-
-import { decodeAccessToken, getCurrentSessionOrThrow } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0UserID } from "@/app/services/auth0/types";
 
 import type { MaybeErrorResponse } from "./MaybeErrorResponse";
 import { parseAuthHeader } from "./parseAuthHeader";

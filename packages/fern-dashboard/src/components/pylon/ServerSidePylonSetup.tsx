@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 
 import { PylonSetup } from "./PylonSetup";
 

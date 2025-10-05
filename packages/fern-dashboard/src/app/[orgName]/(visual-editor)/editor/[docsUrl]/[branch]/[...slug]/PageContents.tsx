@@ -1,13 +1,10 @@
 "use client";
 
 import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import { PageEditor, usePages } from "@fern-dashboard/visual-editor/client";
 import type { MdxToHtmlResponse } from "@fern-docs/mdx";
 import { useEffect } from "react";
-
 import { useCurrentPage } from "@/providers/CurrentPageContext";
-import { usePages } from "@/providers/PagesStoreContext";
-
-import PageEditor from "./PageEditor";
 import PageSubtitle from "./PageSubtitle";
 import PageTitle from "./PageTitle";
 

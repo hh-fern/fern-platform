@@ -1,3 +1,5 @@
+import type { Auth0Organization } from "@fern-dashboard/services/auth/types";
+
 import ClipboardIcon from "@heroicons/react/24/outline/ClipboardIcon";
 import LinkIcon from "@heroicons/react/24/outline/LinkIcon";
 import PaperAirplaneIcon from "@heroicons/react/24/outline/PaperAirplaneIcon";
@@ -5,10 +7,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckIcon, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-
 import { createInviteLink } from "@/app/actions/createInviteLink";
 import { inviteUserToOrg } from "@/app/actions/inviteUserToOrg";
-import type { Auth0Organization } from "@/app/services/auth0/types";
 import { type inferQueryData, ReactQueryKey } from "@/state/queryKeys";
 import { getOrgDisplayName } from "@/utils/getOrgDisplayName";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";

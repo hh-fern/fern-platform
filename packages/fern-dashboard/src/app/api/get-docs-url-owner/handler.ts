@@ -1,4 +1,4 @@
-import { Auth0OrgName } from "@/app/services/auth0/types";
+import { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 
 import { getDocsUrlMetadata } from "../utils/getDocsUrlMetadata";
 

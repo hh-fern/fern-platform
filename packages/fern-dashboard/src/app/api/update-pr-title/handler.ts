@@ -1,4 +1,4 @@
-import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
+import { getFernBotOctokitForRepo } from "@fern-dashboard/services/auth/fernBotOctokit";
 
 /**
  * Updates the title of a PR.

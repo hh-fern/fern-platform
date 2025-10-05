@@ -10,7 +10,8 @@ import { useGitPrInfo } from "@/client/providers/GitPRContext";
 import { useOrgName } from "@/client/providers/OrgNameContext";
 import { usePages } from "@/client/providers/PagesStoreContext";
 import { useVisualEditorApiClient } from "@/client/providers/VisualEditorApiClientContext";
-import { DEFAULT_COMMIT_MESSAGE, handleCreatePr } from "@/client/utils/github";
+import { handleCreatePr } from "@/client/utils/github";
+import { DEFAULT_COMMIT_MESSAGE } from "@/shared/github";
 import { DashboardTooltip } from "./DashboardTooltip";
 import {
     ErrorFullCommitToast,

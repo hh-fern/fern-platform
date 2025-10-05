@@ -3,10 +3,9 @@ import { createFileResolver } from "@fern-api/docs-server/file-resolver";
 import { withLogo } from "@fern-api/docs-server/withLogo";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { getPageId, slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { AbstractLogo } from "@fern-docs/components/abstract/logo";
 import { getFrontmatter } from "@fern-docs/mdx";
-
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import type { EncodedDocsUrl } from "@/utils/types";
 

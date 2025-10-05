@@ -1,5 +1,6 @@
 "use client";
 
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { createContext, useContext } from "react";
 import type { GithubPrStatus } from "@/shared/github";
 
@@ -18,7 +19,7 @@ export interface VisualEditorApiClient {
     }>;
     getPrForBranch: (
         request: GithubIdentification & {
-            orgName: string;
+            orgName: Auth0OrgName;
             branch: string;
             baseBranch?: string;
         }
@@ -35,7 +36,7 @@ export interface VisualEditorApiClient {
     }>;
     generatePrDescription: (
         request: GithubIdentification & {
-            orgName: string;
+            orgName: Auth0OrgName;
             branch: string;
             baseBranch?: string;
         }
@@ -46,7 +47,7 @@ export interface VisualEditorApiClient {
     }>;
     postCreatePr: (
         request: GithubIdentification & {
-            orgName: string;
+            orgName: Auth0OrgName;
             head: string;
             base: string;
             title: string;
@@ -62,7 +63,7 @@ export interface VisualEditorApiClient {
     }>;
     postGitCommit: (
         request: GithubIdentification & {
-            orgName: string;
+            orgName: Auth0OrgName;
             owner: string;
             repo: string;
             branch: string;
@@ -88,7 +89,7 @@ export interface VisualEditorApiClient {
     }>;
     updatePrStatus: (
         request: GithubIdentification & {
-            orgName: string;
+            orgName: Auth0OrgName;
             branch: string;
             status: "open" | "draft";
             baseBranch?: string;
@@ -107,7 +108,7 @@ export interface VisualEditorApiClient {
     >;
     updatePrTitle: (
         request: GithubIdentification & {
-            orgName: string;
+            orgName: Auth0OrgName;
             branch: string;
             title: string;
             baseBranch?: string;

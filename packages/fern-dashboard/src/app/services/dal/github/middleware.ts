@@ -1,12 +1,10 @@
 import "server-only";
 
+import type { Auth0OrgName, Auth0UserID } from "@fern-dashboard/services/auth/types";
+import { getOwnerAndRepoFromGithubUrl } from "@fern-dashboard/visual-editor/shared/github";
 import { type NextRequest, NextResponse } from "next/server";
-
 import { maybeGetCurrentSession } from "@/app/api/utils/maybeGetCurrentSession";
-import type { Auth0OrgName, Auth0UserID } from "@/app/services/auth0/types";
 import { getValidationErrorMessage } from "@/utils/errors";
-
-import { getOwnerAndRepoFromGithubUrl } from "../../github/github";
 import { assertUserHasOrganizationAccess } from "../organization";
 import type { GithubIdentificationSchemeType, RepoIdentifier } from "./types";
 import { type GithubRepoValidationError, validateGithubRepoAccess } from "./validators";

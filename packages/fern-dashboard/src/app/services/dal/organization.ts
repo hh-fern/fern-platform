@@ -1,12 +1,10 @@
 import { FernVenusApi } from "@fern-api/venus-api-sdk";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import * as auth0Management from "@fern-dashboard/services/auth/management";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
-
-import * as auth0Management from "@/app/services/auth0/management";
 import { throwDigestibleError } from "@/utils/errors";
-
-import { getCurrentSession } from "../../../../../fern-dashboard-services/src/getCurrentSession";
-import type { Auth0OrgName } from "../auth0/types";
 import { getVenusClient } from "../venus/getVenusClient";
 
 /**

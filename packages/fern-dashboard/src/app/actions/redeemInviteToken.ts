@@ -1,13 +1,13 @@
 "use server";
 
-import { getCurrentSessionOrThrow } from "../../../../fern-dashboard-services/src/getCurrentSession";
+import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
 import {
     addUserToOrg,
     doesUserBelongToOrg,
     getInviteToken,
     invalidateInviteToken
-} from "../../../../fern-dashboard-services/src/management";
-import { type Auth0OrgName, Auth0UserID } from "../services/auth0/types";
+} from "@fern-dashboard/services/auth/management";
+import { type Auth0OrgName, Auth0UserID } from "@fern-dashboard/services/auth/types";
 
 export type RedeemInviteTokenErrors =
     | { type: "NOT_LOGGED_IN" }

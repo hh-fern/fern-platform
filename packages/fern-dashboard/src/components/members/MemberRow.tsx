@@ -1,12 +1,11 @@
 "use client";
 
+import { Auth0UserID } from "@fern-dashboard/services/auth/types";
 import UserMinusIcon from "@heroicons/react/24/outline/UserMinusIcon";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { GetMembers200ResponseOneOfInner } from "auth0";
 import { toast } from "sonner";
-
 import { removeUserFromOrg } from "@/app/actions/removeUserFromOrg";
-import { Auth0UserID } from "@/app/services/auth0/types";
 import { type inferQueryData, ReactQueryKey } from "@/state/queryKeys";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 

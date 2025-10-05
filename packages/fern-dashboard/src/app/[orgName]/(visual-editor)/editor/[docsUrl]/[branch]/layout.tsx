@@ -1,24 +1,28 @@
 import "server-only";
 
-import { EditorProvider } from "@fern-dashboard/visual-editor";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
+import {
+    BranchProvider,
+    ClientMDXProvider,
+    DevModeProvider,
+    EditorProvider,
+    GitHubRepoProvider,
+    GitPRProvider,
+    HeaderToolbar,
+    OrgNameProvider,
+    PagesStoreProvider,
+    PreviewOnlyNotification,
+    VisualEditorApiClientProvider
+} from "@fern-dashboard/visual-editor/client";
 import { NavigationStoreProvider } from "@fern-docs/components/navigation/NavigationStoreContext";
 import { ThemeProvider } from "next-themes";
 import type React from "react";
-import { ClientMDXProvider } from "@/app/[orgName]/context/ClientMDXProvider";
-import { OrgNameProvider } from "@/app/[orgName]/context/OrgNameContext";
 import getGithubSourceMetadata from "@/app/api/get-github-source-metadata/handler";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { assertAuthAndFetchGithubUrl } from "@/app/services/dal/github/assertAuthAndFetchGithubUrl";
 import createBranchIfNotExists from "@/app/services/dal/github/createBranchIfNotExists";
 import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organization";
-import { HeaderToolbar } from "@/components/editor/HeaderToolbar";
-import { PreviewOnlyNotification } from "@/components/editor/PreviewOnlyNotification";
-import { BranchProvider } from "@/providers/BranchContext";
+import { DashboardApiClient } from "@/app/services/dashboard-api/client";
 import { CurrentPageProvider } from "@/providers/CurrentPageContext";
-import { DevModeProvider } from "@/providers/DevModeProvider";
-import { GitHubRepoProvider } from "@/providers/GitHubRepoContext";
-import { GitPRProvider } from "@/providers/GitPRContext";
-import { PagesStoreProvider } from "@/providers/PagesStoreContext";
 import { throwDigestibleError } from "@/utils/errors";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import type { EncodedDocsUrl } from "@/utils/types";
@@ -89,35 +93,37 @@ export default async function EditorLayout({
     return (
         <EditorShell>
             <ThemeProvider attribute="class" forcedTheme="light" enableSystem={false} disableTransitionOnChange>
-                <OrgNameProvider orgName={orgName}>
-                    <BranchProvider branch={branch} branchFailed={branchFailed}>
-                        <GitHubRepoProvider branch={branch} sourceRepo={sourceRepo}>
-                            <NavigationStoreProvider branchName={branch} orgName={orgName} docsUrl={docsUrl}>
-                                <PagesStoreProvider branchName={branch}>
-                                    <CurrentPageProvider>
-                                        <ClientMDXProvider>
-                                            <DevModeProvider>
-                                                <EditorProvider>
-                                                    <GitPRProvider
-                                                        owner={sourceRepo.owner}
-                                                        repo={sourceRepo.repo}
-                                                        baseBranch={sourceRepo.baseBranch}
-                                                        branch={branch}
-                                                        site={docsUrl}
-                                                    >
-                                                        <HeaderToolbar session={session} docsUrl={docsUrl} />
-                                                        <PreviewOnlyNotification />
-                                                        {children}
-                                                    </GitPRProvider>
-                                                </EditorProvider>
-                                            </DevModeProvider>
-                                        </ClientMDXProvider>
-                                    </CurrentPageProvider>
-                                </PagesStoreProvider>
-                            </NavigationStoreProvider>
-                        </GitHubRepoProvider>
-                    </BranchProvider>
-                </OrgNameProvider>
+                <VisualEditorApiClientProvider value={DashboardApiClient}>
+                    <OrgNameProvider orgName={orgName}>
+                        <BranchProvider branch={branch} branchFailed={branchFailed}>
+                            <GitHubRepoProvider branch={branch} sourceRepo={sourceRepo}>
+                                <NavigationStoreProvider branchName={branch} orgName={orgName} docsUrl={docsUrl}>
+                                    <PagesStoreProvider branchName={branch}>
+                                        <CurrentPageProvider>
+                                            <ClientMDXProvider>
+                                                <DevModeProvider>
+                                                    <EditorProvider>
+                                                        <GitPRProvider
+                                                            owner={sourceRepo.owner}
+                                                            repo={sourceRepo.repo}
+                                                            baseBranch={sourceRepo.baseBranch}
+                                                            branch={branch}
+                                                            site={docsUrl}
+                                                        >
+                                                            <HeaderToolbar session={session} docsUrl={docsUrl} />
+                                                            <PreviewOnlyNotification />
+                                                            {children}
+                                                        </GitPRProvider>
+                                                    </EditorProvider>
+                                                </DevModeProvider>
+                                            </ClientMDXProvider>
+                                        </CurrentPageProvider>
+                                    </PagesStoreProvider>
+                                </NavigationStoreProvider>
+                            </GitHubRepoProvider>
+                        </BranchProvider>
+                    </OrgNameProvider>
+                </VisualEditorApiClientProvider>
             </ThemeProvider>
         </EditorShell>
     );

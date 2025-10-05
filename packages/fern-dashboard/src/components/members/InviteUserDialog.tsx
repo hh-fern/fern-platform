@@ -1,7 +1,7 @@
+import type { Auth0Organization } from "@fern-dashboard/services/auth/types";
+
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
 import { useState } from "react";
-
-import type { Auth0Organization } from "@/app/services/auth0/types";
 
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";

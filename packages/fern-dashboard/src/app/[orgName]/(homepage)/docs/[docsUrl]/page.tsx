@@ -1,9 +1,8 @@
 import "server-only";
 
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { notFound } from "next/navigation";
-
 import getGithubSourceMetadataHandler from "@/app/api/get-github-source-metadata/handler";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import getDocsSitesForOrg from "@/app/services/dal/fdr/getDocsSitesForOrg";
 import getDocsGithubUrl from "@/app/services/dal/github/getDocsGithubUrl";
 import { validateGithubRepoAccess } from "@/app/services/dal/github/validators";

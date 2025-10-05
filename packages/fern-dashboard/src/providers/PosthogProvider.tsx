@@ -1,13 +1,12 @@
 "use client";
 
+import type { Auth0SessionData } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { useParams } from "next/navigation";
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider } from "posthog-js/react";
 import type React from "react";
 import { useEffect } from "react";
-
-import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { PostHogIdentify } from "@/components/posthog/PostHogIdentify";
 import { PostHogPageView } from "@/components/posthog/PostHogPageView";
 import { isProduction } from "@/utils/environment";

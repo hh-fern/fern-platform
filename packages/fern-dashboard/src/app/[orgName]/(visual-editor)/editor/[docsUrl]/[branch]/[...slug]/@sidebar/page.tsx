@@ -2,12 +2,12 @@ import { createEditableDocsLoader, PrefetchedDocsLoader } from "@fern-api/docs-l
 import { getIsSidebarFixed, getIsSingleOverviewPage } from "@fern-api/docs-utils";
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { getClientPageRedirectTarget } from "@fern-docs/components/navigation/pageUtils";
 import { SidebarClientRootNode } from "@fern-docs/components/sidebar/nodes/SidebarClientRootNode";
 import { SidebarClientTabsRoot } from "@fern-docs/components/sidebar/SidebarClientTabsRoot";
 import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
 import { HiddenSidebar } from "@fern-docs/components/theming/HiddenSidebar";
-import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import type { EncodedDocsUrl } from "@/utils/types";
 import { CreatePageButton } from "./CreatePageButton";
