@@ -2,13 +2,12 @@
 
 @plugin "tailwindcss-animate";
 @plugin "@tailwindcss/typography";
-@config "../../tailwind.config.ts";
 
-@source "../components";
+@source "../../../fern-docs/components/src";
+@source "../../../fern-docs/search-ui/src";
 
-
-@import "@fern-docs/components/styles";
-@import "@fern-docs/search-ui/styles";
+@import "../../../fern-docs/components/src/index.css";
+@import "../../../fern-docs/search-ui/src/index.css";
 @import "../styles/_variables.scss";
 @import "../styles/_keyframe-animations.scss";
 @import "../../../fern-docs/bundle/src/components/css/base.scss";
@@ -26,7 +25,16 @@
 
 @theme {
   --spacing: 0.25rem;
+  
   --radius: 0.25rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999rem;
+
   --background: oklch(1 0 0);
   --foreground: var(--gray-1200);
   --card: oklch(1 0 0);
@@ -60,6 +68,17 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --sidebar-width: 240px;
+
+  /* container queries */
+  --container-xs: 20rem;
+  --container-sm: 24rem;
+  --container-md: 28rem;
+  --container-lg: 32rem;
+  --container-xl: 36rem;
+  --container-2xl: 42rem;
+
+  /* animations */
+  --animate-slide-down: slide-down 1s ease-in-out forwards;
 
   /* monaco editor */
   --monaco-blue: #0969da;
@@ -640,6 +659,15 @@ why? who knows. thanks monaco:)
   }
 }
 
+@keyframes slide-down {
+  0% {
+    transform: translateY(-150%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 /* Icon animations: Code bracket */
 .code-bracket #middle {
   stroke-dasharray: 20;
@@ -730,4 +758,72 @@ code:not(.code-block) {
   @apply text-[0.875em];
 
   font-weight: inherit;
+}
+
+/* Typography plugin configuration */
+.prose {
+  max-width: unset;
+  --tw-prose-bold: inherit;
+  --tw-prose-body: var(--gray-1100);
+  --tw-prose-bullets: var(--gray-900);
+  --tw-prose-captions: var(--gray-1100);
+  --tw-prose-code: var(--green-1100);
+  --tw-prose-code-bg: var(--gray-200);
+  --tw-prose-counters: var(--gray-1000);
+  --tw-prose-headings: inherit;
+  --tw-prose-th-borders: var(--color-border-default);
+  --tw-prose-hr: var(--color-border-default);
+  --tw-prose-kbd: var(--gray-1100);
+  --tw-prose-kbd-shadows: var(--color-border-default);
+  --tw-prose-lead: var(--gray-1100);
+  --tw-prose-links: var(--green-1100);
+  --tw-prose-pre-bg: var(--gray-200);
+  --tw-prose-pre-code: var(--gray-1100);
+  --tw-prose-quote-borders: var(--green-600);
+  --tw-prose-quotes: var(--gray-1100);
+  --tw-prose-td-borders: var(--color-border-default);
+}
+
+.prose tbody td[rowspan]:first-child,
+.prose tfoot td[rowspan]:first-child {
+  padding-right: 0.571428571em;
+}
+
+.prose tbody td[rowspan]:first-child + td,
+.prose tfoot td[rowspan]:first-child + td {
+  padding-left: 0;
+}
+
+.prose code::before {
+  content: "";
+}
+
+.prose code::after {
+  content: "";
+}
+
+.prose blockquote p:first-of-type::before {
+  content: "";
+}
+
+.prose blockquote p:last-of-type::after {
+  content: "";
+}
+
+.prose-sm {
+  color: var(--grayscale-a11);
+}
+
+.prose-sm p {
+  margin-top: 0.25rem;
+}
+
+.prose-sm tbody td[rowspan]:first-child,
+.prose-sm tfoot td[rowspan]:first-child {
+  padding-right: 1em;
+}
+
+.prose-sm tbody td[rowspan]:first-child + td,
+.prose-sm tfoot td[rowspan]:first-child + td {
+  padding-left: 0;
 }
