@@ -1,5 +1,6 @@
 import "server-only";
 
+import { EditorProvider } from "@fern-dashboard/visual-editor";
 import { NavigationStoreProvider } from "@fern-docs/components/navigation/NavigationStoreContext";
 import { ThemeProvider } from "next-themes";
 import type React from "react";
@@ -15,7 +16,6 @@ import { PreviewOnlyNotification } from "@/components/editor/PreviewOnlyNotifica
 import { BranchProvider } from "@/providers/BranchContext";
 import { CurrentPageProvider } from "@/providers/CurrentPageContext";
 import { DevModeProvider } from "@/providers/DevModeProvider";
-import { EditorProvider } from "@/providers/EditorContext";
 import { GitHubRepoProvider } from "@/providers/GitHubRepoContext";
 import { GitPRProvider } from "@/providers/GitPRContext";
 import { PagesStoreProvider } from "@/providers/PagesStoreContext";
