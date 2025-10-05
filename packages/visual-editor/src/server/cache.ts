@@ -1,5 +1,3 @@
-"use server";
-
 import { bundleEditorMDX } from "@/server/bundleEditorMdx";
 import type { EncodedDocsUrl } from "@/shared/types";
 

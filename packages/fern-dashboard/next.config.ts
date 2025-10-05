@@ -61,6 +61,7 @@ let nextConfig: NextConfig = {
     webpack: (config, { isServer }) => {
         config.externals.push(
             "sharp",
+            "esbuild",
             // mongodb subdependencies are optional, and need to be externalized for rspack.
             // add them + install dependencies as needed.
             "kerberos",
@@ -85,12 +86,6 @@ let nextConfig: NextConfig = {
                 message: /Critical dependency: the request of a dependency is an expression/
             }
         ];
-
-        // esbuild is only used on the server (mdx-bundler), so only externalize it there
-        if (isServer) {
-            config.externals = config.externals || [];
-            config.externals.push("esbuild");
-        }
 
         // ignore all test files
         // Use IgnorePlugin to ignore .test.ts and .test.tsx files
