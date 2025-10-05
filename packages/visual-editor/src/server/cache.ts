@@ -1,3 +1,5 @@
+import "server-only";
+
 import { bundleEditorMDX } from "@/server/bundleEditorMdx";
 import type { EncodedDocsUrl } from "@/shared/types";
 
