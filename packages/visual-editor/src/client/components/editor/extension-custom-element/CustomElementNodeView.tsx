@@ -1,44 +1,26 @@
-"use client";
-
 import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
-import type React from "react";
-import { useCallback, useEffect } from "react";
+import { useParams } from "next/navigation";
+import React, { useCallback, useEffect } from "react";
 
-export interface CustomElementNodeViewProps extends NodeViewProps {
-    FernEditorMDXRenderer?: React.ComponentType<{
-        mdx: string;
-        onUpdate: (mdx: string) => void;
-        newlyCreated?: boolean;
-        docsUrl?: string;
-        branch?: string;
-    }>;
-    ErrorBoundary?: React.ComponentType<{
-        fallback: React.ReactNode;
-        children: React.ReactNode;
-    }>;
-    UnsupportedContent?: React.ComponentType<{ children: React.ReactNode }>;
-    docsUrl?: string;
-    branch?: string;
-}
+import FernEditorMDXRenderer from "@/client/components/editor/editor-mdx-renderer/FernEditorMDXRenderer";
+import { ErrorBoundary } from "@/client/docs/components/error-boundary";
+import type { EncodedDocsUrl } from "@/shared/types";
 
-export const CustomElementNodeView = (props: CustomElementNodeViewProps) => {
-    const {
-        node,
-        updateAttributes,
-        editor,
-        getPos,
-        FernEditorMDXRenderer,
-        ErrorBoundary,
-        UnsupportedContent,
-        docsUrl,
-        branch
-    } = props;
+import { UnsupportedContent } from "../UnsupportedContent";
+
+export const CustomElementNodeView = (props: NodeViewProps) => {
+    const { node, updateAttributes, editor, getPos } = props;
     const { attrs } = node;
+    const params = useParams();
 
     // Get the MDX content from the node attributes
     const mdxb64 = attrs["fve-mdx-b64"];
     const newlyCreated = attrs["fve-newly-created"];
     const mdx = Buffer.from(mdxb64, "base64").toString("utf-8");
+
+    // Extract docsUrl and branch from params
+    const docsUrl = typeof params.docsUrl === "string" ? (params.docsUrl as EncodedDocsUrl) : undefined;
+    const branch = typeof params.branch === "string" ? params.branch : undefined;
 
     // Delete the node when mdxb64 becomes empty
     const handleDelete = useCallback(() => {
@@ -67,17 +49,6 @@ export const CustomElementNodeView = (props: CustomElementNodeViewProps) => {
             "fve-newly-created": false
         });
     };
-
-    // If required components are not provided, render basic fallback
-    if (!FernEditorMDXRenderer || !ErrorBoundary || !UnsupportedContent) {
-        return (
-            <NodeViewWrapper>
-                <div className="p-4 border border-gray-300 rounded">
-                    <pre className="text-xs overflow-auto">{mdx}</pre>
-                </div>
-            </NodeViewWrapper>
-        );
-    }
 
     return (
         <ErrorBoundary
