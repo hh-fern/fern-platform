@@ -1,9 +1,8 @@
 "use client";
 
-import React, { ReactNode, RefObject, createContext, useContext, useEffect, useState } from "react";
-
 import * as Popover from "@radix-ui/react-popover";
 import { EllipsisVertical, Trash2, TriangleAlert } from "lucide-react";
+import React, { createContext, ReactNode, RefObject, useContext, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/utils/utils";
 
 import { AttributeValue } from "../editor-mdx-renderer/types";
-import { useEditorComponent } from "./EditorComponentContext";
 import {
     AttributeConfig,
     AttributeValues,
@@ -22,7 +20,7 @@ import {
     SelectControl,
     TextInputControl
 } from "./controls";
-import "./controls.scss";
+import { useEditorComponent } from "./EditorComponentContext";
 
 // Context types with generics
 interface EditorComponentPopoverContextValue<T extends AttributeConfig = AttributeConfig> {

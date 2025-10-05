@@ -1,13 +1,10 @@
-import dynamic from "next/dynamic";
-import React from "react";
-
 import { CopyToClipboardButton } from "@fern-docs/components/CopyToClipboardButton";
 import { cn } from "@fern-docs/components/cn";
 import { useIsMobile } from "@fern-ui/react-commons";
+import dynamic from "next/dynamic";
+import React from "react";
 
 import { useResolvedTheme } from "@/docs/hooks/use-theme";
-
-import "./index.scss";
 
 const JsonView = dynamic(() => import("@microlink/react-json-view"), {
     ssr: false

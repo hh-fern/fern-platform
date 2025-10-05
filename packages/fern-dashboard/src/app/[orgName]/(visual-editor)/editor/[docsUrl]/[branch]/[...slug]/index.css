@@ -1,12 +1,3 @@
-@import "tailwindcss";
-
-@plugin "tailwindcss-animate";
-@plugin "@tailwindcss/typography";
-@import "@fern-docs/components/styles";
-@import "@fern-docs/search-ui/styles";
-
-@source "../../../../../../../components";
-
 :root {
   --header-toolbar-height: 54px;
   --header-toolbar-height-mobile: 108px;
@@ -15,11 +6,6 @@
 #preview-container {
   @apply relative;
   container-type: inline-size;
-  @import "../../../../../../../../../fern-docs/bundle/src/components/css/base.scss";
-  @import "../../../../../../../../../fern-docs/bundle/src/components/css/components.scss";
-  @import "../../../../../../../../../fern-docs/bundle/src/components/FernAnchor.scss";
-  @import "../../../../../../../../../fern-docs/bundle/src/components/css/rmiz.scss";
-  @import "../../../../../../../docs/mdx/components/index.scss";
 
   @apply font-body text-body bg-background text-base;
   @apply h-full;

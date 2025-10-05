@@ -1,9 +1,8 @@
 import "server-only";
 
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-
-import { Loader2 } from "lucide-react";
 
 import { RedeemInviteTokenErrors, redeemInviteToken } from "@/app/actions/redeemInviteToken";
 import { GithubLoginButton, GoogleLoginButton } from "@/components/auth/LoginButton";
@@ -11,7 +10,6 @@ import { LoginImage } from "@/components/login-page/LoginImage";
 import { Button } from "@/components/ui/button";
 
 import AcceptInviteSuccess from "./AcceptInviteSuccess";
-import "./invite-page.scss";
 
 export const revalidate = 0;
 

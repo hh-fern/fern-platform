@@ -4,7 +4,6 @@ import { useEffect } from "react";
 
 import { Auth0User } from "@/app/services/auth0/types";
 
-import "./PylonSetup.scss";
 import { HIDE_PYLON_CLASS_NAME } from "./constants";
 import { getPylon } from "./getPylon";
 

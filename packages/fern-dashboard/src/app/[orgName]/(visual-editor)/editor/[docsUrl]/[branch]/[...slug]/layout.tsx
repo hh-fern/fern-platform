@@ -25,8 +25,6 @@ import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import { EncodedDocsUrl } from "@/utils/types";
 
-import "./index.css";
-
 export default async function VisualEditorPreviewLayout({
     params,
     children,
