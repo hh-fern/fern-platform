@@ -18,7 +18,7 @@
     },
     "compile": {
       "outputs": ["dist/**", "tsconfig.tsbuildinfo"],
-      "dependsOn": ["^compile"],
+      "dependsOn": ["^compile", "^compile:js", "^compile:types"],
       "env": ["NODE_ENV", "VERCEL_ENV"]
     },
     "check-types": {
@@ -52,7 +52,13 @@
     "docs:dev": {
       "persistent": true,
       "dependsOn": ["^build", "^compile"],
-      "inputs": ["$TURBO_DEFAULT$", ".env.production.local", ".env.local", ".env.production", ".env"]
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".env.production.local",
+        ".env.local",
+        ".env.production",
+        ".env"
+      ]
     },
     "docs:build": {
       "dependsOn": ["^build", "^compile", "^docs:build"],

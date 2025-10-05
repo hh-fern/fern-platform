@@ -54,26 +54,21 @@
     flex-shrink: 0;
     width: 0.625rem;
     height: 0.625rem;
+    color: var(--tt-badge-icon-color);
   }
 
   &[data-size="large"] .tiptap-badge-icon {
     width: 0.75rem;
     height: 0.75rem;
   }
-}
 
-/* --------------------------------------------
------------ BADGE COLOR SETTINGS -------------
--------------------------------------------- */
+  /* --------------------------------------------
+  ----------- BADGE COLOR SETTINGS -------------
+  -------------------------------------------- */
 
-.tiptap-badge {
   background-color: var(--tt-badge-bg-color);
   border-color: var(--tt-badge-border-color);
   color: var(--tt-badge-text-color);
-
-  .tiptap-badge-icon {
-    color: var(--tt-badge-icon-color);
-  }
 
   /* Emphasized */
   &[data-appearance="emphasized"] {

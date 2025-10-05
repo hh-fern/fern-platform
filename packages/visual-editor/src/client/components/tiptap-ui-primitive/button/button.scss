@@ -27,6 +27,7 @@
   &[data-focus-visible="true"] {
     background-color: var(--tt-button-hover-bg-color);
     color: var(--tt-button-hover-text-color);
+
     /* outline: 2px solid var(--tt-button-active-icon-color); */
   }
 
@@ -82,6 +83,7 @@
   .tiptap-button-icon {
     width: 1rem;
     height: 1rem;
+    color: var(--tt-button-default-icon-color);
   }
 
   &[data-size="large"] .tiptap-button-icon {
@@ -98,6 +100,7 @@
   .tiptap-button-icon-sub {
     width: 1rem;
     height: 1rem;
+    color: var(--tt-button-default-icon-sub-color);
   }
 
   &[data-size="large"] .tiptap-button-icon-sub {
@@ -114,6 +117,7 @@
   .tiptap-button-dropdown-arrows {
     width: 0.75rem;
     height: 0.75rem;
+    color: var(--tt-button-default-dropdown-arrows-color);
   }
 
   &[data-size="large"] .tiptap-button-dropdown-arrows {
@@ -130,6 +134,7 @@
   .tiptap-button-dropdown-small {
     width: 0.625rem;
     height: 0.625rem;
+    color: var(--tt-button-default-dropdown-arrows-color);
   }
 
   &[data-size="large"] .tiptap-button-dropdown-small {
@@ -153,9 +158,7 @@
   }
 
   /* button only has 2 icons and one of them is dropdown small */
-  &:has(> svg:nth-of-type(2)):has(> .tiptap-button-dropdown-small):not(
-      :has(> svg:nth-of-type(3))
-    ):not(:has(> .tiptap-button-text)) {
+  &:has(> svg:nth-of-type(2)):has(> .tiptap-button-dropdown-small):not(:has(> svg:nth-of-type(3)), :has(> .tiptap-button-text)) {
     gap: 0;
     padding-right: 0.25rem;
 
@@ -182,36 +185,18 @@
   &[data-size="small"] .tiptap-button-emoji {
     width: 0.875rem;
   }
-}
 
-/* --------------------------------------------
------------ BUTTON COLOR SETTINGS -------------
--------------------------------------------- */
+  /* --------------------------------------------
+  ----------- BUTTON COLOR SETTINGS -------------
+  -------------------------------------------- */
 
-.tiptap-button {
   background-color: var(--tt-button-default-bg-color);
   color: var(--tt-button-default-text-color);
 
-  .tiptap-button-icon {
-    color: var(--tt-button-default-icon-color);
-  }
-
-  .tiptap-button-icon-sub {
-    color: var(--tt-button-default-icon-sub-color);
-  }
-
-  .tiptap-button-dropdown-arrows {
-    color: var(--tt-button-default-dropdown-arrows-color);
-  }
-
-  .tiptap-button-dropdown-small {
-    color: var(--tt-button-default-dropdown-arrows-color);
-  }
-
   /* hover state of a button */
-  &:hover:not([data-active-item="true"]):not([disabled]),
+  &:hover:not([data-active-item="true"], [disabled]),
   &[data-active-item="true"]:not([disabled]),
-  &[data-highlighted]:not([disabled]):not([data-highlighted="false"]) {
+  &[data-highlighted]:not([disabled], [data-highlighted="false"]) {
     background-color: var(--tt-button-hover-bg-color);
     color: var(--tt-button-hover-text-color);
 

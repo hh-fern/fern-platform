@@ -3,9 +3,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-}
-
-.tiptap-badge-group {
+  
   [data-orientation="vertical"] {
     flex-direction: column;
   }
