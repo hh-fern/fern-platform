@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@fern-docs/components/cn";
 import CodeBlock from "@tiptap/extension-code-block";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -12,7 +13,10 @@ import {
 import StarterKit from "@tiptap/starter-kit";
 import { createLowlight } from "lowlight";
 import { useEffect } from "react";
+import { useEditingDisabled } from "@/client/hooks/useEditingDisabled";
+import { useEditor } from "@/client/providers/EditorContext";
 
+import BubbleMenu from "./BubbleMenu";
 import { createCodeBlockComponent } from "./extension-code-block/CodeBlockComponent";
 import type { LowlightInstance } from "./extension-code-block/types";
 import { CustomElement } from "./extension-custom-element/custom-element";
@@ -20,6 +24,10 @@ import { FVEAttributesExtension } from "./extension-fve-attributes";
 import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
 import { LowlightPlugin } from "./tiptap-node/lowlight/lowlight-plugin";
+import {
+    ConfiguredFileHandler,
+    ConfiguredMediaUploadNode
+} from "./tiptap-node/media-upload-node/configured-upload-extension";
 
 // We'll need to lazy-load the lowlight instance to avoid importing all the lowlight package dependencies, so
 // this is just an empty instance
@@ -41,89 +49,59 @@ const dataAttributeNodeTypes = [
     "listItem"
 ];
 
-export interface TiptapEditorProps {
-    autofocus?: boolean;
-    className?: string;
-    disableDragging?: boolean;
-    initialContent: string;
-    onCreate?: EditorProviderProps["onCreate"];
-    onUpdate?: EditorProviderProps["onUpdate"];
-    // Optional configuration
-    configuredMediaUploadNode?: Extension;
-    configuredFileHandler?: Extension;
-    isEditingDisabled?: boolean;
-    // Optional components
-    NodeHoverHandle?: React.ComponentType;
-    FloatingMenu?: React.ComponentType;
-    BubbleMenu?: React.ComponentType;
-    // EditorContext utilities
-    setEditor?: (editor: any) => void;
-    cn?: (...classes: any[]) => string;
+// Configure Tiptap extensions
+const extensions = [
+    StarterKit.configure({
+        dropcursor: {
+            color: "var(--grayscale-a11)"
+        },
+        gapcursor: false,
+        codeBlock: false
+    }),
+    FVEAttributesExtension.configure({
+        types: dataAttributeNodeTypes
+    }),
+    CustomElement,
+    Placeholder.configure({
+        placeholder: "Write or press `/` for components",
+        emptyEditorClass: "is-empty",
+        emptyNodeClass: "is-empty"
+    }),
+    CodeBlock.configure({ enableTabIndentation: true }).extend({
+        addNodeView() {
+            return ReactNodeViewRenderer(createCodeBlockComponent(lowlight));
+        },
+        addProseMirrorPlugins() {
+            return [LowlightPlugin({ name: "codeBlock", lowlight, defaultLanguage: null })];
+        }
+    })
+] as Extension[];
+export declare namespace TiptapEditor {
+    export interface Props {
+        autofocus?: boolean;
+        className?: string;
+        disableDragging?: boolean;
+        initialContent: string;
+        onCreate?: EditorProviderProps["onCreate"];
+        onUpdate?: EditorProviderProps["onUpdate"];
+    }
 }
 
-// Configure Tiptap extensions
-const createExtensions = (configuredMediaUploadNode?: Extension, configuredFileHandler?: Extension): Extension[] => {
-    const baseExtensions = [
-        StarterKit.configure({
-            dropcursor: {
-                color: "var(--grayscale-a11)"
-            },
-            gapcursor: false,
-            codeBlock: false
-        }),
-        FVEAttributesExtension.configure({
-            types: dataAttributeNodeTypes
-        }),
-        CustomElement,
-        Placeholder.configure({
-            placeholder: "Write or press `/` for components",
-            emptyEditorClass: "is-empty",
-            emptyNodeClass: "is-empty"
-        }),
-        CodeBlock.configure({ enableTabIndentation: true }).extend({
-            addNodeView() {
-                return ReactNodeViewRenderer(createCodeBlockComponent(lowlight));
-            },
-            addProseMirrorPlugins() {
-                return [LowlightPlugin({ name: "codeBlock", lowlight, defaultLanguage: null })];
-            }
-        })
-    ] as Extension[];
-
-    // Add optional extensions if provided
-    if (configuredMediaUploadNode) {
-        baseExtensions.push(configuredMediaUploadNode);
-    }
-    if (configuredFileHandler) {
-        baseExtensions.push(configuredFileHandler);
-    }
-
-    return baseExtensions;
-};
-
 // SEE: https://tiptap.dev/docs/editor/getting-started/install/react
-export function TiptapEditor({
+export default function TiptapEditor({
     autofocus,
     className,
     initialContent,
     onCreate,
     onUpdate,
-    disableDragging,
-    configuredMediaUploadNode,
-    configuredFileHandler,
-    isEditingDisabled = false,
-    NodeHoverHandle,
-    FloatingMenu,
-    BubbleMenu,
-    setEditor,
-    cn
-}: TiptapEditorProps) {
-    const classNameValue = cn ? cn(className, "relative") : `${className || ""} relative`.trim();
+    disableDragging
+}: TiptapEditor.Props) {
+    const isEditingDisabled = useEditingDisabled();
 
     return (
         <EditorProvider
             autofocus={autofocus}
-            extensions={createExtensions(configuredMediaUploadNode, configuredFileHandler)}
+            extensions={[...extensions, ConfiguredMediaUploadNode(), ConfiguredFileHandler()]}
             editorProps={{
                 attributes: {
                     class: "prose prose-md focus:outline-none max-w-none p-4 prose-inherit-colors"
@@ -135,7 +113,7 @@ export function TiptapEditor({
             }}
             content={initialContent}
             editorContainerProps={{
-                className: classNameValue
+                className: cn(className, "relative")
             }}
             immediatelyRender={false}
             onCreate={onCreate}
@@ -158,18 +136,19 @@ export function TiptapEditor({
                 {/* DEV NOTE: The floating menu and bubble menu MUST be rendered before the editor content to reconcile
         a dom bug with tiptap's floating menus.
         Context here: https://github.com/ueberdosis/tiptap/issues/4619#issuecomment-1869042861 */}
-                {!isEditingDisabled && !disableDragging && NodeHoverHandle && <NodeHoverHandle />}
-                {!isEditingDisabled && FloatingMenu && <FloatingMenu />}
-                {!isEditingDisabled && BubbleMenu && <BubbleMenu />}
+                {!isEditingDisabled && !disableDragging && <NodeHoverHandle />}
+                {!isEditingDisabled && <FloatingMenu />}
+                {!isEditingDisabled && <BubbleMenu />}
             </div>
-            {setEditor && <EditorContextUpdater setEditor={setEditor} />}
-            <TipTapEditingDisabledListener isEditingDisabled={isEditingDisabled} />
+            <EditorContextUpdater />
+            <TipTapEditingDisabledListener />
         </EditorProvider>
     );
 }
 
-function EditorContextUpdater({ setEditor }: { setEditor: (editor: any) => void }) {
+function EditorContextUpdater() {
     const { editor } = useCurrentEditor();
+    const { setEditor } = useEditor();
 
     // Update the shared editor context when the Tiptap editor instance changes
     useEffect(() => {
@@ -184,8 +163,9 @@ function EditorContextUpdater({ setEditor }: { setEditor: (editor: any) => void 
     return <></>;
 }
 
-function TipTapEditingDisabledListener({ isEditingDisabled }: { isEditingDisabled: boolean }) {
+function TipTapEditingDisabledListener() {
     const { editor } = useCurrentEditor();
+    const isEditingDisabled = useEditingDisabled();
 
     // Ensure the editor stays in sync with editability status
     useEffect(() => {
@@ -198,5 +178,3 @@ function TipTapEditingDisabledListener({ isEditingDisabled }: { isEditingDisable
 
     return <></>;
 }
-
-export default TiptapEditor;

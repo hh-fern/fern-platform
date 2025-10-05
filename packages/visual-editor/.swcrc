@@ -10,7 +10,8 @@
         "transform": {
             "verbatimModuleSyntax": true,
             "react": {
-                "runtime": "preserve"
+                "runtime": "automatic",
+                "importSource": "react"
             }
         },
         "paths": {
