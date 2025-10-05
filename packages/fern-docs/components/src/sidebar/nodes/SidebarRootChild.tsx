@@ -1,6 +1,5 @@
-import { UnreachableCaseError } from "ts-essentials";
-
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { UnreachableCaseError } from "ts-essentials";
 
 import { processIcon } from "../../processIcon";
 import { SidebarGroupNode } from "./SidebarGroupNode";

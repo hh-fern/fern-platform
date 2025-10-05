@@ -1,10 +1,9 @@
 "use client";
 
-import type React from "react";
-import { type ReactNode, type RefObject, createContext, useContext, useEffect, useState } from "react";
-
 import * as Popover from "@radix-ui/react-popover";
 import { EllipsisVertical, Trash2, TriangleAlert } from "lucide-react";
+import type React from "react";
+import { createContext, type ReactNode, type RefObject, useContext, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,6 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/utils/utils";
 
 import type { AttributeValue } from "../editor-mdx-renderer/types";
-import { useEditorComponent } from "./EditorComponentContext";
 import {
     type AttributeConfig,
     type AttributeValues,
@@ -23,6 +21,7 @@ import {
     SelectControl,
     TextInputControl
 } from "./controls";
+import { useEditorComponent } from "./EditorComponentContext";
 import "./controls.scss";
 
 // Context types with generics

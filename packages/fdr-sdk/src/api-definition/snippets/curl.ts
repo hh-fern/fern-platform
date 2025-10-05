@@ -1,8 +1,7 @@
+import { isNonNullish, isPlainObject, unknownToString } from "@fern-api/ui-core-utils";
 import { compact } from "es-toolkit/array";
 import qs from "qs";
 import { UnreachableCaseError } from "ts-essentials";
-
-import { isNonNullish, isPlainObject, unknownToString } from "@fern-api/ui-core-utils";
 
 import { obfuscateSecret } from "../../utils/obfuscate-secret";
 import type * as Latest from "../latest";

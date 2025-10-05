@@ -1,8 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server";
-
 import { createOpenAI } from "@ai-sdk/openai";
-import { kv } from "@vercel/kv";
-
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { track } from "@fern-api/docs-server/analytics/posthog";
 import { fdrEnvironment, fernToken_admin, openaiApiKey, turbopufferApiKey } from "@fern-api/docs-server/env-variables";
@@ -19,6 +15,8 @@ import {
     getTurbopufferVectorizer,
     turbopufferUpsertTask
 } from "@fern-docs/search-ask-fern";
+import { kv } from "@vercel/kv";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { getFaiClient } from "@/getFaiClient";
 

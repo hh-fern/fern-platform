@@ -1,6 +1,5 @@
-import { bundleMDX as internalBundleMDX } from "mdx-bundler";
-
 import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import { bundleMDX as internalBundleMDX } from "mdx-bundler";
 
 import { rehypeEditorComponents } from "./plugins/rehype-editor-components";
 import { rehypeEndpointExampleSnippets } from "./plugins/rehype-endpoint-example-snippets";

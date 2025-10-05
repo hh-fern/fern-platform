@@ -15,6 +15,7 @@ import { GithubLogo } from "../auth/GithubLogo";
 import { Button } from "../ui/button";
 import { DashboardTooltip } from "./DashboardTooltip";
 import {
+    ErrorFullCommitToast,
     ErrorNoBaseBranchToast,
     ErrorNoBranchToast,
     ErrorNoGithubSourceToast,
@@ -22,7 +23,6 @@ import {
     SuccessfulCommitToast,
     WarningNoChangesToast
 } from "./EditorToasts";
-import { ErrorFullCommitToast } from "./EditorToasts";
 
 export function CommitButton() {
     const {

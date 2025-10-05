@@ -1,22 +1,13 @@
-import { unstable_cache, unstable_cacheTag } from "next/cache";
-import { notFound } from "next/navigation";
-import { after } from "next/server";
-import { cache } from "react";
-
-import { kv } from "@vercel/kv";
-import { createHash } from "crypto";
-import { Semaphore, mapValues } from "es-toolkit";
-import { type AsyncOrSync, UnreachableCaseError } from "ts-essentials";
-
 import type { AuthEdgeConfig } from "@fern-api/docs-auth";
 // import { track } from "@fern-api/docs-server";
 import {
     type AuthState,
-    type DynamicIRsByLanguage,
-    type FernFonts,
+    loadWithUrl as cachedLoadWithUrl,
     cacheSeed,
     cleanBasePath,
     createGetAuthState,
+    type DynamicIRsByLanguage,
+    type FernFonts,
     findEndpoint,
     generateFernColorPalette,
     generateFonts,
@@ -24,14 +15,12 @@ import {
     isLocal,
     isSelfHosted,
     provideRegistryService,
-    pruneWithAuthState
-} from "@fern-api/docs-server";
-import {
-    loadWithUrl as cachedLoadWithUrl,
+    pruneWithAuthState,
     loadDynamicIRWithUrl as uncachedLoadDynamicIRWithUrl,
     uncachedLoadWithUrl
 } from "@fern-api/docs-server";
 import { type DocsLoader, type DocsMetadata, DocsMetadataSchema } from "@fern-api/docs-server/docs-loader";
+import type { HttpMethod } from "@fern-api/docs-utils";
 import {
     DEFAULT_CONTENT_WIDTH,
     DEFAULT_GUTTER_WIDTH,
@@ -46,25 +35,32 @@ import {
     type FernColorTheme,
     withoutStaging
 } from "@fern-api/docs-utils";
-import type { HttpMethod } from "@fern-api/docs-utils";
 import type { FileData } from "@fern-api/docs-utils/types/file-data";
 import { FernAIClient } from "@fern-api/fai-sdk";
 import { type ApiDefinition, type DocsV1Read, type DocsV2Read, FernNavigation } from "@fern-api/fdr-sdk";
 import {
     ApiDefinitionV1ToLatest,
     type AuthScheme,
+    backfillSnippets,
     type EnvironmentId,
     type ObjectProperty,
     type PruningNodeType,
-    type TypeDefinition,
-    backfillSnippets,
-    prune
+    prune,
+    type TypeDefinition
 } from "@fern-api/fdr-sdk/api-definition";
 import { ApiDefinitionId, EndpointId, type PageId, type Slug, type TypeId } from "@fern-api/fdr-sdk/navigation";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, isPlainObject } from "@fern-api/ui-core-utils";
 import { visualEditorStorage } from "@fern-api/visual-editor-server";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
+import { kv } from "@vercel/kv";
+import { createHash } from "crypto";
+import { mapValues, Semaphore } from "es-toolkit";
+import { unstable_cache, unstable_cacheTag } from "next/cache";
+import { notFound } from "next/navigation";
+import { after } from "next/server";
+import { cache } from "react";
+import { type AsyncOrSync, UnreachableCaseError } from "ts-essentials";
 
 const loadWithUrl = async (domainKey: string): Promise<DocsV2Read.LoadDocsForUrlResponse> => {
     const { domain, branchName } = decodeDocsLoaderDomainKey(domainKey);

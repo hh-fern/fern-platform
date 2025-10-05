@@ -1,13 +1,12 @@
 import "server-only";
 
-import React from "react";
-
 import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { cn } from "@fern-docs/components/cn";
 import { NavbarLinks } from "@fern-docs/components/header/NavbarLinks";
 import { SidebarContainer } from "@fern-docs/components/sidebar/SidebarContainer";
+import React from "react";
 
 import { Announcement } from "@/components/header/Announcement";
 import { HeaderContent } from "@/components/header/HeaderContent";

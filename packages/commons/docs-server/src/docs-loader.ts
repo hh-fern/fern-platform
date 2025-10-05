@@ -1,9 +1,5 @@
-import { z } from "zod";
-
 import type { AuthEdgeConfig } from "@fern-api/docs-auth";
-import type { FernColorTheme } from "@fern-api/docs-utils";
-import type { EdgeFlags } from "@fern-api/docs-utils";
-import type { HttpMethod } from "@fern-api/docs-utils";
+import type { EdgeFlags, FernColorTheme, HttpMethod } from "@fern-api/docs-utils";
 import type { FileData } from "@fern-api/docs-utils/types/file-data";
 import type { FernLayoutConfig } from "@fern-api/docs-utils/types/layout-config";
 import type { ApiDefinition, DocsV1Read, FernNavigation } from "@fern-api/fdr-sdk";
@@ -16,6 +12,7 @@ import type {
     TypeId
 } from "@fern-api/fdr-sdk/api-definition";
 import type { Slug } from "@fern-api/fdr-sdk/navigation";
+import { z } from "zod";
 
 import type { AuthState } from "./auth/getAuthState";
 import type { FernFonts } from "./generateFonts";

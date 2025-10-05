@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-
 import type { NodeId } from "@fern-api/fdr-sdk/navigation";
 import type { MdxToHtmlResponse } from "@fern-docs/mdx";
+import { useEffect } from "react";
 
 import { useCurrentPage } from "@/providers/CurrentPageContext";
 import { usePages } from "@/providers/PagesStoreContext";

@@ -1,11 +1,10 @@
+import { APIV1Db, type DocsV1Db, type DocsV2Read, FdrAPI, migrateDocsDbDefinition } from "@fern-api/fdr-sdk";
 import type { AuthType, PrismaClient } from "@prisma/client";
 import urljoin from "url-join";
 import { v4 as uuidv4 } from "uuid";
 
-import { APIV1Db, type DocsV1Db, type DocsV2Read, FdrAPI, migrateDocsDbDefinition } from "@fern-api/fdr-sdk";
-
 import type { DocsRegistrationInfo } from "../../controllers/docs/v2/getDocsWriteV2Service";
-import { type WithoutQuestionMarks, readBuffer, writeBuffer } from "../../util";
+import { readBuffer, type WithoutQuestionMarks, writeBuffer } from "../../util";
 import { ParsedBaseUrl } from "../../util/ParsedBaseUrl";
 import { sort } from "../../util/sort";
 import type { IndexSegmentIds, PrismaTransaction, ReferencedAPIDefinitionIds } from "../types";

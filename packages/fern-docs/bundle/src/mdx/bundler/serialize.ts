@@ -1,24 +1,5 @@
 import "server-only";
 
-import { after } from "next/server";
-
-import { kv } from "@vercel/kv";
-import { createHash } from "crypto";
-import { mapKeys } from "es-toolkit/object";
-import fs from "fs";
-import { gracefulify } from "graceful-fs";
-import { bundleMDX } from "mdx-bundler";
-import path from "path";
-import rehypeKatex from "rehype-katex";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkGemoji from "remark-gemoji";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import remarkMdxFrontmatter from "remark-mdx-frontmatter";
-import remarkSmartypants from "remark-smartypants";
-import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
-import { noop } from "ts-essentials";
-
 import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
@@ -27,9 +8,9 @@ import { isDevelopment, isPreviewDomain } from "@fern-api/docs-utils";
 import type { FileData } from "@fern-api/docs-utils/types/file-data";
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
 import {
+    customHeadingHandler,
     type Hast,
     type PluggableList,
-    customHeadingHandler,
     sanitizeBreaks,
     sanitizeMdxExpression
 } from "@fern-docs/mdx";
@@ -42,6 +23,23 @@ import {
     remarkInjectEsm,
     remarkSanitizeAcorn
 } from "@fern-docs/mdx/plugins";
+import { kv } from "@vercel/kv";
+import { createHash } from "crypto";
+import { mapKeys } from "es-toolkit/object";
+import fs from "fs";
+import { gracefulify } from "graceful-fs";
+import { bundleMDX } from "mdx-bundler";
+import { after } from "next/server";
+import path from "path";
+import rehypeKatex from "rehype-katex";
+import remarkFrontmatter from "remark-frontmatter";
+import remarkGemoji from "remark-gemoji";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkMdxFrontmatter from "remark-mdx-frontmatter";
+import remarkSmartypants from "remark-smartypants";
+import remarkSqueezeParagraphs from "remark-squeeze-paragraphs";
+import { noop } from "ts-essentials";
 
 import { getMDXExport } from "../get-mdx-export";
 import { rehypeAccordionNestedHeaders } from "../plugins/rehype-accordion-nested-headers";

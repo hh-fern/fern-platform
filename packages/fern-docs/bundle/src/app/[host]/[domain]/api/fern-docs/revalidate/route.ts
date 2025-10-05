@@ -1,13 +1,3 @@
-import { revalidatePath, revalidateTag } from "next/cache";
-import { type NextRequest, NextResponse } from "next/server";
-
-import { waitUntil } from "@vercel/functions";
-import { kv } from "@vercel/kv";
-import { chunk } from "es-toolkit/array";
-import { mapValues } from "es-toolkit/object";
-import { escapeRegExp } from "es-toolkit/string";
-import { UnreachableCaseError } from "ts-essentials";
-
 import { convertResponseToRootNode, createEndpointCacheKey, getMetadataFromResponse } from "@fern-api/docs-loader";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
@@ -18,12 +8,20 @@ import { type ApiDefinition, type DocsV2Read, FernNavigation } from "@fern-api/f
 import {
     ApiDefinitionV1ToLatest,
     type EndpointId,
-    type WebSocketId,
+    prune,
     type WebhookId,
-    prune
+    type WebSocketId
 } from "@fern-api/fdr-sdk/api-definition";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
+import { waitUntil } from "@vercel/functions";
+import { kv } from "@vercel/kv";
+import { chunk } from "es-toolkit/array";
+import { mapValues } from "es-toolkit/object";
+import { escapeRegExp } from "es-toolkit/string";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { type NextRequest, NextResponse } from "next/server";
+import { UnreachableCaseError } from "ts-essentials";
 
 import { getFaiClient } from "@/getFaiClient";
 import { queueAlgoliaReindex, queueTurbopufferReindex } from "@/server/queue-reindex";

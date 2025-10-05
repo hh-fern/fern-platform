@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { getChangedNodesFromHtml } from "@fern-docs/mdx";
 
 import type { Editor, EditorEvents } from "@tiptap/react";
-
-import { getChangedNodesFromHtml } from "@fern-docs/mdx";
+import React, { useEffect, useRef, useState } from "react";
 
 import TiptapEditor from "@/components/editor/TiptapEditor";
 import { usePages } from "@/providers/PagesStoreContext";

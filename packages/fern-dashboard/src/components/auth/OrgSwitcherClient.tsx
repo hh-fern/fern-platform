@@ -1,14 +1,13 @@
 "use client";
 
+import { useRouter } from "@bprogress/next/app";
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { useRouter } from "@bprogress/next/app";
-import { ChevronDown } from "lucide-react";
-
-import type { Auth0OrgName, Auth0Organization } from "@/app/services/auth0/types";
-import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
+import type { Auth0Organization, Auth0OrgName } from "@/app/services/auth0/types";
 import { Button } from "@/components/ui/button";
+import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { getOrgDisplayName } from "@/utils/getOrgDisplayName";
 import { useOrgNameFromPathname } from "@/utils/useOrgNameFromPathname";
 import { usePathnameWithoutOrgName } from "@/utils/usePathnameWithoutOrgName";

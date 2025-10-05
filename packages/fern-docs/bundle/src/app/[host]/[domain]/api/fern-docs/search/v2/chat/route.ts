@@ -1,8 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server";
-
 import { createOpenAI } from "@ai-sdk/openai";
-import type { UIMessage } from "ai";
-
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { createGetAuthStateEdge } from "@fern-api/docs-server/auth/getAuthStateEdge";
 import { fernToken_admin, openaiApiKey } from "@fern-api/docs-server/env-variables";
@@ -19,6 +15,8 @@ import {
 import type { FacetFilter } from "@fern-docs/search-keyword";
 import { MAX_AI_CHAT_MESSAGE_LENGTH } from "@fern-docs/search-ui";
 import { createDelimitedRolesetCombinations } from "@fern-docs/search-utils";
+import type { UIMessage } from "ai";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { getFaiClient } from "@/getFaiClient";
 

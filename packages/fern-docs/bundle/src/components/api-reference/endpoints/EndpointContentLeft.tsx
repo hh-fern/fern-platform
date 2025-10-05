@@ -1,7 +1,7 @@
 import "server-only";
 
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
+import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 
 import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
@@ -12,7 +12,7 @@ import { WithSeparator } from "../type-definitions/TypeDefinitionDetails";
 import { EndpointErrorGroup } from "./EndpointErrorGroup";
 import { EndpointMultipleRequestSection } from "./EndpointMultipleRequestSection";
 import { EndpointMultipleResponseSection } from "./EndpointMultipleResponseSection";
-import { EndpointRequestSection, createEndpointRequestDescriptionFallback } from "./EndpointRequestSection";
+import { createEndpointRequestDescriptionFallback, EndpointRequestSection } from "./EndpointRequestSection";
 import { EndpointResponseSection } from "./EndpointResponseSection";
 import { EndpointSection } from "./EndpointSection";
 import { ResponseSummaryFallback } from "./response-summary-fallback";

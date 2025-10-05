@@ -1,12 +1,10 @@
 import "server-only";
 
+import { createCachedDocsLoader } from "@fern-api/docs-loader";
+import { conformExplorerRoute, conformTrailingSlash } from "@fern-api/docs-utils";
+import { FernNavigation } from "@fern-api/fdr-sdk";
 import { RedirectType, redirect } from "next/navigation";
 import React from "react";
-
-import { createCachedDocsLoader } from "@fern-api/docs-loader";
-import { conformTrailingSlash } from "@fern-api/docs-utils";
-import { conformExplorerRoute } from "@fern-api/docs-utils";
-import { FernNavigation } from "@fern-api/fdr-sdk";
 
 import { ExplorerContent, NoEndpointSelected } from "@/components/playground/ExplorerContent";
 

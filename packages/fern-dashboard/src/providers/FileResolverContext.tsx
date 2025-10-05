@@ -1,9 +1,8 @@
 "use client";
 
-import { createContext, useContext } from "react";
-
 import { DashboardFileResolver } from "@fern-api/docs-server/dashboard-file-resolver";
 import type { FileData } from "@fern-api/docs-utils/types/file-data";
+import { createContext, useContext } from "react";
 
 export const FileResolverContext = createContext<{
     resolveFileSrc: DashboardFileResolver["getResolvedFileData"];

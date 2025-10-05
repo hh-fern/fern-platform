@@ -1,11 +1,9 @@
 "use client";
 
+import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import { MinusCircleIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { type ReactNode, useMemo, useRef } from "react";
-
-import { MinusCircleIcon } from "lucide-react";
-
-import type { NodeId } from "@fern-api/fdr-sdk/navigation";
 
 import { useScrollSidebarNodeIntoView } from "../../hooks/sidebar-scroll";
 import { useSafeNavigation } from "../../navigation";

@@ -1,10 +1,9 @@
 "use client";
 
-import React, { type ComponentProps } from "react";
+import type { MDXComponents } from "@fern-docs/mdx";
 
 import { NodeViewWrapper } from "@tiptap/react";
-
-import type { MDXComponents } from "@fern-docs/mdx";
+import React, { type ComponentProps } from "react";
 
 import { UnsupportedContent } from "@/components/editor/UnsupportedContent";
 import { ErrorBoundary, ErrorBoundaryFallback } from "@/docs/components/error-boundary";

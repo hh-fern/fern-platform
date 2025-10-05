@@ -1,4 +1,4 @@
-import { type MdastNodes, type MdxJsxExpressionAttribute, astToMDX, mdxToAST } from "@fern-docs/mdx";
+import { astToMDX, type MdastNodes, type MdxJsxExpressionAttribute, mdxToAST } from "@fern-docs/mdx";
 
 import type { AttributeValue, JSXElement, JSXElementChildren, ParsedMarkdownElement } from "./types";
 

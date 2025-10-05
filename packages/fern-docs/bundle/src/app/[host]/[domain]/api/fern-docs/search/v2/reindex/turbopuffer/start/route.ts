@@ -1,12 +1,10 @@
-import { type NextRequest, NextResponse } from "next/server";
-
-import { kv } from "@vercel/kv";
-
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { loadWithUrl } from "@fern-api/docs-server/loadWithUrl";
 import { getDocsDomainEdge } from "@fern-api/docs-server/xfernhost/edge";
 import { withoutStaging } from "@fern-api/docs-utils";
+import { kv } from "@vercel/kv";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { createJobResponse } from "@/jobs";
 import { queueTurbopufferStartReindex } from "@/server/queue-reindex";

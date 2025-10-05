@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
 import CodeBlock from "@tiptap/extension-code-block";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -13,6 +11,7 @@ import {
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { createLowlight } from "lowlight";
+import { useEffect } from "react";
 
 import "@/components/editor/tiptap-node/node-focus/node-focus.scss";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
@@ -20,12 +19,12 @@ import { useEditor } from "@/providers/EditorContext";
 import { cn } from "@/utils/utils";
 
 import BubbleMenu from "./BubbleMenu";
-import FloatingMenu from "./FloatingMenu";
-import NodeHoverHandle from "./NodeHoverHandle";
 import { createCodeBlockComponent } from "./extension-code-block/CodeBlockComponent";
 import type { LowlightInstance } from "./extension-code-block/types";
 import CustomElement from "./extension-custom-element";
 import { FVEAttributesExtension } from "./extension-fve-attributes";
+import FloatingMenu from "./FloatingMenu";
+import NodeHoverHandle from "./NodeHoverHandle";
 import { LowlightPlugin } from "./tiptap-node/lowlight/lowlight-plugin";
 import {
     ConfiguredFileHandler,

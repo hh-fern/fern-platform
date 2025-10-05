@@ -1,7 +1,6 @@
+import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import type { ReactNode } from "react";
 import React from "react";
-
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
 import { SidebarClientNavigationChildInjector } from "./SidebarClientNavigationChildInjector";
 import { SidebarCollapseGroup } from "./SidebarCollapseGroup";

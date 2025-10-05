@@ -1,8 +1,7 @@
 "use client";
 
-import { type ReactNode, useEffect, useState } from "react";
-
 import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { useSafeNavigation } from "../../navigation";
 import { SidebarClientNavigationChild } from "./SidebarClientNavigationChild";

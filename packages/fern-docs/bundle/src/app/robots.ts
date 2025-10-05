@@ -1,12 +1,10 @@
-import type { MetadataRoute } from "next";
-import { headers } from "next/headers";
-
-import urlJoin from "url-join";
-
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { HEADER_HOST, HEADER_X_FERN_HOST } from "@fern-api/docs-utils";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getCanonicalUrl, getSeoDisabled } from "@fern-docs/edge-config";
+import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
+import urlJoin from "url-join";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
     if (isLocal()) {

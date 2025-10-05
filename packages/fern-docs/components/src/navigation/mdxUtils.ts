@@ -1,7 +1,5 @@
 import { htmlToMdx } from "@fern-docs/mdx";
-
-import type { PageData } from "./types";
-import type { StoredNavigationData } from "./types";
+import type { PageData, StoredNavigationData } from "./types";
 
 export function createMdxFrontmatter(config: { title: string; slug?: string; subtitle?: string }): string {
     // Always include the title, even if it's an empty string

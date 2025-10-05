@@ -1,7 +1,6 @@
-import type { MouseEventHandler } from "react";
-
 import { useCurrentEditor } from "@tiptap/react";
 import { BubbleMenu as EditorBubbleMenu } from "@tiptap/react/menus";
+import type { MouseEventHandler } from "react";
 
 import { Icon } from "@/components/icon/Icon";
 

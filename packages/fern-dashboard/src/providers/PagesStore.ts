@@ -1,5 +1,5 @@
-import type { NodeId } from "@fern-api/fdr-sdk/navigation";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NodeId } from "@fern-api/fdr-sdk/navigation";
 import type { NavigationStore } from "@fern-docs/components/navigation/NavigationStore";
 import type {
     BuildPageDataProps,

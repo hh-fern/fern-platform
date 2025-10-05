@@ -1,6 +1,5 @@
-import { type ReactNode, useState } from "react";
-
 import { SearchIcon } from "lucide-react";
+import { type ReactNode, useState } from "react";
 
 import { Input } from "./input";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";

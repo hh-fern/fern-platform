@@ -1,9 +1,8 @@
 "use client";
 
+import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
-
-import { ArrowLeftIcon } from "lucide-react";
 
 import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";

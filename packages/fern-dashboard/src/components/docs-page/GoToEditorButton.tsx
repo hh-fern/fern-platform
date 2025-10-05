@@ -1,16 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
-
-import { Loader2, Plus } from "lucide-react";
-
 import { FernTooltip, FernTooltipProvider } from "@fern-docs/components/FernTooltip";
 import { generateBranchName } from "@fern-docs/components/navigation/local-storage";
 
+import { Loader2, Plus } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+
 import { useOrgName } from "@/app/[orgName]/context/OrgNameContext";
 import type { Auth0SessionData } from "@/app/services/auth0/getCurrentSession";
-import { ROOT_SLUG_ALIAS, constructEditorSlug } from "@/utils/editor-routing";
+import { constructEditorSlug, ROOT_SLUG_ALIAS } from "@/utils/editor-routing";
 import type { DocsUrl, EncodedDocsUrl } from "@/utils/types";
 
 import { Button } from "../ui/button";

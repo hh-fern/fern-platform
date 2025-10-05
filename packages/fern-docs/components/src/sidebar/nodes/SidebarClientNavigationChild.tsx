@@ -1,10 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
-
-import { UnreachableCaseError } from "ts-essentials";
-
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { ReactNode } from "react";
+import { UnreachableCaseError } from "ts-essentials";
 
 import { processIcon } from "../../processIcon";
 import { SidebarClientPageNode } from "./SidebarClientPageNode";
