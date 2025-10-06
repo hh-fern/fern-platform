@@ -5,6 +5,7 @@ import { BubbleMenu as EditorBubbleMenu } from "@tiptap/react/menus";
 import type { MouseEventHandler } from "react";
 
 import { Icon } from "@/components/icon/Icon";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { LinkPopover } from "./LinkPopover";
 
@@ -14,14 +15,13 @@ type TextBubbleMenuAction =
     | "toggleItalic"
     | "toggleUnderline"
     | "toggleStrike"
-    | "setLink"
     | "toggleCode"
     | "toggleBulletList"
     | "toggleOrderedList";
 
 export default function TextBubbleMenu() {
     const { editor } = useCurrentEditor();
-    const [showLinkPopover, setShowLinkPopover] = useState(false);
+    const [linkPopoverOpen, setLinkPopoverOpen] = useState(false);
 
     function menuItemClickHandler(action: TextBubbleMenuAction) {
         return () => {
@@ -43,9 +43,6 @@ export default function TextBubbleMenu() {
                     break;
                 case "toggleStrike":
                     editor.chain().focus().toggleStrike().run();
-                    break;
-                case "setLink":
-                    setShowLinkPopover(true);
                     break;
                 case "toggleCode":
                     editor.chain().focus().toggleCode().run();
@@ -81,28 +78,42 @@ export default function TextBubbleMenu() {
                 return editor.isFocused && !selection.empty;
             }}
         >
-            {showLinkPopover ? (
-                <LinkPopover editor={editor} onClose={() => setShowLinkPopover(false)} />
-            ) : (
-                <div className="border-1 rounded-2 text-gray-1100 flex items-center gap-px border-gray-500 bg-white p-1 shadow-sm">
-                    <BubbleMenuItem iconProps={{ variant: "Heading1" }} onClick={menuItemClickHandler("setNodeType")} />
-                    <BubbleMenuSeparator />
-                    <BubbleMenuItem iconProps={{ variant: "Bold" }} onClick={menuItemClickHandler("toggleBold")} />
-                    <BubbleMenuItem iconProps={{ variant: "Italic" }} onClick={menuItemClickHandler("toggleItalic")} />
-                    <BubbleMenuItem
-                        iconProps={{ variant: "Underline" }}
-                        onClick={menuItemClickHandler("toggleUnderline")}
-                    />
-                    <BubbleMenuItem iconProps={{ variant: "Link" }} onClick={menuItemClickHandler("setLink")} />
-                    <BubbleMenuItem iconProps={{ variant: "Code" }} onClick={menuItemClickHandler("toggleCode")} />
-                    <BubbleMenuSeparator />
-                    <BubbleMenuItem iconProps={{ variant: "List" }} onClick={menuItemClickHandler("toggleBulletList")} />
-                    <BubbleMenuItem
-                        iconProps={{ variant: "ListOrdered" }}
-                        onClick={menuItemClickHandler("toggleOrderedList")}
-                    />
-                </div>
-            )}
+            <div className="border-1 rounded-2 text-gray-1100 flex items-center gap-px border-gray-500 bg-white p-1 shadow-sm">
+                <BubbleMenuItem iconProps={{ variant: "Heading1" }} onClick={menuItemClickHandler("setNodeType")} />
+                <BubbleMenuSeparator />
+                <BubbleMenuItem iconProps={{ variant: "Bold" }} onClick={menuItemClickHandler("toggleBold")} />
+                <BubbleMenuItem iconProps={{ variant: "Italic" }} onClick={menuItemClickHandler("toggleItalic")} />
+                <BubbleMenuItem
+                    iconProps={{ variant: "Underline" }}
+                    onClick={menuItemClickHandler("toggleUnderline")}
+                />
+                <Popover open={linkPopoverOpen} onOpenChange={setLinkPopoverOpen}>
+                    <PopoverTrigger asChild>
+                        <button
+                            className="rounded-1 cursor-pointer p-1 transition-colors hover:bg-gray-300 hover:transition-none"
+                            onMouseDown={(e) => e.preventDefault()}
+                        >
+                            <div className="flex size-6 items-center justify-center">
+                                <Icon variant="Link" size={20} />
+                            </div>
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                        className="p-0"
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
+                    >
+                        <LinkPopover editor={editor} onClose={() => setLinkPopoverOpen(false)} />
+                    </PopoverContent>
+                </Popover>
+                <BubbleMenuItem iconProps={{ variant: "Code" }} onClick={menuItemClickHandler("toggleCode")} />
+                <BubbleMenuSeparator />
+                <BubbleMenuItem iconProps={{ variant: "List" }} onClick={menuItemClickHandler("toggleBulletList")} />
+                <BubbleMenuItem
+                    iconProps={{ variant: "ListOrdered" }}
+                    onClick={menuItemClickHandler("toggleOrderedList")}
+                />
+            </div>
         </EditorBubbleMenu>
     );
 }
