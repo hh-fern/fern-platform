@@ -61,7 +61,7 @@ export function LinkPopover({ editor, onClose }: LinkPopover.Props) {
     );
 
     return (
-        <div className="border-1 rounded-2 flex min-w-[300px] flex-col gap-2 border-gray-500 bg-white p-3 shadow-lg">
+        <div className="flex min-w-[300px] flex-col gap-3 p-4">
             <div className="flex items-center gap-2">
                 <input
                     type="text"
