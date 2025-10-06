@@ -9,7 +9,7 @@ import { type ApiDefinition, type DocsV2Read, FernNavigation } from "@fern-api/f
 import {
     ApiDefinitionV1ToLatest,
     EndpointId,
-    EnvironmentId,
+    type EnvironmentId,
     prune,
     type WebhookId,
     type WebSocketId
