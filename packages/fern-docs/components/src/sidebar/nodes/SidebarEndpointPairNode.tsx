@@ -1,6 +1,6 @@
 "use client";
 
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { EndpointPairNode } from "@fern-api/fdr-sdk/navigation";
 
 import { useAtomValue } from "jotai";
 import type { ReactNode } from "react";
@@ -9,7 +9,7 @@ import { FERN_STREAM_ATOM } from "../../state/stream";
 import { SidebarApiLeafNode } from "./SidebarApiLeafNode";
 
 interface SidebarEndpointPairNodeProps {
-    node: FernNavigation.EndpointPairNode;
+    node: EndpointPairNode;
     depth: number;
     shallow: boolean;
 }

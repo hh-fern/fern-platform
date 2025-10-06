@@ -1,7 +1,14 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type ObjectProperty as ObjectPropertyType,
+    type TypeDefinition,
+    type TypeId,
+    type TypeReference,
+    type TypeShape,
+    type TypeShapeOrReference,
+    unwrapObjectType
+} from "@fern-api/fdr-sdk/api-definition";
 import { memo } from "react";
 import { UnreachableCaseError } from "ts-essentials";
-
 import { DiscriminatedUnionVariant } from "./DiscriminatedUnionVariant";
 import { EnumTypeDefinition } from "./EnumTypeDefinition";
 import { EnumValue } from "./EnumValue";
@@ -14,12 +21,12 @@ import { UndiscriminatedUnionVariant } from "./UndiscriminatedUnionVariant";
 
 export declare namespace InternalTypeDefinition {
     export interface Props {
-        shape: ApiDefinition.TypeShapeOrReference;
-        types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+        shape: TypeShapeOrReference;
+        types: Record<TypeId, TypeDefinition>;
         location?: PropertyLocation;
-        additionalProperties?: ApiDefinition.ObjectProperty[];
+        additionalProperties?: ObjectPropertyType[];
         TypeShorthand: React.ComponentType<{
-            shape: ApiDefinition.TypeShapeOrReference;
+            shape: TypeShapeOrReference;
         }>;
         PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
         TypeDefinitionAnchor: React.ComponentType<{
@@ -55,16 +62,16 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
     ChipSizeProvider
 }: {
     shape:
-        | ApiDefinition.TypeShape.Enum
-        | ApiDefinition.TypeShape.UndiscriminatedUnion
-        | ApiDefinition.TypeShape.DiscriminatedUnion
-        | ApiDefinition.TypeShape.Object_
-        | ApiDefinition.TypeReference.Primitive;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+        | TypeShape.Enum
+        | TypeShape.UndiscriminatedUnion
+        | TypeShape.DiscriminatedUnion
+        | TypeShape.Object_
+        | TypeReference.Primitive;
+    types: Record<TypeId, TypeDefinition>;
     location?: PropertyLocation;
-    additionalProperties?: ApiDefinition.ObjectProperty[];
+    additionalProperties?: ObjectPropertyType[];
     TypeShorthand: React.ComponentType<{
-        shape: ApiDefinition.TypeShapeOrReference;
+        shape: TypeShapeOrReference;
     }>;
     PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
     TypeDefinitionAnchor: React.ComponentType<{
@@ -151,7 +158,7 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
                 </FernCollapseWithButtonUncontrolled>
             );
         case "object": {
-            const properties = ApiDefinition.unwrapObjectType(shape, types).properties;
+            const properties = unwrapObjectType(shape, types).properties;
 
             const filteredProperties = filterDuplicateObjectProperties(
                 filterObjectPropertiesByAccess(properties, location)
@@ -214,10 +221,7 @@ export const InternalTypeDefinition = memo(function InternalTypeDefinition({
     }
 });
 
-const filterObjectPropertiesByAccess = (
-    properties: ApiDefinition.ObjectProperty[],
-    location: PropertyLocation | undefined
-) => {
+const filterObjectPropertiesByAccess = (properties: ObjectPropertyType[], location: PropertyLocation | undefined) => {
     if (location === undefined) {
         return properties;
     }
@@ -232,8 +236,8 @@ const filterObjectPropertiesByAccess = (
     });
 };
 
-const filterDuplicateObjectProperties = (properties: ApiDefinition.ObjectProperty[]) => {
-    return properties.reduce<ApiDefinition.ObjectProperty[]>((acc, property) => {
+const filterDuplicateObjectProperties = (properties: ObjectPropertyType[]) => {
+    return properties.reduce<ObjectPropertyType[]>((acc, property) => {
         if (!acc.some((p) => p.key === property.key)) {
             acc.push(property);
         }

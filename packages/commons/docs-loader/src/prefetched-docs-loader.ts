@@ -15,8 +15,7 @@ import type {
     TypeDefinition,
     TypeId
 } from "@fern-api/fdr-sdk/api-definition";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import type { Slug } from "@fern-api/fdr-sdk/navigation";
+import type { EndpointNode, NavigationNode, RootNode, Slug } from "@fern-api/fdr-sdk/navigation";
 
 /**
  * Serializable data structure for transmission over the wire to the client.
@@ -106,7 +105,7 @@ export class PrefetchedDocsLoader implements DocsLoader<false> {
         _endpointId: EndpointId
     ): {
         endpoint: ApiDefinition.EndpointDefinition;
-        nodes: FernNavigation.EndpointNode[];
+        nodes: EndpointNode[];
         globalHeaders: ObjectProperty[];
         authSchemes: AuthScheme[];
         types: Record<TypeId, TypeDefinition>;
@@ -126,15 +125,15 @@ export class PrefetchedDocsLoader implements DocsLoader<false> {
         return this.notSupported("getEndpointByLocator");
     }
 
-    getRoot(): FernNavigation.RootNode {
+    getRoot(): RootNode {
         return this.notSupported("getRoot");
     }
 
-    getNavigationNode(_id: string): FernNavigation.NavigationNode {
+    getNavigationNode(_id: string): NavigationNode {
         return this.notSupported("getNavigationNode");
     }
 
-    unsafe_getFullRoot(): FernNavigation.RootNode {
+    unsafe_getFullRoot(): RootNode {
         return this.notSupported("unsafe_getFullRoot");
     }
 

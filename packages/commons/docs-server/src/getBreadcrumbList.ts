@@ -1,16 +1,22 @@
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import {
+    hasMetadata,
+    hasRedirect,
+    type NavigationNode,
+    type NavigationNodePage,
+    type Slug
+} from "@fern-api/fdr-sdk/navigation";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import urljoin from "url-join";
 
-function toUrl(domain: string, slug: FernNavigation.Slug): string {
+function toUrl(domain: string, slug: Slug): string {
     return urljoin(withDefaultProtocol(domain), slug);
 }
 
 export function getBreadcrumbList(
     domain: string,
-    parents: readonly FernNavigation.NavigationNode[],
-    node: FernNavigation.NavigationNodePage,
+    parents: readonly NavigationNode[],
+    node: NavigationNodePage,
     title?: string
 ): FernDocs.JsonLdBreadcrumbList {
     title ??= node.title;
@@ -19,9 +25,9 @@ export function getBreadcrumbList(
     const visitedSlugs = new Set<string>();
 
     parents.forEach((parent) => {
-        if (FernNavigation.hasMetadata(parent)) {
+        if (hasMetadata(parent)) {
             const slug = visitedSlugs.has(parent.slug)
-                ? FernNavigation.hasRedirect(parent)
+                ? hasRedirect(parent)
                     ? parent.pointsTo != null && !visitedSlugs.has(parent.pointsTo)
                         ? parent.pointsTo
                         : undefined

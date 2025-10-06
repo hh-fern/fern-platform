@@ -1,7 +1,14 @@
 import "server-only";
 
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import type { GrpcContext } from "@fern-api/fdr-sdk/api-definition";
+import type {
+    GrpcContext,
+    HttpRequest,
+    HttpRequestBodyShape,
+    HttpResponse,
+    HttpResponseBodyShape,
+    Protocol,
+    TypeReference
+} from "@fern-api/fdr-sdk/api-definition";
 
 import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
 
@@ -73,23 +80,20 @@ export async function GrpcContentLeft({ context: { grpc, types } }: { context: G
 }
 
 type GrpcTypeAlias =
-    | (ApiDefinition.HttpRequest & {
+    | (HttpRequest & {
           contentType: "application/proto";
-          body: ApiDefinition.HttpRequestBodyShape.Alias & {
-              value: ApiDefinition.TypeReference.Id;
+          body: HttpRequestBodyShape.Alias & {
+              value: TypeReference.Id;
           };
       })
-    | (ApiDefinition.HttpResponse & {
+    | (HttpResponse & {
           statusCode: number;
-          body: ApiDefinition.HttpResponseBodyShape.Alias & {
-              value: ApiDefinition.TypeReference.Id;
+          body: HttpResponseBodyShape.Alias & {
+              value: TypeReference.Id;
           };
       });
 
-function isGrpcTypeAlias(
-    item: ApiDefinition.HttpRequest | ApiDefinition.HttpResponse,
-    protocolType: string | undefined
-): item is GrpcTypeAlias {
+function isGrpcTypeAlias(item: HttpRequest | HttpResponse, protocolType: string | undefined): item is GrpcTypeAlias {
     const hasAliasId = item.body?.type === "alias" && item.body.value?.type === "id";
     const isGrpc = protocolType === "grpc";
     if (!hasAliasId || !isGrpc) return false;
@@ -101,7 +105,7 @@ function isGrpcTypeAlias(
     return "statusCode" in item;
 }
 
-function isStreaming(protocol: ApiDefinition.Protocol | undefined, location: "request" | "response"): boolean {
+function isStreaming(protocol: Protocol | undefined, location: "request" | "response"): boolean {
     if (protocol?.type !== "grpc") return false;
     if (protocol.methodType === "BIDIRECTIONAL_STREAM") return true;
     if (location === "request" && protocol.methodType === "CLIENT_STREAM") return true;

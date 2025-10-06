@@ -1,6 +1,6 @@
 "use client";
 
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { HttpRequestBodyShape, TypeDefinition, TypeId } from "@fern-api/fdr-sdk/api-definition";
 import { unwrapReference } from "@fern-api/fdr-sdk/api-definition";
 import { type ReactElement, useMemo } from "react";
 
@@ -9,8 +9,8 @@ import { PlaygroundTypeReferenceForm } from "../form/PlaygroundTypeReferenceForm
 import { PlaygroundEndpointFormSection } from "./PlaygroundEndpointFormSection";
 
 interface PlaygroundEndpointAliasFormProps {
-    alias: ApiDefinition.HttpRequestBodyShape.Alias;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    alias: HttpRequestBodyShape.Alias;
+    types: Record<TypeId, TypeDefinition>;
     ignoreHeaders: boolean;
     setBodyJson: (value: unknown) => void;
     value: unknown;

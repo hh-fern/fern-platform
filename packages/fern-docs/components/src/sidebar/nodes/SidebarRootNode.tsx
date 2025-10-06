@@ -1,5 +1,5 @@
 import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NodeId, SidebarRootNode as SidebarRootNodeType } from "@fern-api/fdr-sdk/navigation";
 
 import { SidebarRootNodeImpl } from "./SidebarRootNodeImpl";
 
@@ -8,8 +8,8 @@ export async function SidebarRootNode({
     visibleNodeIds,
     loader
 }: {
-    root: FernNavigation.SidebarRootNode | undefined;
-    visibleNodeIds: FernNavigation.NodeId[] | undefined;
+    root: SidebarRootNodeType | undefined;
+    visibleNodeIds: NodeId[] | undefined;
     loader: DocsLoader;
 }) {
     const authState = await loader.getAuthState();

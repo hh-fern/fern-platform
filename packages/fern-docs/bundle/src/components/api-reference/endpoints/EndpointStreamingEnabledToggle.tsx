@@ -1,7 +1,7 @@
 "use client";
 
 import { slugToHref } from "@fern-api/docs-utils";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { EndpointPairNode } from "@fern-api/fdr-sdk/navigation";
 import { useCurrentSlug } from "@fern-docs/components/hooks/use-current-pathname";
 import { FERN_STREAM_ATOM } from "@fern-docs/components/state/stream";
 import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 import { StreamingEnabledToggle } from "./StreamingEnabledToggle";
 
-export function EndpointStreamingEnabledToggle({ node }: { node: FernNavigation.EndpointPairNode }) {
+export function EndpointStreamingEnabledToggle({ node }: { node: EndpointPairNode }) {
     const router = useRouter();
     const [isStream, setIsStream] = useAtom(FERN_STREAM_ATOM);
     const currentSlug = useCurrentSlug();

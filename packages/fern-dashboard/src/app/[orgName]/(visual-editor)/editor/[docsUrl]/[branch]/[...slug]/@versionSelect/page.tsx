@@ -2,8 +2,7 @@ import "server-only";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import { getFallbackProduct, getFallbackVersion } from "@fern-api/docs-server/handle-node-fallbacks";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { NodeCollector, slugjoin, utils } from "@fern-api/fdr-sdk/navigation";
 import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { VersionDropdown } from "@fern-docs/components/header/VersionDropdown";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
@@ -33,8 +32,8 @@ export default async function VersionSelectPage({
     ]);
     const useDenseLayout = layout.isHeaderDisabled;
 
-    const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));
-    const collector = FernNavigation.NodeCollector.collect(root);
+    const foundNode = utils.findNode(root, slugjoin(slug));
+    const collector = NodeCollector.collect(root);
     const versionNodes = collector.getVersionNodes();
 
     if (versionNodes.length === 0) {

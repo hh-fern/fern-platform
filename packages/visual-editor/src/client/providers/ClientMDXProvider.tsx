@@ -2,17 +2,22 @@
 
 import { MDXProvider } from "@mdx-js/react";
 import type React from "react";
-
+import { useEffect, useState } from "react";
 import { InterceptedChildren } from "@/client/components/editor/editor-component/EditorComponentChildrenContext";
-import { MDX_COMPONENTS } from "@/client/docs/mdx/components";
-
-// due to how many modules this file imports, we should export this separately from the other providers
 
 export function ClientMDXProvider({ children }: React.PropsWithChildren) {
-    const editorComponents = {
-        ...MDX_COMPONENTS,
-        InterceptedChildren: InterceptedChildren
-    };
+    const [editorComponents, setEditorComponents] = useState(() => ({ InterceptedChildren }));
+
+    useEffect(() => {
+        import(/* webpackChunkName: "visual-editor-mdx-components" */ "@/client/docs/mdx/components").then(
+            ({ MDX_COMPONENTS }) => {
+                setEditorComponents({
+                    ...MDX_COMPONENTS,
+                    InterceptedChildren
+                });
+            }
+        );
+    }, []);
 
     return <MDXProvider components={editorComponents}>{children}</MDXProvider>;
 }

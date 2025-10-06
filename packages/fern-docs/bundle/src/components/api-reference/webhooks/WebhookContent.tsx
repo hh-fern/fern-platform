@@ -1,7 +1,7 @@
 import "server-only";
 
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { WebhookContext } from "@fern-api/fdr-sdk/api-definition";
+import type { BreadcrumbItem } from "@fern-api/fdr-sdk/navigation";
 import type { FernDropdown } from "@fern-docs/components/FernDropdown";
 import { ReferenceLayout } from "@fern-docs/components/layouts/ReferenceLayout";
 import { Prose } from "@fern-docs/components/mdx/prose";
@@ -31,8 +31,8 @@ export async function WebhookContent({
     markdown
 }: {
     serialize: MdxSerializer;
-    context: ApiDefinition.WebhookContext;
-    breadcrumb: readonly FernNavigation.BreadcrumbItem[];
+    context: WebhookContext;
+    breadcrumb: readonly BreadcrumbItem[];
     bottomNavigation: React.ReactNode;
     action?: React.ReactNode;
     hideFeedback: boolean;

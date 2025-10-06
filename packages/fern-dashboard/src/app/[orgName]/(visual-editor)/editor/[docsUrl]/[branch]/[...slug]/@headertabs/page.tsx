@@ -1,7 +1,6 @@
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import { getTabs } from "@fern-api/docs-server/handle-node-fallbacks";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { slugjoin, utils } from "@fern-api/fdr-sdk/navigation";
 import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { HeaderTabsList } from "@fern-docs/components/HeaderTabsList";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
@@ -33,7 +32,7 @@ export default async function HeaderTabsPage({
 
     const showAuthenticatedNodes = (await loader.getEdgeFlags()).isAuthenticatedPagesDiscoverable;
 
-    const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));
+    const foundNode = utils.findNode(root, slugjoin(slug));
 
     const tabs = getTabs(
         foundNode,

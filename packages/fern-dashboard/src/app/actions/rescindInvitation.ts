@@ -1,8 +1,7 @@
 "use server";
 
 import { getCurrentSessionOrThrow } from "@fern-dashboard/services/auth/getCurrentSession";
-import * as auth0Management from "@fern-dashboard/services/auth/management";
-import { getAuth0ManagementClient } from "@fern-dashboard/services/auth/management";
+import { getAuth0ManagementClient, getOrgIdFromName } from "@fern-dashboard/services/auth/management";
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { assertUserHasOrganizationAccess } from "../services/dal/organization";
 
@@ -15,7 +14,7 @@ export async function rescindInvitation({ invitationId, orgName }: { invitationI
 
     const auth0 = getAuth0ManagementClient();
     await auth0.organizations.deleteInvitation({
-        id: await auth0Management.getOrgIdFromName(orgName),
+        id: await getOrgIdFromName(orgName),
         invitation_id: invitationId
     });
 }

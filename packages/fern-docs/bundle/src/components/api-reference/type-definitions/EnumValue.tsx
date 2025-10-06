@@ -1,10 +1,10 @@
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { EnumValue as EnumValueType } from "@fern-api/fdr-sdk/api-definition";
 import React from "react";
 
 import { Chip } from "@/components/Chip";
 import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
 
-export function EnumValue({ enumValue }: { enumValue: ApiDefinition.EnumValue }) {
+export function EnumValue({ enumValue }: { enumValue: EnumValueType }) {
     return (
         <Chip
             name={enumValue.value}

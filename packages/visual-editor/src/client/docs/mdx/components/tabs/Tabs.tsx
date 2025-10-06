@@ -1,6 +1,6 @@
 "use client";
 
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { Button } from "@fern-docs/components/button";
 import { cn } from "@fern-docs/components/cn";
 import { useCurrentAnchor } from "@fern-docs/components/hooks/use-anchor";
@@ -169,12 +169,12 @@ export function TabGroup({ children }: { toc?: boolean; children?: ReactNode }) 
     useEffect(() => {
         if (selectedLanguage) {
             const matchingTabIndex = sortedTabs.findIndex(
-                (tab) => tab.language && ApiDefinition.cleanLanguage(tab.language) === selectedLanguage
+                (tab) => tab.language && cleanLanguage(tab.language) === selectedLanguage
             );
             if (matchingTabIndex >= 0) {
                 setActiveTabIndex((prevActiveTabIndex) => {
                     const prevTab = sortedTabs[prevActiveTabIndex];
-                    if (prevTab?.language && ApiDefinition.cleanLanguage(prevTab.language) === selectedLanguage) {
+                    if (prevTab?.language && cleanLanguage(prevTab.language) === selectedLanguage) {
                         return prevActiveTabIndex;
                     }
                     return matchingTabIndex;
@@ -188,9 +188,7 @@ export function TabGroup({ children }: { toc?: boolean; children?: ReactNode }) 
         if (tabIndex >= 0) {
             setActiveTabIndex(tabIndex);
             const selectedTab = sortedTabs[tabIndex];
-            const cleanedLanguage = selectedTab?.language
-                ? ApiDefinition.cleanLanguage(selectedTab.language)
-                : undefined;
+            const cleanedLanguage = selectedTab?.language ? cleanLanguage(selectedTab.language) : undefined;
             if (cleanedLanguage && cleanedLanguage !== selectedLanguage) {
                 setSelectedLanguage(cleanedLanguage);
             }

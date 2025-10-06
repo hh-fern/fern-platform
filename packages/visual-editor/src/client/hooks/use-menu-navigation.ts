@@ -1,7 +1,7 @@
 "use client";
 
 import type { Editor } from "@tiptap/react";
-import * as React from "react";
+import React from "react";
 
 type Orientation = "horizontal" | "vertical" | "both";
 

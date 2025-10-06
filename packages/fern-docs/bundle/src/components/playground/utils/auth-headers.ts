@@ -1,5 +1,5 @@
 import { obfuscateSecret } from "@fern-api/fdr-sdk";
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { AuthScheme } from "@fern-api/fdr-sdk/api-definition";
 import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 import { decodeJwt } from "jose";
 import { noop } from "ts-essentials";
@@ -12,7 +12,7 @@ import {
 import { returnSelectedOption } from "./parse-auth-options";
 
 export function buildAuthHeaders(
-    auth: ApiDefinition.AuthScheme | undefined,
+    auth: AuthScheme | undefined,
     authState: PlaygroundAuthState,
     { redacted }: { redacted: boolean },
     oAuthClientCredentialReferencedEndpointLoginFlowProps?: Omit<

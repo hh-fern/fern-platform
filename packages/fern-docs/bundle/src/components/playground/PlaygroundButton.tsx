@@ -1,7 +1,7 @@
 "use client";
 
 import { conformExplorerRoute } from "@fern-api/docs-utils";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NavigationNodeApiLeaf } from "@fern-api/fdr-sdk/navigation";
 import { cn } from "@fern-docs/components/cn";
 import { ButtonLink } from "@fern-docs/components/FernLinkButton";
 import { FernTooltip, FernTooltipProvider } from "@fern-docs/components/FernTooltip";
@@ -11,7 +11,7 @@ import type { FC } from "react";
 import { usePlaygroundSettings } from "../hooks/usePlaygroundSettings";
 
 export const PlaygroundButton: FC<{
-    state: FernNavigation.NavigationNodeApiLeaf;
+    state: NavigationNodeApiLeaf;
     className?: string;
 }> = ({ state, className }) => {
     const settings = usePlaygroundSettings(state.id);

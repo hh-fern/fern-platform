@@ -1,12 +1,20 @@
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import {
+    type ApiDefinitionId,
+    isApiLeaf,
+    type NavigationNode,
+    type NavigationNodeApiLeaf,
+    type NodeId,
+    traverseDF,
+    utils
+} from "@fern-api/fdr-sdk/navigation";
 
 import { createBreadcrumbSlicer } from "./breadcrumb";
 
 export interface ApiGroup {
-    api: FernNavigation.ApiDefinitionId;
-    id: FernNavigation.NodeId;
+    api: ApiDefinitionId;
+    id: NodeId;
     breadcrumb: readonly string[];
-    items: FernNavigation.NavigationNodeApiLeaf[];
+    items: NavigationNodeApiLeaf[];
 }
 
 const trimBreadcrumbs = createBreadcrumbSlicer<ApiGroup>({
@@ -14,26 +22,24 @@ const trimBreadcrumbs = createBreadcrumbSlicer<ApiGroup>({
     updateBreadcrumb: (apiGroup, breadcrumb) => ({ ...apiGroup, breadcrumb })
 });
 
-export function flattenApiSection(root: FernNavigation.NavigationNode | undefined): ApiGroup[] {
+export function flattenApiSection(root: NavigationNode | undefined): ApiGroup[] {
     if (root == null) {
         return [];
     }
     const result: ApiGroup[] = [];
-    FernNavigation.traverseDF(root, (node, parents) => {
+    traverseDF(root, (node, parents) => {
         if (node.type === "changelog") {
             return "skip";
         }
         if (node.type === "apiReference" || node.type === "apiPackage") {
             // webhooks are not supported in the playground
-            const items = node.children.filter(FernNavigation.isApiLeaf).filter((item) => item.type !== "webhook");
+            const items = node.children.filter(isApiLeaf).filter((item) => item.type !== "webhook");
             if (items.length === 0) {
                 return;
             }
 
             // current node should be included in the breadcrumb
-            const breadcrumb = FernNavigation.utils
-                .createBreadcrumb([...parents, node])
-                .map((breadcrumb) => breadcrumb.title);
+            const breadcrumb = utils.createBreadcrumb([...parents, node]).map((breadcrumb) => breadcrumb.title);
 
             result.push({
                 api: node.apiDefinitionId,

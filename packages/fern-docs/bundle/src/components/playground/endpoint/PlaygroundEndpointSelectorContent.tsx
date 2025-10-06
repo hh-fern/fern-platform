@@ -1,7 +1,7 @@
 "use client";
 
 import { getExplorerBasePath, removeTrailingSlash } from "@fern-api/docs-utils";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { EndpointNode, NavigationNodeApiLeaf, WebSocketNode } from "@fern-api/fdr-sdk/navigation";
 import { isNonNullish } from "@fern-api/ui-core-utils";
 import { cn } from "@fern-docs/components/cn";
 import { FernButton } from "@fern-docs/components/FernButton";
@@ -24,7 +24,7 @@ export interface PlaygroundEndpointSelectorContentProps {
     replace?: boolean;
 }
 
-function matchesEndpoint(query: string, group: ApiGroup, endpoint: FernNavigation.NavigationNodeApiLeaf): boolean {
+function matchesEndpoint(query: string, group: ApiGroup, endpoint: NavigationNodeApiLeaf): boolean {
     return (
         group.breadcrumb.some((breadcrumb) => breadcrumb.toLowerCase().includes(query.toLowerCase())) ||
         endpoint.title?.toLowerCase().includes(query.toLowerCase()) ||
@@ -48,7 +48,7 @@ export const PlaygroundEndpointSelectorContent = forwardRef<HTMLDivElement, Play
         function renderApiDefinitionPackage(apiGroup: ApiGroup) {
             const apiLeafNodes = apiGroup.items
                 .filter(
-                    (node): node is FernNavigation.EndpointNode | FernNavigation.WebSocketNode =>
+                    (node): node is EndpointNode | WebSocketNode =>
                         node.type === "endpoint" || node.type === "webSocket"
                 )
                 .filter((node) => matchesEndpoint(filterValue, apiGroup, node));

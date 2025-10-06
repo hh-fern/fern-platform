@@ -1,4 +1,4 @@
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { ExampleEndpointCall } from "@fern-api/fdr-sdk/api-definition";
 import titleCase from "@fern-api/ui-core-utils/titleCase";
 
 export interface CodeExample {
@@ -12,7 +12,7 @@ export interface CodeExample {
     // hast: Root;
     install: string | null | undefined;
     // TODO: it's a bit excessive to include the full example call here. this should be refactored to include just the relevant properties
-    exampleCall: ApiDefinition.ExampleEndpointCall;
+    exampleCall: ExampleEndpointCall;
     globalError?: boolean;
 }
 

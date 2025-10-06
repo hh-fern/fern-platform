@@ -1,6 +1,6 @@
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { EndpointDefinition, TypeDefinition } from "@fern-api/fdr-sdk/api-definition";
+import type { TypeId } from "@fern-api/fdr-sdk/navigation";
 import { useCurrentSlug } from "@fern-docs/components/hooks/use-current-pathname";
-
 import { EndpointRequestSection } from "@/components/api-reference/endpoints/EndpointRequestSection";
 import { EndpointResponseSection } from "@/components/api-reference/endpoints/EndpointResponseSection";
 import { EndpointSection } from "@/components/api-reference/endpoints/EndpointSection";
@@ -25,11 +25,11 @@ type EndpointSchemaSnippetProps = {
     /**
      * @internal the rehype-endpoint-schema-snippets plugin will set this
      */
-    endpointDefinition?: ApiDefinition.EndpointDefinition;
+    endpointDefinition?: EndpointDefinition;
     /**
      * @internal the rehype-endpoint-schema-snippets plugin will set this
      */
-    types?: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    types?: Record<TypeId, TypeDefinition>;
     className?: string;
 };
 

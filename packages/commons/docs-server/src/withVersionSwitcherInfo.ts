@@ -1,4 +1,13 @@
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import {
+    hasMetadata,
+    hasRedirect,
+    isPage,
+    type NavigationNode,
+    type NavigationNodeWithMetadata,
+    slugjoin,
+    utils,
+    type VersionNode
+} from "@fern-api/fdr-sdk/navigation";
 import { isNonNullish } from "@fern-api/ui-core-utils";
 import type { VersionSwitcherInfo } from "@fern-platform/fdr-utils";
 
@@ -6,23 +15,23 @@ interface WithVersionSwitcherInfoArgs {
     /**
      * The current node to mutate the version switcher info for.
      */
-    node: FernNavigation.NavigationNodeWithMetadata;
+    node: NavigationNodeWithMetadata;
 
     /**
      * The parents of the current node, in descending order.
      */
-    parents: readonly FernNavigation.NavigationNode[];
+    parents: readonly NavigationNode[];
 
     /**
      * All available versions to be rendered in the version switcher.
      */
-    versions: readonly FernNavigation.VersionNode[];
+    versions: readonly VersionNode[];
 
     /**
      * A map of slugs to nodes for ALL nodes in the tree.
      * This is used to check if a node exists in a different version.s
      */
-    slugMap: Map<string, FernNavigation.NavigationNodeWithMetadata>;
+    slugMap: Map<string, NavigationNodeWithMetadata>;
 }
 
 /**
@@ -56,9 +65,9 @@ export function withVersionSwitcherInfo({
         currentVersion == null
             ? []
             : nodes
-                  .filter(FernNavigation.hasMetadata)
+                  .filter(hasMetadata)
                   .map((node) => node.slug)
-                  .map((slug) => FernNavigation.utils.toUnversionedSlug(slug, currentVersion.slug));
+                  .map((slug) => utils.toUnversionedSlug(slug, currentVersion.slug));
 
     return versions
         .filter((version) => !version.hidden)
@@ -81,7 +90,7 @@ export function withVersionSwitcherInfo({
                 } satisfies VersionSwitcherInfo;
             }
 
-            const expectedSlugs = unversionedSlugs.map((slug) => FernNavigation.slugjoin(version.slug, slug));
+            const expectedSlugs = unversionedSlugs.map((slug) => slugjoin(version.slug, slug));
 
             const expectedSlug = expectedSlugs
                 .map((slug) => {
@@ -94,12 +103,12 @@ export function withVersionSwitcherInfo({
 
                     // if the node is a visitable page, return the slug
                     // for the default version, use the canonical slugs, if available
-                    else if (FernNavigation.isPage(node)) {
+                    else if (isPage(node)) {
                         return isDefault ? (node.canonicalSlug ?? node.slug) : node.slug;
                     }
 
                     // if the node is a redirect, return the slug it points to (which can be undefined)
-                    else if (FernNavigation.hasRedirect(node)) {
+                    else if (hasRedirect(node)) {
                         return node.pointsTo;
                     }
 
@@ -134,11 +143,11 @@ export function withVersionSwitcherInfo({
  */
 export function getNodesUnderCurrentVersionAscending<
     NODE extends {
-        type: FernNavigation.NavigationNode["type"];
-    } = FernNavigation.NavigationNode,
+        type: NavigationNode["type"];
+    } = NavigationNode,
     VERSION_NODE extends {
-        type: FernNavigation.VersionNode["type"];
-    } = FernNavigation.VersionNode
+        type: VersionNode["type"];
+    } = VersionNode
 >(
     node: NODE,
 

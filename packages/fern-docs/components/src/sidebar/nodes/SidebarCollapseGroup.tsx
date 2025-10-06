@@ -1,6 +1,6 @@
 "use client";
 
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { ApiPackageNode, ApiReferenceNode, SectionNode } from "@fern-api/fdr-sdk/navigation";
 import type React from "react";
 import type { ReactNode } from "react";
 
@@ -16,7 +16,7 @@ export function SidebarCollapseGroup({
     className,
     children
 }: {
-    node: FernNavigation.ApiReferenceNode | FernNavigation.ApiPackageNode | FernNavigation.SectionNode;
+    node: ApiReferenceNode | ApiPackageNode | SectionNode;
     icon: React.ReactNode;
     depth: number;
     className?: string;

@@ -1,4 +1,4 @@
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NodeId, PageId, PageNode, SidebarRootNode, Slug } from "@fern-api/fdr-sdk/navigation";
 import { createNavigationMemoryStorage } from "@fern-docs/components/navigation/NavigationStorage";
 import { NavigationStore } from "@fern-docs/components/navigation/NavigationStore";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -20,12 +20,12 @@ const createTestPageData = (title = "Test") => ({
     frontmatter: { title, slug: title.toLowerCase().replace(" ", "-") }
 });
 
-const createTestNode = (id: string, title: string): FernNavigation.PageNode => ({
-    id: id as FernNavigation.NodeId,
+const createTestNode = (id: string, title: string): PageNode => ({
+    id: id as NodeId,
     type: "page" as const,
     title,
-    slug: title.toLowerCase().replace(" ", "-") as FernNavigation.Slug,
-    pageId: id as FernNavigation.PageId,
+    slug: title.toLowerCase().replace(" ", "-") as Slug,
+    pageId: id as PageId,
     availability: undefined,
     canonicalSlug: undefined,
     icon: undefined,
@@ -37,15 +37,15 @@ const createTestNode = (id: string, title: string): FernNavigation.PageNode => (
     noindex: undefined
 });
 
-const createMockSidebar = (): FernNavigation.SidebarRootNode => ({
-    id: "root" as FernNavigation.NodeId,
+const createMockSidebar = (): SidebarRootNode => ({
+    id: "root" as NodeId,
     type: "sidebarRoot" as const,
     children: [
         {
-            id: "intro-section" as FernNavigation.NodeId,
+            id: "intro-section" as NodeId,
             type: "section" as const,
             title: "Introduction",
-            slug: "introduction" as FernNavigation.Slug,
+            slug: "introduction" as Slug,
             children: [],
             availability: undefined,
             collapsed: undefined,
@@ -193,7 +193,7 @@ describe("PagesStore", () => {
 
         it("should handle create/update/delete page sequence", () => {
             const mockSidebar = createMockSidebar();
-            const parentId = "intro-section" as FernNavigation.NodeId;
+            const parentId = "intro-section" as NodeId;
 
             // Create pages A, B, C
             const pages = ["A", "B", "C"].map((letter) => {
@@ -238,7 +238,7 @@ describe("PagesStore", () => {
             const pageData = createTestPageData("Persistent Page");
             const pageNode = createTestNode("persistent", "Persistent Page");
 
-            navigationStore.createPage("section" as FernNavigation.NodeId, pageNode, undefined, pageData, "persistent");
+            navigationStore.createPage("section" as NodeId, pageNode, undefined, pageData, "persistent");
             pagesStore.initializePage("persistent.mdx", pageNode.id, pageData.html, pageData.frontmatter, undefined);
             pagesStore.updatePage("persistent.mdx", pageData);
 
@@ -256,7 +256,7 @@ describe("PagesStore", () => {
             const pageNode = createTestNode("new-page", "New Page");
 
             pagesStore.createPage(
-                (mockSidebar.children[0]?.id ?? "intro-section") as FernNavigation.NodeId,
+                (mockSidebar.children[0]?.id ?? "intro-section") as NodeId,
                 pageNode,
                 mockSidebar,
                 pageData,

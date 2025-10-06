@@ -1,7 +1,23 @@
 import { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { track } from "@fern-api/docs-server/analytics/posthog";
 import { addLeadingSlash, COOKIE_FERN_TOKEN, isLikelyBrowser, slugToHref } from "@fern-api/docs-utils";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import {
+    type ApiDefinitionId,
+    type EndpointId,
+    getPageId,
+    hasMarkdown,
+    hasMetadata,
+    isApiLeaf,
+    isPage,
+    type LandingPageNode,
+    type NavigationNodePage,
+    type NavigationNodeWithMetadata,
+    type PageId,
+    type Slug,
+    traverseDF,
+    type WebhookId,
+    type WebSocketId
+} from "@fern-api/fdr-sdk/navigation";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
@@ -104,19 +120,19 @@ async function getLlmsTxt(
     }
 
     const pageInfos: {
-        pageId: FernNavigation.PageId;
-        slug: FernNavigation.Slug;
+        pageId: PageId;
+        slug: Slug;
         nodeTitle: string;
     }[] = [];
 
     const endpointPageInfos: {
-        slug: FernNavigation.Slug;
+        slug: Slug;
         breadcrumb: string[];
         nodeTitle: string;
-        apiDefinitionId: FernNavigation.ApiDefinitionId;
-        endpointId: FernNavigation.EndpointId | undefined;
-        webhookId: FernNavigation.WebhookId | undefined;
-        websocketId: FernNavigation.WebSocketId | undefined;
+        apiDefinitionId: ApiDefinitionId;
+        endpointId: EndpointId | undefined;
+        webhookId: WebhookId | undefined;
+        websocketId: WebSocketId | undefined;
     }[] = [];
 
     const landingPage = getLandingPage(root);
@@ -124,7 +140,7 @@ async function getLlmsTxt(
 
     // traverse the tree in a depth-first manner to collect all the nodes that have markdown content
     // in the order that they appear in the sidebar
-    FernNavigation.traverseDF(root, (node, parents) => {
+    traverseDF(root, (node, parents) => {
         // don't include the landing page in the list
         if (landingPage != null && node.id === landingPage.id) {
             return CONTINUE;
@@ -132,20 +148,20 @@ async function getLlmsTxt(
 
         // if the node is hidden or authed, don't include it in the list
         // TODO: include "hidden" nodes in `llms-full.txt`
-        if (FernNavigation.hasMetadata(node)) {
+        if (hasMetadata(node)) {
             if (node.hidden || node.authed) {
                 return SKIP;
             }
         }
 
-        if (FernNavigation.hasMarkdown(node)) {
+        if (hasMarkdown(node)) {
             // if the node is noindexed, don't include it in the list
             // TODO: include "noindexed" nodes in `llms-full.txt`
             if (node.noindex) {
                 return SKIP;
             }
 
-            const pageId = FernNavigation.getPageId(node);
+            const pageId = getPageId(node);
             if (pageId != null) {
                 pageInfos.push({
                     pageId,
@@ -155,7 +171,7 @@ async function getLlmsTxt(
             }
         }
 
-        if (FernNavigation.isApiLeaf(node)) {
+        if (isApiLeaf(node)) {
             endpointPageInfos.push({
                 slug: node.canonicalSlug ?? node.slug,
                 nodeTitle: node.title,
@@ -165,7 +181,7 @@ async function getLlmsTxt(
                 websocketId: node.type === "webSocket" ? node.webSocketId : undefined,
                 breadcrumb: parents
                     .slice(parents.findLastIndex((p) => p.type === "apiReference"))
-                    .map((p) => (FernNavigation.hasMetadata(p) ? p.title : undefined))
+                    .map((p) => (hasMetadata(p) ? p.title : undefined))
                     .filter(isNonNullish)
             });
         }
@@ -256,9 +272,7 @@ async function getLlmsTxt(
     };
 }
 
-function getLandingPage(
-    root: FernNavigation.NavigationNodeWithMetadata
-): FernNavigation.LandingPageNode | FernNavigation.NavigationNodePage | undefined {
+function getLandingPage(root: NavigationNodeWithMetadata): LandingPageNode | NavigationNodePage | undefined {
     if (root.type === "version") {
         return root.landingPage;
     } else if (root.type === "root") {
@@ -270,7 +284,7 @@ function getLandingPage(
         }
     }
 
-    if (FernNavigation.isPage(root)) {
+    if (isPage(root)) {
         return root;
     }
 

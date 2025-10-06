@@ -1,4 +1,4 @@
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NavigationNodeApiLeaf } from "@fern-api/fdr-sdk/navigation";
 import type { ReactNode } from "react";
 
 import { cn } from "../../cn";
@@ -11,7 +11,7 @@ export function SidebarApiLeafNode({
     depth,
     shallow
 }: {
-    node: FernNavigation.NavigationNodeApiLeaf;
+    node: NavigationNodeApiLeaf;
     depth: number;
     shallow: boolean;
 }): ReactNode {

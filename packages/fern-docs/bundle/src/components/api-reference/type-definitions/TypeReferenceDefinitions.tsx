@@ -1,4 +1,10 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type ObjectProperty,
+    type TypeDefinition,
+    type TypeId,
+    type TypeShapeOrReference,
+    unwrapReference
+} from "@fern-api/fdr-sdk/api-definition";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import React from "react";
 import { UnreachableCaseError } from "ts-essentials";
@@ -8,11 +14,8 @@ import { TypeDefinitionPathPart } from "./TypeDefinitionContext";
 import { TypeDefinitionSlot } from "./TypeDefinitionSlotsClient";
 
 // HACHACK: this is a hack to render inlined enums above the description
-export function hasInlineEnum(
-    shape: ApiDefinition.TypeShapeOrReference,
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>
-): boolean {
-    const unwrapped = ApiDefinition.unwrapReference(shape, types);
+export function hasInlineEnum(shape: TypeShapeOrReference, types: Record<TypeId, TypeDefinition>): boolean {
+    const unwrapped = unwrapReference(shape, types);
     return visitDiscriminatedUnion(unwrapped.shape)._visit<boolean>({
         object: () => false,
         enum: (value) => value.values.length < 6,
@@ -28,11 +31,8 @@ export function hasInlineEnum(
     });
 }
 
-export function hasInternalTypeReference(
-    shape: ApiDefinition.TypeShapeOrReference,
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>
-): boolean {
-    const unwrapped = ApiDefinition.unwrapReference(shape, types);
+export function hasInternalTypeReference(shape: TypeShapeOrReference, types: Record<TypeId, TypeDefinition>): boolean {
+    const unwrapped = unwrapReference(shape, types);
     return visitDiscriminatedUnion(unwrapped.shape)._visit<boolean>({
         object: () => true,
         enum: () => true,
@@ -56,10 +56,10 @@ export const TypeReferenceDefinitions = React.memo(function TypeReferenceDefinit
     location,
     additionalProperties
 }: {
-    shape: ApiDefinition.TypeShapeOrReference;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    shape: TypeShapeOrReference;
+    types: Record<TypeId, TypeDefinition>;
     location?: PropertyLocation;
-    additionalProperties?: ApiDefinition.ObjectProperty[];
+    additionalProperties?: ObjectProperty[];
 }) {
     switch (shape.type) {
         case "id":

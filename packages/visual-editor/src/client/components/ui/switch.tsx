@@ -2,7 +2,7 @@
 
 import { cn } from "@fern-docs/components/cn";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
-import type * as React from "react";
+import type React from "react";
 
 function Switch({
     className,

@@ -1,8 +1,8 @@
 import type { FileData } from "@fern-api/docs-utils/types/file-data";
-import { FernNavigation } from "@fern-api/fdr-sdk";
+import { FileId } from "@fern-api/fdr-sdk/navigation";
 
 export class DashboardFileResolver {
-    private filePathToFileIdMap: Record<string, FernNavigation.FileId> = {};
+    private filePathToFileIdMap: Record<string, FileId> = {};
     private files: Record<string, FileData> = {};
 
     constructor(files: Record<string, FileData>) {
@@ -12,7 +12,7 @@ export class DashboardFileResolver {
         // Preload all files when the resolver is created
         for (const [fileId, file] of Object.entries(files)) {
             const path = this._extractPathAfterDate(file.src) || file.src;
-            this.filePathToFileIdMap[path] = FernNavigation.FileId(fileId);
+            this.filePathToFileIdMap[path] = FileId(fileId);
         }
     }
 
@@ -27,7 +27,7 @@ export class DashboardFileResolver {
         }
 
         // Fallback logic for edge cases
-        let fileId: FernNavigation.FileId | undefined;
+        let fileId: FileId | undefined;
 
         const trimmedSrc = src.trim().startsWith(".") ? src.replace(".", "") : src;
 
@@ -46,7 +46,7 @@ export class DashboardFileResolver {
 
         if (!fileId) {
             // otherwise, we assume the src is a file id
-            fileId = FernNavigation.FileId(src.startsWith("file:") ? src.slice(5) : src);
+            fileId = FileId(src.startsWith("file:") ? src.slice(5) : src);
         }
 
         const file = this.files[fileId];

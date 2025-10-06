@@ -1,18 +1,25 @@
 import { addLeadingSlash, conformTrailingSlash } from "@fern-api/docs-utils";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import {
+    type NavigationNodeWithMetadata,
+    NodeId,
+    PageId,
+    type PageNode,
+    Slug,
+    slugjoin
+} from "@fern-api/fdr-sdk/navigation";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 
 export function createReplaceHref(
     rootSlug: string,
     versionSlug: string,
-    slugMap: Map<string, FernNavigation.NavigationNodeWithMetadata>,
+    slugMap: Map<string, NavigationNodeWithMetadata>,
     loader: { domain: string }
 ): (href: string) => string | undefined {
     function replaceHref(href: string): string | undefined {
         if (href.startsWith("/")) {
             const url = new URL(href, withDefaultProtocol(loader.domain));
             if (versionSlug != null) {
-                const slugWithVersion = FernNavigation.slugjoin(versionSlug, url.pathname);
+                const slugWithVersion = slugjoin(versionSlug, url.pathname);
                 const found = slugMap.get(slugWithVersion);
                 if (found) {
                     return `${conformTrailingSlash(addLeadingSlash(found.slug))}${url.search}${url.hash}`;
@@ -20,7 +27,7 @@ export function createReplaceHref(
             }
 
             if (rootSlug.length > 0) {
-                const slugWithRoot = FernNavigation.slugjoin(rootSlug, url.pathname);
+                const slugWithRoot = slugjoin(rootSlug, url.pathname);
                 const found = slugMap.get(slugWithRoot);
                 if (found) {
                     return `${conformTrailingSlash(addLeadingSlash(found.slug))}${url.search}${url.hash}`;
@@ -35,38 +42,40 @@ export function createReplaceHref(
 
 describe("rehypeLinks", () => {
     const mockLoader = { domain: "https://example.com" };
-    const mockSlugMap = new Map<string, FernNavigation.NavigationNodeWithMetadata>();
+    const mockSlugMap = new Map<string, NavigationNodeWithMetadata>();
 
-    const pageNode: FernNavigation.PageNode = {
+    const pageNode: PageNode = {
         type: "page",
         title: "Test Page",
-        slug: FernNavigation.Slug("/root/page"),
-        pageId: FernNavigation.PageId("page.mdx"),
-        id: FernNavigation.NodeId("page"),
+        slug: Slug("/root/page"),
+        pageId: PageId("page.mdx"),
+        id: NodeId("page"),
         viewers: [],
         noindex: false,
         featureFlags: [],
-        canonicalSlug: FernNavigation.Slug("/root/v1/page"),
+        canonicalSlug: Slug("/root/v1/page"),
         icon: undefined,
         hidden: undefined,
         authed: undefined,
-        orphaned: undefined
+        orphaned: undefined,
+        availability: undefined
     };
 
-    const versionedPageNode: FernNavigation.PageNode = {
+    const versionedPageNode: PageNode = {
         type: "page",
         title: "Test Page",
-        slug: FernNavigation.Slug("/root/v1/page"),
-        pageId: FernNavigation.PageId("page.mdx"),
-        id: FernNavigation.NodeId("page"),
+        slug: Slug("/root/v1/page"),
+        pageId: PageId("page.mdx"),
+        id: NodeId("page"),
         viewers: [],
         noindex: false,
         featureFlags: [],
-        canonicalSlug: FernNavigation.Slug("/root/v1/page"),
+        canonicalSlug: Slug("/root/v1/page"),
         icon: undefined,
         hidden: undefined,
         authed: undefined,
-        orphaned: undefined
+        orphaned: undefined,
+        availability: undefined
     };
 
     beforeEach(() => {

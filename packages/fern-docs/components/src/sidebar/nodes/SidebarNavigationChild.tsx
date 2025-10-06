@@ -1,4 +1,4 @@
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { ApiPackageChild, NavigationChild } from "@fern-api/fdr-sdk/navigation";
 import type { ReactNode } from "react";
 import { UnreachableCaseError } from "ts-essentials";
 
@@ -12,7 +12,7 @@ import { SidebarPageNode } from "./SidebarPageNode";
 import { SidebarSectionNode } from "./SidebarSectionNode";
 
 interface SidebarNavigationChildProps {
-    node: FernNavigation.NavigationChild;
+    node: NavigationChild;
     depth: number;
     root?: boolean;
 }
@@ -22,7 +22,7 @@ export function SidebarNavigationChild({ node, depth, root }: SidebarNavigationC
         case "apiReference":
             return (
                 <SidebarApiPackageNode node={node} depth={depth} icon={processIcon(node)}>
-                    {node.children.map((node: FernNavigation.ApiPackageChild) => (
+                    {node.children.map((node: ApiPackageChild) => (
                         <SidebarApiPackageChild key={node.id} node={node} depth={depth + 1} shallow={false} />
                     ))}
                 </SidebarApiPackageNode>
@@ -37,7 +37,7 @@ export function SidebarNavigationChild({ node, depth, root }: SidebarNavigationC
                         "!text-body font-semibold": root
                     })}
                 >
-                    {node.children.map((node: FernNavigation.NavigationChild) => (
+                    {node.children.map((node: NavigationChild) => (
                         <SidebarNavigationChild key={node.id} node={node} depth={depth + 1} />
                     ))}
                 </SidebarSectionNode>

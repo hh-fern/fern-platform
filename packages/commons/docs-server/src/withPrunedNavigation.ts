@@ -1,4 +1,13 @@
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import {
+    getChildren,
+    hasMetadata,
+    isLeaf,
+    isPage,
+    type NavigationNode,
+    type NodeId,
+    Pruner,
+    traverseBF
+} from "@fern-api/fdr-sdk/navigation";
 
 import type { DocsLoader } from "./docs-loader";
 import { SKIP } from "./node-navigation";
@@ -7,7 +16,7 @@ interface WithPrunedSidebarOpts {
     /**
      * If provided, hidden nodes in this list will not be pruned
      */
-    visibleNodeIds?: FernNavigation.NodeId[];
+    visibleNodeIds?: NodeId[];
 
     /**
      * If true, authenticated pages will not be pruned
@@ -28,7 +37,7 @@ interface WithPrunedSidebarOpts {
  * @param visibleNodeIds the set of node ids that are visible
  * @returns true if the node is visible, false otherwise
  */
-function isVisible(node: FernNavigation.NavigationNode, visibleNodeIds: Set<FernNavigation.NodeId>): boolean {
+function isVisible(node: NavigationNode, visibleNodeIds: Set<NodeId>): boolean {
     let visible = false;
 
     if (visibleNodeIds.size === 0) {
@@ -39,7 +48,7 @@ function isVisible(node: FernNavigation.NavigationNode, visibleNodeIds: Set<Fern
         visible = true;
     }
 
-    FernNavigation.traverseBF(node, (node) => {
+    traverseBF(node, (node) => {
         if (visibleNodeIds.has(node.id)) {
             visible = true;
             return false;
@@ -55,16 +64,16 @@ function isVisible(node: FernNavigation.NavigationNode, visibleNodeIds: Set<Fern
  * @returns true if the node should be included, false otherwise
  */
 export function pruneNavigationPredicate(
-    node: FernNavigation.NavigationNode,
+    node: NavigationNode,
     { visibleNodeIds, authed, discoverable }: WithPrunedSidebarOpts
 ): boolean {
     // prune authenticated pages (unless the discoverable flag is turned on)
-    if (FernNavigation.isPage(node) && node.authed && !authed && !discoverable) {
+    if (isPage(node) && node.authed && !authed && !discoverable) {
         return false;
     }
 
     // then, prune hidden nodes, unless it is the current node
-    if (FernNavigation.hasMetadata(node) && node.hidden) {
+    if (hasMetadata(node) && node.hidden) {
         if (isVisible(node, new Set(visibleNodeIds))) {
             return true;
         }
@@ -72,14 +81,14 @@ export function pruneNavigationPredicate(
     }
 
     // finally, prune nodes that are not pages and have no children (avoid pruning links)
-    if (!FernNavigation.isPage(node) && !FernNavigation.isLeaf(node)) {
-        return FernNavigation.getChildren(node).length > 0;
+    if (!isPage(node) && !isLeaf(node)) {
+        return getChildren(node).length > 0;
     }
 
     return true;
 }
 
-export function withPrunedNavigation<NODE extends FernNavigation.NavigationNode>(
+export function withPrunedNavigation<NODE extends NavigationNode>(
     node: NODE | undefined,
     opts: WithPrunedSidebarOpts
 ): NODE | undefined {
@@ -87,28 +96,28 @@ export function withPrunedNavigation<NODE extends FernNavigation.NavigationNode>
         return node;
     }
 
-    FernNavigation.traverseBF(node, (node, parents) => {
-        if (opts.visibleNodeIds?.includes(node.id) && FernNavigation.hasMetadata(node) && node.hidden) {
+    traverseBF(node, (node, parents) => {
+        if (opts.visibleNodeIds?.includes(node.id) && hasMetadata(node) && node.hidden) {
             return SKIP;
         }
 
         const parent = parents[parents.length - 1];
 
-        if (parent && FernNavigation.hasMetadata(parent) && parent.hidden && FernNavigation.hasMetadata(node)) {
+        if (parent && hasMetadata(parent) && parent.hidden && hasMetadata(node)) {
             node.hidden = true;
         }
         return true;
     });
 
-    return FernNavigation.Pruner.from(node)
+    return Pruner.from(node)
         .keep((n) => pruneNavigationPredicate(n, opts))
         .get();
 }
 
-export async function withPrunedNavigationLoader<NODE extends FernNavigation.NavigationNode>(
+export async function withPrunedNavigationLoader<NODE extends NavigationNode>(
     node: NODE | undefined,
     loader: DocsLoader,
-    visibleNodeIds: FernNavigation.NodeId[] | undefined
+    visibleNodeIds: NodeId[] | undefined
 ): Promise<NODE | undefined> {
     const returned = withPrunedNavigation(node, {
         visibleNodeIds,

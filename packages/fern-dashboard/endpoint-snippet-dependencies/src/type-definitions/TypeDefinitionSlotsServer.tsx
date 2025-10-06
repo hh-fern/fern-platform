@@ -1,5 +1,5 @@
 // import "server-only";
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { TypeDefinition, TypeShapeOrReference } from "@fern-api/fdr-sdk/api-definition";
 
 import { TypeDefinitionSlotsProvider } from "./TypeDefinitionSlotsClient";
 import {
@@ -9,10 +9,10 @@ import {
 } from "./TypeReferenceDefinitions";
 
 export interface TypeDefinitionSlotsServerProps {
-    types: Record<string, ApiDefinition.TypeDefinition>;
+    types: Record<string, TypeDefinition>;
     children: React.ReactNode;
     TypeShorthand: React.ComponentType<{
-        shape: ApiDefinition.TypeShapeOrReference;
+        shape: TypeShapeOrReference;
     }>;
     PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
     TypeDefinitionAnchor: React.ComponentType<{
@@ -61,7 +61,7 @@ export function TypeDefinitionSlotsServer({
 }
 
 function createTypeDefinitionSlots(
-    types: Record<string, ApiDefinition.TypeDefinition>,
+    types: Record<string, TypeDefinition>,
     componentProps: Omit<TypeReferenceDefinitionsProps, "shape" | "types" | "location" | "additionalProperties">
 ) {
     return Object.fromEntries(
@@ -78,8 +78,8 @@ function createTypeDefinitionSlots(
 
 function createPropertyAccessTypeVariants(
     id: string,
-    type: ApiDefinition.TypeDefinition,
-    types: Record<string, ApiDefinition.TypeDefinition>,
+    type: TypeDefinition,
+    types: Record<string, TypeDefinition>,
     componentProps: Omit<TypeReferenceDefinitionsProps, "shape" | "types" | "location" | "additionalProperties">
 ) {
     return {

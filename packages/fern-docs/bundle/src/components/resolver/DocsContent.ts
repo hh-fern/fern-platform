@@ -1,11 +1,11 @@
 import type { ApiDefinition } from "@fern-api/fdr-sdk/api-definition";
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { PageId, Slug } from "@fern-api/fdr-sdk/navigation";
 import type { TableOfContentsItem } from "@fern-docs/mdx";
 
 export declare namespace DocsContent {
     export interface Neighbor {
-        slug: FernNavigation.Slug;
+        slug: Slug;
         title: string;
         excerpt:
             | string
@@ -24,7 +24,7 @@ export declare namespace DocsContent {
     interface ChangelogPage {
         type: "changelog";
         title: string;
-        pages: Record<FernNavigation.PageId, string | FernDocs.ResolvedMdx>;
+        pages: Record<PageId, string | FernDocs.ResolvedMdx>;
         node: FernNavigation.ChangelogNode;
         breadcrumb: readonly FernNavigation.BreadcrumbItem[];
         slug: FernNavigation.Slug;

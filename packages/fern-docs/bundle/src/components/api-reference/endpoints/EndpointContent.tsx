@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { BreadcrumbItem } from "@fern-api/fdr-sdk/navigation";
 import { AvailabilityBadge } from "@fern-docs/components/badges";
 import type { FernDropdown } from "@fern-docs/components/FernDropdown";
 import { ReferenceLayout } from "@fern-docs/components/layouts/ReferenceLayout";
@@ -40,7 +40,7 @@ export async function EndpointContent({
     showErrors: boolean;
     showAuth: boolean;
     context: EndpointContext;
-    breadcrumb: readonly FernNavigation.BreadcrumbItem[];
+    breadcrumb: readonly BreadcrumbItem[];
     action?: React.ReactNode;
     bottomNavigation?: React.ReactNode;
     hideFeedback: boolean;

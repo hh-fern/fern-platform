@@ -1,6 +1,6 @@
 "use client";
 
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { SidebarRootNode } from "@fern-api/fdr-sdk/navigation";
 import { DashboardTooltip } from "@fern-dashboard/visual-editor/client/components/editor";
 import { useEditingDisabled } from "@fern-dashboard/visual-editor/client/hooks/useEditingDisabled";
 import { useGitPrInfo } from "@fern-dashboard/visual-editor/client/providers";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { CreateClientPage } from "./CreateClientPage";
 
 interface CreatePageButtonProps {
-    root: FernNavigation.SidebarRootNode | undefined;
+    root: SidebarRootNode | undefined;
     navigationContext?: NavigationContext;
 }
 

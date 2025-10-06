@@ -1,7 +1,7 @@
 "use client";
 
 import { WithSeparator } from "@fern-api/endpoint-snippet-dependencies";
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { EndpointDefinition, TypeDefinition, TypeId } from "@fern-api/fdr-sdk/api-definition";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 import { TextInputControl } from "@/client/components/editor/editor-component/controls";
@@ -42,11 +42,11 @@ type EndpointSchemaSnippetProps = {
     /**
      * @internal the rehype-endpoint-schema-snippets plugin will set this
      */
-    endpointDefinition?: ApiDefinition.EndpointDefinition;
+    endpointDefinition?: EndpointDefinition;
     /**
      * @internal the rehype-endpoint-schema-snippets plugin will set this
      */
-    types?: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    types?: Record<TypeId, TypeDefinition>;
     className?: string;
 };
 
@@ -101,9 +101,9 @@ function EndpointSchemaSnippetInternal({
     endpointProp
 }: {
     endpoint?: string;
-    endpointDefinition: ApiDefinition.EndpointDefinition;
+    endpointDefinition: EndpointDefinition;
     selector: string | null;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    types: Record<TypeId, TypeDefinition>;
     className?: string;
     endpointProp?: string;
 }) {

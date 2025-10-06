@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React from "react";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
     variant?: "ghost" | "white" | "gray" | "green" | "default";

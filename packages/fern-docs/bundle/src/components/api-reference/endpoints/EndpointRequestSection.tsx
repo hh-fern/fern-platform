@@ -1,8 +1,13 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
+import {
+    type FormDataField,
+    type HttpRequest,
+    type TypeDefinition,
+    type TypeId,
+    unwrapReference
+} from "@fern-api/fdr-sdk/api-definition";
+import visitDiscriminatedUnion from "@fern-api/ui-core-utils/visitDiscriminatedUnion";
 import { compact } from "es-toolkit/array";
 import type { ReactNode } from "react";
-
 import { renderTypeShorthand } from "../../type-shorthand";
 import { PropertyRenderer, PropertyWithShape } from "../type-definitions/ObjectProperty";
 import { TypeDefinitionAnchorPart } from "../type-definitions/TypeDefinitionContext";
@@ -13,8 +18,8 @@ export function EndpointRequestSection({
     request,
     types
 }: {
-    request: ApiDefinition.HttpRequest;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    request: HttpRequest;
+    types: Record<TypeId, TypeDefinition>;
 }) {
     return visitDiscriminatedUnion(request.body)._visit({
         formData: (formData) => (
@@ -48,7 +53,7 @@ export function EndpointRequestSection({
                                     description={
                                         compact([
                                             property.description,
-                                            ...ApiDefinition.unwrapReference(property.valueShape, types).descriptions
+                                            ...unwrapReference(property.valueShape, types).descriptions
                                         ])[0]
                                     }
                                     shape={property.valueShape}
@@ -69,16 +74,11 @@ export function EndpointRequestSection({
     });
 }
 
-export function createEndpointRequestDescriptionFallback(
-    request: ApiDefinition.HttpRequest,
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>
-) {
+export function createEndpointRequestDescriptionFallback(request: HttpRequest, types: Record<TypeId, TypeDefinition>) {
     return `This endpoint expects ${visitDiscriminatedUnion(request.body)._visit<string>({
         formData: (formData) => {
-            const fileArrays = formData.fields.filter(
-                (p): p is ApiDefinition.FormDataField.Files => p.type === "files"
-            );
-            const files = formData.fields.filter((p): p is ApiDefinition.FormDataField.File_ => p.type === "file");
+            const fileArrays = formData.fields.filter((p): p is FormDataField.Files => p.type === "files");
+            const files = formData.fields.filter((p): p is FormDataField.File_ => p.type === "file");
             return `a multipart form${fileArrays.length > 0 || files.length > 1 ? " with multiple files" : files[0] != null ? ` containing ${files[0].isOptional ? "an optional" : "a"} file` : ""}`;
         },
         bytes: (bytes) => `binary data${bytes.contentType != null ? ` of type ${bytes.contentType}` : ""}`,
@@ -87,9 +87,7 @@ export function createEndpointRequestDescriptionFallback(
     })}.`;
 }
 
-function renderTypeShorthandFormDataField(
-    property: Exclude<ApiDefinition.FormDataField, ApiDefinition.FormDataField.Property>
-): ReactNode {
+function renderTypeShorthandFormDataField(property: Exclude<FormDataField, FormDataField.Property>): ReactNode {
     return (
         <span className="fern-api-property-meta">
             <span>{property.type}</span>

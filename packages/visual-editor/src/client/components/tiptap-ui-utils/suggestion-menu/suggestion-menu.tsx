@@ -7,7 +7,7 @@ import type { Range } from "@tiptap/react";
 // --- Tiptap UI ---
 // --- UI Primitives ---
 import { Suggestion, type SuggestionKeyDownProps, SuggestionPluginKey, type SuggestionProps } from "@tiptap/suggestion";
-import * as React from "react";
+import React from "react";
 
 // --- Hooks ---
 import { useFloatingElement } from "../../../hooks/use-floating-element";

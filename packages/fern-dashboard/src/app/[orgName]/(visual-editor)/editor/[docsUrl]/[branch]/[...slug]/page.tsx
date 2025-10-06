@@ -1,8 +1,7 @@
 import "server-only";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { getPageId, type NodeId, slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { getPageId, type NodeId, slugjoin, utils } from "@fern-api/fdr-sdk/navigation";
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 import { mdxToHtml } from "@fern-docs/mdx";
@@ -50,7 +49,7 @@ export default async function Page({
     const root = await loader.getRoot();
 
     const slug = slugAlias === ROOT_SLUG_ALIAS ? root.slug : slugAlias;
-    const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));
+    const foundNode = utils.findNode(root, slugjoin(slug));
     // Check if client-node-id is passed as search param
     const clientNodeId = resolvedSearchParams["client-node-id"];
     // If the page is not found and client-node-id is not passed, redirect to appropriate page

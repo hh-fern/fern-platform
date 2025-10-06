@@ -1,7 +1,7 @@
 import type { AuthState } from "@fern-api/docs-server/auth/getAuthState";
 import { withPrunedNavigation } from "@fern-api/docs-server/withPrunedNavigation";
 import type { EdgeFlags } from "@fern-api/docs-utils";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { ApiPackageNode, ApiReferenceNode, NodeId, SidebarRootNode } from "@fern-api/fdr-sdk/navigation";
 import type React from "react";
 
 import { SidebarRootChild } from "./SidebarRootChild";
@@ -15,8 +15,8 @@ export function SidebarRootNodeImpl({
     authState,
     edgeFlags
 }: {
-    root: FernNavigation.SidebarRootNode | undefined;
-    visibleNodeIds: FernNavigation.NodeId[] | undefined;
+    root: SidebarRootNode | undefined;
+    visibleNodeIds: NodeId[] | undefined;
     authState: AuthState;
     edgeFlags: EdgeFlags;
 }) {
@@ -35,7 +35,7 @@ export function SidebarRootNodeImpl({
                 return [child];
             }
 
-            const groups: (FernNavigation.ApiReferenceNode | FernNavigation.ApiPackageNode)[] = [];
+            const groups: (ApiReferenceNode | ApiPackageNode)[] = [];
 
             // if the ApiReference is set to `hideTitle=true`, we need to re-group the children
             // such that the root node appears to contain a collection of api references rather than a single one
@@ -48,7 +48,7 @@ export function SidebarRootNodeImpl({
                         lastGroup = {
                             ...child,
                             // Generate a unique ID for the group
-                            id: `${child.id}-${groups.length}` as FernNavigation.NodeId,
+                            id: `${child.id}-${groups.length}` as NodeId,
                             children: [],
                             changelog: undefined
                         };

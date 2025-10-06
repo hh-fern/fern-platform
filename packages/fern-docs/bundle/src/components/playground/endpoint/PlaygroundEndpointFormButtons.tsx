@@ -1,4 +1,4 @@
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { type EndpointNode, utils } from "@fern-api/fdr-sdk/navigation";
 import { FernButton, FernButtonGroup } from "@fern-docs/components/FernButton";
 import { FernLink } from "@fern-docs/components/FernLink";
 import { ArrowUpRight } from "lucide-react";
@@ -7,7 +7,7 @@ const USE_EXAMPLE_TEXT = "Use example";
 const CLEAR_FORM_TEXT = "Clear form";
 
 interface PlaygroundEndpointFormButtonsProps {
-    node: FernNavigation.EndpointNode;
+    node: EndpointNode;
     resetWithExample: () => void;
     resetWithoutExample: () => void;
 }
@@ -17,7 +17,7 @@ export function PlaygroundEndpointFormButtons({
     resetWithExample,
     resetWithoutExample
 }: PlaygroundEndpointFormButtonsProps) {
-    const apiReferenceId = FernNavigation.utils.getApiReferenceId(node);
+    const apiReferenceId = utils.getApiReferenceId(node);
     return (
         <div className="flex items-center justify-between">
             <FernButtonGroup>

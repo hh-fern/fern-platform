@@ -1,4 +1,4 @@
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { type ApiPackageNode, type ApiReferenceNode, hasMarkdown } from "@fern-api/fdr-sdk/navigation";
 import React, { type ReactNode } from "react";
 
 import { SidebarCollapseGroup } from "./SidebarCollapseGroup";
@@ -6,7 +6,7 @@ import { SidebarGroupApiReferenceNode } from "./SidebarGroupApiReferenceNode";
 import { SidebarPageNode } from "./SidebarPageNode";
 
 export interface SidebarApiPackageNodeProps {
-    node: FernNavigation.ApiReferenceNode | FernNavigation.ApiPackageNode;
+    node: ApiReferenceNode | ApiPackageNode;
     icon: React.ReactNode;
     depth: number;
     className?: string;
@@ -20,7 +20,7 @@ export function SidebarApiPackageNode({
     className,
     children
 }: SidebarApiPackageNodeProps): ReactNode {
-    if (React.Children.count(children) === 0 && FernNavigation.hasMarkdown(node)) {
+    if (React.Children.count(children) === 0 && hasMarkdown(node)) {
         return <SidebarPageNode node={node} depth={depth} className={className} shallow={false} icon={icon} />;
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { ExampleEndpointResponse, HttpResponse, TypeDefinition } from "@fern-api/fdr-sdk/api-definition";
 
 import { renderTypeShorthand } from "@/components/type-shorthand";
 
@@ -10,8 +10,8 @@ export function ResponseSummaryFallback({
     response,
     types
 }: {
-    response: ApiDefinition.HttpResponse;
-    types: Record<string, ApiDefinition.TypeDefinition>;
+    response: HttpResponse;
+    types: Record<string, TypeDefinition>;
 }) {
     const { selectedExample } = useEndpointContext();
     const exampleResponseBody = selectedExample?.exampleCall.responseBody;
@@ -30,9 +30,9 @@ function getResponseSummary({
     types,
     isAudioFileDownloadSpanSummary
 }: {
-    response: ApiDefinition.HttpResponse;
-    exampleResponseBody: ApiDefinition.ExampleEndpointResponse | undefined;
-    types: Record<string, ApiDefinition.TypeDefinition>;
+    response: HttpResponse;
+    exampleResponseBody: ExampleEndpointResponse | undefined;
+    types: Record<string, TypeDefinition>;
     isAudioFileDownloadSpanSummary: boolean;
 }) {
     switch (response.body.type) {

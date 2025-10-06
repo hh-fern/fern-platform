@@ -2,7 +2,7 @@ import "server-only";
 
 import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { BreadcrumbItem, PageId } from "@fern-api/fdr-sdk/navigation";
 import { type Availability, AvailabilityBadge } from "@fern-docs/components/badges/availability-badge";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
 import type React from "react";
@@ -30,8 +30,8 @@ export async function LayoutEvaluator({
     loader: DocsLoader;
     serialize: MdxSerializer;
     fallbackTitle: string;
-    pageId: FernNavigation.PageId;
-    breadcrumb: readonly FernNavigation.BreadcrumbItem[];
+    pageId: PageId;
+    breadcrumb: readonly BreadcrumbItem[];
     bottomNavigation?: React.ReactNode;
     slug: string;
     availability?: Availability;

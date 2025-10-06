@@ -1,4 +1,4 @@
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { ApiPackageChild, ChangelogNode } from "@fern-api/fdr-sdk/navigation";
 import type { ReactNode } from "react";
 import { UnreachableCaseError } from "ts-essentials";
 
@@ -11,7 +11,7 @@ import { SidebarLinkNode } from "./SidebarLinkNode";
 import { SidebarPageNode } from "./SidebarPageNode";
 
 interface SidebarApiPackageChild {
-    node: FernNavigation.ApiPackageChild | FernNavigation.ChangelogNode;
+    node: ApiPackageChild | ChangelogNode;
     depth: number;
     shallow: boolean;
 }
@@ -39,7 +39,7 @@ export function SidebarApiPackageChild({ node, depth, shallow }: SidebarApiPacka
             }
             return (
                 <SidebarApiPackageNode node={node} depth={depth} icon={processIcon(node)}>
-                    {node.children.map((node: FernNavigation.ApiPackageChild) => (
+                    {node.children.map((node: ApiPackageChild) => (
                         <SidebarApiPackageChild key={node.id} node={node} depth={depth + 1} shallow={shallow} />
                     ))}
                 </SidebarApiPackageNode>

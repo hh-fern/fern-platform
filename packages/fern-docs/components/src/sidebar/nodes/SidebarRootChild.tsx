@@ -1,4 +1,4 @@
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { ApiPackageNode, SidebarRootChild as SidebarRootChildType } from "@fern-api/fdr-sdk/navigation";
 import { UnreachableCaseError } from "ts-essentials";
 
 import { processIcon } from "../../processIcon";
@@ -6,7 +6,7 @@ import { SidebarGroupNode } from "./SidebarGroupNode";
 import { SidebarRootApiPackageNode } from "./SidebarRootApiPackageNode";
 import { SidebarRootSectionNode } from "./SidebarRootSectionNode";
 
-export function SidebarRootChild({ node }: { node: FernNavigation.SidebarRootChild | FernNavigation.ApiPackageNode }) {
+export function SidebarRootChild({ node }: { node: SidebarRootChildType | ApiPackageNode }) {
     switch (node.type) {
         case "sidebarGroup":
             return <SidebarGroupNode node={node} />;

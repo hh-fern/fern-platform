@@ -31,6 +31,7 @@ let nextConfig: NextConfig = {
     experimental: {
         webpackBuildWorker: true,
         optimizePackageImports: [
+            "@fern-api/fdr-sdk",
             // this will separate the `createLowlight` from the `all` import
             "lowlight"
         ],

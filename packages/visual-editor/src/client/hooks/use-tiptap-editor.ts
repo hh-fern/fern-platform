@@ -2,7 +2,7 @@
 
 import type { Editor } from "@tiptap/react";
 import { useCurrentEditor, useEditorState } from "@tiptap/react";
-import * as React from "react";
+import React from "react";
 
 /**
  * Hook that provides access to a Tiptap editor instance.

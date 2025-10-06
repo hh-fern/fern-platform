@@ -1,18 +1,20 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type ObjectProperty,
+    type TypeDefinition,
+    type TypeShapeOrReference,
+    unwrapReference
+} from "@fern-api/fdr-sdk/api-definition";
+import type { TypeId } from "@fern-api/fdr-sdk/navigation";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import React from "react";
 import { UnreachableCaseError } from "ts-essentials";
-
 import { InternalTypeDefinition } from "./InternalTypeDefinition";
 import { TypeDefinitionPathPart } from "./TypeDefinitionContext";
 import { TypeDefinitionSlot } from "./TypeDefinitionSlotsClient";
 
 // HACHACK: this is a hack to render inlined enums above the description
-export function hasInlineEnum(
-    shape: ApiDefinition.TypeShapeOrReference,
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>
-): boolean {
-    const unwrapped = ApiDefinition.unwrapReference(shape, types);
+export function hasInlineEnum(shape: TypeShapeOrReference, types: Record<TypeId, TypeDefinition>): boolean {
+    const unwrapped = unwrapReference(shape, types);
     return visitDiscriminatedUnion(unwrapped.shape)._visit<boolean>({
         object: () => false,
         enum: (value) => value.values.length < 6,
@@ -28,11 +30,8 @@ export function hasInlineEnum(
     });
 }
 
-export function hasInternalTypeReference(
-    shape: ApiDefinition.TypeShapeOrReference,
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>
-): boolean {
-    const unwrapped = ApiDefinition.unwrapReference(shape, types);
+export function hasInternalTypeReference(shape: TypeShapeOrReference, types: Record<TypeId, TypeDefinition>): boolean {
+    const unwrapped = unwrapReference(shape, types);
     return visitDiscriminatedUnion(unwrapped.shape)._visit<boolean>({
         object: () => true,
         enum: () => true,
@@ -51,12 +50,12 @@ export function hasInternalTypeReference(
 export type PropertyLocation = "request" | "response";
 
 export interface TypeReferenceDefinitionsProps {
-    shape: ApiDefinition.TypeShapeOrReference;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    shape: TypeShapeOrReference;
+    types: Record<TypeId, TypeDefinition>;
     location?: PropertyLocation;
-    additionalProperties?: ApiDefinition.ObjectProperty[];
+    additionalProperties?: ObjectProperty[];
     TypeShorthand: React.ComponentType<{
-        shape: ApiDefinition.TypeShapeOrReference;
+        shape: TypeShapeOrReference;
     }>;
     PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
     TypeDefinitionAnchor: React.ComponentType<{

@@ -37,7 +37,7 @@ import {
 } from "@fern-api/docs-utils";
 import type { FileData } from "@fern-api/docs-utils/types/file-data";
 import { FernAIClient } from "@fern-api/fai-sdk";
-import { type ApiDefinition, type DocsV1Read, type DocsV2Read, FernNavigation } from "@fern-api/fdr-sdk";
+import type { ApiDefinition, DocsV1Read, DocsV2Read } from "@fern-api/fdr-sdk";
 import {
     ApiDefinitionV1ToLatest,
     type AuthScheme,
@@ -48,7 +48,22 @@ import {
     prune,
     type TypeDefinition
 } from "@fern-api/fdr-sdk/api-definition";
-import { ApiDefinitionId, EndpointId, type PageId, type Slug, type TypeId } from "@fern-api/fdr-sdk/navigation";
+import {
+    ApiDefinitionId,
+    EndpointId,
+    type EndpointNode,
+    hasMetadata,
+    migrate,
+    type NavigationNodeApiLeaf,
+    NodeCollector,
+    NodeId,
+    type PageId,
+    type RootNode,
+    type Slug,
+    type TypeId,
+    traverseBF,
+    utils
+} from "@fern-api/fdr-sdk/navigation";
 import { CONTINUE, SKIP } from "@fern-api/fdr-sdk/traversers";
 import { isNonNullish, isPlainObject } from "@fern-api/ui-core-utils";
 import { visualEditorStorage } from "@fern-api/visual-editor-server";
@@ -538,7 +553,7 @@ const getEndpointById = async ({
     cacheConfig: Required<CacheConfig>;
 }): Promise<{
     endpoint: ApiDefinition.EndpointDefinition;
-    nodes: FernNavigation.EndpointNode[];
+    nodes: EndpointNode[];
     globalHeaders: ObjectProperty[];
     authSchemes: AuthScheme[];
     types: Record<TypeId, TypeDefinition>;
@@ -560,11 +575,11 @@ const getEndpointById = async ({
     const root = await unsafe_getFullRoot(domainKey);
     return {
         endpoint,
-        nodes: FernNavigation.NodeCollector.collect(root)
+        nodes: NodeCollector.collect(root)
             .getNodesInOrder()
-            .filter(FernNavigation.hasMetadata)
+            .filter(hasMetadata)
             .filter(
-                (node): node is FernNavigation.EndpointNode =>
+                (node): node is EndpointNode =>
                     node.type === "endpoint" && node.apiDefinitionId === api.id && node.endpointId === endpoint.id
             ),
         globalHeaders: api.globalHeaders ?? [],
@@ -593,9 +608,9 @@ const getEndpointByLocator = async (
         });
         if (endpoint != null) {
             const root = await unsafe_getFullRoot(domainKey);
-            const slugs = FernNavigation.NodeCollector.collect(root)
+            const slugs = NodeCollector.collect(root)
                 .getNodesInOrder()
-                .filter(FernNavigation.hasMetadata)
+                .filter(hasMetadata)
                 .filter(
                     (node) =>
                         node.type === "endpoint" && node.apiDefinitionId === api.id && node.endpointId === endpoint.id
@@ -613,19 +628,15 @@ const getEndpointByLocator = async (
 };
 
 export function convertResponseToRootNode(response: DocsV2Read.LoadDocsForUrlResponse, edgeFlags: EdgeFlags) {
-    let root: FernNavigation.RootNode | undefined;
+    let root: RootNode | undefined;
     if (response.definition.config.root) {
-        root = FernNavigation.migrate.FernNavigationV1ToLatest.create().root(response.definition.config.root);
+        root = migrate.FernNavigationV1ToLatest.create().root(response.definition.config.root);
     } else if (response.definition.config.navigation) {
-        root = FernNavigation.utils.toRootNode(
-            response,
-            edgeFlags.isBatchStreamToggleDisabled,
-            edgeFlags.isApiScrollingDisabled
-        );
+        root = utils.toRootNode(response, edgeFlags.isBatchStreamToggleDisabled, edgeFlags.isApiScrollingDisabled);
     }
 
     if (root && edgeFlags.isApiScrollingDisabled) {
-        FernNavigation.traverseBF(root, (node) => {
+        traverseBF(root, (node) => {
             if (node.type === "apiReference") {
                 node.paginated = true;
                 return CONTINUE;
@@ -639,7 +650,7 @@ export function convertResponseToRootNode(response: DocsV2Read.LoadDocsForUrlRes
 
 const unsafe_getFullRoot = async (domainKey: string) => {
     try {
-        const cached = await kvGet<FernNavigation.RootNode>(domainKey, "root");
+        const cached = await kvGet<RootNode>(domainKey, "root");
         if (cached != null) {
             return cached;
         }
@@ -660,7 +671,7 @@ const unsafe_getRootCached = (cacheConfig: Required<CacheConfig>) =>
         return await unstable_cache(
             async (domainKey: string) => {
                 try {
-                    const cached = await kvGet<FernNavigation.RootNode>(domainKey, "root", cacheConfig.cacheKeySuffix);
+                    const cached = await kvGet<RootNode>(domainKey, "root", cacheConfig.cacheKeySuffix);
                     if (cached != null) {
                         return cached;
                     }
@@ -691,7 +702,7 @@ const getRoot = async (
     if (authConfig) {
         root = pruneWithAuthState(authState, authConfig, root);
     }
-    FernNavigation.utils.mutableUpdatePointsTo(root);
+    utils.mutableUpdatePointsTo(root);
     return root;
 };
 
@@ -708,8 +719,8 @@ const getRootCached = (cacheConfig: Required<CacheConfig>) =>
 const getNavigationNode = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string, id: string, authState: AuthState, authConfig: AuthEdgeConfig | undefined) => {
         const root = await getRootCached(cacheConfig)(domainKey, authState, authConfig);
-        const collector = FernNavigation.NodeCollector.collect(root);
-        const node = collector.get(FernNavigation.NodeId(id));
+        const collector = NodeCollector.collect(root);
+        const node = collector.get(NodeId(id));
         if (node == null) {
             console.error(`Could not find node ${id} for domainKey ${domainKey}`);
             notFound();
@@ -1206,7 +1217,7 @@ export function toPx(
     return config.value * 16;
 }
 
-export function createPruneKey(node: FernNavigation.NavigationNodeApiLeaf): PruningNodeType {
+export function createPruneKey(node: NavigationNodeApiLeaf): PruningNodeType {
     switch (node.type) {
         case "endpoint":
             return {

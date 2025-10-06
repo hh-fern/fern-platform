@@ -1,6 +1,6 @@
 "use client";
 
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { atom, getDefaultStore, useAtomValue } from "jotai";
 import { useHydrateAtoms } from "jotai/utils";
 import { z } from "zod";
@@ -29,7 +29,7 @@ export const useProgrammingLanguageStore = create<LanguageStore>()(
                 set((prev) => {
                     const language = typeof action === "function" ? action(prev.language) : action;
                     return {
-                        language: language ? ApiDefinition.cleanLanguage(language) : null
+                        language: language ? cleanLanguage(language) : null
                     };
                 })
         }),
@@ -44,9 +44,7 @@ export const useProgrammingLanguageStore = create<LanguageStore>()(
                 if (result.success) {
                     return {
                         ...currentState,
-                        language: result.data.language
-                            ? ApiDefinition.cleanLanguage(result.data.language)
-                            : currentState.language
+                        language: result.data.language ? cleanLanguage(result.data.language) : currentState.language
                     };
                 }
                 return currentState;
@@ -57,7 +55,7 @@ export const useProgrammingLanguageStore = create<LanguageStore>()(
 
 export function useProgrammingLanguageValue() {
     const defaultLanguage = useAtomValue(defaultLanguageAtom);
-    return useProgrammingLanguageStore((state) => ApiDefinition.cleanLanguage(state.language ?? defaultLanguage));
+    return useProgrammingLanguageStore((state) => cleanLanguage(state.language ?? defaultLanguage));
 }
 
 export function useSetProgrammingLanguage() {

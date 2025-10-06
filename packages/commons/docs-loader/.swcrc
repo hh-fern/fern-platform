@@ -1,18 +1,17 @@
 {
     "$schema": "https://swc.rs/schema.json",
     "exclude": [".*\\.test\\.tsx?"],
+    "env": {
+        "exclude": ["transform-async-to-generator"]
+    },
     "jsc": {
         "parser": {
             "decorators": true,
             "syntax": "typescript",
-            "tsx": true
+            "tsx": false
         },
         "transform": {
-            "verbatimModuleSyntax": true,
-            "react": {
-                "runtime": "automatic",
-                "importSource": "react"
-            }
+            "verbatimModuleSyntax": true
         }
     },
     "module": {

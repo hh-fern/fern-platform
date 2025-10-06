@@ -1,18 +1,24 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import { AvailabilityBadge } from "@fern-docs/components/badges";
+import {
+    type ObjectProperty as ObjectPropertyType,
+    type TypeDefinition,
+    type TypeShape,
+    type TypeShapeOrReference,
+    unwrapReference
+} from "@fern-api/fdr-sdk/api-definition";
+import type { TypeId } from "@fern-api/fdr-sdk/navigation";
+import { type Availability, AvailabilityBadge } from "@fern-docs/components/badges";
 import { compact } from "es-toolkit/array";
 import React from "react";
-
 import { PropertyKey } from "./PropertyKey";
 import { TypeDefinitionAnchorPart, TypeDefinitionCollapsible } from "./TypeDefinitionContext";
 import { type PropertyLocation, TypeReferenceDefinitions } from "./TypeReferenceDefinitions";
 
 export interface ObjectPropertyProps {
-    property: ApiDefinition.ObjectProperty;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    property: ObjectPropertyType;
+    types: Record<TypeId, TypeDefinition>;
     location?: PropertyLocation;
     TypeShorthand: React.ComponentType<{
-        shape: ApiDefinition.TypeShapeOrReference;
+        shape: TypeShapeOrReference;
     }>;
     PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
     TypeDefinitionAnchor: React.ComponentType<{
@@ -45,7 +51,7 @@ export const ObjectProperty = React.memo(function ObjectProperty({
     Chip,
     ChipSizeProvider
 }: ObjectPropertyProps) {
-    const unwrapped = ApiDefinition.unwrapReference(property.valueShape, types);
+    const unwrapped = unwrapReference(property.valueShape, types);
     const description = compact([property.description, ...unwrapped.descriptions])[0];
 
     return (
@@ -70,13 +76,13 @@ export interface PropertyWithShapeProps {
     icon?: React.ReactNode;
     name?: string;
     description: string | undefined;
-    availability: ApiDefinition.Availability | null | undefined;
-    shape: ApiDefinition.TypeShape;
-    types: Record<string, ApiDefinition.TypeDefinition>;
+    availability: Availability | null | undefined;
+    shape: TypeShape;
+    types: Record<string, TypeDefinition>;
     location?: PropertyLocation;
-    additionalProperties?: ApiDefinition.ObjectProperty[];
+    additionalProperties?: ObjectPropertyType[];
     TypeShorthand: React.ComponentType<{
-        shape: ApiDefinition.TypeShapeOrReference;
+        shape: TypeShapeOrReference;
     }>;
     PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
     TypeDefinitionAnchor: React.ComponentType<{
@@ -144,7 +150,7 @@ export interface PropertyRendererProps {
     name?: string;
     description: string | undefined;
     typeShorthand: React.ReactNode;
-    availability: ApiDefinition.Availability | null | undefined;
+    availability: Availability | null | undefined;
     children?: React.ReactNode;
     PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
     TypeDefinitionAnchor: React.ComponentType<{

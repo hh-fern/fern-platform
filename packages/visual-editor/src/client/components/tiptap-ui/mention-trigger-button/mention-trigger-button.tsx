@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React from "react";
 import { Badge } from "@/client/components/tiptap-ui-primitive/badge";
 import type { ButtonProps } from "@/client/components/tiptap-ui-primitive/button";
 import { Button } from "@/client/components/tiptap-ui-primitive/button";

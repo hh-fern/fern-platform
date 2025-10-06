@@ -2,8 +2,7 @@ import "server-only";
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import { getFallbackProduct } from "@fern-api/docs-server/handle-node-fallbacks";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { slugjoin, utils } from "@fern-api/fdr-sdk/navigation";
 import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { ProductDropdown } from "@fern-docs/components/header/ProductDropdown";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
@@ -33,7 +32,7 @@ export default async function ProductSelectPage({
     ]);
     const useDenseLayout = layout.isHeaderDisabled;
 
-    const foundNode = FernNavigation.utils.findNode(root, slugjoin(slug));
+    const foundNode = utils.findNode(root, slugjoin(slug));
 
     const fallbackProduct = getFallbackProduct(foundNode, root, slug);
     if (fallbackProduct == null) {

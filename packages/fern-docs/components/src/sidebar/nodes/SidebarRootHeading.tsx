@@ -1,18 +1,18 @@
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { hasMarkdown, type NavigationNodeSection } from "@fern-api/fdr-sdk/navigation";
 import type { ReactElement } from "react";
 
 import { cn } from "../../cn";
 import { SidebarPageNode } from "./SidebarPageNode";
 
 interface SidebarRootHeadingProps {
-    node: FernNavigation.NavigationNodeSection;
+    node: NavigationNodeSection;
     icon: React.ReactNode;
     className: string | undefined;
     shallow?: boolean;
 }
 
 export function SidebarRootHeading({ node, icon, className, shallow }: SidebarRootHeadingProps): ReactElement<any> {
-    if (FernNavigation.hasMarkdown(node)) {
+    if (hasMarkdown(node)) {
         return (
             <SidebarPageNode
                 node={node}

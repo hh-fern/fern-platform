@@ -1,9 +1,14 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import {
+    type ObjectProperty as ObjectPropertyType,
+    type TypeDefinition,
+    type TypeShapeOrReference,
+    type UndiscriminatedUnionVariant as UndiscriminatedUnionVariantType,
+    unwrapReference
+} from "@fern-api/fdr-sdk/api-definition";
+import type { Slug, TypeId } from "@fern-api/fdr-sdk/navigation";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import type React from "react";
 import type { ReactElement } from "react";
-
 import { PropertyWithShape } from "./ObjectProperty";
 import type { PropertyLocation } from "./TypeReferenceDefinitions";
 
@@ -13,10 +18,10 @@ type IconInfo = {
 };
 
 function getIconInfoForTypeReference(
-    typeRef: ApiDefinition.TypeShapeOrReference,
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>
+    typeRef: TypeShapeOrReference,
+    types: Record<TypeId, TypeDefinition>
 ): IconInfo | null {
-    return visitDiscriminatedUnion(ApiDefinition.unwrapReference(typeRef, types).shape)._visit<IconInfo | null>({
+    return visitDiscriminatedUnion(unwrapReference(typeRef, types).shape)._visit<IconInfo | null>({
         primitive: (primitive) =>
             visitDiscriminatedUnion(primitive.value, "type")._visit<IconInfo | null>({
                 string: () => ({ content: "abc", size: 6 }),
@@ -47,8 +52,8 @@ function getIconInfoForTypeReference(
 }
 
 function getIconForTypeReference(
-    typeRef: ApiDefinition.TypeShapeOrReference,
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>
+    typeRef: TypeShapeOrReference,
+    types: Record<TypeId, TypeDefinition>
 ): ReactElement<any> | null {
     const info = getIconInfoForTypeReference(typeRef, types);
     if (info == null) {
@@ -67,11 +72,11 @@ function getIconForTypeReference(
 
 export declare namespace UndiscriminatedUnionVariant {
     export interface Props {
-        unionVariant: ApiDefinition.UndiscriminatedUnionVariant;
+        unionVariant: UndiscriminatedUnionVariantType;
         anchorIdParts: readonly string[];
-        slug: FernNavigation.Slug;
+        slug: Slug;
         idx: number;
-        types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+        types: Record<TypeId, TypeDefinition>;
     }
 }
 
@@ -87,13 +92,13 @@ export function UndiscriminatedUnionVariant({
     Chip,
     ChipSizeProvider
 }: {
-    unionVariant: ApiDefinition.UndiscriminatedUnionVariant;
+    unionVariant: UndiscriminatedUnionVariantType;
     idx: number;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    types: Record<TypeId, TypeDefinition>;
     location?: PropertyLocation;
-    additionalProperties?: ApiDefinition.ObjectProperty[];
+    additionalProperties?: ObjectPropertyType[];
     TypeShorthand: React.ComponentType<{
-        shape: ApiDefinition.TypeShapeOrReference;
+        shape: TypeShapeOrReference;
     }>;
     PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
     TypeDefinitionAnchor: React.ComponentType<{

@@ -2,7 +2,7 @@
 
 import type { HttpOrWssOrGrpc } from "@fern-api/docs-utils";
 import type { APIV1Read } from "@fern-api/fdr-sdk";
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import { buildRequestUrl, type EnvironmentId, type PathPart } from "@fern-api/fdr-sdk/api-definition";
 import { sanitizeUrl, visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import { HttpMethodBadge } from "@fern-docs/components/badges";
 import { CopyToClipboardButton } from "@fern-docs/components/CopyToClipboardButton";
@@ -12,15 +12,14 @@ import { useBooleanState, useCopyToClipboard } from "@fern-ui/react-commons";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import React, { type PropsWithChildren, type ReactElement, useMemo, useRef, useState } from "react";
 import { noop } from "ts-essentials";
-
 import { MaybeEnvironmentDropdown } from "../MaybeEnvironmentDropdown";
 
 export declare namespace EndpointUrl {
     export type Props = React.PropsWithChildren<{
-        path: ApiDefinition.PathPart[];
+        path: PathPart[];
         method: HttpOrWssOrGrpc;
         baseUrl?: string;
-        environmentId?: ApiDefinition.EnvironmentId;
+        environmentId?: EnvironmentId;
         options?: APIV1Read.Environment[];
         showEnvironment?: boolean;
         hideCopyButton?: boolean;
@@ -40,7 +39,7 @@ export const EndpointUrl = React.forwardRef<HTMLDivElement, PropsWithChildren<En
     const isEditingEnvironment = useBooleanState(false);
 
     const { copyToClipboard, wasJustCopied } = useCopyToClipboard(
-        ApiDefinition.buildRequestUrl({
+        buildRequestUrl({
             baseUrl,
             path
         })
@@ -160,7 +159,7 @@ export const EndpointUrl = React.forwardRef<HTMLDivElement, PropsWithChildren<En
                         <CopyToClipboardButton
                             className={isHovered ? "visible" : "invisible"}
                             content={() =>
-                                ApiDefinition.buildRequestUrl({
+                                buildRequestUrl({
                                     baseUrl,
                                     path
                                 })

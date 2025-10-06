@@ -1,12 +1,12 @@
 "use client";
 
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NavigationNodeApiLeaf } from "@fern-api/fdr-sdk/navigation";
 import type { FC } from "react";
 
 import { PlaygroundButton } from "./PlaygroundButton";
 
 export const PlaygroundButtonTray: FC<{
-    state: FernNavigation.NavigationNodeApiLeaf;
+    state: NavigationNodeApiLeaf;
     className?: string;
 }> = ({ state, className }) => {
     return (

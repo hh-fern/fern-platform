@@ -1,11 +1,11 @@
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { SidebarGroupNode as SidebarGroupNodeType } from "@fern-api/fdr-sdk/navigation";
 import type { ReactNode } from "react";
 
 import { SidebarClientNavigationChildInjector } from "./SidebarClientNavigationChildInjector";
 import { SidebarNavigationChild } from "./SidebarNavigationChild";
 
 interface SidebarGroupNodeProps {
-    node: FernNavigation.SidebarGroupNode;
+    node: SidebarGroupNodeType;
 }
 
 export function SidebarGroupNode({ node }: SidebarGroupNodeProps): ReactNode {

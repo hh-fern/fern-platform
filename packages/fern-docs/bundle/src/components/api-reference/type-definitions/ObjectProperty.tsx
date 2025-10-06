@@ -1,4 +1,11 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type Availability,
+    type ObjectProperty as ObjectPropertyType,
+    type TypeDefinition,
+    type TypeId,
+    type TypeShape,
+    unwrapReference
+} from "@fern-api/fdr-sdk/api-definition";
 import { AvailabilityBadge } from "@fern-docs/components/badges";
 import { compact } from "es-toolkit/array";
 import React from "react";
@@ -16,11 +23,11 @@ export const ObjectProperty = React.memo(function ObjectProperty({
     types,
     location
 }: {
-    property: ApiDefinition.ObjectProperty;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    property: ObjectPropertyType;
+    types: Record<TypeId, TypeDefinition>;
     location?: PropertyLocation;
 }) {
-    const unwrapped = ApiDefinition.unwrapReference(property.valueShape, types);
+    const unwrapped = unwrapReference(property.valueShape, types);
     const description = compact([property.description, ...unwrapped.descriptions])[0];
 
     return (
@@ -47,11 +54,11 @@ export const PropertyWithShape = React.memo(function PropertyWithShape({
     icon?: React.ReactNode;
     name?: string;
     description: string | undefined;
-    availability: ApiDefinition.Availability | null | undefined;
-    shape: ApiDefinition.TypeShape;
-    types: Record<string, ApiDefinition.TypeDefinition>;
+    availability: Availability | null | undefined;
+    shape: TypeShape;
+    types: Record<string, TypeDefinition>;
     location?: PropertyLocation;
-    additionalProperties?: ApiDefinition.ObjectProperty[];
+    additionalProperties?: ObjectPropertyType[];
 }) {
     return (
         <PropertyRenderer
@@ -82,7 +89,7 @@ export const PropertyRenderer = React.memo(function PropertyRenderer({
     name?: string;
     description: string | undefined;
     typeShorthand: React.ReactNode;
-    availability: ApiDefinition.Availability | null | undefined;
+    availability: Availability | null | undefined;
     children?: React.ReactNode;
 }) {
     const child = (

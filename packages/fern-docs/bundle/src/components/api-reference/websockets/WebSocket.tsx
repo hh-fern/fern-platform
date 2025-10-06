@@ -1,9 +1,16 @@
 import "server-only";
 
-import type { WebSocketContext } from "@fern-api/fdr-sdk/api-definition";
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type TypeDefinition,
+    type TypeId,
+    type TypeShape,
+    type UndiscriminatedUnionVariant,
+    unwrapReference,
+    type WebSocketContext,
+    type WebSocketMessage as WebSocketMessageType
+} from "@fern-api/fdr-sdk/api-definition";
 import { APIV1Read } from "@fern-api/fdr-sdk/client/types";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { BreadcrumbItem } from "@fern-api/fdr-sdk/navigation";
 import { AvailabilityBadge } from "@fern-docs/components/badges";
 import type { FernDropdown } from "@fern-docs/components/FernDropdown";
 import { FernScrollArea } from "@fern-docs/components/FernScrollArea";
@@ -42,7 +49,7 @@ export async function WebSocketContent({
 }: {
     serialize: MdxSerializer;
     context: WebSocketContext;
-    breadcrumb: readonly FernNavigation.BreadcrumbItem[];
+    breadcrumb: readonly BreadcrumbItem[];
     bottomNavigation: React.ReactNode;
     action?: React.ReactNode;
     hideFeedback: boolean;
@@ -58,12 +65,12 @@ export async function WebSocketContent({
         (message) => message.origin === APIV1Read.WebSocketMessageOrigin.Server
     );
 
-    const publishMessageShape: ApiDefinition.TypeShape.UndiscriminatedUnion = {
+    const publishMessageShape: TypeShape.UndiscriminatedUnion = {
         type: "undiscriminatedUnion",
         variants: flattenWebSocketShape(publishMessages, types)
     };
 
-    const subscribeMessageShape: ApiDefinition.TypeShape.UndiscriminatedUnion = {
+    const subscribeMessageShape: TypeShape.UndiscriminatedUnion = {
         type: "undiscriminatedUnion",
         variants: flattenWebSocketShape(subscribeMessages, types)
     };
@@ -129,7 +136,7 @@ export async function WebSocketContent({
             }
             reference={
                 <TypeDefinitionRoot types={types} slug={node.slug}>
-                    <TypeDefinitionSlotsServer types={types} serialize={serialize}>
+                    <TypeDefinitionSlotsServer types={types}>
                         <CardedSection
                             number={1}
                             title={
@@ -165,7 +172,6 @@ export async function WebSocketContent({
                                             <WithSeparator>
                                                 {headers.map((parameter) => (
                                                     <ObjectProperty
-                                                        serialize={serialize}
                                                         key={parameter.key}
                                                         property={parameter}
                                                         types={types}
@@ -181,7 +187,6 @@ export async function WebSocketContent({
                                             <WithSeparator>
                                                 {channel.pathParameters.map((parameter) => (
                                                     <ObjectProperty
-                                                        serialize={serialize}
                                                         key={parameter.key}
                                                         property={parameter}
                                                         types={types}
@@ -198,7 +203,6 @@ export async function WebSocketContent({
                                                 {channel.queryParameters.map((parameter) => {
                                                     return (
                                                         <ObjectProperty
-                                                            serialize={serialize}
                                                             key={parameter.key}
                                                             property={parameter}
                                                             types={types}
@@ -224,11 +228,7 @@ export async function WebSocketContent({
                                         </span>
                                     }
                                 >
-                                    <TypeReferenceDefinitions
-                                        serialize={serialize}
-                                        shape={publishMessageShape}
-                                        types={types}
-                                    />
+                                    <TypeReferenceDefinitions shape={publishMessageShape} types={types} />
                                 </EndpointSection>
                             </TypeDefinitionAnchorPart>
                         )}
@@ -244,11 +244,7 @@ export async function WebSocketContent({
                                         </span>
                                     }
                                 >
-                                    <TypeReferenceDefinitions
-                                        serialize={serialize}
-                                        shape={subscribeMessageShape}
-                                        types={types}
-                                    />
+                                    <TypeReferenceDefinitions shape={subscribeMessageShape} types={types} />
                                 </EndpointSection>
                             </TypeDefinitionAnchorPart>
                         )}
@@ -258,17 +254,14 @@ export async function WebSocketContent({
             footer={<FooterLayout bottomNavigation={bottomNavigation} hideFeedback={hideFeedback} />}
         >
             <PlaygroundKeyboardTrigger />
-            <MdxServerComponentProseSuspense serialize={serialize} mdx={channel.description} />
+            <MdxServerComponentProseSuspense mdx={channel.description} />
         </ReferenceLayout>
     );
 }
 
-function flattenWebSocketShape(
-    subscribeMessages: ApiDefinition.WebSocketMessage[],
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>
-) {
-    return subscribeMessages.flatMap((message): ApiDefinition.UndiscriminatedUnionVariant[] => {
-        const unwrapped = ApiDefinition.unwrapReference(message.body, types);
+function flattenWebSocketShape(subscribeMessages: WebSocketMessageType[], types: Record<TypeId, TypeDefinition>) {
+    return subscribeMessages.flatMap((message): UndiscriminatedUnionVariant[] => {
+        const unwrapped = unwrapReference(message.body, types);
         if (unwrapped.shape.type === "undiscriminatedUnion") {
             return unwrapped.shape.variants;
         }

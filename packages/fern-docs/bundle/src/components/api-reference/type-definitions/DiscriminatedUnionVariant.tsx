@@ -1,8 +1,13 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type DiscriminatedUnionVariant as DiscriminatedUnionVariantType,
+    type PropertyKey,
+    type TypeDefinition,
+    type TypeShape,
+    unwrapDiscriminatedUnionVariant
+} from "@fern-api/fdr-sdk/api-definition";
 import titleCase from "@fern-api/ui-core-utils/titleCase";
 import { compact } from "es-toolkit/array";
 import React from "react";
-
 import { PropertyWithShape } from "./ObjectProperty";
 import { TypeDefinitionPathPart } from "./TypeDefinitionContext";
 import { WithSeparator } from "./TypeDefinitionDetails";
@@ -13,12 +18,12 @@ export function DiscriminatedUnionVariant({
     types,
     location
 }: {
-    discriminant: ApiDefinition.PropertyKey;
-    unionVariant: ApiDefinition.DiscriminatedUnionVariant;
-    types: Record<string, ApiDefinition.TypeDefinition>;
+    discriminant: PropertyKey;
+    unionVariant: DiscriminatedUnionVariantType;
+    types: Record<string, TypeDefinition>;
     location?: "request" | "response";
 }) {
-    const unwrapped = ApiDefinition.unwrapDiscriminatedUnionVariant({ discriminant }, unionVariant, types);
+    const unwrapped = unwrapDiscriminatedUnionVariant({ discriminant }, unionVariant, types);
 
     const description = compact([unionVariant.description, ...unwrapped.descriptions])[0];
 
@@ -34,9 +39,9 @@ export function DiscriminatedUnionVariant({
             if (extendedTypeDefinition?.shape.type !== "undiscriminatedUnion") {
                 return null;
             }
-            return extendedTypeDefinition.shape as ApiDefinition.TypeShape.UndiscriminatedUnion;
+            return extendedTypeDefinition.shape as TypeShape.UndiscriminatedUnion;
         })
-        .filter((shape): shape is ApiDefinition.TypeShape.UndiscriminatedUnion => shape != null);
+        .filter((shape): shape is TypeShape.UndiscriminatedUnion => shape != null);
 
     return (
         <TypeDefinitionPathPart

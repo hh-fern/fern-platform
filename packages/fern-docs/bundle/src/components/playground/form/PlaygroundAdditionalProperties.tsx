@@ -1,8 +1,13 @@
 "use client";
 
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type ObjectProperty,
+    PropertyKey,
+    type TypeDefinition,
+    type TypeId,
+    type TypeReference
+} from "@fern-api/fdr-sdk/api-definition";
 import { cn } from "@fern-docs/components/cn";
-// import { Property, TypeIdKey, TypeId } from "@fern-api/fdr-sdk/navigation";
 import { type ReactElement, useCallback, useMemo } from "react";
 import { noop } from "ts-essentials";
 import { castToRecord } from "../utils";
@@ -58,10 +63,10 @@ const ADDITIONAL_PROPERTIES_DEFAULT_SHAPE = {
 
 interface PlaygroundAdditionalPropertiesProps {
     onChange: (dispatch: unknown) => void;
-    properties: readonly ApiDefinition.ObjectProperty[];
-    extraProperties: ApiDefinition.TypeReference;
+    properties: readonly ObjectProperty[];
+    extraProperties: TypeReference;
     value: unknown;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    types: Record<TypeId, TypeDefinition>;
 }
 
 export function PlaygroundAdditionalProperties({
@@ -110,14 +115,17 @@ export function PlaygroundAdditionalProperties({
         <div className={cn("mt-8 min-w-0 flex-1 shrink")}>
             <WithLabel
                 property={{
-                    key: ApiDefinition.PropertyKey("Optional Extra Properties"),
+                    key: PropertyKey("Optional Extra Properties"),
                     valueShape: ADDITIONAL_PROPERTIES_DEFAULT_SHAPE,
                     description: undefined,
-                    availability: undefined
+                    availability: undefined,
+                    propertyAccess: undefined
                 }}
                 value={"Optional Extra Properties"}
                 onRemove={noop}
                 types={types}
+                onChange={noop}
+                isNullSelected={false}
             >
                 <PlaygroundMapForm
                     id="extraProperties"

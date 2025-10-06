@@ -1,7 +1,7 @@
 "use client";
 
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { type EndpointDefinition, getMessageForStatus } from "@fern-api/fdr-sdk/api-definition";
+import type { EndpointNode } from "@fern-api/fdr-sdk/navigation";
 import { EMPTY_OBJECT, visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import { StatusCodeBadge, statusCodeToIntent } from "@fern-docs/components/badges/status-code-badge";
 import { cn } from "@fern-docs/components/cn";
@@ -25,8 +25,8 @@ import { ErrorExampleSelect } from "./ErrorExampleSelect";
 
 export declare namespace EndpointContentCodeSnippets {
     export interface Props {
-        node: FernNavigation.EndpointNode;
-        endpoint: ApiDefinition.EndpointDefinition;
+        node: EndpointNode;
+        endpoint: EndpointDefinition;
         showErrors: boolean;
         className?: string;
     }
@@ -68,7 +68,7 @@ const UnmemoizedEndpointContentCodeSnippets: React.FC<EndpointContentCodeSnippet
                     }
                     const title =
                         example.exampleCall.name ??
-                        ApiDefinition.getMessageForStatus(example.exampleCall.responseStatusCode, endpoint.method) ??
+                        getMessageForStatus(example.exampleCall.responseStatusCode, endpoint.method) ??
                         "Response";
                     return renderResponseTitle(title, example.exampleCall.responseStatusCode);
                 }
@@ -289,7 +289,7 @@ export function renderResponseTitle(title: string, statusCode: number | string, 
 }
 
 const resolveEnvironmentUrlInCodeSnippet = (
-    endpoint: ApiDefinition.EndpointDefinition,
+    endpoint: EndpointDefinition,
     requestCodeSnippet: string,
     baseUrl: string | undefined
 ): string => {

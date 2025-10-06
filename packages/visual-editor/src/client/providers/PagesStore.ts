@@ -1,5 +1,4 @@
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import type { NodeId } from "@fern-api/fdr-sdk/navigation";
+import type { NodeId, PageNode, SidebarRootNode } from "@fern-api/fdr-sdk/navigation";
 import type { NavigationStore } from "@fern-docs/components/navigation/NavigationStore";
 import type {
     BuildPageDataProps,
@@ -53,7 +52,7 @@ export interface PagesSnapshot {
     allMdxFiles: Record<Filename, string>;
     frontmatterData: Record<Filename, PageMetadata>;
     syncedStatus: Record<Filename, string>;
-    clientNodes: Record<NodeId, FernNavigation.PageNode[]>;
+    clientNodes: Record<NodeId, PageNode[]>;
     version: number;
 }
 
@@ -198,8 +197,8 @@ export class PagesStore {
     /** Create a new page in both stores */
     createPage(
         parentNodeId: NodeId,
-        node: FernNavigation.PageNode,
-        sidebar?: FernNavigation.SidebarRootNode,
+        node: PageNode,
+        sidebar?: SidebarRootNode,
         pageData?: PageData,
         fullSlug?: string,
         navigationContext?: NavigationContext,
@@ -257,7 +256,7 @@ export class PagesStore {
     }
 
     /** Load client navigation nodes */
-    loadClientNodes(): Record<NodeId, FernNavigation.PageNode[]> {
+    loadClientNodes(): Record<NodeId, PageNode[]> {
         return this._navigationStore?.loadClientNodes() || {};
     }
 

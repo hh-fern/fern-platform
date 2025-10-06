@@ -3,7 +3,7 @@
 import type { Node } from "@tiptap/pm/model";
 import type { Editor } from "@tiptap/react";
 import { AtSignIcon } from "lucide-react";
-import * as React from "react";
+import React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 // --- Icons ---

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@fern-docs/components/cn";
-import * as React from "react";
+import React from "react";
 
 export type Orientation = "horizontal" | "vertical";
 

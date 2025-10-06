@@ -1,7 +1,7 @@
 "use client";
 
 import * as SwitchPrimitive from "@radix-ui/react-switch";
-import type * as React from "react";
+import type React from "react";
 
 import { cn } from "@/utils/utils";
 

@@ -1,4 +1,4 @@
-import { formatRelative } from "date-fns";
+import { formatRelative } from "date-fns/formatRelative";
 
 /**
  * changelogs do not have a time component, so we can safely ignore user's timezones

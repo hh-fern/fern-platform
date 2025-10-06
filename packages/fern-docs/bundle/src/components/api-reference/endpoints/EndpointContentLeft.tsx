@@ -1,7 +1,11 @@
 import "server-only";
 
 import type { EndpointContext } from "@fern-api/fdr-sdk/api-definition";
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type ObjectProperty as ObjectPropertyType,
+    PropertyKey,
+    type TypeShape
+} from "@fern-api/fdr-sdk/api-definition";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 
 import { MdxServerComponentProseSuspense } from "@/mdx/components/server-component";
@@ -30,9 +34,9 @@ export async function EndpointContentLeft({
     showAuth: boolean;
     showErrors: boolean;
 }) {
-    let authHeader: ApiDefinition.ObjectProperty | undefined;
+    let authHeader: ObjectPropertyType | undefined;
     if (auth && showAuth) {
-        const stringShape: ApiDefinition.TypeShape = {
+        const stringShape: TypeShape = {
             type: "alias",
             value: {
                 type: "primitive",
@@ -46,10 +50,10 @@ export async function EndpointContentLeft({
                 }
             }
         };
-        authHeader = visitDiscriminatedUnion(auth)._visit<ApiDefinition.ObjectProperty>({
+        authHeader = visitDiscriminatedUnion(auth)._visit<ObjectPropertyType>({
             basicAuth: (basicAuth) => {
                 return {
-                    key: ApiDefinition.PropertyKey("Authorization"),
+                    key: PropertyKey("Authorization"),
                     description:
                         basicAuth.description ?? "Basic authentication of the form `Basic <username:password>`.",
                     hidden: false,
@@ -60,7 +64,7 @@ export async function EndpointContentLeft({
             },
             bearerAuth: (bearerAuth) => {
                 return {
-                    key: ApiDefinition.PropertyKey("Authorization"),
+                    key: PropertyKey("Authorization"),
                     description:
                         bearerAuth.description ??
                         "Bearer authentication of the form `Bearer <token>`, where token is your auth token.",
@@ -72,7 +76,7 @@ export async function EndpointContentLeft({
             },
             header: (value) => {
                 return {
-                    key: ApiDefinition.PropertyKey(value.headerWireValue),
+                    key: PropertyKey(value.headerWireValue),
                     description:
                         (value.description ?? value.prefix != null)
                             ? `Header authentication of the form \`${value.prefix} <token>\``
@@ -88,9 +92,7 @@ export async function EndpointContentLeft({
                     clientCredentials: (clientCredentialsValue) =>
                         visitDiscriminatedUnion(clientCredentialsValue.value, "type")._visit({
                             referencedEndpoint: (oauth) => ({
-                                key: ApiDefinition.PropertyKey(
-                                    clientCredentialsValue.value.headerName || "Authorization"
-                                ),
+                                key: PropertyKey(clientCredentialsValue.value.headerName || "Authorization"),
                                 description:
                                     oauth.description ??
                                     `OAuth authentication of the form \`${clientCredentialsValue.value.tokenPrefix ? `${clientCredentialsValue.value.tokenPrefix ?? "Bearer"} ` : ""}<token>\`.`,

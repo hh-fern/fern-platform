@@ -1,13 +1,22 @@
 "use client";
 
 import type { NodeId } from "@fern-api/fdr-sdk/navigation";
-import { PageEditor } from "@fern-dashboard/visual-editor/client/components/editor/PageEditor";
 import { usePages } from "@fern-dashboard/visual-editor/client/providers/PagesStoreContext";
 import type { MdxToHtmlResponse } from "@fern-docs/mdx";
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useCurrentPage } from "@/providers/CurrentPageContext";
 import PageSubtitle from "./PageSubtitle";
 import PageTitle from "./PageTitle";
+
+const PageEditor = dynamic(
+    () =>
+        import(
+            /* webpackChunkName: "visual-editor-page-editor" */
+            "@fern-dashboard/visual-editor/client/components/editor/PageEditor"
+        ).then((mod) => mod.PageEditor),
+    { ssr: false }
+);
 
 export declare namespace PageContents {
     export interface Props {

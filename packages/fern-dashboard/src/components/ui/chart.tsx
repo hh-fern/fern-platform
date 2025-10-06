@@ -1,9 +1,10 @@
 "use client";
 
-import * as React from "react";
-
-import * as RechartsPrimitive from "recharts";
-
+import React from "react";
+import type { LegendProps } from "recharts";
+import { Legend } from "recharts/types/component/Legend";
+import { ResponsiveContainer } from "recharts/types/component/ResponsiveContainer";
+import { Tooltip } from "recharts/types/component/Tooltip";
 import { cn } from "@/utils/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
@@ -41,7 +42,7 @@ function ChartContainer({
     ...props
 }: React.ComponentProps<"div"> & {
     config: ChartConfig;
-    children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>["children"];
+    children: React.ComponentProps<typeof ResponsiveContainer>["children"];
 }) {
     const uniqueId = React.useId();
     const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
@@ -58,9 +59,9 @@ function ChartContainer({
                 {...props}
             >
                 <ChartStyle id={chartId} config={config} />
-                <RechartsPrimitive.ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%">
                     {children}
-                </RechartsPrimitive.ResponsiveContainer>
+                </ResponsiveContainer>
             </div>
         </ChartContext.Provider>
     );
@@ -95,7 +96,7 @@ ${colorConfig
     );
 };
 
-const ChartTooltip = RechartsPrimitive.Tooltip;
+const ChartTooltip = Tooltip;
 
 function ChartTooltipContent({
     name,
@@ -108,7 +109,7 @@ function ChartTooltipContent({
     labelFormatter,
     labelClassName,
     labelKey
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
+}: React.ComponentProps<typeof Tooltip> &
     React.ComponentProps<"div"> & {
         name: string;
         hideLabel?: boolean;
@@ -164,7 +165,7 @@ function ChartTooltipContent({
     );
 }
 
-const ChartLegend = RechartsPrimitive.Legend;
+const ChartLegend = Legend;
 
 function ChartLegendContent({
     className,
@@ -173,7 +174,7 @@ function ChartLegendContent({
     verticalAlign = "bottom",
     nameKey
 }: React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+    Pick<LegendProps, "payload" | "verticalAlign"> & {
         hideIcon?: boolean;
         nameKey?: string;
     }) {

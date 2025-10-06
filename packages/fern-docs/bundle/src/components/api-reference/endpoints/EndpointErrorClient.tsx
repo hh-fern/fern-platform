@@ -1,6 +1,6 @@
 "use client";
 
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { ErrorResponse } from "@fern-api/fdr-sdk/api-definition";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { AvailabilityBadge, StatusCodeBadge } from "@fern-docs/components/badges";
 import { cn } from "@fern-docs/components/cn";
@@ -15,7 +15,7 @@ export function EndpointErrorClient({
     availability,
     children
 }: {
-    error: ApiDefinition.ErrorResponse;
+    error: ErrorResponse;
     isFirst: boolean;
     isLast: boolean;
     isSelected: boolean;

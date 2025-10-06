@@ -1,7 +1,6 @@
 "use client";
 
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import type { WebSocketContext } from "@fern-api/fdr-sdk/api-definition";
+import type { WebSocketContext, WebSocketMessage } from "@fern-api/fdr-sdk/api-definition";
 import { type Dispatch, type FC, type SetStateAction, useEffect, useRef, useState } from "react";
 
 import type { PlaygroundWebSocketRequestFormState } from "../types";
@@ -13,7 +12,7 @@ interface PlaygroundWebSocketContentProps {
     setFormState: Dispatch<SetStateAction<PlaygroundWebSocketRequestFormState>>;
     startSesssion: () => void;
     clearMessages: () => void;
-    sendMessage: (message: ApiDefinition.WebSocketMessage, data: unknown) => void;
+    sendMessage: (message: WebSocketMessage, data: unknown) => void;
     connected: boolean;
     error: string | null;
     authForm: React.ReactNode;

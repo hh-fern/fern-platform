@@ -1,7 +1,7 @@
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { ChevronRight } from "lucide-react";
-import * as React from "react";
+import React from "react";
 import * as AccordionPrimitive from "./accordion-primitive";
 import { cn } from "./cn";
 import { useFernCollapseOverflow } from "./FernCollapse";

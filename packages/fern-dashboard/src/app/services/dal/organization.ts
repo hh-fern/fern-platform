@@ -1,6 +1,6 @@
 import { FernVenusApi } from "@fern-api/venus-api-sdk";
 import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
-import * as auth0Management from "@fern-dashboard/services/auth/management";
+import { doesOrgExist } from "@fern-dashboard/services/auth/management";
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
@@ -14,7 +14,7 @@ import { getVenusClient } from "../venus/getVenusClient";
  */
 export const assertUserHasOrganizationAccess = cache(
     async ({ token, orgName }: { token: string; orgName: Auth0OrgName }) => {
-        const orgExists = await auth0Management.doesOrgExist(orgName);
+        const orgExists = await doesOrgExist(orgName);
         if (!orgExists) {
             throw throwDigestibleError(new Error("Organization not found"), "ORG_NOT_FOUND");
         }

@@ -1,7 +1,6 @@
 "use client";
 
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import type { WebSocketContext } from "@fern-api/fdr-sdk/api-definition";
+import type { WebSocketContext, WebSocketMessage } from "@fern-api/fdr-sdk/api-definition";
 import titleCase from "@fern-api/ui-core-utils/titleCase";
 import { cn } from "@fern-docs/components/cn";
 import { FernButton } from "@fern-docs/components/FernButton";
@@ -21,7 +20,7 @@ interface PlaygroundWebSocketSessionFormProps {
     formState: PlaygroundWebSocketRequestFormState;
     setFormState: Dispatch<SetStateAction<PlaygroundWebSocketRequestFormState>>;
     scrollAreaHeight: number;
-    sendMessage: (message: ApiDefinition.WebSocketMessage, data: unknown) => void;
+    sendMessage: (message: WebSocketMessage, data: unknown) => void;
     clearMessages: () => void;
     startSession: () => void;
     connected: boolean;
@@ -43,7 +42,7 @@ export const PlaygroundWebSocketSessionForm: FC<PlaygroundWebSocketSessionFormPr
     const { messages } = useWebsocketMessages(context.node.id);
 
     const setMessage = useCallback(
-        (message: ApiDefinition.WebSocketMessage, data: unknown) => {
+        (message: WebSocketMessage, data: unknown) => {
             setFormState((old) => ({
                 ...old,
                 messages: {

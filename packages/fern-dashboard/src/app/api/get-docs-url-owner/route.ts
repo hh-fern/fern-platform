@@ -1,4 +1,4 @@
-import * as auth0Management from "@fern-dashboard/services/auth/management";
+import { doesUserBelongToOrg as doesUserBelongToOrgFromAuth0 } from "@fern-dashboard/services/auth/management";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import type { ResolvedReturnType } from "@/utils/types";
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     let response = await handler({ token, url });
     if (response.orgName != null) {
-        const doesUserBelongToOrg = await auth0Management.doesUserBelongToOrg(userId, response.orgName);
+        const doesUserBelongToOrg = await doesUserBelongToOrgFromAuth0(userId, response.orgName);
         if (!doesUserBelongToOrg) {
             response = { orgName: undefined };
         }

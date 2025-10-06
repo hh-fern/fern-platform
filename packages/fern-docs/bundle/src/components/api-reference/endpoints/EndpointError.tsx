@@ -1,4 +1,10 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type ErrorResponse,
+    type TypeDefinition,
+    type TypeShapeOrReference,
+    unwrapObjectType,
+    unwrapReference
+} from "@fern-api/fdr-sdk/api-definition";
 import type { APIV1Read } from "@fern-api/fdr-sdk/client/types";
 import { visitDiscriminatedUnion } from "@fern-api/ui-core-utils";
 import { Separator } from "@fern-docs/components/Separator";
@@ -13,9 +19,9 @@ export function EndpointError({
     error,
     types
 }: {
-    error: ApiDefinition.ErrorResponse;
+    error: ErrorResponse;
     availability: APIV1Read.Availability | null | undefined;
-    types: Record<string, ApiDefinition.TypeDefinition>;
+    types: Record<string, TypeDefinition>;
 }) {
     if (error.shape == null) {
         return null;
@@ -38,14 +44,11 @@ export function EndpointError({
     );
 }
 
-function shouldHideShape(
-    shape: ApiDefinition.TypeShapeOrReference,
-    types: Record<string, ApiDefinition.TypeDefinition>
-): boolean {
-    return visitDiscriminatedUnion(ApiDefinition.unwrapReference(shape, types).shape)._visit<boolean>({
+function shouldHideShape(shape: TypeShapeOrReference, types: Record<string, TypeDefinition>): boolean {
+    return visitDiscriminatedUnion(unwrapReference(shape, types).shape)._visit<boolean>({
         primitive: () => true,
         literal: () => true,
-        object: (object) => ApiDefinition.unwrapObjectType(object, types).properties.length === 0,
+        object: (object) => unwrapObjectType(object, types).properties.length === 0,
         undiscriminatedUnion: () => false,
         discriminatedUnion: () => false,
         enum: () => false,

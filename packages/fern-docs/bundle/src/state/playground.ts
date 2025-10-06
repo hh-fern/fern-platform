@@ -1,7 +1,7 @@
 "use client";
 
 import type { EndpointContext, WebSocketContext } from "@fern-api/fdr-sdk/api-definition";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NodeId } from "@fern-api/fdr-sdk/navigation";
 import { useDomain } from "@fern-docs/components/state/domain";
 import { fernUserAtom } from "@fern-docs/components/state/fern-user";
 import { atom, useAtomValue, type WritableAtom } from "jotai";
@@ -209,7 +209,7 @@ export const PLAYGROUND_AUTH_STATE_OAUTH_ATOM = atom(
     }
 );
 
-const playgroundFormStateFamily = atomFamily((nodeId: FernNavigation.NodeId) => {
+const playgroundFormStateFamily = atomFamily((nodeId: NodeId) => {
     const formStateAtom = atomWithStorage<PlaygroundRequestFormState | undefined>(nodeId, undefined, undefined, {
         getOnInit: true
     });
@@ -218,7 +218,7 @@ const playgroundFormStateFamily = atomFamily((nodeId: FernNavigation.NodeId) => 
 });
 
 export const usePlaygroundFormStateAtom = (
-    nodeId: FernNavigation.NodeId
+    nodeId: NodeId
 ): WritableAtom<
     PlaygroundRequestFormState | undefined,
     [SetStateAction<PlaygroundRequestFormState | undefined>],

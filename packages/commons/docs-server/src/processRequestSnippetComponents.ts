@@ -1,4 +1,10 @@
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import {
+    type ApiDefinition,
+    type EndpointDefinition,
+    type ExampleEndpointCall,
+    toColonEndpointPathLiteral,
+    toCurlyBraceEndpointPathLiteral
+} from "@fern-api/fdr-sdk/api-definition";
 import urljoin from "url-join";
 
 export function findEndpoint({
@@ -7,11 +13,11 @@ export function findEndpoint({
     path,
     example: exampleName
 }: {
-    apiDefinition: ApiDefinition.ApiDefinition;
+    apiDefinition: ApiDefinition;
     method: string;
     path: string;
     example: string | undefined;
-}): ApiDefinition.EndpointDefinition | undefined {
+}): EndpointDefinition | undefined {
     path = path.startsWith("/") ? path : `/${path}`;
     const matchingEndpoints = Object.values(apiDefinition.endpoints).filter(
         (e) => e.method === method && getMatchablePermutationsForEndpoint(e).has(path)
@@ -27,7 +33,7 @@ export function findEndpoint({
     return matchingEndpoints[0];
 }
 
-function createExampleNamePredicate(exampleName: string): (example: ApiDefinition.ExampleEndpointCall) => boolean {
+function createExampleNamePredicate(exampleName: string): (example: ExampleEndpointCall) => boolean {
     return (example) =>
         example.name === exampleName ||
         Object.values(example.snippets ?? {})
@@ -36,10 +42,10 @@ function createExampleNamePredicate(exampleName: string): (example: ApiDefinitio
 }
 
 export function getMatchablePermutationsForEndpoint(
-    endpoint: Pick<ApiDefinition.EndpointDefinition, "path" | "environments">
+    endpoint: Pick<EndpointDefinition, "path" | "environments">
 ): Set<string> {
-    const path1 = ApiDefinition.toCurlyBraceEndpointPathLiteral(endpoint.path);
-    const path2 = ApiDefinition.toColonEndpointPathLiteral(endpoint.path);
+    const path1 = toCurlyBraceEndpointPathLiteral(endpoint.path);
+    const path2 = toColonEndpointPathLiteral(endpoint.path);
     const possiblePaths = new Set<string>([path1, path2]);
     endpoint.environments?.forEach((env) => {
         const fullUrl1 = urljoin(env.baseUrl, path1);

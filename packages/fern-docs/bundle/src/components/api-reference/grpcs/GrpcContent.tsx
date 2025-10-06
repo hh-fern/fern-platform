@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { GrpcContext } from "@fern-api/fdr-sdk/api-definition";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { BreadcrumbItem } from "@fern-api/fdr-sdk/navigation";
 import { AvailabilityBadge } from "@fern-docs/components/badges";
 import type { FernDropdown } from "@fern-docs/components/FernDropdown";
 import { ReferenceLayout } from "@fern-docs/components/layouts/ReferenceLayout";
@@ -29,7 +29,7 @@ export async function GrpcContent({
 }: {
     serialize: MdxSerializer;
     context: GrpcContext;
-    breadcrumb: readonly FernNavigation.BreadcrumbItem[];
+    breadcrumb: readonly BreadcrumbItem[];
     action?: React.ReactNode;
     bottomNavigation?: React.ReactNode;
     hideFeedback: boolean;

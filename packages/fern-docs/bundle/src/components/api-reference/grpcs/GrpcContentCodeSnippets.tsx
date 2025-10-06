@@ -1,6 +1,6 @@
 "use client";
 
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { GrpcNode } from "@fern-api/fdr-sdk/navigation";
 import { cn } from "@fern-docs/components/cn";
 import { memo } from "react";
 
@@ -9,7 +9,7 @@ import { useGrpcContext } from "./GrpcContext";
 
 export declare namespace GrpcContentCodeSnippets {
     export interface Props {
-        node: FernNavigation.GrpcNode;
+        node: GrpcNode;
         className?: string;
     }
 }

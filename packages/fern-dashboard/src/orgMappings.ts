@@ -1,5 +1,9 @@
 import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
-import * as auth0Management from "@fern-dashboard/services/auth/management";
+import {
+    addUserToOrg,
+    doesUserBelongToOrg,
+    getUserGoogleOauth2EmailInfo
+} from "@fern-dashboard/services/auth/management";
 import { Auth0OrgName, type Auth0UserID } from "@fern-dashboard/services/auth/types";
 import { z } from "zod";
 
@@ -37,7 +41,7 @@ async function processUserOrgMapping(userId: Auth0UserID): Promise<void> {
         return; // Early return if no mappings available
     }
 
-    const { email, isEmailVerified } = await auth0Management.getUserGoogleOauth2EmailInfo(userId);
+    const { email, isEmailVerified } = await getUserGoogleOauth2EmailInfo(userId);
 
     if (!email || !isEmailVerified) {
         return;
@@ -54,14 +58,14 @@ async function processUserOrgMapping(userId: Auth0UserID): Promise<void> {
     const auth0OrgName = Auth0OrgName(orgName);
 
     // Check if user is already a member of the org
-    const userBelongsToOrg = await auth0Management.doesUserBelongToOrg(userId, auth0OrgName);
+    const userBelongsToOrg = await doesUserBelongToOrg(userId, auth0OrgName);
 
     if (userBelongsToOrg) {
         return;
     }
 
     // Add user to the organization
-    await auth0Management.addUserToOrg(userId, auth0OrgName);
+    await addUserToOrg(userId, auth0OrgName);
 }
 
 export async function applyOrgMappings(): Promise<void> {

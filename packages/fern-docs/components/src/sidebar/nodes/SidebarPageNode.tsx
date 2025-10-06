@@ -1,11 +1,11 @@
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NavigationNodeWithMarkdown } from "@fern-api/fdr-sdk/navigation";
 import type { ReactNode } from "react";
 
 import { WithFeatureFlags } from "../../feature-flags/WithFeatureFlags";
 import { SidebarSlugLink } from "../SidebarLink";
 
 export interface SidebarPageNodeProps {
-    node: FernNavigation.NavigationNodeWithMarkdown;
+    node: NavigationNodeWithMarkdown;
     icon: React.ReactNode;
     depth: number;
     className?: string;

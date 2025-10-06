@@ -1,9 +1,8 @@
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { EndpointDefinition } from "@fern-api/fdr-sdk/api-definition";
 import { EMPTY_OBJECT } from "@fern-api/ui-core-utils";
 import { cn } from "@fern-docs/components/cn";
 import { useCurrentVersionSlug } from "@fern-docs/components/state/navigation";
 import type { ReactElement } from "react";
-
 import { ApiReferenceButton } from "@/components/ApiReferenceButton";
 import { CodeExampleClientDropdown } from "@/components/api-reference/endpoints/CodeExampleClientDropdown";
 import { EndpointUrlWithOverflow } from "@/components/api-reference/endpoints/EndpointUrlWithOverflow";
@@ -28,7 +27,7 @@ export function EndpointRequestSnippet({
     /**
      * @internal the rehype-endpoint--examples-snippets plugin will set this
      */
-    endpointDefinition?: ApiDefinition.EndpointDefinition;
+    endpointDefinition?: EndpointDefinition;
     /**
      * @internal the rehype-endpoint-examples-snippets plugin will set this
      */
@@ -55,7 +54,7 @@ function EndpointRequestSnippetInternal({
     slugs,
     className
 }: {
-    endpoint: ApiDefinition.EndpointDefinition;
+    endpoint: EndpointDefinition;
     example: string | undefined;
     slugs: string[];
     className?: string;

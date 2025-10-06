@@ -1,6 +1,5 @@
 import { TypeDefinitionSlotsServer as SharedTypeDefinitionSlotsServer } from "@fern-api/endpoint-snippet-dependencies";
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-
+import type { TypeDefinition } from "@fern-api/fdr-sdk/api-definition";
 import { Chip, ChipSizeProvider } from "@/client/docs/components/Chip";
 import { MdxContent } from "@/client/docs/mdx/components/MdxContent";
 
@@ -18,7 +17,7 @@ export function TypeDefinitionSlotsServer({
     types,
     children
 }: {
-    types: Record<string, ApiDefinition.TypeDefinition>;
+    types: Record<string, TypeDefinition>;
     children: React.ReactNode;
 }) {
     return (

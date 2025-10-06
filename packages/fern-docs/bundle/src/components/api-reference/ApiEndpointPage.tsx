@@ -10,7 +10,7 @@ import {
     createWebSocketContext,
     prune
 } from "@fern-api/fdr-sdk/api-definition";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { BreadcrumbItem, NavigationNodeApiLeaf } from "@fern-api/fdr-sdk/navigation";
 import type { FernDropdown } from "@fern-docs/components/FernDropdown";
 
 import { getMarkdownForPath } from "@/server/getMarkdownForPath";
@@ -32,9 +32,9 @@ export default async function ApiEndpointPage({
 }: {
     loader: DocsLoader;
     serialize: MdxSerializer;
-    node: FernNavigation.NavigationNodeApiLeaf;
+    node: NavigationNodeApiLeaf;
     action?: React.ReactNode;
-    breadcrumb: readonly FernNavigation.BreadcrumbItem[];
+    breadcrumb: readonly BreadcrumbItem[];
     bottomNavigation?: React.ReactNode;
 }) {
     const apiDefinition = await loader.getPrunedApi(node.apiDefinitionId, createPruneKey(node));
@@ -76,10 +76,10 @@ async function ApiEndpointContent({
     markdown
 }: {
     serialize: MdxSerializer;
-    node: FernNavigation.NavigationNodeApiLeaf;
+    node: NavigationNodeApiLeaf;
     action?: React.ReactNode;
     apiDefinition: ApiDefinition;
-    breadcrumb: readonly FernNavigation.BreadcrumbItem[];
+    breadcrumb: readonly BreadcrumbItem[];
     bottomNavigation?: React.ReactNode;
     hideFeedback: boolean;
     pageActionOptions?: FernDropdown.PageActionOption[];

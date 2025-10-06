@@ -1,6 +1,6 @@
 "use client";
 
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NavigationChild } from "@fern-api/fdr-sdk/navigation";
 import type { ReactNode } from "react";
 import { UnreachableCaseError } from "ts-essentials";
 
@@ -8,7 +8,7 @@ import { processIcon } from "../../processIcon";
 import { SidebarClientPageNode } from "./SidebarClientPageNode";
 
 interface SidebarClientNavigationChildProps {
-    node: FernNavigation.NavigationChild;
+    node: NavigationChild;
     depth: number;
     root?: boolean;
 }

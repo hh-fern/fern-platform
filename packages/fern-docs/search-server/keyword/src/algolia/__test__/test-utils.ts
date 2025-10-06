@@ -1,6 +1,6 @@
 import type { DocsV2Read } from "@fern-api/fdr-sdk";
-import * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { type ApiDefinition, ApiDefinitionV1ToLatest } from "@fern-api/fdr-sdk/api-definition";
+import { type RootNode, utils } from "@fern-api/fdr-sdk/navigation";
 import { mapValues } from "es-toolkit/object";
 import fs from "fs";
 import path from "path";
@@ -17,17 +17,17 @@ export function readFixture(fixture: string): [DocsV2Read.LoadDocsForUrlResponse
 }
 
 export function readFixtureToRootNode(fixture: DocsV2Read.LoadDocsForUrlResponse): {
-    root: FernNavigation.RootNode;
-    apis: Record<string, ApiDefinition.ApiDefinition>;
+    root: RootNode;
+    apis: Record<string, ApiDefinition>;
     pages: Record<string, string>;
 } {
-    const root = FernNavigation.utils.toRootNode(fixture);
+    const root = utils.toRootNode(fixture);
     const apis = {
         ...Object.fromEntries(
             Object.values(fixture.definition.apis).map((api) => {
                 return [
                     api.id,
-                    ApiDefinition.ApiDefinitionV1ToLatest.from(api, {
+                    ApiDefinitionV1ToLatest.from(api, {
                         useJavaScriptAsTypeScript: false,
                         alwaysEnableJavaScriptFetch: false,
                         usesApplicationJsonInFormDataValue: false

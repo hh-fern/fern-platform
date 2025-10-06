@@ -1,10 +1,8 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
-import * as React from "react";
-
+import React from "react";
 import { cn } from "@/utils/utils";
-
 import { Button } from "./button";
 
 const PaginationContent = React.forwardRef<HTMLUListElement, React.ComponentProps<"ul">>(

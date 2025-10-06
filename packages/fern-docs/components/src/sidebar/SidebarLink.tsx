@@ -1,7 +1,7 @@
 "use client";
 
 import { slugToHref } from "@fern-api/docs-utils";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NodeId, Slug } from "@fern-api/fdr-sdk/navigation";
 
 import { composeEventHandlers } from "@radix-ui/primitive";
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -20,9 +20,9 @@ import { useScrollSidebarNodeIntoView } from "../hooks/sidebar-scroll";
 import { useIsSelectedSidebarNode } from "../state/navigation";
 
 interface SidebarSlugLinkProps {
-    nodeId: FernNavigation.NodeId;
+    nodeId: NodeId;
     icon?: React.ReactNode;
-    slug?: FernNavigation.Slug;
+    slug?: Slug;
     onClick?: React.MouseEventHandler<HTMLElement>;
     onToggleExpand?: (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => void;
     className?: string;

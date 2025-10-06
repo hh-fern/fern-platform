@@ -1,4 +1,4 @@
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { HttpResponseBodyShape, TypeDefinition, TypeId } from "@fern-api/fdr-sdk/api-definition";
 import React from "react";
 
 import { TypeReferenceDefinitions } from "../type-definitions/TypeReferenceDefinitions";
@@ -7,8 +7,8 @@ export function EndpointResponseSection({
     body,
     types
 }: {
-    body: ApiDefinition.HttpResponseBodyShape;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    body: HttpResponseBodyShape;
+    types: Record<TypeId, TypeDefinition>;
 }) {
     switch (body.type) {
         case "empty":

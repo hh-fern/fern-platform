@@ -1,7 +1,7 @@
 "use client";
 
 import { slugToHref } from "@fern-api/docs-utils";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { Slug } from "@fern-api/fdr-sdk/navigation";
 import React from "react";
 
 import { FernAnchor } from "@/components/FernAnchor";
@@ -19,7 +19,7 @@ export function CardedSection({
     title: React.ReactNode;
     headingElement: React.ReactNode;
     children: React.ReactNode | undefined;
-    slug: FernNavigation.Slug;
+    slug: Slug;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, "title">) {
     const href = `${slugToHref(slug)}#${getSlugFromChildren(title)}`;
     return (

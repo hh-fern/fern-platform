@@ -1,13 +1,18 @@
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type {
+    HttpResponseBodyShape,
+    TypeDefinition,
+    TypeId,
+    TypeShapeOrReference
+} from "@fern-api/fdr-sdk/api-definition";
 import type React from "react";
 
 import { TypeReferenceDefinitions } from "../type-definitions/TypeReferenceDefinitions";
 
 export interface EndpointResponseSectionProps {
-    body: ApiDefinition.HttpResponseBodyShape;
-    types: Record<ApiDefinition.TypeId, ApiDefinition.TypeDefinition>;
+    body: HttpResponseBodyShape;
+    types: Record<TypeId, TypeDefinition>;
     TypeShorthand: React.ComponentType<{
-        shape: ApiDefinition.TypeShapeOrReference;
+        shape: TypeShapeOrReference;
     }>;
     PropertyContainer: React.ComponentType<{ children: React.ReactNode }>;
     TypeDefinitionAnchor: React.ComponentType<{

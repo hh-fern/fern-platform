@@ -1,7 +1,6 @@
 import { createEditableDocsLoader, PrefetchedDocsLoader } from "@fern-api/docs-loader";
 import { getIsSidebarFixed, getIsSingleOverviewPage } from "@fern-api/docs-utils";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { slugjoin } from "@fern-api/fdr-sdk/navigation";
+import { Slug, slugjoin, utils } from "@fern-api/fdr-sdk/navigation";
 import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
 import { getClientPageRedirectTarget } from "@fern-docs/components/navigation/pageUtils";
 import { SidebarClientRootNode } from "@fern-docs/components/sidebar/nodes/SidebarClientRootNode";
@@ -45,17 +44,17 @@ export default async function SidebarPage({
     }).serializable();
 
     const slug = slugjoin(slugArray);
-    let found = FernNavigation.utils.findNode(root, slug);
+    let found = utils.findNode(root, slug);
 
     if (found.type !== "found") {
         // For client pages that don't exist in server navigation, we need to understand
         // the current tab context and use the default page for that tab as the foundNode
         if (found.redirect && clientNodeId) {
             const targetTabSlug = getClientPageRedirectTarget(root, slug, found.redirect);
-            found = FernNavigation.utils.findNode(root, FernNavigation.Slug(targetTabSlug));
+            found = utils.findNode(root, Slug(targetTabSlug));
         } else if (found.redirect) {
             // Regular redirect logic for non-client pages
-            found = FernNavigation.utils.findNode(root, found.redirect);
+            found = utils.findNode(root, found.redirect);
         }
     }
     if (found.type !== "found") {

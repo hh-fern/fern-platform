@@ -1,5 +1,5 @@
 import type { DocsV1Read } from "@fern-api/fdr-sdk";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { Availability, Slug, VersionId } from "@fern-api/fdr-sdk/navigation";
 
 export interface ColorsConfig {
     light: DocsV1Read.ThemeConfig | undefined;
@@ -7,13 +7,13 @@ export interface ColorsConfig {
 }
 
 export interface VersionSwitcherInfo {
-    id: FernNavigation.VersionId;
+    id: VersionId;
     title: string;
-    slug: FernNavigation.Slug;
+    slug: Slug;
     index: number;
-    availability: FernNavigation.Availability | undefined;
-    pointsTo: FernNavigation.Slug | undefined;
-    landingPage: FernNavigation.Slug | undefined;
+    availability: Availability | undefined;
+    pointsTo: Slug | undefined;
+    landingPage: Slug | undefined;
     hidden: boolean | undefined;
     authed: boolean | undefined;
 }
@@ -23,8 +23,8 @@ interface SidebarTabGroup {
     title: string;
     icon: string | undefined;
     index: number;
-    slug: FernNavigation.Slug;
-    pointsTo: FernNavigation.Slug | undefined;
+    slug: Slug;
+    pointsTo: Slug | undefined;
     hidden: boolean | undefined;
     authed: boolean | undefined;
 }
@@ -42,7 +42,7 @@ interface SidebarTabChangelog {
     title: string;
     icon: string | undefined;
     index: number;
-    slug: FernNavigation.Slug;
+    slug: Slug;
     hidden: boolean | undefined;
     authed: boolean | undefined;
 }

@@ -1,4 +1,4 @@
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { hasMarkdown, type SectionNode } from "@fern-api/fdr-sdk/navigation";
 import type { ReactNode } from "react";
 
 import { WithFeatureFlags } from "../../feature-flags/WithFeatureFlags";
@@ -8,14 +8,14 @@ import { SidebarPageNode } from "./SidebarPageNode";
 import { SidebarRootHeading } from "./SidebarRootHeading";
 
 interface SidebarRootSectionNodeProps {
-    node: FernNavigation.SectionNode;
+    node: SectionNode;
     icon: React.ReactNode;
     className?: string;
 }
 
 export function SidebarRootSectionNode({ node, icon, className }: SidebarRootSectionNodeProps): ReactNode {
     // If the node has no children, it is a page node.
-    if (node.children.length === 0 && FernNavigation.hasMarkdown(node)) {
+    if (node.children.length === 0 && hasMarkdown(node)) {
         return <SidebarPageNode node={node} depth={0} className={className} icon={icon} />;
     }
 

@@ -5,8 +5,7 @@ import { isLocal } from "@fern-api/docs-server/isLocal";
 import { COOKIE_FERN_TOKEN, getRedirectForPath, slugToHref } from "@fern-api/docs-utils";
 import type { FileData } from "@fern-api/docs-utils/types/file-data";
 import type { DocsV1Read } from "@fern-api/fdr-sdk/client/types";
-import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
-import { NodeCollector } from "@fern-api/fdr-sdk/navigation";
+import { type ChangelogEntryNode, NodeCollector, slugjoin } from "@fern-api/fdr-sdk/navigation";
 import { assertNever, withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getEdgeFlags } from "@fern-docs/edge-config";
 import { getFrontmatter, mdxToHtml } from "@fern-docs/mdx";
@@ -120,7 +119,7 @@ async function createFeed(host: string, domain: string, path: string, fernToken:
 
     const collector = NodeCollector.collect(root);
 
-    const node = collector.slugMap.get(FernNavigation.slugjoin(path));
+    const node = collector.slugMap.get(slugjoin(path));
 
     if (node?.type !== "changelog") {
         console.error(`[createFeed:${domain}] Node type is unexpected: ${node?.type}`);
@@ -169,7 +168,7 @@ function getFormat(req: NextRequest): Format {
 }
 
 async function toFeedItem(
-    entry: FernNavigation.ChangelogEntryNode,
+    entry: ChangelogEntryNode,
     domain: string,
     getPage: (id: string) => Promise<{ filename: string; markdown: string }>,
     files: Record<string, FileData>

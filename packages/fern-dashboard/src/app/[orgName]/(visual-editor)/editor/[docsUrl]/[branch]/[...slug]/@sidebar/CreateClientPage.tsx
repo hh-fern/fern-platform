@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "@bprogress/next/app";
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { NodeId, PageId, PageNode, SectionNode, SidebarRootNode, Slug } from "@fern-api/fdr-sdk/navigation";
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { useGitHubRepo, useGitPrInfo } from "@fern-dashboard/visual-editor/client/providers";
 import { usePages } from "@fern-dashboard/visual-editor/client/providers/PagesStoreContext";
@@ -21,7 +21,7 @@ import type { EncodedDocsUrl } from "@/utils/types";
 
 interface CreateClientPageProps {
     children: React.ReactNode;
-    root: FernNavigation.SidebarRootNode | undefined;
+    root: SidebarRootNode | undefined;
     disabled?: boolean;
     navigationContext?: NavigationContext;
 }
@@ -193,14 +193,14 @@ export function CreateClientPage({ children, root, disabled = false, navigationC
             });
 
             // Create a client node for the new page
-            const nodeId = `client-${finalSlug}-${Date.now()}` as FernNavigation.NodeId;
-            const pageId = `${fullSlug}.mdx` as FernNavigation.PageId;
+            const nodeId = `client-${finalSlug}-${Date.now()}` as NodeId;
+            const pageId = `${fullSlug}.mdx` as PageId;
 
-            const clientNode: FernNavigation.PageNode = {
+            const clientNode: PageNode = {
                 type: "page",
                 id: nodeId,
                 pageId,
-                slug: slug as FernNavigation.Slug,
+                slug: slug as Slug,
                 title: pageTitle,
                 canonicalSlug: undefined,
                 icon: undefined,
@@ -395,7 +395,7 @@ export function CreateClientPage({ children, root, disabled = false, navigationC
  * @param section - The section node to get the display name for
  * @returns The formatted display name
  */
-function getSectionDisplayName(section: FernNavigation.SectionNode): string {
+function getSectionDisplayName(section: SectionNode): string {
     // Use the title if available, otherwise fall back to a formatted slug
     if (section.title) {
         return section.title;

@@ -1,6 +1,6 @@
 "use client";
 
-import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import type { LinkNode } from "@fern-api/fdr-sdk/navigation";
 
 import { ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
@@ -9,7 +9,7 @@ import { useLocationHref } from "../../hooks/useLocationHref";
 import { SidebarLink } from "../SidebarLink";
 
 interface SidebarLinkNodeProps {
-    node: FernNavigation.LinkNode;
+    node: LinkNode;
     icon: React.ReactNode;
     depth: number;
     className?: string;

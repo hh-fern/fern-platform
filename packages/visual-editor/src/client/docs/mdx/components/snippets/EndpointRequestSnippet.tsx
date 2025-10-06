@@ -1,7 +1,7 @@
 "use client";
 
 import { EndpointUrlWithOverflow } from "@fern-api/endpoint-snippet-dependencies";
-import type * as ApiDefinition from "@fern-api/fdr-sdk/api-definition";
+import type { EndpointDefinition } from "@fern-api/fdr-sdk/api-definition";
 import { FernButton } from "@fern-docs/components/FernButton";
 import { FernDropdown } from "@fern-docs/components/FernDropdown";
 import { FaIcon } from "@fern-docs/components/fa-icon";
@@ -43,7 +43,7 @@ export function EndpointRequestSnippet({
     /**
      * @internal the rehype-endpoint-examples-snippets plugin will set this
      */
-    endpointDefinition?: ApiDefinition.EndpointDefinition;
+    endpointDefinition?: EndpointDefinition;
     /**
      * @internal the rehype-endpoint-examples-snippets plugin will set this
      */
@@ -90,7 +90,7 @@ function EndpointRequestSnippetInternal({
     className,
     endpointProp
 }: {
-    endpoint: ApiDefinition.EndpointDefinition;
+    endpoint: EndpointDefinition;
     example: string | undefined;
     slugs: string[];
     className?: string;
