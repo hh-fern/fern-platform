@@ -1,9 +1,12 @@
 import type { MouseEventHandler } from "react";
+import { useEffect, useState } from "react";
 
 import { useCurrentEditor } from "@tiptap/react";
 import { BubbleMenu as EditorBubbleMenu } from "@tiptap/react/menus";
 
 import { Icon } from "@/components/icon/Icon";
+
+import { LinkPopover } from "./LinkPopover";
 
 type BubbleMenuAction =
     | "setNodeType"
@@ -18,6 +21,20 @@ type BubbleMenuAction =
 
 export default function BubbleMenu() {
     const { editor } = useCurrentEditor();
+    const [showLinkPopover, setShowLinkPopover] = useState(false);
+
+    // Listen for Command+K keyboard shortcut
+    useEffect(() => {
+        const handleOpenLinkPopover = () => {
+            setShowLinkPopover(true);
+        };
+
+        window.addEventListener("tiptap:openLinkPopover", handleOpenLinkPopover);
+
+        return () => {
+            window.removeEventListener("tiptap:openLinkPopover", handleOpenLinkPopover);
+        };
+    }, []);
 
     function menuItemClickHandler(action: BubbleMenuAction) {
         return () => {
@@ -41,8 +58,7 @@ export default function BubbleMenu() {
                     editor.chain().focus().toggleStrike().run();
                     break;
                 case "setLink":
-                    // TODO: This should open an additional popover to edit the link
-                    editor.chain().focus().setLink({ href: "https://www.google.com" }).run();
+                    setShowLinkPopover(true);
                     break;
                 case "toggleCode":
                     editor.chain().focus().toggleCode().run();
@@ -57,54 +73,65 @@ export default function BubbleMenu() {
         };
     }
 
-    return (
-        <EditorBubbleMenu
-            options={{ placement: "top-start" }}
-            shouldShow={({ editor: { isFocused }, state: { selection } }) => {
-                // Don't show the bubble menu if the selection is an image or image upload
-                if (
-                    // @ts-expect-error - type issue with tiptap
-                    selection?.node?.type?.name === "custom-element-v2" ||
-                    // @ts-expect-error - type issue with tiptap
-                    selection?.node?.type?.name === "mediaUpload"
-                ) {
-                    return false;
-                }
+    if (!editor) {
+        return null;
+    }
 
-                // Check if we have an active selection
-                return isFocused && !selection.empty;
-            }}
-        >
-            <div className="border-1 rounded-2 text-gray-1100 flex items-center gap-px border-gray-500 bg-white p-1 shadow-sm">
-                <BubbleMenuItem iconProps={{ variant: "Heading1" }} onClick={menuItemClickHandler("setNodeType")} />
-                <BubbleMenuSeparator />
-                <BubbleMenuItem iconProps={{ variant: "Bold" }} onClick={menuItemClickHandler("toggleBold")} />
-                <BubbleMenuItem iconProps={{ variant: "Italic" }} onClick={menuItemClickHandler("toggleItalic")} />
-                <BubbleMenuItem
-                    iconProps={{ variant: "Underline" }}
-                    onClick={menuItemClickHandler("toggleUnderline")}
-                />
-                {/* 
-        TODO: Add strikethrough
-        <BubbleMenuItem
-          iconProps={{ variant: "Strikethrough" }}
-          onClick={menuItemClickHandler("toggleStrike")}
-        /> */}
-                {/*
-        TODO: Add link
-         <BubbleMenuItem
-          iconProps={{ variant: "Link" }}
-          onClick={menuItemClickHandler("setLink")}
-        /> */}
-                <BubbleMenuItem iconProps={{ variant: "Code" }} onClick={menuItemClickHandler("toggleCode")} />
-                <BubbleMenuSeparator />
-                <BubbleMenuItem iconProps={{ variant: "List" }} onClick={menuItemClickHandler("toggleBulletList")} />
-                <BubbleMenuItem
-                    iconProps={{ variant: "ListOrdered" }}
-                    onClick={menuItemClickHandler("toggleOrderedList")}
-                />
-            </div>
-        </EditorBubbleMenu>
+    return (
+        <>
+            <EditorBubbleMenu
+                options={{ placement: "top-start" }}
+                shouldShow={({ editor: { isFocused }, state: { selection } }) => {
+                    // Don't show the bubble menu if the link popover is open
+                    if (showLinkPopover) {
+                        return false;
+                    }
+
+                    // Don't show the bubble menu if the selection is an image or image upload
+                    if (
+                        // @ts-expect-error - type issue with tiptap
+                        selection?.node?.type?.name === "custom-element-v2" ||
+                        // @ts-expect-error - type issue with tiptap
+                        selection?.node?.type?.name === "mediaUpload"
+                    ) {
+                        return false;
+                    }
+
+                    // Check if we have an active selection
+                    return isFocused && !selection.empty;
+                }}
+            >
+                <div className="border-1 rounded-2 text-gray-1100 flex items-center gap-px border-gray-500 bg-white p-1 shadow-sm">
+                    <BubbleMenuItem
+                        iconProps={{ variant: "Heading1" }}
+                        onClick={menuItemClickHandler("setNodeType")}
+                    />
+                    <BubbleMenuSeparator />
+                    <BubbleMenuItem iconProps={{ variant: "Bold" }} onClick={menuItemClickHandler("toggleBold")} />
+                    <BubbleMenuItem iconProps={{ variant: "Italic" }} onClick={menuItemClickHandler("toggleItalic")} />
+                    <BubbleMenuItem
+                        iconProps={{ variant: "Underline" }}
+                        onClick={menuItemClickHandler("toggleUnderline")}
+                    />
+                    <BubbleMenuItem iconProps={{ variant: "Link" }} onClick={menuItemClickHandler("setLink")} />
+                    <BubbleMenuItem iconProps={{ variant: "Code" }} onClick={menuItemClickHandler("toggleCode")} />
+                    <BubbleMenuSeparator />
+                    <BubbleMenuItem
+                        iconProps={{ variant: "List" }}
+                        onClick={menuItemClickHandler("toggleBulletList")}
+                    />
+                    <BubbleMenuItem
+                        iconProps={{ variant: "ListOrdered" }}
+                        onClick={menuItemClickHandler("toggleOrderedList")}
+                    />
+                </div>
+            </EditorBubbleMenu>
+            {showLinkPopover && (
+                <EditorBubbleMenu options={{ placement: "top-start" }}>
+                    <LinkPopover editor={editor} onClose={() => setShowLinkPopover(false)} />
+                </EditorBubbleMenu>
+            )}
+        </>
     );
 }
 

@@ -26,6 +26,7 @@ import { createCodeBlockComponent } from "./extension-code-block/CodeBlockCompon
 import type { LowlightInstance } from "./extension-code-block/types";
 import CustomElement from "./extension-custom-element";
 import { FVEAttributesExtension } from "./extension-fve-attributes";
+import { LinkExtensionWithShortcut } from "./extension-link/LinkExtensionWithShortcut";
 import { LowlightPlugin } from "./tiptap-node/lowlight/lowlight-plugin";
 import {
     ConfiguredFileHandler,
@@ -60,6 +61,14 @@ const extensions = [
         },
         gapcursor: false,
         codeBlock: false
+    }),
+    LinkExtensionWithShortcut.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        HTMLAttributes: {
+            class: "text-blue-600 underline cursor-pointer hover:text-blue-800"
+        }
     }),
     FVEAttributesExtension.configure({
         types: dataAttributeNodeTypes
