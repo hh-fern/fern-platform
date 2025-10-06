@@ -1,5 +1,5 @@
 import { cloneRepository } from "@fern-api/github";
-import { template } from "es-toolkit/compat";
+import template from "es-toolkit/compat/template";
 import { camelCase, upperFirst } from "es-toolkit/string";
 import type fs from "fs";
 

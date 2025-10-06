@@ -1,4 +1,4 @@
-import { template } from "es-toolkit/compat";
+import template from "es-toolkit/compat/template";
 
 export const createCohereSystemPrompt = (data: {
     date: string;

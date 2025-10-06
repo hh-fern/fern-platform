@@ -6,7 +6,7 @@ import { FernNavigation } from "@fern-api/fdr-sdk";
 import { isNonNullish } from "@fern-api/ui-core-utils";
 import { FernLink } from "@fern-docs/components/FernLink";
 import { makeToc, type TableOfContentsItem, toTree } from "@fern-docs/mdx";
-import { compact } from "es-toolkit/compat";
+import compact from "es-toolkit/compat/compact";
 import { notFound } from "next/navigation";
 
 import { PageHeader } from "@/components/PageHeader";

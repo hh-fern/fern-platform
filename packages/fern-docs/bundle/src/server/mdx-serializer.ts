@@ -3,7 +3,7 @@ import "server-only";
 import type { createCachedDocsLoader } from "@fern-api/docs-loader";
 import { cacheSeed } from "@fern-api/docs-server/cache-seed";
 import type { Frontmatter } from "@fern-api/fdr-sdk/docs";
-import { Semaphore } from "es-toolkit";
+import { Semaphore } from "es-toolkit/promise";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 

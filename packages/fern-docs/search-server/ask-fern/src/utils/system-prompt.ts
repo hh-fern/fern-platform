@@ -1,4 +1,4 @@
-import { template } from "es-toolkit/compat";
+import template from "es-toolkit/compat/template";
 
 // TODO: might need to have custom defaults per model
 export const createDefaultSystemPrompt = (data: {
