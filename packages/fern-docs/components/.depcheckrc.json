@@ -2,6 +2,9 @@
   "ignores": [
     "@chromatic-com/storybook",
     "@radix-ui/colors",
+    "@swc/core",
+    "@swc/cli",
+    "@swc/plugin-styled-jsx",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "@storybook/addon-links",
