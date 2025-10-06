@@ -14,7 +14,6 @@ type BubbleMenuAction =
     | "toggleItalic"
     | "toggleUnderline"
     | "toggleStrike"
-    | "setLink"
     | "toggleCode"
     | "toggleBulletList"
     | "toggleOrderedList";
@@ -56,9 +55,6 @@ export default function BubbleMenu() {
                     break;
                 case "toggleStrike":
                     editor.chain().focus().toggleStrike().run();
-                    break;
-                case "setLink":
-                    setShowLinkPopover(true);
                     break;
                 case "toggleCode":
                     editor.chain().focus().toggleCode().run();
@@ -113,7 +109,6 @@ export default function BubbleMenu() {
                         iconProps={{ variant: "Underline" }}
                         onClick={menuItemClickHandler("toggleUnderline")}
                     />
-                    <BubbleMenuItem iconProps={{ variant: "Link" }} onClick={menuItemClickHandler("setLink")} />
                     <BubbleMenuItem iconProps={{ variant: "Code" }} onClick={menuItemClickHandler("toggleCode")} />
                     <BubbleMenuSeparator />
                     <BubbleMenuItem
