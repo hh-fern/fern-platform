@@ -80,7 +80,7 @@ export function LinkPopover({ editor, onClose }: LinkPopover.Props) {
                         Remove
                     </Button>
                 )}
-                <Button variant="ghost" size="sm" onClick={onClose}>
+                <Button variant="outline" size="sm" onClick={onClose}>
                     Cancel
                 </Button>
                 <Button size="sm" onClick={handleSetLink}>
