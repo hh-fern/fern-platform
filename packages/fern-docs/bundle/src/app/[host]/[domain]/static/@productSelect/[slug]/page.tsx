@@ -17,11 +17,12 @@ export default async function ProductSelectPage({
     const loader = await createCachedDocsLoader(host, domain, await getFernToken());
 
     // preload:
-    const [layout, _auth, _flags, root] = await Promise.all([
+    const [layout, auth, flags, root, files] = await Promise.all([
         loader.getLayout(),
         loader.getAuthState(),
         loader.getEdgeFlags(),
-        loader.getRoot()
+        loader.getRoot(),
+        loader.getFiles()
     ]);
     const useDenseLayout = layout.isHeaderDisabled;
 
@@ -32,5 +33,14 @@ export default async function ProductSelectPage({
         return null;
     }
 
-    return <ProductDropdown loader={loader} fallbackProduct={fallbackProduct} useDenseLayout={useDenseLayout} />;
+    return (
+        <ProductDropdown
+            root={root}
+            isAuthenticatedPagesDiscoverable={flags.isAuthenticatedPagesDiscoverable}
+            authState={auth}
+            files={files}
+            fallbackProduct={fallbackProduct}
+            useDenseLayout={useDenseLayout}
+        />
+    );
 }

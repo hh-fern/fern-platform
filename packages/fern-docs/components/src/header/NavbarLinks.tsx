@@ -1,7 +1,5 @@
-import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
-
+import type { DocsV1Read } from "@fern-api/fdr-sdk/client/types";
 import { ArrowRight } from "lucide-react";
-import React from "react";
 import { cn } from "../cn";
 import { FernLinkButton } from "../FernLinkButton";
 import { FaIconServer } from "../fa-icon-server";
@@ -9,9 +7,7 @@ import type { NavbarLink, NavbarLink as NavbarLinkType } from "../types/navbar-l
 import { GitHubWidget } from "./GitHubWidget";
 import { WithReturnTo } from "./WithReturnTo";
 
-export async function NavbarLinks({ loader }: { loader: DocsLoader }) {
-    const config = await loader.getConfig();
-
+export function NavbarLinks({ config }: { config: Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root"> }) {
     const navbarLinks: NavbarLink[] = [];
 
     config.navbarLinks?.forEach((link) => {

@@ -1,6 +1,7 @@
 import "server-only";
 
-import { createEditableDocsLoader } from "@fern-api/docs-loader";
+import { createEditableDocsLoader, type DangerousTransmittableDocsLoaderData } from "@fern-api/docs-loader";
+import type { Frontmatter } from "@fern-api/fdr-sdk/docs";
 import { getPageId, type NodeId, slugjoin, utils } from "@fern-api/fdr-sdk/navigation";
 import type { Auth0OrgName } from "@fern-dashboard/services/auth/types";
 import { AbstractLayoutEvaluatorContent } from "@fern-docs/components/layouts/AbstractLayoutEvaluatorContent";
@@ -12,7 +13,8 @@ import { constructEditorSlug, ROOT_SLUG_ALIAS } from "@/utils/editor-routing";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import type { EncodedDocsUrl } from "@/utils/types";
-
+import { DocsLayout } from "./docs-layout";
+import { LazyDocsPage } from "./lazy-docs-page";
 import PageNode from "./PageNode";
 
 export default async function Page({
@@ -36,8 +38,6 @@ export default async function Page({
 
     const [resolvedSearchParams, host] = await Promise.all([searchParams, getHostFromHeaders()]);
 
-    const slugAlias = slugArray.join("/");
-
     const loader = await createEditableDocsLoader({
         host,
         encodedDocsUrl: docsUrl,
@@ -46,8 +46,25 @@ export default async function Page({
         branchName: branch
     });
 
-    const root = await loader.getRoot();
+    const [root, config, layout, authState, flags, files, colors, { basePath }] = await Promise.all([
+        loader.getRoot(),
+        loader.getConfig(),
+        loader.getLayout(),
+        loader.getAuthState(),
+        loader.getEdgeFlags(),
+        loader.getFiles(),
+        loader.getColors(),
+        loader.getMetadata()
+    ]);
 
+    const prefetchedLoaderData: DangerousTransmittableDocsLoaderData = {
+        domain: loader.domain,
+        authState,
+        edgeFlags: flags,
+        layout
+    };
+
+    const slugAlias = slugjoin(slugArray);
     const slug = slugAlias === ROOT_SLUG_ALIAS ? root.slug : slugAlias;
     const foundNode = utils.findNode(root, slugjoin(slug));
     // Check if client-node-id is passed as search param
@@ -103,35 +120,44 @@ export default async function Page({
             })
           : {};
 
+    const hasProductsOrVersions = root.child.type === "productgroup" || root.child.type === "versioned";
+    const showSearchBarInHeaderTabs = layout.searchbarPlacement === "HEADER_TABS";
+
     return (
-        // TODO: Currently, we are force-hiding the table of contents is within Visual Editor.
-        // This is a temporary solution, as I anticipate we will want the TOC to be dynamic based
-        // on the tiptap editor's content.
-        <AbstractLayoutEvaluatorContent tableOfContents={[]} frontmatter={frontmatter}>
-            <div className="flex w-full flex-col gap-2 py-12">
-                <PageNode
-                    serializableFoundNode={
-                        foundNode.type === "found"
-                            ? {
-                                  type: foundNode.type,
-                                  node: foundNode.node,
-                                  sidebar: foundNode.sidebar,
-                                  currentTab: foundNode.currentTab,
-                                  currentProduct: foundNode.currentProduct,
-                                  currentVersion: foundNode.currentVersion,
-                                  isCurrentVersionDefault: foundNode.isCurrentVersionDefault,
-                                  isCurrentProductDefault: foundNode.isCurrentProductDefault
-                              }
-                            : undefined
-                    }
-                    clientNodeId={clientNodeId as NodeId}
-                    initialFilename={filename}
-                    initialHtml={html}
-                    initialFrontmatter={frontmatter}
-                    initialOriginalFrontmatter={originalFrontmatter}
-                    cssConfig={cssConfig}
-                />
-            </div>
-        </AbstractLayoutEvaluatorContent>
+        <LazyDocsPage
+            domain={loader.domain}
+            config={config}
+            slug={slug}
+            root={root}
+            basePath={basePath}
+            files={files}
+            frontmatter={frontmatter as Frontmatter | undefined}
+            colors={colors}
+            layout={layout}
+            authState={authState}
+            prefetchedLoaderData={prefetchedLoaderData}
+            isAuthenticatedPagesDiscoverable={flags.isAuthenticatedPagesDiscoverable}
+            showSearchBarInHeaderTabs={showSearchBarInHeaderTabs}
+            hasProductsOrVersions={hasProductsOrVersions}
+            foundNode={
+                foundNode.type === "found"
+                    ? {
+                          type: foundNode.type,
+                          node: foundNode.node,
+                          sidebar: foundNode.sidebar,
+                          currentTab: foundNode.currentTab,
+                          currentProduct: foundNode.currentProduct,
+                          currentVersion: foundNode.currentVersion,
+                          isCurrentVersionDefault: foundNode.isCurrentVersionDefault,
+                          isCurrentProductDefault: foundNode.isCurrentProductDefault
+                      }
+                    : undefined
+            }
+            clientNodeId={clientNodeId as NodeId}
+            filename={filename}
+            html={html}
+            cssConfig={cssConfig}
+            originalFrontmatter={originalFrontmatter}
+        />
     );
 }

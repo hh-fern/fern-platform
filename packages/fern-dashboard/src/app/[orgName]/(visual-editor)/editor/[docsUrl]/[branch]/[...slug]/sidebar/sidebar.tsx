@@ -1,49 +1,31 @@
-import { createEditableDocsLoader, PrefetchedDocsLoader } from "@fern-api/docs-loader";
+"use client";
+
+import type { DangerousTransmittableDocsLoaderData } from "@fern-api/docs-loader";
 import { getIsSidebarFixed, getIsSingleOverviewPage } from "@fern-api/docs-utils";
-import { Slug, slugjoin, utils } from "@fern-api/fdr-sdk/navigation";
-import { getCurrentSession } from "@fern-dashboard/services/auth/getCurrentSession";
+import type { DocsV1Read } from "@fern-api/fdr-sdk/client/types";
+import { type RootNode, Slug, utils } from "@fern-api/fdr-sdk/navigation";
 import { getClientPageRedirectTarget } from "@fern-docs/components/navigation/pageUtils";
 import { SidebarClientRootNode } from "@fern-docs/components/sidebar/nodes/SidebarClientRootNode";
 import { SidebarClientTabsRoot } from "@fern-docs/components/sidebar/SidebarClientTabsRoot";
 import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
 import { HiddenSidebar } from "@fern-docs/components/theming/HiddenSidebar";
-import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
-import type { EncodedDocsUrl } from "@/utils/types";
+import { useSearchParams } from "next/navigation";
 import { CreatePageButton } from "./CreatePageButton";
 
-export default async function SidebarPage({
-    params,
-    searchParams
+export function Sidebar({
+    config,
+    slug,
+    root,
+    prefetchedLoaderData
 }: {
-    params: Promise<{ docsUrl: EncodedDocsUrl; slug: string[]; branch: string }>;
-    searchParams: Promise<Record<string, string>>;
+    config: Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">;
+    slug: Slug;
+    root: RootNode;
+    prefetchedLoaderData: DangerousTransmittableDocsLoaderData;
 }) {
-    const { docsUrl, slug: slugArray, branch } = await params;
-    const resolvedSearchParams = await searchParams;
-    const clientNodeId = resolvedSearchParams["client-node-id"];
-    const session = await getCurrentSession();
-    const host = await getHostFromHeaders();
-    const loader = await createEditableDocsLoader({
-        host,
-        encodedDocsUrl: docsUrl,
-        fernToken: session?.accessToken,
-        branchName: branch
-    });
-    const [config, root, authState, edgeFlags, layout] = await Promise.all([
-        loader.getConfig(),
-        loader.getRoot(),
-        loader.getAuthState(),
-        loader.getEdgeFlags(),
-        loader.getLayout()
-    ]);
-    const prefetchedLoaderData = new PrefetchedDocsLoader({
-        domain: loader.domain,
-        authState,
-        edgeFlags,
-        layout
-    }).serializable();
+    const resolvedSearchParams = useSearchParams();
+    const clientNodeId = resolvedSearchParams.get("client-node-id");
 
-    const slug = slugjoin(slugArray);
     let found = utils.findNode(root, slug);
 
     if (found.type !== "found") {

@@ -1,4 +1,4 @@
-import "server-only";
+"use client";
 
 import type * as FernDocs from "@fern-api/fdr-sdk/docs";
 import type { TableOfContentsItem } from "@fern-docs/mdx";
@@ -12,7 +12,7 @@ import { PageLayout } from "./PageLayout";
 import { ReferenceLayout } from "./ReferenceLayout";
 import { TableOfContentsLayout } from "./TableOfContentsLayout";
 
-export async function AbstractLayoutEvaluatorContent({
+export function AbstractLayoutEvaluatorContent({
     frontmatter,
     tableOfContents,
     children,

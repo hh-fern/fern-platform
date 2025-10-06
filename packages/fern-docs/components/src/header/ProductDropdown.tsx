@@ -1,9 +1,9 @@
-import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import type { AuthState } from "@fern-api/docs-server/auth/getAuthState";
 import { createFileResolver } from "@fern-api/docs-server/file-resolver";
 import { getProducts } from "@fern-api/docs-server/handle-node-fallbacks";
+import type { FileData } from "@fern-api/docs-utils/types/file-data";
 import type { FernNavigation } from "@fern-api/fdr-sdk";
 import Image from "next/image";
-
 import { processIcon } from "../processIcon";
 import { ProductDropdownClient, type ProductDropdownItem } from "./ProductDropdownClient";
 
@@ -11,22 +11,26 @@ export declare namespace ProductDropdown {
     export interface Props {}
 }
 
-export async function ProductDropdown({
-    loader,
+export function ProductDropdown({
     fallbackProduct,
-    useDenseLayout = false
+    useDenseLayout = false,
+    root,
+    isAuthenticatedPagesDiscoverable,
+    authState,
+    files
 }: {
-    loader: DocsLoader;
     fallbackProduct: FernNavigation.ProductNode;
     useDenseLayout?: boolean;
+    root: FernNavigation.RootNode;
+    isAuthenticatedPagesDiscoverable: boolean;
+    authState: AuthState;
+    files: Record<string, FileData>;
 }) {
-    const root = await loader.getRoot();
     if (root.child.type !== "productgroup") {
         return null;
     }
 
-    const showHiddenNodes = (await loader.getEdgeFlags()).isAuthenticatedPagesDiscoverable;
-    const authState = await loader.getAuthState();
+    const showHiddenNodes = isAuthenticatedPagesDiscoverable;
     const roles = authState.authed ? (authState.user.roles ?? []) : [];
 
     const products = getProducts(root, showHiddenNodes, roles);
@@ -34,8 +38,6 @@ export async function ProductDropdown({
     if (products?.length === 0) {
         return null;
     }
-
-    const files = await loader.getFiles();
 
     const resolveFileSrc = createFileResolver(files);
 

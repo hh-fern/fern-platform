@@ -1,6 +1,3 @@
-import "server-only";
-
-import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
 import { withVersionSwitcherInfo } from "@fern-api/docs-server/withVersionSwitcherInfo";
 import { FernNavigation } from "@fern-api/fdr-sdk";
 
@@ -17,8 +14,9 @@ export declare namespace VersionDropdown {
  * The version dropdown is used at a root level if the root is versioned.
  * The version dropdown is used at a product level if the root has a productgroup and the current product is versioned.
  */
-export async function VersionDropdown({
-    loader,
+export function VersionDropdown({
+    root,
+    domain,
     currentNode,
     currentProduct,
     slugMap,
@@ -26,7 +24,8 @@ export async function VersionDropdown({
     fallbackVersion,
     useDenseLayout = false
 }: {
-    loader: DocsLoader;
+    root: FernNavigation.RootNode;
+    domain: string;
     slugMap: Map<string, FernNavigation.NavigationNodeWithMetadata>;
     currentProduct: FernNavigation.ProductNode | undefined;
     currentNode: FernNavigation.NavigationNodeWithMetadata;
@@ -34,9 +33,8 @@ export async function VersionDropdown({
     fallbackVersion: FernNavigation.VersionNode;
     useDenseLayout?: boolean;
 }) {
-    const root = await loader.getRoot();
     // HACK: force the version dropdown to appear in the cohere theme
-    const isCohere = loader.domain.includes("cohere");
+    const isCohere = domain.includes("cohere");
 
     // If the root is not versioned or a productgroup, don't render the version dropdown
     if (root.child.type !== "versioned" && root.child.type !== "productgroup") {

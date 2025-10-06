@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 
 import { FaIcon } from "./fa-icon";
 import { getIconUrl, parseSvg } from "./util/fa";
@@ -53,14 +53,16 @@ async function FaIconServerInternal({
     }
 }
 
-export function FaIconServer(
-    props: {
-        icon: string;
-    } & React.SVGProps<SVGSVGElement>
-) {
-    return (
-        <React.Suspense fallback={<FaIcon {...props} />}>
-            <FaIconServerInternal {...props} />
-        </React.Suspense>
-    );
-}
+export const FaIconServer = memo(
+    (
+        props: {
+            icon: string;
+        } & React.SVGProps<SVGSVGElement>
+    ) => {
+        return (
+            <React.Suspense fallback={<FaIcon {...props} />}>
+                <FaIconServerInternal {...props} />
+            </React.Suspense>
+        );
+    }
+);

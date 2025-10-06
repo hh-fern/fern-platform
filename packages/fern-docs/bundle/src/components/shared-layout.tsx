@@ -92,7 +92,7 @@ export default async function SharedLayout({
                         </React.Suspense>
                     }
                     showSearchBar={layout.searchbarPlacement === "HEADER"}
-                    navbarLinks={<NavbarLinks loader={loader} />}
+                    navbarLinks={<NavbarLinks config={config} />}
                     loginButton={
                         <React.Suspense fallback={null}>
                             <LoginButton loader={loader} size="sm" className="ml-2" disabled={isLocalEnvironment} />
@@ -126,7 +126,7 @@ export default async function SharedLayout({
                     }
                     navbarLinks={
                         <React.Suspense fallback={null}>
-                            <NavbarLinks loader={loader} />
+                            <NavbarLinks config={config} />
                         </React.Suspense>
                     }
                     loginButton={
