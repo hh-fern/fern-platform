@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import CodeBlock from "@tiptap/extension-code-block";
+import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
     EditorProvider,
@@ -26,7 +27,6 @@ import { createCodeBlockComponent } from "./extension-code-block/CodeBlockCompon
 import type { LowlightInstance } from "./extension-code-block/types";
 import CustomElement from "./extension-custom-element";
 import { FVEAttributesExtension } from "./extension-fve-attributes";
-import { LinkExtensionWithShortcut } from "./extension-link/LinkExtensionWithShortcut";
 import { LowlightPlugin } from "./tiptap-node/lowlight/lowlight-plugin";
 import {
     ConfiguredFileHandler,
@@ -62,7 +62,7 @@ const extensions = [
         gapcursor: false,
         codeBlock: false
     }),
-    LinkExtensionWithShortcut.configure({
+    Link.configure({
         openOnClick: false,
         autolink: true,
         linkOnPaste: true,

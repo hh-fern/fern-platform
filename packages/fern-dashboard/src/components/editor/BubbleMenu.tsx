@@ -1,5 +1,5 @@
 import type { MouseEventHandler } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useCurrentEditor } from "@tiptap/react";
 import { BubbleMenu as EditorBubbleMenu } from "@tiptap/react/menus";
@@ -14,6 +14,7 @@ type BubbleMenuAction =
     | "toggleItalic"
     | "toggleUnderline"
     | "toggleStrike"
+    | "setLink"
     | "toggleCode"
     | "toggleBulletList"
     | "toggleOrderedList";
@@ -21,19 +22,6 @@ type BubbleMenuAction =
 export default function BubbleMenu() {
     const { editor } = useCurrentEditor();
     const [showLinkPopover, setShowLinkPopover] = useState(false);
-
-    // Listen for Command+K keyboard shortcut
-    useEffect(() => {
-        const handleOpenLinkPopover = () => {
-            setShowLinkPopover(true);
-        };
-
-        window.addEventListener("tiptap:openLinkPopover", handleOpenLinkPopover);
-
-        return () => {
-            window.removeEventListener("tiptap:openLinkPopover", handleOpenLinkPopover);
-        };
-    }, []);
 
     function menuItemClickHandler(action: BubbleMenuAction) {
         return () => {
@@ -55,6 +43,9 @@ export default function BubbleMenu() {
                     break;
                 case "toggleStrike":
                     editor.chain().focus().toggleStrike().run();
+                    break;
+                case "setLink":
+                    setShowLinkPopover(true);
                     break;
                 case "toggleCode":
                     editor.chain().focus().toggleCode().run();
@@ -109,6 +100,7 @@ export default function BubbleMenu() {
                         iconProps={{ variant: "Underline" }}
                         onClick={menuItemClickHandler("toggleUnderline")}
                     />
+                    <BubbleMenuItem iconProps={{ variant: "Link" }} onClick={menuItemClickHandler("setLink")} />
                     <BubbleMenuItem iconProps={{ variant: "Code" }} onClick={menuItemClickHandler("toggleCode")} />
                     <BubbleMenuSeparator />
                     <BubbleMenuItem
