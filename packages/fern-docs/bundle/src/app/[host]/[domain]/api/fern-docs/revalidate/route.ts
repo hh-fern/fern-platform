@@ -12,7 +12,7 @@ import {
     EnvironmentId,
     prune,
     type WebhookId,
-    type WebSocketId,
+    type WebSocketId
 } from "@fern-api/fdr-sdk/api-definition";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
@@ -158,7 +158,6 @@ export async function GET(
                     Object.values(docs.definition.apis).forEach((api) => {
                         const prunedApi = createPrunedApi(ApiDefinitionV1ToLatest.from(api, edgeFlags).migrate());
                         prunedApi.forEach((api, key) => {
-                            
                             for (const endpointK of Object.keys(api.endpoints)) {
                                 if (api.endpoints[EndpointId(endpointK)]?.environments?.length === 0) {
                                     console.debug(`${endpointK} has empty environments, adding default URL.`);
@@ -168,7 +167,7 @@ export async function GET(
                                     });
                                 }
                             }
-                            
+
                             keys[`api:${key}`] = api;
                         });
                     });
