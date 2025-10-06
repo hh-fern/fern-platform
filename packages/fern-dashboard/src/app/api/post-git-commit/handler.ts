@@ -1,5 +1,6 @@
 import { getFernBotOctokitForRepo } from "@/app/services/auth0/fernBotOctokit";
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
+import { createDiffMinimizationService } from "@/app/services/diff-minimization";
 import type { GithubCommitableFile } from "@/app/services/github/types";
 
 export default async function postGitCommit(request: {
@@ -59,13 +60,69 @@ export default async function postGitCommit(request: {
             recursive: "true" // Get all files recursively
         });
 
-        // Create a set of existing file paths for quick lookup
-        const existingFiles = new Set(
-            baseTreeResponse.data.tree?.filter((item) => item.type === "blob").map((item) => item.path) || []
+        // Create a set of existing file paths for quick lookup and also store file SHAs for content retrieval
+        const existingFilesMap = new Map(
+            baseTreeResponse.data.tree
+                ?.filter((item) => item.type === "blob")
+                .map((item) => [item.path, item.sha]) || []
         );
+        const existingFiles = new Set(existingFilesMap.keys());
+
+        // Minimize diffs using LLM if ANTHROPIC_API_KEY is available
+        let minimizedFiles = request.files;
+        const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+
+        if (anthropicApiKey) {
+            const diffMinimizationService = createDiffMinimizationService(anthropicApiKey);
+            minimizedFiles = await Promise.all(
+                request.files.map(async (file) => {
+                    // Skip deleted files and new files (files that don't exist in the base tree)
+                    if (file.delete || !existingFiles.has(file.path)) {
+                        return file;
+                    }
+
+                    try {
+                        // Get the original file content from GitHub
+                        const fileSha = existingFilesMap.get(file.path);
+                        if (!fileSha) {
+                            return file;
+                        }
+
+                        const blobResponse = await octokit.request("GET /repos/{owner}/{repo}/git/blobs/{file_sha}", {
+                            owner: request.owner,
+                            repo: request.repo,
+                            file_sha: fileSha
+                        });
+
+                        const originalContent = Buffer.from(blobResponse.data.content, "base64").toString("utf-8");
+
+                        // Minimize the diff using LLM
+                        const result = await diffMinimizationService.minimizeDiff({
+                            originalContent,
+                            newContent: file.content || "",
+                            filePath: file.path
+                        });
+
+                        if (result.success && result.minimizedContent) {
+                            return {
+                                ...file,
+                                content: result.minimizedContent
+                            };
+                        }
+
+                        // If minimization fails, return the original file
+                        return file;
+                    } catch (error) {
+                        console.error(`Failed to minimize diff for ${file.path}:`, error);
+                        // On error, return the original file
+                        return file;
+                    }
+                })
+            );
+        }
 
         // Create a new tree with the files
-        const tree = request.files
+        const tree = minimizedFiles
             .map((file) => {
                 if (file.delete) {
                     // Only include deletion entries for files that actually exist in the base tree
