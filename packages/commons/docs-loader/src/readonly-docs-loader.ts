@@ -463,6 +463,7 @@ const getApi = async (domainKey: string, id: string) => {
     return ApiDefinitionV1ToLatest.from(v1, flags).migrate();
 };
 
+// impt: if you implement logic here to update the endpoint definition, make sure to also add it to revalidate/route.ts
 const createGetPrunedApiCached = (domainKey: string, cacheConfig: Required<CacheConfig>) =>
     unstable_cache(
         async (id: string, ...nodes: PruningNodeType[]): Promise<ApiDefinition.ApiDefinition> => {

@@ -8,10 +8,11 @@ import { HEADER_X_FERN_HOST, slugToHref, withoutStaging } from "@fern-api/docs-u
 import { type ApiDefinition, type DocsV2Read, FernNavigation } from "@fern-api/fdr-sdk";
 import {
     ApiDefinitionV1ToLatest,
-    type EndpointId,
+    EndpointId,
+    EnvironmentId,
     prune,
     type WebhookId,
-    type WebSocketId
+    type WebSocketId,
 } from "@fern-api/fdr-sdk/api-definition";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
@@ -154,17 +155,21 @@ export async function GET(
                         keys[`page:${id}`] = page;
                     });
 
-                    Object.values(docs.definition.apisV2).forEach((api) => {
-                        const prunedApi = createPrunedApi(api);
-                        prunedApi.forEach((value, key) => {
-                            keys[`api:${key}`] = value;
-                        });
-                    });
-
                     Object.values(docs.definition.apis).forEach((api) => {
                         const prunedApi = createPrunedApi(ApiDefinitionV1ToLatest.from(api, edgeFlags).migrate());
-                        prunedApi.forEach((value, key) => {
-                            keys[`api:${key}`] = value;
+                        prunedApi.forEach((api, key) => {
+                            
+                            for (const endpointK of Object.keys(api.endpoints)) {
+                                if (api.endpoints[EndpointId(endpointK)]?.environments?.length === 0) {
+                                    console.debug(`${endpointK} has empty environments, adding default URL.`);
+                                    api.endpoints[EndpointId(endpointK)]?.environments?.push({
+                                        id: "Default" as EnvironmentId,
+                                        baseUrl: "https://host.com"
+                                    });
+                                }
+                            }
+                            
+                            keys[`api:${key}`] = api;
                         });
                     });
 
@@ -376,6 +381,7 @@ async function reindex(docs: DocsV2Read.LoadDocsForUrlResponse, host: string, do
     return ["algolia"];
 }
 
+// todo: dedup logic between readonly-docs-loader createGetPrunedApiCached
 function createPrunedApi(api: ApiDefinition.ApiDefinition) {
     const apis = new Map<string, ApiDefinition.ApiDefinition>();
     Object.keys(api.endpoints).forEach((endpointId) => {
