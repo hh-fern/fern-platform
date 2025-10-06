@@ -4,22 +4,5 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["./src/**/*"],
-  "references": [
-    {
-      "path": "../core-utils"
-    },
-    {
-      "path": "../docs-auth"
-    },
-    {
-      "path": "../docs-server"
-    },
-    {
-      "path": "../docs-utils"
-    },
-    {
-      "path": "../../fern-docs/edge-config"
-    }
-  ]
+  "include": ["./src/**/*"]
 }

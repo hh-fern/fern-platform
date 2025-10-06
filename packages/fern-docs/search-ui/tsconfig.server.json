@@ -9,16 +9,5 @@
     "moduleResolution": "Bundler",
     "isolatedModules": false
   },
-  "include": ["./src/server/**/*.ts"],
-  "references": [
-    {
-      "path": "../search-server/keyword"
-    },
-    {
-      "path": "../search-server/ask-fern"
-    },
-    {
-      "path": "../search-server/utils"
-    }
-  ]
+  "include": ["./src/server/**/*.ts"]
 }

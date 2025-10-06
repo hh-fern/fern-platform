@@ -8,22 +8,5 @@
     "types": ["vitest/globals"],
     "lib": ["WebWorker", "ES2023.Array"]
   },
-  "include": ["./src/**/*.ts"],
-  "references": [
-    {
-      "path": "../../../fdr-sdk"
-    },
-    {
-      "path": "../../../fai-sdk"
-    },
-    {
-      "path": "../../../commons/core-utils"
-    },
-    {
-      "path": "../utils"
-    },
-    {
-      "path": "../keyword"
-    }
-  ]
+  "include": ["./src/**/*.ts"]
 }

@@ -6,10 +6,5 @@
     "rootDir": ".",
     "types": ["vitest/globals"]
   },
-  "include": ["./src/**/*"],
-  "references": [
-    {
-      "path": "../../packages/commons/github"
-    }
-  ]
+  "include": ["./src/**/*"]
 }

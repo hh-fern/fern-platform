@@ -17,16 +17,5 @@
     "types": ["vitest/globals"]
   },
   "include": ["./src/**/*"],
-  "exclude": ["**/__test__"],
-  "references": [
-    {
-      "path": "../../packages/commons/github"
-    },
-    {
-      "path": "../../packages/fdr-sdk"
-    },
-    {
-      "path": "../../packages/commons/core-utils"
-    }
-  ]
+  "exclude": ["**/__test__"]
 }

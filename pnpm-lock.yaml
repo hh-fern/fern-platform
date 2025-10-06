@@ -512,6 +512,12 @@ importers:
       '@fern-platform/configs':
         specifier: workspace:*
         version: link:../../configs
+      '@swc/cli':
+        specifier: 'catalog:'
+        version: 0.7.8(@swc/core@1.13.5(@swc/helpers@0.5.15))(chokidar@4.0.3)
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.13.5(@swc/helpers@0.5.15)
       '@types/node':
         specifier: ^22.0.0
         version: 22.18.8
@@ -573,6 +579,12 @@ importers:
       '@fern-platform/configs':
         specifier: workspace:*
         version: link:../../configs
+      '@swc/cli':
+        specifier: 'catalog:'
+        version: 0.7.8(@swc/core@1.13.5(@swc/helpers@0.5.15))(chokidar@4.0.3)
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.13.5(@swc/helpers@0.5.15)
       '@types/node':
         specifier: ^22.0.0
         version: 22.18.8
@@ -679,6 +691,12 @@ importers:
       '@fern-platform/configs':
         specifier: workspace:*
         version: link:../../configs
+      '@swc/cli':
+        specifier: 'catalog:'
+        version: 0.7.8(@swc/core@1.13.5(@swc/helpers@0.5.15))(chokidar@4.0.3)
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.13.5(@swc/helpers@0.5.15)
       '@types/node':
         specifier: ^22.0.0
         version: 22.18.8
@@ -2528,6 +2546,12 @@ importers:
       '@fern-platform/configs':
         specifier: workspace:*
         version: link:../../../configs
+      '@swc/cli':
+        specifier: 'catalog:'
+        version: 0.7.8(@swc/core@1.13.5(@swc/helpers@0.5.15))(chokidar@4.0.3)
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.13.5(@swc/helpers@0.5.15)
       '@types/node':
         specifier: ^22.0.0
         version: 22.18.8
@@ -2586,6 +2610,12 @@ importers:
       '@fern-platform/configs':
         specifier: workspace:*
         version: link:../../../configs
+      '@swc/cli':
+        specifier: 'catalog:'
+        version: 0.7.8(@swc/core@1.13.5(@swc/helpers@0.5.15))(chokidar@4.0.3)
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.13.5(@swc/helpers@0.5.15)
       '@types/node':
         specifier: ^22.0.0
         version: 22.18.8
@@ -2629,6 +2659,12 @@ importers:
       '@fern-platform/configs':
         specifier: workspace:*
         version: link:../../../configs
+      '@swc/cli':
+        specifier: 'catalog:'
+        version: 0.7.8(@swc/core@1.13.5(@swc/helpers@0.5.15))(chokidar@4.0.3)
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.13.5(@swc/helpers@0.5.15)
       '@types/node':
         specifier: ^22.0.0
         version: 22.18.8

@@ -4,19 +4,5 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["./src/**/*", "./storybook/**/*"],
-  "references": [
-    {
-      "path": "../../commons/react-commons"
-    },
-    {
-      "path": "../../commons/core-utils"
-    },
-    {
-      "path": "../mdx"
-    },
-    {
-      "path": "../../commons/docs-utils"
-    }
-  ]
+  "include": ["./src/**/*", "./storybook/**/*"]
 }

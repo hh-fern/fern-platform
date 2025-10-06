@@ -10,26 +10,33 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/js/index.js"
+    },
     "./types": {
-      "types": "./dist/algolia/types.d.ts",
-      "default": "./dist/algolia/types.js"
+      "types": "./dist/types/algolia/types.d.ts",
+      "default": "./dist/js/algolia/types.js"
     },
     "./edge": {
-      "types": "./dist/algolia/edge/index.d.ts",
-      "default": "./dist/algolia/edge/index.js"
+      "types": "./dist/types/algolia/edge/index.d.ts",
+      "default": "./dist/js/algolia/edge/index.js"
     },
     "./archive": {
-      "types": "./dist/algolia/records/archive/index.d.ts",
-      "default": "./dist/algolia/records/archive/index.js"
+      "types": "./dist/types/algolia/records/archive/index.d.ts",
+      "default": "./dist/js/algolia/records/archive/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "rm -rf ./lib ./dist && tsc --build --clean",
-    "compile": "tsc --build",
+    "compile": "pnpm compile:js && pnpm compile:types",
+    "compile:js": "swc ./src --out-dir ./dist/js --copy-files --strip-leading-paths",
+    "compile:types": "tsc -p . --emitDeclarationOnly --declaration --outDir ./dist/types",
     "depcheck": "depcheck",
-    "dev": "tsc --watch",
+    "dev": "swc ./src --out-dir ./dist/js --watch --copy-files --strip-leading-paths",
     "format": "prettier --write --ignore-unknown \"**\"",
     "format:check": "prettier --check --ignore-unknown \"**\"",
     "lint:eslint": "eslint --max-warnings 0 .",
@@ -54,6 +61,8 @@
   },
   "devDependencies": {
     "@fern-platform/configs": "workspace:*",
+    "@swc/cli": "catalog:",
+    "@swc/core": "catalog:",
     "@types/node": "catalog:",
     "depcheck": "catalog:",
     "stylelint": "catalog:",

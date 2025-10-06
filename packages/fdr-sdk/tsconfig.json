@@ -9,6 +9,5 @@
     "esModuleInterop": true
   },
   "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules"],
-  "references": [{ "path": "../commons/core-utils" }]
+  "exclude": ["node_modules"]
 }

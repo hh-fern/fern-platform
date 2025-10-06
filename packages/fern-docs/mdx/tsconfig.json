@@ -8,13 +8,5 @@
     "types": ["node", "vitest/globals"],
     "isolatedDeclarations": true
   },
-  "include": ["./src/**/*"],
-  "references": [
-    {
-      "path": "../../fdr-sdk"
-    },
-    {
-      "path": "../../commons/core-utils"
-    }
-  ]
+  "include": ["./src/**/*"]
 }

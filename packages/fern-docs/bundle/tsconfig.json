@@ -9,46 +9,5 @@
     "jsx": "preserve"
   },
   "exclude": ["node_modules", "**/__snapshots__"],
-  "include": ["src/**/*", ".next/types/**/*.ts", ".storybook/**/*.{ts,tsx}", "next.config.ts", "vitest.config.ts"],
-  "references": [
-    {
-      "path": "../../commons/core-utils"
-    },
-    {
-      "path": "../../commons/docs-auth"
-    },
-    {
-      "path": "../../commons/fdr-utils"
-    },
-    {
-      "path": "../../fai-sdk"
-    },
-    {
-      "path": "../../fdr-sdk"
-    },
-    {
-      "path": "../components"
-    },
-    {
-      "path": "../edge-config"
-    },
-    {
-      "path": "../mdx"
-    },
-    {
-      "path": "../search-server/keyword"
-    },
-    {
-      "path": "../search-server/ask-fern"
-    },
-    {
-      "path": "../../commons/docs-utils"
-    },
-    {
-      "path": "../../commons/docs-server"
-    },
-    {
-      "path": "../../commons/docs-loader"
-    }
-  ]
+  "include": ["src/**/*", ".next/types/**/*.ts", ".storybook/**/*.{ts,tsx}", "next.config.ts", "vitest.config.ts"]
 }
