@@ -52,7 +52,7 @@ Please analyze the differences between the original and new content. Your task i
 Return ONLY the minimized content, without any explanation or markdown code blocks. The output should be the exact file content that should be committed.`;
 
             const response = await anthropic.messages.create({
-                model: "claude-3-5-sonnet-20241022",
+                model: "claude-3-5-haiku-20241022",
                 max_tokens: 8000,
                 temperature: 0,
                 messages: [
