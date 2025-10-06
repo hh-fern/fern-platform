@@ -16,9 +16,9 @@ import { setMdxSerializer } from "@/context/MdxSerializerContext";
 import { MdxServerComponent } from "@/mdx/components/server-component";
 import { createCachedMdxSerializer } from "@/server/mdx-serializer";
 import { SearchV2Trigger } from "@/state/search";
-import { SearchPanelTrigger } from "@/state/search-panel";
 
 import { LoginButton } from "./login-button";
+import { SearchPanelTrigger } from "@/state/search-panel";
 
 export default async function SharedLayout({
     children,
@@ -34,20 +34,24 @@ export default async function SharedLayout({
     sidebar?: React.ReactNode;
     versionSelect: React.ReactNode;
     productSelect: React.ReactNode;
-    loader: DocsLoader;
+    loader: DocsLoader & {
+        clearKvCache: () => Promise<void>;
+        isAskAiEnabledForDocs: () => Promise<boolean>;
+    };
     logo: React.ReactNode;
 }) {
     const isLocalEnvironment = isLocal() || isSelfHosted();
 
-    const [config, edgeFlags, colors, layout, root] = await Promise.all([
+    const [config, settings, edgeFlags, colors, layout, root, isAskAiEnabled] = await Promise.all([
         loader.getConfig(),
+        loader.getSettings(),
         loader.getEdgeFlags(),
         loader.getColors(),
         loader.getLayout(),
-        loader.getRoot()
+        loader.getRoot(),
+        loader.isAskAiEnabledForDocs()
     ]);
     const theme = edgeFlags.isCohereTheme ? "cohere" : "default";
-    const isAskAiEnabled = edgeFlags.isAskAiEnabled;
     const announcementText = config.announcement?.text;
 
     const serialize = createCachedMdxSerializer(loader, {
@@ -101,6 +105,7 @@ export default async function SharedLayout({
                     }
                     forceHeader={edgeFlags.isCohereTheme}
                     headerDisabled={layout.isHeaderDisabled}
+                    placeholder={settings.searchText}
                 />
             }
             productSelect={
@@ -140,13 +145,20 @@ export default async function SharedLayout({
                         </React.Suspense>
                     }
                     searchBar={
-                        <div className="flex w-full items-center gap-2">
+                        <div
+                            className={cn(
+                                "flex flex-row w-full items-center gap-2",
+                                !showHeaderInSidebar && "mt-3 lg:mt-2",
+                                {
+                                    "mt-3": showHeaderInSidebar && hasProductsOrVersions
+                                }
+                            )}
+                        >
                             <SearchV2Trigger
                                 aria-label="Search"
-                                className={cn("w-full overflow-hidden", !showHeaderInSidebar && "mt-3 lg:mt-2", {
-                                    "mt-3": showHeaderInSidebar && hasProductsOrVersions
-                                })}
+                                className={cn("w-full overflow-hidden")}
                                 isSearchInSidebar={true}
+                                placeholder={settings.searchText}
                             />
                             {isAskAiEnabled && <SearchPanelTrigger isSearchInSidebar={true} />}
                         </div>
@@ -161,6 +173,7 @@ export default async function SharedLayout({
                     {versionSelect}
                 </React.Suspense>
             }
+            searchPlaceholder={settings.searchText}
         >
             {children}
         </ThemedDocs>

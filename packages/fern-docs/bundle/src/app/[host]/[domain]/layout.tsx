@@ -60,6 +60,7 @@ export default async function Layout({
         files,
         colors,
         layout,
+        settings,
         fonts,
         isAskAiEnabled,
         deprecated_customerAnalytics,
@@ -72,8 +73,9 @@ export default async function Layout({
         loader.getFiles(),
         loader.getColors(),
         loader.getLayout(),
+        loader.getSettings(),
         loader.getFonts(),
-        loader.isAskAiEnabled(),
+        loader.isAskAiEnabledForDocs(),
         deprecated_getCustomerAnalytics(domain),
         getLaunchDarklyInfo(loader)
     ]);
@@ -114,11 +116,15 @@ export default async function Layout({
                 {/** HACKHACK: this is a hack to set the logo text to "Docs" for Cohere, this needs to be moved into docs.yml */}
                 <SetLogoText text={domain.includes("cohere") ? "Docs" : undefined} />
                 {config.defaultLanguage != null && <DefaultLanguage language={config.defaultLanguage} />}
-                <DarkCode value={edgeFlags.isDarkCodeEnabled} />
+                <DarkCode value={edgeFlags.isDarkCodeEnabled || settings.darkModeCode} />
                 <Whitelabeled value={edgeFlags.isWhitelabeled} />
                 <SetColors colors={colors} />
                 <SetIsAskAiEnabled isAskAiEnabled={isAskAiEnabled} />
-                <SetIsDefaultSearchFilterOn isDefaultSearchFilterOn={edgeFlags.isDefaultSearchFilterOn} />
+                <SetIsDefaultSearchFilterOn
+                    isDefaultSearchFilterOn={
+                        edgeFlags.isDefaultSearchFilterOn || (settings.defaultSearchFilters ?? false)
+                    }
+                />
                 <FernUser domain={domain} host={host} />
                 <GlobalStyles
                     domain={domain}
@@ -130,7 +136,9 @@ export default async function Layout({
                 />
                 <FeatureFlagProvider featureFlagsConfig={{ launchDarkly }}>{children}</FeatureFlagProvider>
                 <React.Suspense fallback={null}>
-                    {!edgeFlags.isSearchDisabled && !isLocalEnvironment && <SearchV2 domain={domain} />}
+                    {!edgeFlags.isSearchDisabled && !isLocalEnvironment && !settings.disableSearch && (
+                        <SearchV2 domain={domain} />
+                    )}
                 </React.Suspense>
                 {jsConfig != null && <JavascriptProvider config={jsConfig} />}
                 {VERCEL_ENV === "production" && (

@@ -721,6 +721,30 @@ const getNavigationNode = (cacheConfig: Required<CacheConfig>) =>
         return node;
     });
 
+const getSettings = (cacheConfig: Required<CacheConfig>) =>
+    cache(async (domainKey: string) => {
+        "use cache";
+        unstable_cacheTag(domainKey, "getSettings");
+
+        const config = await getConfig(cacheConfig)(domainKey);
+        if (!config) {
+            console.error("Could not find config for domainKey", domainKey);
+            notFound();
+        }
+
+        const settings = config.settings;
+
+        return {
+            darkModeCode: settings?.darkModeCode ?? false,
+            defaultSearchFilters: settings?.defaultSearchFilters ?? false,
+            disableFeedback: settings?.disableFeedback ?? false,
+            disableSearch: settings?.disableSearch ?? false,
+            hide404Page: settings?.hide404Page ?? false,
+            httpSnippets: settings?.httpSnippets ?? false,
+            searchText: settings?.searchText ?? "Search"
+        };
+    });
+
 const getConfig = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string) => {
         // Check in-memory cache first
@@ -1041,7 +1065,7 @@ function calcDefaultPageWidth(sidebarWidth: number, contentWidth: number) {
 
 const getAuthConfig = getAuthEdgeConfig;
 
-const getAskAiEnabled = (cacheConfig: Required<CacheConfig>) =>
+const getAskAiEnabledForDocs = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domain: string) => {
         "use cache";
         unstable_cacheTag(domain, "askAiEnabled");
@@ -1066,7 +1090,7 @@ const getAskAiEnabled = (cacheConfig: Required<CacheConfig>) =>
                 await new FernAIClient({
                     baseUrl: process.env.FAI_SERVER_URL ?? "https://fai.buildwithfern.com",
                     token: process.env.FERN_TOKEN ?? ""
-                }).settings.getSettings({ domain })
+                }).settings.getDocsSettings({ domain })
             ).ask_ai_enabled;
 
             kvSet(domain, "askAiEnabled", result, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
@@ -1096,7 +1120,7 @@ export const createCachedDocsLoader = async (
 ): Promise<
     DocsLoader & {
         clearKvCache: () => Promise<void>;
-        isAskAiEnabled: () => Promise<boolean>;
+        isAskAiEnabledForDocs: () => Promise<boolean>;
     }
 > => {
     assertDocsDomain(domainKey);
@@ -1161,6 +1185,7 @@ export const createCachedDocsLoader = async (
         getPage: (pageId) => getPage(config)(domainKey, pageId, options?.returnRawMarkdown),
         getColors: () => getColors(config)(domainKey),
         getLayout: () => getLayout(config)(domainKey),
+        getSettings: () => getSettings(config)(domainKey),
         getFonts: () => getFonts(config)(domainKey),
         getAuthState,
         getEdgeFlags: () => cachedGetEdgeFlags(domainKey),
@@ -1173,7 +1198,7 @@ export const createCachedDocsLoader = async (
             return getDynamicIr(config)(m.org, m.domain, apiName);
         },
         clearKvCache: () => clearKvCache(domainKey),
-        isAskAiEnabled: () => getAskAiEnabled(config)(domainKey)
+        isAskAiEnabledForDocs: () => getAskAiEnabledForDocs(config)(domainKey)
     };
 };
 

@@ -1,14 +1,5 @@
-import { revalidatePath, revalidateTag } from "next/cache";
-import { type NextRequest, NextResponse } from "next/server";
-
-import { waitUntil } from "@vercel/functions";
-import { kv } from "@vercel/kv";
-import { chunk } from "es-toolkit/array";
-import { mapValues } from "es-toolkit/object";
-import { escapeRegExp } from "es-toolkit/string";
-import { UnreachableCaseError } from "ts-essentials";
-
 import { convertResponseToRootNode, createEndpointCacheKey, getMetadataFromResponse } from "@fern-api/docs-loader";
+import { track } from "@fern-api/docs-server";
 import { isLocal } from "@fern-api/docs-server/isLocal";
 import { isSelfHosted } from "@fern-api/docs-server/isSelfHosted";
 import { loadWithUrl } from "@fern-api/docs-server/loadWithUrl";
@@ -18,15 +9,34 @@ import { type ApiDefinition, type DocsV2Read, FernNavigation } from "@fern-api/f
 import {
     ApiDefinitionV1ToLatest,
     type EndpointId,
-    type WebSocketId,
+    prune,
     type WebhookId,
-    prune
+    type WebSocketId
 } from "@fern-api/fdr-sdk/api-definition";
 import { withDefaultProtocol } from "@fern-api/ui-core-utils";
 import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
-
+import { waitUntil } from "@vercel/functions";
+import { kv } from "@vercel/kv";
+import { chunk } from "es-toolkit/array";
+import { mapValues } from "es-toolkit/object";
+import { escapeRegExp } from "es-toolkit/string";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { type NextRequest, NextResponse } from "next/server";
+import { UnreachableCaseError } from "ts-essentials";
 import { getFaiClient } from "@/getFaiClient";
 import { queueAlgoliaReindex, queueTurbopufferReindex } from "@/server/queue-reindex";
+
+// Custom error type for intentional revalidation failures
+class RevalidationError extends Error {
+    constructor(
+        message: string,
+        public readonly url: string,
+        public readonly status?: number
+    ) {
+        super(message);
+        this.name = "RevalidationError";
+    }
+}
 
 export const maxDuration = 800; // 13 minutes timeout
 
@@ -88,20 +98,28 @@ export async function GET(
                         });
                 }
 
-                // Revalidate the LLMs full text cache
-                const llmsFullPromise = fetch(`${req.nextUrl.origin}/api/fern-docs/llms-full.txt`, {
-                    method: "HEAD",
-                    cache: "no-store",
-                    headers: { [HEADER_X_FERN_HOST]: domain },
-                    signal: AbortSignal.timeout(600_000)
-                })
-                    .then(() => {
-                        controller.enqueue(`llms-full-revalidated\n`);
+                // Revalidate cache endpoints
+                const cacheEndpoints = [
+                    { path: "/api/fern-docs/llms-full.txt", name: "llms-full" },
+                    { path: "/api/fern-docs/favicon.ico", name: "api-favicon" },
+                    { path: "/favicon.ico", name: "base-favicon" }
+                ];
+
+                const cachePromises = cacheEndpoints.map(({ path, name }) =>
+                    fetch(`${req.nextUrl.origin}${path}`, {
+                        method: "HEAD",
+                        cache: "no-store",
+                        headers: { [HEADER_X_FERN_HOST]: domain },
+                        signal: AbortSignal.timeout(600_000)
                     })
-                    .catch((e: unknown) => {
-                        console.error(`[revalidate:llms-full-revalidate] error: ${JSON.stringify(e)}`);
-                        controller.enqueue(`llms-full-revalidate-failed:error=${escapeRegExp(String(e))}\n`);
-                    });
+                        .then(() => {
+                            controller.enqueue(`${name}-revalidated\n`);
+                        })
+                        .catch((e: unknown) => {
+                            console.error(`[revalidate:${name}-revalidate] error: ${JSON.stringify(e)}`);
+                            controller.enqueue(`${name}-revalidate-failed:error=${escapeRegExp(String(e))}\n`);
+                        })
+                );
 
                 const root = convertResponseToRootNode(docs, edgeFlags);
                 let staticRoot = root;
@@ -216,6 +234,7 @@ export async function GET(
                                     `/${host}/${domain}/static/${encodeURIComponent(slugToHref(slug))}`,
                                     "page"
                                 );
+                                const startTime = performance.now();
                                 try {
                                     const res = await fetch(`${req.nextUrl.origin}${slugToHref(slug)}`, {
                                         method: "HEAD",
@@ -223,14 +242,43 @@ export async function GET(
                                         headers: { [HEADER_X_FERN_HOST]: domain },
                                         signal: AbortSignal.timeout(600_000)
                                     });
+                                    const endTime = performance.now();
+                                    track("revalidate_page_stats", {
+                                        url,
+                                        domain,
+                                        durationMs: endTime - startTime,
+                                        status: res?.status ?? null,
+                                        ok: res?.ok ?? false
+                                    });
                                     if (!res?.ok) {
-                                        throw new Error(`Failed to revalidate ${url}. Status code: ${res?.status}`);
+                                        track("revalidate_page_error_res_not_ok", {
+                                            url,
+                                            domain,
+                                            status: res?.status ?? null,
+                                            error: `Failed to revalidate ${url}. Status code: ${res?.status}`
+                                        });
+                                        throw new RevalidationError(
+                                            `Failed to revalidate ${url}. Status code: ${res?.status}`,
+                                            url,
+                                            res?.status
+                                        );
                                     }
                                     controller.enqueue(`revalidated:${url}\n`);
                                 } catch (e) {
                                     console.error(
                                         `[revalidate:page-revalidate] error: url=${url}; error=${JSON.stringify((e as Error)?.message)}`
                                     );
+
+                                    // Check if this is an intentional revalidation error or an unexpected error
+                                    if (!(e instanceof RevalidationError)) {
+                                        // This is an unexpected error
+                                        track("revalidate_page_error_unexpected", {
+                                            url,
+                                            domain,
+                                            error: String(e)
+                                        });
+                                    }
+
                                     controller.enqueue(
                                         `revalidate-failed:url=${url}:error=${escapeRegExp(String(e))}\n`
                                     );
@@ -270,14 +318,32 @@ export async function GET(
 
                 // finish reindexing before returning
                 await reindexPromise;
-                // finish caching llms full txt before returning
-                await llmsFullPromise;
+                // finish revalidating cache endpoints before returning
+                await Promise.all(cachePromises);
 
                 const end = performance.now();
                 console.log(`Reindex took ${end - start}ms`);
                 controller.enqueue(`revalidate-finished:${end - start}ms\n`);
             } catch (e) {
                 console.error(`[revalidate] ${JSON.stringify(e)}`);
+
+                // Check if this is an intentional revalidation error or an unexpected error
+                if (e instanceof RevalidationError) {
+                    // This is an intentional "Failed to revalidate" error - track it as such
+                    track("revalidate_intentional_failure", {
+                        url: e.url,
+                        domain,
+                        status: e.status,
+                        error: e.message
+                    });
+                } else {
+                    // This is an unexpected error
+                    track("revalidate_unexpected_error", {
+                        domain,
+                        error: String(e)
+                    });
+                }
+
                 controller.enqueue(`revalidate-failed:error=${escapeRegExp(String(e))}\n`);
             } finally {
                 controller.close();
