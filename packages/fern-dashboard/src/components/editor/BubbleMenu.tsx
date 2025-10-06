@@ -65,29 +65,26 @@ export default function BubbleMenu() {
     }
 
     return (
-        <>
-            <EditorBubbleMenu
-                options={{ placement: "top-start" }}
-                shouldShow={({ editor: { isFocused }, state: { selection } }) => {
-                    // Don't show the bubble menu if the link popover is open
-                    if (showLinkPopover) {
-                        return false;
-                    }
+        <EditorBubbleMenu
+            options={{ placement: "top-start" }}
+            shouldShow={({ editor: { isFocused }, state: { selection } }) => {
+                // Don't show the bubble menu if the selection is an image or image upload
+                if (
+                    // @ts-expect-error - type issue with tiptap
+                    selection?.node?.type?.name === "custom-element-v2" ||
+                    // @ts-expect-error - type issue with tiptap
+                    selection?.node?.type?.name === "mediaUpload"
+                ) {
+                    return false;
+                }
 
-                    // Don't show the bubble menu if the selection is an image or image upload
-                    if (
-                        // @ts-expect-error - type issue with tiptap
-                        selection?.node?.type?.name === "custom-element-v2" ||
-                        // @ts-expect-error - type issue with tiptap
-                        selection?.node?.type?.name === "mediaUpload"
-                    ) {
-                        return false;
-                    }
-
-                    // Check if we have an active selection
-                    return isFocused && !selection.empty;
-                }}
-            >
+                // Check if we have an active selection
+                return isFocused && !selection.empty;
+            }}
+        >
+            {showLinkPopover ? (
+                <LinkPopover editor={editor} onClose={() => setShowLinkPopover(false)} />
+            ) : (
                 <div className="border-1 rounded-2 text-gray-1100 flex items-center gap-px border-gray-500 bg-white p-1 shadow-sm">
                     <BubbleMenuItem
                         iconProps={{ variant: "Heading1" }}
@@ -112,13 +109,8 @@ export default function BubbleMenu() {
                         onClick={menuItemClickHandler("toggleOrderedList")}
                     />
                 </div>
-            </EditorBubbleMenu>
-            {showLinkPopover && (
-                <EditorBubbleMenu options={{ placement: "top-start" }}>
-                    <LinkPopover editor={editor} onClose={() => setShowLinkPopover(false)} />
-                </EditorBubbleMenu>
             )}
-        </>
+        </EditorBubbleMenu>
     );
 }
 
