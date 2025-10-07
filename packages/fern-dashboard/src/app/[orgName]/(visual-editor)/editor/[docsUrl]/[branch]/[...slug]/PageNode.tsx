@@ -143,7 +143,8 @@ export default function PageNode(props: PageNode.Props) {
 
     // For sections, redirect to first child page (prefer client pages)
     // Do this early to avoid setting navigation state and triggering sidebar renders
-    if (found.node.type === "section" && !hasRedirectedToChild.current) {
+    // Wait for hydration to ensure pageRegistry is available
+    if (found.node.type === "section" && !hasRedirectedToChild.current && hydrated) {
         // Find first client page child
         const clientPageChild = pageRegistry
             ? Object.values(pageRegistry).find((entry) => {
