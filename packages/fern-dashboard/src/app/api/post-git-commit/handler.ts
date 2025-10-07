@@ -62,9 +62,8 @@ export default async function postGitCommit(request: {
 
         // Create a set of existing file paths for quick lookup and also store file SHAs for content retrieval
         const existingFilesMap = new Map(
-            baseTreeResponse.data.tree
-                ?.filter((item) => item.type === "blob")
-                .map((item) => [item.path, item.sha]) || []
+            baseTreeResponse.data.tree?.filter((item) => item.type === "blob").map((item) => [item.path, item.sha]) ||
+                []
         );
         const existingFiles = new Set(existingFilesMap.keys());
 
