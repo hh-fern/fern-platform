@@ -76,12 +76,18 @@ export default async function Page({
     let serializableFoundNode: SerializableFoundNode | undefined;
     let cssConfig: PageNodeNamespace.Props["cssConfig"];
 
+    console.log("[page.tsx] resolvedSearchParams:", resolvedSearchParams);
+    console.log("[page.tsx] client-page param:", resolvedSearchParams["client-page"]);
+    console.log("[page.tsx] requestedSlug:", requestedSlug);
+
     if (resolvedSearchParams["client-page"]) {
+        console.log("[page.tsx] Rendering as CLIENT page");
         pageDataDeps = {
             source: "client",
             filename: getClientPageDefaultFilename(requestedSlug)
         };
     } else {
+        console.log("[page.tsx] Rendering as SERVER page");
         const root = await loader.getRoot();
 
         // If requested slug == ROOT_SLUG_ALIAS ("root"), use slug from the root node instead
