@@ -107,11 +107,9 @@ export default async function Page({
         // Server-side redirect is removed to allow client-side logic to take priority
 
         // For sections, don't use pageDataDeps - just use fallbackFoundNode
-        // Sections are containers that may or may not have content
+        // Sections should redirect to their first child page (handled in PageNode)
         if (serializableFoundNode.node.type === "section") {
-            // Section will be rendered using only fallbackFoundNode
-            // If it has content (pageId), PageNode will handle loading it
-            // If it has no content, client pages will be injected via SidebarClientNavigationChildInjector
+            // Section will redirect to first child in PageNode
             pageDataDeps = undefined;
         } else {
             // This is a regular page - get the page data from the loader

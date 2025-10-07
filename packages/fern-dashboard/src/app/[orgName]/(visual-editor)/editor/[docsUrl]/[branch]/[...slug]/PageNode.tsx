@@ -156,7 +156,6 @@ export default function PageNode(props: PageNode.Props) {
     // For sections, redirect to first child page (prefer client pages)
     // Do this early to avoid setting navigation state and triggering sidebar renders
     // Wait for hydration to ensure pageRegistry is available
-    // Only redirect if section has no content
 
     // Reset redirect flag if we're viewing a different section
     if (found.node.type === "section" && lastSectionId.current !== found.node.id) {
@@ -164,12 +163,7 @@ export default function PageNode(props: PageNode.Props) {
         lastSectionId.current = found.node.id;
     }
 
-    // Check if section has its own markdown content
-    const sectionHasContent =
-        found.node.type === "section" &&
-        (FernNavigation.hasMarkdown(found.node) || (initialPageData && initialPageData.html));
-
-    if (found.node.type === "section" && !sectionHasContent && !hasRedirectedToChild.current && hydrated) {
+    if (found.node.type === "section" && !hasRedirectedToChild.current && hydrated) {
         // Find first client page child
         const clientPageChild = pageRegistry
             ? Object.values(pageRegistry).find((entry) => {
@@ -224,11 +218,6 @@ export default function PageNode(props: PageNode.Props) {
         }
     }
 
-    // For sections with markdown content, we need to fetch and render it
-    // For sections without content, just show a placeholder
-    const isSectionWithContent =
-        found.node.type === "section" && FernNavigation.hasMarkdown(found.node) && !initialPageData;
-
     return (
         <>
             <SetCurrentNavigationNode
@@ -249,16 +238,7 @@ export default function PageNode(props: PageNode.Props) {
                         initialHtml={initialPageData.html}
                         initialFrontmatter={initialPageData.frontmatter}
                     />
-                ) : isSectionWithContent ? (
-                    <UnsupportedContent>
-                        Section pages are not yet supported in the editor. This section has markdown content that cannot
-                        be edited here.
-                    </UnsupportedContent>
-                ) : (
-                    <UnsupportedContent>
-                        This section has no content. Add pages to this section from the sidebar.
-                    </UnsupportedContent>
-                )}
+                ) : null}
             </CSSProvider>
         </>
     );
