@@ -28,7 +28,12 @@ export interface DangerousTransmittableDocsLoaderData {
     config: Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">;
     authState: AuthState;
     edgeFlags: EdgeFlags;
-    layout: FernLayoutConfig;
+    layout: FernLayoutConfig & {
+        /** The sidebar navigation tree */
+        sidebarRoot?: FernNavigation.SidebarRootNode;
+        /** Navigation tabs */
+        tabs?: FernNavigation.TabNode[];
+    };
 }
 
 /**
@@ -42,7 +47,10 @@ export class PrefetchedDocsLoader implements DocsLoader<false> {
     private config: Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">;
     private authState: AuthState;
     private edgeFlags: EdgeFlags;
-    private layout: FernLayoutConfig;
+    private layout: FernLayoutConfig & {
+        sidebarRoot?: FernNavigation.SidebarRootNode;
+        tabs?: FernNavigation.TabNode[];
+    };
 
     constructor({ config, domain, authState, edgeFlags, layout }: DangerousTransmittableDocsLoaderData) {
         this.config = config;
@@ -86,7 +94,10 @@ export class PrefetchedDocsLoader implements DocsLoader<false> {
         return this.edgeFlags;
     }
 
-    getLayout(): FernLayoutConfig {
+    getLayout(): FernLayoutConfig & {
+        sidebarRoot?: FernNavigation.SidebarRootNode;
+        tabs?: FernNavigation.TabNode[];
+    } {
         return this.layout;
     }
 

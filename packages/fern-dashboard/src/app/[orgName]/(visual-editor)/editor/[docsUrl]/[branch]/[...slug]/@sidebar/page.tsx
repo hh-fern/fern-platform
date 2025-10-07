@@ -41,18 +41,37 @@ export default async function SidebarPage({
         fernToken: session?.accessToken,
         branchName: branch
     });
-    const [config, authState, edgeFlags, layout] = await Promise.all([
+    const [config, authState, edgeFlags, layout, root] = await Promise.all([
         loader.getConfig(),
         loader.getAuthState(),
         loader.getEdgeFlags(),
-        loader.getLayout()
+        loader.getLayout(),
+        loader.getRoot()
     ]);
+
+    // Find any page in the navigation to extract the sidebar and tabs
+    // All pages within the same docs share the same sidebar/tabs structure
+    const firstPageSlug = root.pointsTo ?? root.slug;
+    const foundNode = FernNavigation.utils.findNode(root, firstPageSlug);
+
+    let sidebarRoot: FernNavigation.SidebarRootNode | undefined;
+    let tabs: FernNavigation.TabNode[] | undefined;
+
+    if (foundNode.type === "found") {
+        sidebarRoot = foundNode.sidebar;
+        tabs = foundNode.tabs as FernNavigation.TabNode[];
+    }
+
     const prefetchedLoaderData = new PrefetchedDocsLoader({
         domain: loader.domain,
         config,
         authState,
         edgeFlags,
-        layout
+        layout: {
+            ...layout,
+            sidebarRoot,
+            tabs
+        }
     }).serializable();
 
     // Sidebar doesn't need page-specific data - it renders the same navigation tree
