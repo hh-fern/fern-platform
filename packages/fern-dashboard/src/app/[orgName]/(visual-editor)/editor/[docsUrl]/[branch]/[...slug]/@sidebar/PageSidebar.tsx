@@ -33,22 +33,38 @@ export default function PageSidebar({ prefetchedLoaderData, pageDataDeps, fallba
     const { hydrated, resolveInitialPageData } = useNavigation();
 
     // Store initial page data in a ref so we don't re-resolve it on every render
-    const initialPageDataRef = useRef<ResolvedPageData>(null);
+    const initialPageDataRef = useRef<ResolvedPageData | null>(null);
+    const pageDataErrorRef = useRef<Error | null>(null);
 
     let found: SerializableFoundNode | undefined;
 
     if (pageDataDeps) {
-        const initialPageData =
-            hydrated && !initialPageDataRef.current
-                ? (initialPageDataRef.current = resolveInitialPageData(pageDataDeps))
-                : initialPageDataRef.current;
-
-        if (!initialPageData) {
-            // TODO: show a loading state
-            return null;
+        // Try to resolve initial page data, catching errors to prevent sidebar crash
+        if (hydrated && !initialPageDataRef.current && !pageDataErrorRef.current) {
+            try {
+                initialPageDataRef.current = resolveInitialPageData(pageDataDeps);
+            } catch (error) {
+                pageDataErrorRef.current = error instanceof Error ? error : new Error(String(error));
+                console.error("Failed to resolve initial page data in sidebar:", error);
+            }
         }
 
-        found = mergeFoundNodes(initialPageData.foundNode, fallbackFoundNode);
+        const initialPageData = initialPageDataRef.current;
+
+        // If there was an error, fall back to fallbackFoundNode if available
+        if (pageDataErrorRef.current) {
+            if (fallbackFoundNode) {
+                found = fallbackFoundNode;
+            } else {
+                // No fallback available, return null to prevent crash
+                return null;
+            }
+        } else if (!initialPageData) {
+            // TODO: show a loading state
+            return null;
+        } else {
+            found = mergeFoundNodes(initialPageData.foundNode, fallbackFoundNode);
+        }
     } else if (fallbackFoundNode) {
         found = fallbackFoundNode;
     } else {
