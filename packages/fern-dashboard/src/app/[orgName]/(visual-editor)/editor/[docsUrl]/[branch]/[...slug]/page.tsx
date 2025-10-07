@@ -120,29 +120,23 @@ export default async function Page({
         // Get a serializable copy of the found node to be passed over the wire to PageNode
         serializableFoundNode = getSerializableFoundNode(navigationNode);
 
-        // If this is a section node, handle it appropriately
+        // If this is a section node, redirect to first child page
         if (serializableFoundNode.node.type === "section") {
-            // If the section has markdown content, treat it as a page
-            const sectionHasContent = FernNavigation.hasMarkdown(serializableFoundNode.node);
-
-            if (!sectionHasContent) {
-                // Try to redirect to the first child page
-                const firstChildSlug = findFirstPageSlug(serializableFoundNode.node);
-                if (firstChildSlug) {
-                    return redirect(
-                        constructEditorSlug({
-                            orgName,
-                            docsUrl,
-                            branchName: branch,
-                            slug: firstChildSlug
-                        })
-                    );
-                }
-                // If no server child page found, the section might have client pages only
-                // Let PageNode handle this - it will show the section container with client pages
-                // via SidebarClientNavigationChildInjector
+            // Try to redirect to the first child page (whether section has content or not)
+            const firstChildSlug = findFirstPageSlug(serializableFoundNode.node);
+            if (firstChildSlug) {
+                return redirect(
+                    constructEditorSlug({
+                        orgName,
+                        docsUrl,
+                        branchName: branch,
+                        slug: firstChildSlug
+                    })
+                );
             }
-            // Section has content or only client children - render it as a page
+            // If no server child page found, the section might have client pages only
+            // Let PageNode handle this - it will show the section container with client pages
+            // via SidebarClientNavigationChildInjector
         }
 
         // For sections, don't use pageDataDeps - just use fallbackFoundNode
