@@ -1,5 +1,6 @@
 import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import { type ChangedNodes, type Frontmatter, htmlToMdx, mdxToHtml } from "@fern-docs/mdx";
+import yaml from "js-yaml";
 
 import { type NavigationStorage, createNavigationLocalStorage } from "./NavigationStorage";
 import {
@@ -143,9 +144,15 @@ export class NavigationStore {
         this._storage = options?.storage || createNavigationLocalStorage();
         const storedSnapshot = this._storage.getOrSetStore(this._branchName, this._orgName, this._docsUrl);
 
+        // Validate initialDocsYmlContent before using it
+        let validatedDocsYmlContent: string | null = null;
+        if (options?.initialDocsYmlContent) {
+            validatedDocsYmlContent = this._validateDocsYmlContent(options.initialDocsYmlContent);
+        }
+
         this._latestSnapshot = storedSnapshot;
         this._pageRegistry = storedSnapshot.pageRegistry;
-        this._docsYmlBaseContent = storedSnapshot.docsYmlBaseContent ?? options?.initialDocsYmlContent ?? null;
+        this._docsYmlBaseContent = storedSnapshot.docsYmlBaseContent ?? validatedDocsYmlContent;
         this._docsYmlChanges = storedSnapshot.docsYmlChanges;
         this._lastCommittedHash = storedSnapshot.lastCommittedHash;
         this._version = storedSnapshot.version;
@@ -428,6 +435,34 @@ export class NavigationStore {
 
     // HELPERS
     // --------------------------------------------------------------------------
+
+    /** Validates docs.yml content and returns it if valid, null otherwise */
+    private _validateDocsYmlContent(content: string): string | null {
+        // Skip validation if content is empty or whitespace-only
+        if (!content || content.trim().length === 0) {
+            console.warn("docs.yml content is empty, skipping validation");
+            return null;
+        }
+
+        try {
+            const parsed = yaml.load(content);
+
+            // Check if navigation field exists and is an array
+            if (parsed && typeof parsed === "object" && "navigation" in parsed) {
+                if (Array.isArray(parsed.navigation)) {
+                    return content;
+                }
+                console.warn("docs.yml navigation field is not an array, skipping");
+                return null;
+            }
+
+            console.warn("docs.yml missing navigation field, skipping");
+            return null;
+        } catch (error) {
+            console.error("Failed to validate docs.yml content:", error);
+            return null;
+        }
+    }
 
     /** Require storage, used to prevent hydration errors */
     private _requireStorage(): NavigationStorage {
