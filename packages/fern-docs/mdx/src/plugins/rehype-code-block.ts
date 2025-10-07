@@ -29,32 +29,22 @@ export const rehypeCodeBlock: Unified.Plugin<[], HastRoot> = () => {
 
             // code groups are not currently supported for twoslash
             if (node.name === "CodeGroup") {
-                // Check if all non-text children are valid <pre><code> elements
-                const hasValidCodeBlocks = node.children.every((child) => {
-                    // Skip text nodes (whitespace)
-                    if (child.type === "text") {
-                        return true;
+                for (const child of node.children) {
+                    if (child == null || child.type !== "element" || child.tagName !== "pre") {
+                        return;
                     }
 
-                    if (child.type !== "element" || child.tagName !== "pre") {
-                        return false;
+                    const codeNode = child.children[0];
+                    if (codeNode == null || codeNode.type !== "element" || codeNode.tagName !== "code") {
+                        return;
                     }
-
-                    const codeNode = child.children?.[0];
-                    return codeNode != null && codeNode.type === "element" && codeNode.tagName === "code";
-                });
-
-                // If valid, skip processing (twoslash not supported for code groups)
-                if (hasValidCodeBlocks) {
-                    return;
                 }
-                // Otherwise, continue to let individual <pre> tags get processed
+                return;
             }
         });
 
         /**
          * Convert <pre><code>...</code></pre> to <CodeBlock>...</CodeBlock>
-         * Also processes code blocks nested inside MDX JSX elements
          */
         visit(tree, "element", (node, index, parent) => {
             if (node.tagName !== "pre" || parent == null || index == null) {
@@ -150,14 +140,6 @@ export function migrateMeta(metastring: string): string {
 
     if (metastring === "") {
         return metastring;
-    }
-
-    // Check if metastring looks like a filename (has file extension)
-    // e.g. "docs.yml", "config.json", "src/index.tsx", ".env.local"
-    // This should be treated as filename= not title=
-    const filenamePattern = /^[a-zA-Z0-9_.\-/]+\.[a-zA-Z0-9]+$/;
-    if (filenamePattern.test(metastring)) {
-        return `filename="${metastring}"`;
     }
 
     // migrate {1-3} to {[1, 2, 3]}
