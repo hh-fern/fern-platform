@@ -147,16 +147,31 @@ export default function PageNode(props: PageNode.Props) {
             return;
         }
 
+        console.log("[PageNode] Section detected:", found.node.id, "title:", (found.node as any).title);
+        console.log("[PageNode] pageRegistry:", pageRegistry);
+
         // Find first client page child
         const clientPageChild = pageRegistry
             ? Object.values(pageRegistry).find((entry) => {
-                  return (
+                  const matches =
                       entry.pageData.source === "client" &&
                       !entry.isMarkedForDeletion &&
-                      entry.parentSectionId === found.node.id
-                  );
+                      entry.parentSectionId === found.node.id;
+                  if (entry.pageData.source === "client") {
+                      console.log(
+                          "[PageNode] Client page:",
+                          entry.pageData.frontmatter?.slug,
+                          "parentSectionId:",
+                          entry.parentSectionId,
+                          "matches:",
+                          matches
+                      );
+                  }
+                  return matches;
               })
             : undefined;
+
+        console.log("[PageNode] Found client page child:", clientPageChild?.pageData.frontmatter?.slug);
 
         // Find first server page child
         const sectionNode = found.node as FernNavigation.SectionNode;
@@ -176,8 +191,12 @@ export default function PageNode(props: PageNode.Props) {
         };
         const serverPageSlug = findFirstServerPageSlug(sectionNode);
 
+        console.log("[PageNode] Found server page slug:", serverPageSlug);
+
         // Prefer client page, fallback to server page
         const targetSlug = clientPageChild?.pageData.frontmatter?.slug || serverPageSlug;
+
+        console.log("[PageNode] Target slug:", targetSlug, "isClientPage:", !!clientPageChild);
 
         if (targetSlug) {
             hasRedirectedToChild.current = true;
