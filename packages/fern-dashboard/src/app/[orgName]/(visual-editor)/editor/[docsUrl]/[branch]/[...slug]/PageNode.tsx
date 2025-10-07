@@ -43,6 +43,7 @@ export default function PageNode(props: PageNode.Props) {
     // Store initial page data in a ref so we don't re-resolve it on every render
     const initialPageDataRef = useRef<ResolvedPageData | null>(null);
     const pageDataErrorRef = useRef<Error | null>(null);
+    const hasRedirectedToChild = useRef(false);
 
     // Try to resolve initial page data, catching errors to allow nav to still render
     if (hydrated && pageDataDeps && !initialPageDataRef.current && !pageDataErrorRef.current) {
@@ -142,8 +143,6 @@ export default function PageNode(props: PageNode.Props) {
 
     // For sections, redirect to first child page (prefer client pages)
     // Do this early to avoid setting navigation state and triggering sidebar renders
-    const hasRedirectedToChild = useRef(false);
-
     if (found.node.type === "section" && !hasRedirectedToChild.current) {
         // Find first client page child
         const clientPageChild = pageRegistry
