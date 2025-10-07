@@ -104,12 +104,15 @@ export default async function SidebarPage({
         sidebarRoot = serializableFoundNode.sidebar;
         tabs = serializableFoundNode.tabs as FernNavigation.TabNode[];
     } else {
-        // Fallback: find any page to extract sidebar/tabs if no serializable found node
+        // Fallback: find any page to extract sidebar/tabs and baseFoundNode
+        // This is used for client pages or when no navigation node is found
         const firstPageSlug = root.pointsTo ?? root.slug;
         const foundNode = FernNavigation.utils.findNode(root, firstPageSlug);
         if (foundNode.type === "found") {
             sidebarRoot = foundNode.sidebar;
             tabs = foundNode.tabs as FernNavigation.TabNode[];
+            // Use this as the fallback found node for create button context
+            serializableFoundNode = getSerializableFoundNode(foundNode);
         }
     }
 
