@@ -46,8 +46,9 @@ ${newContent}
 Please analyze the differences between the original and new content. Your task is to produce a minimized version of the new content that:
 1. Preserves all meaningful changes (actual content/code changes)
 2. Removes unnecessary whitespace differences (trailing spaces, extra blank lines, etc.)
-3. Maintains consistent formatting with the original file where possible
-4. Avoids introducing unnecessary diff noise
+3. Removes random newlines that don't affect the produced HTML or rendered output
+4. Maintains consistent formatting with the original file where possible
+5. Avoids introducing unnecessary diff noise
 
 Return ONLY the minimized content, without any explanation or markdown code blocks. The output should be the exact file content that should be committed.`;
 
