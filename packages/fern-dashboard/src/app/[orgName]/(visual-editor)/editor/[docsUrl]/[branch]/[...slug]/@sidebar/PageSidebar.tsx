@@ -1,126 +1,51 @@
 "use client";
 
 import type { DangerousTransmittableDocsLoaderData } from "@fern-api/docs-loader";
-import { getIsSidebarFixed, getIsSingleOverviewPage } from "@fern-api/docs-utils";
-import type { FernNavigation } from "@fern-api/fdr-sdk";
-import {
-    type ClientPageDataDependencies,
-    mergeFoundNodes,
-    type ResolvedPageData,
-    type SerializableFoundNode,
-    type ServerPageDataDependencies,
-    useNavigation
-} from "@fern-docs/components/navigation";
+import { getIsSidebarFixed } from "@fern-api/docs-utils";
 import { SidebarClientRootNode } from "@fern-docs/components/sidebar/nodes/SidebarClientRootNode";
 import { SidebarClientTabsRoot } from "@fern-docs/components/sidebar/SidebarClientTabsRoot";
 import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
-import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
-import { HiddenSidebar } from "@fern-docs/components/theming/HiddenSidebar";
-import { useMemo, useRef } from "react";
-
-import { CreatePageButton } from "./CreatePageButton";
+import React, { useMemo } from "react";
 
 interface PageSidebarProps {
     /** Maintains compat with existing docs sidebar API */
     prefetchedLoaderData: DangerousTransmittableDocsLoaderData;
-    /** Resolves to initial data for page nodes */
-    pageDataDeps?: ClientPageDataDependencies | ServerPageDataDependencies;
-    /** Directly accepts found node from loader for non-page nodes (e.g. "endpoint") */
-    fallbackFoundNode?: SerializableFoundNode;
 }
 
-export default function PageSidebar({ prefetchedLoaderData, pageDataDeps, fallbackFoundNode }: PageSidebarProps) {
-    const { hydrated, resolveInitialPageData } = useNavigation();
-
-    // Store initial page data in a ref so we don't re-resolve it on every render
-    const initialPageDataRef = useRef<ResolvedPageData | null>(null);
-    const pageDataErrorRef = useRef<Error | null>(null);
-
-    let found: SerializableFoundNode | undefined;
-
-    if (pageDataDeps) {
-        // Try to resolve initial page data, catching errors to prevent sidebar crash
-        if (hydrated && !initialPageDataRef.current && !pageDataErrorRef.current) {
-            try {
-                initialPageDataRef.current = resolveInitialPageData(pageDataDeps);
-            } catch (error) {
-                pageDataErrorRef.current = error instanceof Error ? error : new Error(String(error));
-                console.error("Failed to resolve initial page data in sidebar:", error);
-            }
-        }
-
-        const initialPageData = initialPageDataRef.current;
-
-        // If there was an error, fall back to fallbackFoundNode if available
-        if (pageDataErrorRef.current) {
-            if (fallbackFoundNode) {
-                found = fallbackFoundNode;
-            } else {
-                // No fallback available, return null to prevent crash
-                return null;
-            }
-        } else if (!initialPageData) {
-            // TODO: show a loading state
-            return null;
-        } else {
-            found = mergeFoundNodes(initialPageData.foundNode, fallbackFoundNode);
-        }
-    } else if (fallbackFoundNode) {
-        found = fallbackFoundNode;
-    } else {
-        throw new Error("Either pageDataDeps or fallbackFoundNode must be provided");
-    }
-
-    // these are all the "visible" nodes to prevent pruning if any of these nodes are hidden
-    // Memoize to prevent unnecessary re-renders of the entire navigation tree
-    const visibleNodeIds = useMemo(() => {
-        const visibleNodes = [...found.parents, found.node];
-        return visibleNodes.map((node) => node.id);
-    }, [found.parents, found.node]);
-
-    const isSingleOverviewPage = getIsSingleOverviewPage(found as FernNavigation.utils.Node.Found);
+const PageSidebar = React.memo(function PageSidebar({ prefetchedLoaderData }: PageSidebarProps) {
     const isSidebarFixed = getIsSidebarFixed(prefetchedLoaderData.config);
 
-    // Memoize sidebar root to prevent re-renders when only selected state changes
-    const sidebarRoot = useMemo(() => found.sidebar, [found.sidebar?.id]);
+    // Get the root sidebar from layout - memoized by ID to prevent re-renders
+    const sidebarRoot = useMemo(() => {
+        return prefetchedLoaderData.layout?.sidebarRoot;
+    }, [prefetchedLoaderData.layout?.sidebarRoot?.id]);
 
+    // Get tabs from layout - memoized to prevent re-renders
+    const tabs = useMemo(() => {
+        return prefetchedLoaderData.layout?.tabs;
+    }, [prefetchedLoaderData.layout?.tabs]);
+
+    if (!sidebarRoot) {
+        return null;
+    }
+
+    // Render the full navigation tree - selection state comes from global atoms
+    // No need for visibleNodeIds or baseFoundNode - selection is managed by navigation state
     return (
         <>
-            {!pageDataDeps && fallbackFoundNode && (
-                // For fallback nodes (non-page nodes like "endpoint"), set navigation state here
-                // PageNode currently does not render SetCurrentNavigationNode for non-pages
-                // TODO: restructure the app so that SetCurrentNavigationNode is always rendered
-                <SetCurrentNavigationNode
-                    nodeId={found.node.id}
-                    sidebarRootNodeId={found.sidebar?.id}
-                    tabId={found.currentTab?.id}
-                    productId={found.currentProduct?.productId}
-                    productSlug={found.currentProduct?.slug}
-                    versionId={found.currentVersion?.versionId}
-                    versionSlug={found.currentVersion?.slug}
-                    versionIsDefault={found.isCurrentVersionDefault}
-                    productIsDefault={found.isCurrentProductDefault}
-                />
-            )}
-            {found.tabs && found.tabs.length > 0 && (
+            {tabs && tabs.length > 0 && (
                 <SidebarClientTabsRoot loaderData={prefetchedLoaderData}>
-                    <SidebarTabsList tabs={found.tabs} forceClientRender={true} />
+                    <SidebarTabsList tabs={tabs} forceClientRender={true} />
                 </SidebarClientTabsRoot>
             )}
-            {isSingleOverviewPage && !isSidebarFixed ? (
-                <HiddenSidebar />
-            ) : (
-                <>
-                    {/* Always use the current found node as the base when creating a new page */}
-                    <CreatePageButton baseFoundNode={found} />
-                    <SidebarClientRootNode
-                        root={sidebarRoot}
-                        visibleNodeIds={visibleNodeIds}
-                        loaderData={prefetchedLoaderData}
-                        forceClientRender={true}
-                    />
-                </>
-            )}
+            <SidebarClientRootNode
+                root={sidebarRoot}
+                visibleNodeIds={undefined}
+                loaderData={prefetchedLoaderData}
+                forceClientRender={true}
+            />
         </>
     );
-}
+});
+
+export default PageSidebar;
