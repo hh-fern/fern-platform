@@ -45,6 +45,7 @@ export default function PageNode(props: PageNode.Props) {
     const initialPageDataRef = useRef<ResolvedPageData | null>(null);
     const pageDataErrorRef = useRef<Error | null>(null);
     const hasRedirectedToChild = useRef(false);
+    const lastSectionId = useRef<FernNavigation.NodeId | null>(null);
 
     // Try to resolve initial page data, catching errors to allow nav to still render
     if (hydrated && pageDataDeps && !initialPageDataRef.current && !pageDataErrorRef.current) {
@@ -155,6 +156,13 @@ export default function PageNode(props: PageNode.Props) {
     // For sections, redirect to first child page (prefer client pages)
     // Do this early to avoid setting navigation state and triggering sidebar renders
     // Wait for hydration to ensure pageRegistry is available
+
+    // Reset redirect flag if we're viewing a different section
+    if (found.node.type === "section" && lastSectionId.current !== found.node.id) {
+        hasRedirectedToChild.current = false;
+        lastSectionId.current = found.node.id;
+    }
+
     if (found.node.type === "section" && !hasRedirectedToChild.current && hydrated) {
         // Find first client page child
         const clientPageChild = pageRegistry
