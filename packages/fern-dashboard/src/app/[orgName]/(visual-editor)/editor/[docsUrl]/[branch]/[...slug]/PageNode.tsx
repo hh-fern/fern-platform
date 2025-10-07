@@ -18,9 +18,9 @@ import PageContents from "./PageContents";
 
 export declare namespace PageNode {
     export type Props = {
-        /** Resolves to initial data for page nodes */
-        pageDataDeps: ClientPageDataDependencies | ServerPageDataDependencies;
-        /** Directly accepts found node from loader for non-page nodes (e.g. "endpoint") */
+        /** Resolves to initial data for page nodes (optional for sections without content) */
+        pageDataDeps?: ClientPageDataDependencies | ServerPageDataDependencies;
+        /** Directly accepts found node from loader for non-page nodes (e.g. "endpoint", "section") */
         fallbackFoundNode?: SerializableFoundNode;
         cssConfig?: { inline?: string[] };
     };
@@ -37,7 +37,7 @@ export default function PageNode(props: PageNode.Props) {
     const pageDataErrorRef = useRef<Error | null>(null);
 
     // Try to resolve initial page data, catching errors to allow nav to still render
-    if (hydrated && !initialPageDataRef.current && !pageDataErrorRef.current) {
+    if (hydrated && pageDataDeps && !initialPageDataRef.current && !pageDataErrorRef.current) {
         try {
             initialPageDataRef.current = resolveInitialPageData(pageDataDeps);
         } catch (error) {
@@ -66,32 +66,32 @@ export default function PageNode(props: PageNode.Props) {
         return <UnsupportedContent>Failed to load page data: {pageDataErrorRef.current.message}</UnsupportedContent>;
     }
 
-    if (!initialPageData) {
+    // For sections without content, use fallbackFoundNode directly
+    if (!initialPageData && !fallbackFoundNode) {
         // TODO: show a loading state
         return null;
     }
 
-    const initialFoundNode = initialPageData.foundNode;
+    const initialFoundNode = initialPageData?.foundNode;
+    const found = mergeFoundNodes(initialFoundNode, fallbackFoundNode);
 
-    if (!initialFoundNode) {
+    if (!found) {
         return (
             <UnsupportedContent>
                 This page is not visible in Fern Editor: &ldquo;
-                {pageDataDeps.filename}
+                {pageDataDeps?.filename || "unknown"}
                 &rdquo;
             </UnsupportedContent>
         );
     }
 
-    const found = mergeFoundNodes(initialFoundNode, fallbackFoundNode);
-
-    const isUnsupportedNodeType = initialFoundNode.node.type !== "page" && initialFoundNode.node.type !== "section";
+    const isUnsupportedNodeType = found.node.type !== "page" && found.node.type !== "section";
 
     if (isUnsupportedNodeType) {
         return (
             <UnsupportedContent>
                 This page type is not visible in Fern Editor: &ldquo;
-                {initialFoundNode.node.type}
+                {found.node.type}
                 &rdquo;
             </UnsupportedContent>
         );
@@ -111,11 +111,17 @@ export default function PageNode(props: PageNode.Props) {
                 productIsDefault={found.isCurrentProductDefault}
             />
             <CSSProvider cssConfig={cssConfig}>
-                <PageContents
-                    filename={initialPageData.filename}
-                    initialHtml={initialPageData.html}
-                    initialFrontmatter={initialPageData.frontmatter}
-                />
+                {initialPageData ? (
+                    <PageContents
+                        filename={initialPageData.filename}
+                        initialHtml={initialPageData.html}
+                        initialFrontmatter={initialPageData.frontmatter}
+                    />
+                ) : (
+                    <UnsupportedContent>
+                        This section has no content. Add pages to this section from the sidebar.
+                    </UnsupportedContent>
+                )}
             </CSSProvider>
         </>
     );

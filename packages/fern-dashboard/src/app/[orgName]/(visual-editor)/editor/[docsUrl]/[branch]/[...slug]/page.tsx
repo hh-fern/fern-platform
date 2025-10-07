@@ -120,41 +120,59 @@ export default async function Page({
         // Get a serializable copy of the found node to be passed over the wire to PageNode
         serializableFoundNode = getSerializableFoundNode(navigationNode);
 
-        // If this is a section node, redirect to the first child page
+        // If this is a section node, handle it appropriately
         if (serializableFoundNode.node.type === "section") {
-            const firstChildSlug = findFirstPageSlug(serializableFoundNode.node);
-            if (firstChildSlug) {
-                return redirect(
-                    constructEditorSlug({
-                        orgName,
-                        docsUrl,
-                        branchName: branch,
-                        slug: firstChildSlug
-                    })
-                );
+            // If the section has markdown content, treat it as a page
+            const sectionHasContent = FernNavigation.hasMarkdown(serializableFoundNode.node);
+
+            if (!sectionHasContent) {
+                // Try to redirect to the first child page
+                const firstChildSlug = findFirstPageSlug(serializableFoundNode.node);
+                if (firstChildSlug) {
+                    return redirect(
+                        constructEditorSlug({
+                            orgName,
+                            docsUrl,
+                            branchName: branch,
+                            slug: firstChildSlug
+                        })
+                    );
+                }
+                // If no server child page found, the section might have client pages only
+                // Let PageNode handle this - it will show the section container with client pages
+                // via SidebarClientNavigationChildInjector
             }
-            // If no child page found, show 404
-            notFound();
+            // Section has content or only client children - render it as a page
         }
 
-        // This is a server page, get the page id and fetch data from the loader
+        // This is a server page (or section), get the page id and fetch data from the loader
         const pageId = getPageId(serializableFoundNode.node);
         const page = pageId ? await loader.getPage(pageId) : undefined;
 
         if (!page) {
-            throw new Error(`Node is not of type "page": "${serializableFoundNode.node.type}"`);
+            // If no page data exists, this might be:
+            // 1. A section with no markdown content (just a container for client pages)
+            // 2. An unsupported node type
+            // For sections, we'll render them with just the fallbackFoundNode
+            if (serializableFoundNode.node.type === "section") {
+                // Section with no content - will be rendered as a container
+                // Client pages will be injected via SidebarClientNavigationChildInjector
+                pageDataDeps = undefined;
+            } else {
+                throw new Error(`Node is not of type "page": "${serializableFoundNode.node.type}"`);
+            }
+        } else {
+            // TODO: if rawMarkdown is not available, show a warning to the user that they need to upgrade their CLI version
+            const rawMarkdown = page.rawMarkdown ?? page.markdown;
+
+            pageDataDeps = {
+                source: "server",
+                filename: page.filename,
+                initialMdx: rawMarkdown,
+                initialFoundNode: serializableFoundNode
+            };
+            cssConfig = page.css;
         }
-
-        // TODO: if rawMarkdown is not available, show a warning to the user that they need to upgrade their CLI version
-        const rawMarkdown = page.rawMarkdown ?? page.markdown;
-
-        pageDataDeps = {
-            source: "server",
-            filename: page.filename,
-            initialMdx: rawMarkdown,
-            initialFoundNode: serializableFoundNode
-        };
-        cssConfig = page.css;
     }
 
     return (
