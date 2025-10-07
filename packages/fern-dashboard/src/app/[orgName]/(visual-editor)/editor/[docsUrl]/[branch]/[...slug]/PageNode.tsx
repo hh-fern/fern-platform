@@ -11,6 +11,7 @@ import {
 } from "@fern-docs/components/navigation";
 import { constructEditorSlug } from "@fern-docs/components/navigation";
 import { SetCurrentNavigationNode, useDispatchSidebarAction } from "@fern-docs/components/state/navigation";
+import { useIsomorphicLayoutEffect } from "@fern-ui/react-commons";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import type { Auth0OrgName } from "@/app/services/auth0/types";
@@ -58,6 +59,27 @@ export default function PageNode(props: PageNode.Props) {
     const initialPageData = initialPageDataRef.current;
 
     const didRegisterPage = useRef(false);
+    const didRegisterParent = useRef(false);
+
+    // For client pages, register the parent relationship BEFORE SetCurrentNavigationNode runs
+    // This must happen in useLayoutEffect (before browser paint) so that when SetCurrentNavigationNode
+    // dispatches expand-soft, the parent relationship is already in the childToParentsMap
+    useIsomorphicLayoutEffect(() => {
+        if (didRegisterParent.current) {
+            return;
+        }
+        if (initialPageData?.source === "client") {
+            const pageEntry = pageRegistry?.[initialPageData.filename];
+            if (pageEntry?.parentSectionId) {
+                const nodeId = initialPageData.foundNode.node.id;
+                // The parent hierarchy is: immediate parent section
+                const parentIds = [pageEntry.parentSectionId];
+                dispatchSidebarAction({ type: "add-node-parent", nodeId, parentIds });
+                didRegisterParent.current = true;
+            }
+        }
+    }, [initialPageData, dispatchSidebarAction, pageRegistry]);
+
     useEffect(() => {
         if (didRegisterPage.current) {
             return;
@@ -67,19 +89,8 @@ export default function PageNode(props: PageNode.Props) {
             didRegisterPage.current = true;
             // Set current filename so @devPanel knows about the current page
             setCurrentFilename(initialPageData.filename);
-
-            // For client pages, register the parent relationship so sections expand properly
-            if (initialPageData.source === "client") {
-                const pageEntry = pageRegistry?.[initialPageData.filename];
-                if (pageEntry?.parentSectionId) {
-                    const nodeId = initialPageData.foundNode.node.id;
-                    // The parent hierarchy is: immediate parent section
-                    const parentIds = [pageEntry.parentSectionId];
-                    dispatchSidebarAction({ type: "add-node-parent", nodeId, parentIds });
-                }
-            }
         }
-    }, [hydrated, initialPageData, registerPage, setCurrentFilename, dispatchSidebarAction, pageRegistry]);
+    }, [hydrated, initialPageData, registerPage, setCurrentFilename]);
 
     // If there was an error resolving page data, show error message but don't crash
     if (pageDataErrorRef.current) {
