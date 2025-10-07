@@ -156,6 +156,7 @@ export default function PageNode(props: PageNode.Props) {
     // For sections, redirect to first child page (prefer client pages)
     // Do this early to avoid setting navigation state and triggering sidebar renders
     // Wait for hydration to ensure pageRegistry is available
+    // ONLY redirect if we're actually rendering a section page (not a child page with section as fallback)
 
     // Reset redirect flag if we're viewing a different section
     if (found.node.type === "section" && lastSectionId.current !== found.node.id) {
@@ -163,7 +164,15 @@ export default function PageNode(props: PageNode.Props) {
         lastSectionId.current = found.node.id;
     }
 
-    if (found.node.type === "section" && !hasRedirectedToChild.current && hydrated) {
+    // Only redirect if:
+    // 1. The found node is a section
+    // 2. We haven't already redirected for this section
+    // 3. We're hydrated (pageRegistry is available)
+    // 4. We're actually rendering a section page (initialPageData doesn't exist or is for a section)
+    //    This prevents redirecting when we're on a client page that uses section as fallbackFoundNode
+    const isSectionPage = found.node.type === "section" && (!initialPageData || initialPageData.foundNode.node.type === "section");
+
+    if (isSectionPage && !hasRedirectedToChild.current && hydrated) {
         // Find first client page child
         const clientPageChild = pageRegistry
             ? Object.values(pageRegistry).find((entry) => {
