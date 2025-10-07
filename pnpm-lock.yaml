@@ -2406,6 +2406,9 @@ importers:
       estree-util-is-identifier-name:
         specifier: ^3.0.0
         version: 3.0.0
+      estree-util-to-js:
+        specifier: ^2.0.0
+        version: 2.0.0
       estree-util-value-to-estree:
         specifier: ^3.3.3
         version: 3.4.0

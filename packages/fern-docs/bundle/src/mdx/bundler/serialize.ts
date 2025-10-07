@@ -34,10 +34,18 @@ import {
     sanitizeMdxExpression
 } from "@fern-docs/mdx";
 import {
+    rehypeAccordions,
     rehypeAcornErrorBoundary,
+    rehypeButtons,
+    rehypeCards,
+    rehypeCodeBlock,
     rehypeExpressionToMd,
     rehypeMdxClassStyle,
+    rehypeParamField,
     rehypeSlug,
+    rehypeSteps,
+    rehypeTable,
+    rehypeTabs,
     rehypeToc,
     remarkInjectEsm,
     remarkSanitizeAcorn
@@ -45,10 +53,6 @@ import {
 
 import { getMDXExport } from "../get-mdx-export";
 import { rehypeAccordionNestedHeaders } from "../plugins/rehype-accordion-nested-headers";
-import { rehypeAccordions } from "../plugins/rehype-accordions";
-import { rehypeButtons } from "../plugins/rehype-buttons";
-import { rehypeCards } from "../plugins/rehype-cards";
-import { rehypeCodeBlock } from "@fern-docs/mdx/plugins";
 import { rehypeCollectJsx } from "../plugins/rehype-collect-jsx";
 import { rehypeEndpointExampleSnippets } from "../plugins/rehype-endpoint-example-snippets";
 import { rehypeEndpointSchemaSnippets } from "../plugins/rehype-endpoint-schema-snippet";
@@ -56,10 +60,6 @@ import { rehypeExtractAsides } from "../plugins/rehype-extract-asides";
 import { rehypeFiles } from "../plugins/rehype-files";
 import { type RehypeLinksOptions, rehypeLinks } from "../plugins/rehype-links";
 import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
-import { rehypeParamField } from "../plugins/rehype-param-field";
-import { rehypeSteps } from "../plugins/rehype-steps";
-import { rehypeTable } from "../plugins/rehype-table";
-import { rehypeTabs } from "../plugins/rehype-tabs";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
 
 // gracefulify fs to avoid EMFILE errors on Vercel

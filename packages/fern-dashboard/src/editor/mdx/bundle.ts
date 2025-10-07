@@ -6,16 +6,18 @@ import remarkMath from "remark-math";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
 import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
-import { rehypeMdxClassStyle } from "@fern-docs/mdx/plugins";
-import { rehypeCodeBlock } from "@fern-docs/mdx/plugins";
+import {
+    rehypeAccordions,
+    rehypeButtons,
+    rehypeCards,
+    rehypeCodeBlock,
+    rehypeMdxClassStyle,
+    rehypeParamField,
+    rehypeSteps,
+    rehypeTable,
+    rehypeTabs
+} from "@fern-docs/mdx/plugins";
 
-import { rehypeAccordions } from "../../../fern-docs/bundle/src/mdx/plugins/rehype-accordions";
-import { rehypeButtons } from "../../../fern-docs/bundle/src/mdx/plugins/rehype-buttons";
-import { rehypeCards } from "../../../fern-docs/bundle/src/mdx/plugins/rehype-cards";
-import { rehypeParamField } from "../../../fern-docs/bundle/src/mdx/plugins/rehype-param-field";
-import { rehypeSteps } from "../../../fern-docs/bundle/src/mdx/plugins/rehype-steps";
-import { rehypeTable } from "../../../fern-docs/bundle/src/mdx/plugins/rehype-table";
-import { rehypeTabs } from "../../../fern-docs/bundle/src/mdx/plugins/rehype-tabs";
 import { rehypeEditorComponents } from "./plugins/rehype-editor-components";
 import { rehypeEndpointExampleSnippets } from "./plugins/rehype-endpoint-example-snippets";
 import { rehypeEndpointSchemaSnippets } from "./plugins/rehype-endpoint-schema-snippets";

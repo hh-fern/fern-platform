@@ -1,4 +1,8 @@
-import { CONTINUE, type Hast, type Unified, isMdxJsxAttribute, isMdxJsxElementHast, visit } from "@fern-docs/mdx";
+import { CONTINUE, visit } from "unist-util-visit";
+
+import { isMdxJsxAttribute, isMdxJsxElementHast } from "../mdx-utils";
+import type { Hast } from "../types";
+import type { Unified } from "../unified";
 
 /**
  * processes ParamField components and sets a title property

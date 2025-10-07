@@ -1,19 +1,13 @@
+import { isNonNullish } from "@fern-api/ui-core-utils";
 import { jsx, toJs } from "estree-util-to-js";
 import { toEstree } from "hast-util-to-estree";
+import type { MdxJsxAttribute, MdxJsxExpressionAttribute } from "mdast-util-mdx";
+import { CONTINUE, SKIP, visit } from "unist-util-visit";
 
-import { isNonNullish } from "@fern-api/ui-core-utils";
-import {
-    CONTINUE,
-    type Hast,
-    type MdxJsxAttribute,
-    type MdxJsxExpressionAttribute,
-    SKIP,
-    type Unified,
-    isHastElement,
-    isMdxJsxElementHast,
-    unknownToMdxJsxAttribute,
-    visit
-} from "@fern-docs/mdx";
+import { isHastElement } from "../hast-utils";
+import { isMdxJsxElementHast, unknownToMdxJsxAttribute } from "../mdx-utils";
+import type { Hast } from "../types";
+import type { Unified } from "../unified";
 
 /**
  * The code below converts `<Steps>` and `<StepGroup>` components

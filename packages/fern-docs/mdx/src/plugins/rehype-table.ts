@@ -1,4 +1,7 @@
-import { SKIP, type Unified, isMdxJsxElementHast, visit } from "@fern-docs/mdx";
+import { SKIP, visit } from "unist-util-visit";
+
+import { isMdxJsxElementHast } from "../mdx-utils";
+import type { Unified } from "../unified";
 
 export const rehypeTable: Unified.Plugin<[], any> = () => {
     return (tree) => {

@@ -17,26 +17,26 @@ import {
     toTree
 } from "@fern-docs/mdx";
 import {
+    rehypeAccordions,
     rehypeAcornErrorBoundary,
+    rehypeButtons,
+    rehypeCards,
+    rehypeCodeBlock,
     rehypeExpressionToMd,
     rehypeMdxClassStyle,
+    rehypeParamField,
     rehypeSlug,
     rehypeSqueezeParagraphs,
+    rehypeSteps,
+    rehypeTable,
+    rehypeTabs,
     remarkSanitizeAcorn
 } from "@fern-docs/mdx/plugins";
 
 import { rehypeAccordionNestedHeaders } from "../plugins/rehype-accordion-nested-headers";
-import { rehypeAccordions } from "../plugins/rehype-accordions";
-import { rehypeButtons } from "../plugins/rehype-buttons";
-import { rehypeCards } from "../plugins/rehype-cards";
-import { rehypeCodeBlock } from "@fern-docs/mdx/plugins";
 import { rehypeFiles } from "../plugins/rehype-files";
 import { type RehypeLinksOptions, rehypeLinks } from "../plugins/rehype-links";
 import { rehypeMigrateJsx } from "../plugins/rehype-migrate-jsx";
-import { rehypeParamField } from "../plugins/rehype-param-field";
-import { rehypeSteps } from "../plugins/rehype-steps";
-import { rehypeTable } from "../plugins/rehype-table";
-import { rehypeTabs } from "../plugins/rehype-tabs";
 import { rehypeExtractAsides } from "../plugins/rehypeExtractAsides";
 import { remarkExtractTitle } from "../plugins/remark-extract-title";
 import type { SerializeMdxResponse } from "./serialize";
