@@ -20,6 +20,16 @@ import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import type { Slug } from "@fern-api/fdr-sdk/navigation";
 
 /**
+ * Extended layout config with navigation tree and tabs
+ */
+export type FernLayoutConfigWithNavigation = FernLayoutConfig & {
+    /** The sidebar navigation tree */
+    sidebarRoot?: FernNavigation.SidebarRootNode;
+    /** Navigation tabs */
+    tabs?: FernNavigation.TabNode[];
+};
+
+/**
  * Serializable data structure for transmission over the wire to the client.
  * ⚠️ NEVER add sensitive information e.g. secrets, tokens, etc. to this interface.
  */
@@ -28,12 +38,7 @@ export interface DangerousTransmittableDocsLoaderData {
     config: Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">;
     authState: AuthState;
     edgeFlags: EdgeFlags;
-    layout: FernLayoutConfig & {
-        /** The sidebar navigation tree */
-        sidebarRoot?: FernNavigation.SidebarRootNode;
-        /** Navigation tabs */
-        tabs?: FernNavigation.TabNode[];
-    };
+    layout: FernLayoutConfigWithNavigation;
 }
 
 /**
@@ -47,10 +52,7 @@ export class PrefetchedDocsLoader implements DocsLoader<false> {
     private config: Omit<DocsV1Read.DocsDefinition["config"], "navigation" | "root">;
     private authState: AuthState;
     private edgeFlags: EdgeFlags;
-    private layout: FernLayoutConfig & {
-        sidebarRoot?: FernNavigation.SidebarRootNode;
-        tabs?: FernNavigation.TabNode[];
-    };
+    private layout: FernLayoutConfigWithNavigation;
 
     constructor({ config, domain, authState, edgeFlags, layout }: DangerousTransmittableDocsLoaderData) {
         this.config = config;
@@ -94,10 +96,7 @@ export class PrefetchedDocsLoader implements DocsLoader<false> {
         return this.edgeFlags;
     }
 
-    getLayout(): FernLayoutConfig & {
-        sidebarRoot?: FernNavigation.SidebarRootNode;
-        tabs?: FernNavigation.TabNode[];
-    } {
+    getLayout(): FernLayoutConfigWithNavigation {
         return this.layout;
     }
 

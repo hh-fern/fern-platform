@@ -49,17 +49,68 @@ export default async function SidebarPage({
         loader.getRoot()
     ]);
 
-    // Find any page in the navigation to extract the sidebar and tabs
-    // All pages within the same docs share the same sidebar/tabs structure
-    const firstPageSlug = root.pointsTo ?? root.slug;
-    const foundNode = FernNavigation.utils.findNode(root, firstPageSlug);
+    const requestedSlug = slugjoin(slug);
 
+    let pageDataDeps: PageNodeNamespace.Props["pageDataDeps"];
+    let serializableFoundNode: SerializableFoundNode | undefined;
+
+    if (resolvedSearchParams["client-page"]) {
+        pageDataDeps = {
+            source: "client",
+            filename: getClientPageDefaultFilename(requestedSlug)
+        };
+    } else {
+        // If requested slug == ROOT_SLUG_ALIAS ("root"), use slug from the root node instead
+        const navigationSlug = requestedSlug === ROOT_SLUG_ALIAS ? root.slug : requestedSlug;
+        const navigationNode = FernNavigation.utils.findNode(root, navigationSlug);
+
+        if (navigationNode.type === "notFound") {
+            // Throw 404 to prevent infinite redirect loop
+            if (navigationSlug === root.slug) {
+                notFound();
+            }
+            return redirect(
+                constructEditorSlug({
+                    orgName,
+                    docsUrl,
+                    branchName: branch,
+                    slug: ROOT_SLUG_ALIAS
+                })
+            );
+        }
+
+        // Redirect to redirect target if specified
+        if (navigationNode.type === "redirect") {
+            return redirect(
+                constructEditorSlug({
+                    orgName,
+                    docsUrl,
+                    branchName: branch,
+                    slug: navigationNode.redirect
+                })
+            );
+        }
+
+        // Get a serializable copy of the found node to be passed to the sidebar
+        serializableFoundNode = getSerializableFoundNode(navigationNode);
+    }
+
+    // Extract sidebar and tabs from the current page's context
+    // This ensures the sidebar shows the correct tab for the current page
     let sidebarRoot: FernNavigation.SidebarRootNode | undefined;
     let tabs: FernNavigation.TabNode[] | undefined;
 
-    if (foundNode.type === "found") {
-        sidebarRoot = foundNode.sidebar;
-        tabs = foundNode.tabs as FernNavigation.TabNode[];
+    if (serializableFoundNode) {
+        sidebarRoot = serializableFoundNode.sidebar;
+        tabs = serializableFoundNode.tabs as FernNavigation.TabNode[];
+    } else {
+        // Fallback: find any page to extract sidebar/tabs if no serializable found node
+        const firstPageSlug = root.pointsTo ?? root.slug;
+        const foundNode = FernNavigation.utils.findNode(root, firstPageSlug);
+        if (foundNode.type === "found") {
+            sidebarRoot = foundNode.sidebar;
+            tabs = foundNode.tabs as FernNavigation.TabNode[];
+        }
     }
 
     const prefetchedLoaderData = new PrefetchedDocsLoader({
@@ -74,7 +125,5 @@ export default async function SidebarPage({
         }
     }).serializable();
 
-    // Sidebar doesn't need page-specific data - it renders the same navigation tree
-    // and relies on global navigation state (atoms) to determine what's selected
-    return <PageSidebar prefetchedLoaderData={prefetchedLoaderData} />;
+    return <PageSidebar prefetchedLoaderData={prefetchedLoaderData} fallbackFoundNode={serializableFoundNode} />;
 }

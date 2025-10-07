@@ -5,6 +5,7 @@ import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useRouter } from "@bprogress/next/app";
+import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 
 import {
     type SectionNodeWithTraversalContext,
@@ -28,11 +29,13 @@ import type { EncodedDocsUrl } from "@/utils/types";
 interface CreateClientPageProps {
     children: React.ReactNode;
     disabled?: boolean;
+    /** The base found node to create the page from */
+    baseFoundNode: SerializableFoundNode;
     /** The sidebar root node to create the page from */
-    sidebarRoot: import("@fern-api/fdr-sdk/navigation").SidebarRootNode;
+    sidebarRoot: FernNavigation.SidebarRootNode;
 }
 
-export function CreateClientPage({ children, disabled = false, sidebarRoot }: CreateClientPageProps) {
+export function CreateClientPage({ children, disabled = false, baseFoundNode, sidebarRoot }: CreateClientPageProps) {
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [pageTitle, setPageTitle] = useState("");
     const [pageSlug, setPageSlug] = useState("");
@@ -47,13 +50,6 @@ export function CreateClientPage({ children, disabled = false, sidebarRoot }: Cr
 
     // Get all sections from the navigation tree (including nested ones)
     const allSections = useMemo(() => getAllSectionsFromSidebarRootNode(sidebarRoot), [sidebarRoot]);
-
-    // Create a minimal baseFoundNode from the first registered page we can find
-    // This is used to synthesize the new page's navigation context
-    const baseFoundNode = useMemo(() => {
-        const firstPage = Object.values(registeredPages)[0];
-        return firstPage?.pageData.foundNode;
-    }, [registeredPages]);
 
     // Set default section on first load
     useEffect(() => {
