@@ -118,7 +118,8 @@ const SidebarLinkInternal = React.forwardRef<HTMLAnchorElement, SidebarLinkProps
                     }
 
                     // if the link is not selected AND is expanded, we do NOT want to close it.
-                    if (selected || !expanded) {
+                    // if the link IS selected (navigating to current page), keep it expanded
+                    if (!selected && !expanded) {
                         onToggleExpand?.(e);
                     }
                 }}
