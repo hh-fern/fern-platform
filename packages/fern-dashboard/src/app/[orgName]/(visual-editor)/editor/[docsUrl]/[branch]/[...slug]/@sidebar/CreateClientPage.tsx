@@ -168,7 +168,7 @@ export function CreateClientPage({ children, disabled = false, sidebarRoot }: Cr
                         branchName: branch,
                         slug: finalSlug,
                         query: {
-                            clientPage: true
+                            "client-page": true
                         }
                     })
                 );
