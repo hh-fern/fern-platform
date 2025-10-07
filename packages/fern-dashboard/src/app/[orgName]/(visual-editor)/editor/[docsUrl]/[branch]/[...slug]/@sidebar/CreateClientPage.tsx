@@ -15,6 +15,7 @@ import {
     getClientPageDefaultFilename,
     useNavigation
 } from "@fern-docs/components/navigation";
+import { useDispatchSidebarAction } from "@fern-docs/components/state/navigation";
 
 import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ export function CreateClientPage({ children, disabled = false, sidebarRoot }: Cr
     const params = useParams();
 
     const { registeredPages, createClientPage } = useNavigation();
+    const dispatchSidebarAction = useDispatchSidebarAction();
 
     // Get all sections from the navigation tree (including nested ones)
     const allSections = useMemo(() => getAllSectionsFromSidebarRootNode(sidebarRoot), [sidebarRoot]);
@@ -159,6 +161,9 @@ export function CreateClientPage({ children, disabled = false, sidebarRoot }: Cr
                     baseFoundNode: baseFoundNode,
                     targetSectionPath: selectedSection.sectionPath
                 });
+
+                // Expand the parent section so the new page is visible
+                dispatchSidebarAction({ type: "expand-soft", nodeId: selectedSection.id });
 
                 // Navigate to the new page
                 router.push(
