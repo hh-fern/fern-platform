@@ -16,7 +16,7 @@ import { SidebarClientTabsRoot } from "@fern-docs/components/sidebar/SidebarClie
 import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
 import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
 import { HiddenSidebar } from "@fern-docs/components/theming/HiddenSidebar";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
 import { CreatePageButton } from "./CreatePageButton";
 
@@ -72,11 +72,17 @@ export default function PageSidebar({ prefetchedLoaderData, pageDataDeps, fallba
     }
 
     // these are all the "visible" nodes to prevent pruning if any of these nodes are hidden
-    const visibleNodes = [...found.parents, found.node];
-    const visibleNodeIds = visibleNodes.map((node) => node.id);
+    // Memoize to prevent unnecessary re-renders of the entire navigation tree
+    const visibleNodeIds = useMemo(() => {
+        const visibleNodes = [...found.parents, found.node];
+        return visibleNodes.map((node) => node.id);
+    }, [found.parents, found.node]);
 
     const isSingleOverviewPage = getIsSingleOverviewPage(found as FernNavigation.utils.Node.Found);
     const isSidebarFixed = getIsSidebarFixed(prefetchedLoaderData.config);
+
+    // Memoize sidebar root to prevent re-renders when only selected state changes
+    const sidebarRoot = useMemo(() => found.sidebar, [found.sidebar?.id]);
 
     return (
         <>
@@ -108,7 +114,7 @@ export default function PageSidebar({ prefetchedLoaderData, pageDataDeps, fallba
                     {/* Always use the current found node as the base when creating a new page */}
                     <CreatePageButton baseFoundNode={found} />
                     <SidebarClientRootNode
-                        root={found.sidebar}
+                        root={sidebarRoot}
                         visibleNodeIds={visibleNodeIds}
                         loaderData={prefetchedLoaderData}
                         forceClientRender={true}

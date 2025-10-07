@@ -2,10 +2,11 @@
 
 import { type DangerousTransmittableDocsLoaderData, PrefetchedDocsLoader } from "@fern-api/docs-loader/client";
 import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import React from "react";
 
 import { SidebarRootNodeImpl } from "./SidebarRootNodeImpl";
 
-export function SidebarClientRootNode({
+export const SidebarClientRootNode = React.memo(function SidebarClientRootNode({
     root,
     visibleNodeIds,
     loaderData,
@@ -29,4 +30,4 @@ export function SidebarClientRootNode({
             forceClientRender={forceClientRender}
         />
     );
-}
+});
