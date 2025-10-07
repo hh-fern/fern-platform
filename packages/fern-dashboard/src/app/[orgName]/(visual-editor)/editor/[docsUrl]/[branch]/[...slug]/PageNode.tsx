@@ -9,7 +9,7 @@ import {
     type ServerPageDataDependencies,
     useNavigation
 } from "@fern-docs/components/navigation";
-import { SetCurrentNavigationNode } from "@fern-docs/components/state/navigation";
+import { SetCurrentNavigationNode, useDispatchSidebarAction } from "@fern-docs/components/state/navigation";
 import { useEffect, useRef } from "react";
 import { CSSProvider } from "@/components/editor/extension-custom-element/CSSContext";
 import { UnsupportedContent } from "@/components/editor/UnsupportedContent";
@@ -30,8 +30,9 @@ export declare namespace PageNode {
 export default function PageNode(props: PageNode.Props) {
     const { pageDataDeps, fallbackFoundNode, cssConfig } = props;
 
-    const { hydrated, resolveInitialPageData, registerPage } = useNavigation();
+    const { hydrated, resolveInitialPageData, registerPage, pageRegistry } = useNavigation();
     const { setCurrentFilename } = useCurrentPage();
+    const dispatchSidebarAction = useDispatchSidebarAction();
 
     // Store initial page data in a ref so we don't re-resolve it on every render
     const initialPageDataRef = useRef<ResolvedPageData | null>(null);
@@ -59,8 +60,19 @@ export default function PageNode(props: PageNode.Props) {
             didRegisterPage.current = true;
             // Set current filename so @devPanel knows about the current page
             setCurrentFilename(initialPageData.filename);
+
+            // For client pages, register the parent relationship so sections expand properly
+            if (initialPageData.source === "client") {
+                const pageEntry = pageRegistry?.[initialPageData.filename];
+                if (pageEntry?.parentSectionId) {
+                    const nodeId = initialPageData.foundNode.node.id;
+                    // The parent hierarchy is: immediate parent section
+                    const parentIds = [pageEntry.parentSectionId];
+                    dispatchSidebarAction({ type: "add-node-parent", nodeId, parentIds });
+                }
+            }
         }
-    }, [hydrated, initialPageData, registerPage, setCurrentFilename]);
+    }, [hydrated, initialPageData, registerPage, setCurrentFilename, dispatchSidebarAction, pageRegistry]);
 
     // If there was an error resolving page data, show error message but don't crash
     if (pageDataErrorRef.current) {

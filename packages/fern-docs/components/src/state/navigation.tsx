@@ -19,7 +19,8 @@ type SidebarAction =
     | { type: "reset"; currentNodeId: FernNavigation.NodeId | undefined }
     | { type: "collapse-all" }
     | { type: "expand-all" }
-    | { type: "reset-implicit" };
+    | { type: "reset-implicit" }
+    | { type: "add-node-parent"; nodeId: FernNavigation.NodeId; parentIds: FernNavigation.NodeId[] };
 
 type RootNodeState = {
     state: ReadonlyMap<FernNavigation.NodeId, ExpandedNodesState>;
@@ -261,6 +262,16 @@ const EMPTY_EXPANDED_NODES_STATE: ExpandedNodesState = {
  * @returns The new expanded nodes state
  */
 function reduceExpandedNodes(prev: ExpandedNodesState, action: SidebarAction): ExpandedNodesState {
+    if (action.type === "add-node-parent") {
+        // Add the node's parent relationship to the childToParentsMap
+        const newChildToParentsMap = new Map(prev.childToParentsMap);
+        newChildToParentsMap.set(action.nodeId, action.parentIds);
+        return {
+            ...prev,
+            childToParentsMap: newChildToParentsMap
+        };
+    }
+
     if (action.type === "reset") {
         return createInitialExpandedNodes(action.currentNodeId, prev.childToParentsMap);
     }
