@@ -50,7 +50,7 @@ Once running, the documentation site will be available at:
 
 The build requires a `.env.selfserved` file in this directory. Key variables include:
 
-- `NEXT_PUBLIC_IS_SELF_SERVED=1` - Enables self-served mode
+- `NEXT_PUBLIC_DOCS_DOMAIN` - Update to the docs site you want to host
 - Other Next.js and application-specific variables
 
 ## Build Stages
