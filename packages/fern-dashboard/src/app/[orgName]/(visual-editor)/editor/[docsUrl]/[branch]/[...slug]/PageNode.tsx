@@ -156,6 +156,7 @@ export default function PageNode(props: PageNode.Props) {
     // For sections, redirect to first child page (prefer client pages)
     // Do this early to avoid setting navigation state and triggering sidebar renders
     // Wait for hydration to ensure pageRegistry is available
+    // Only redirect if section has no content
 
     // Reset redirect flag if we're viewing a different section
     if (found.node.type === "section" && lastSectionId.current !== found.node.id) {
@@ -163,7 +164,12 @@ export default function PageNode(props: PageNode.Props) {
         lastSectionId.current = found.node.id;
     }
 
-    if (found.node.type === "section" && !hasRedirectedToChild.current && hydrated) {
+    // Check if section has its own markdown content
+    const sectionHasContent =
+        found.node.type === "section" &&
+        (FernNavigation.hasMarkdown(found.node) || (initialPageData && initialPageData.html));
+
+    if (found.node.type === "section" && !sectionHasContent && !hasRedirectedToChild.current && hydrated) {
         // Find first client page child
         const clientPageChild = pageRegistry
             ? Object.values(pageRegistry).find((entry) => {
