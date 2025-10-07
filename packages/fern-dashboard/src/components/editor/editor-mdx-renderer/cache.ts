@@ -1,8 +1,11 @@
+import type { TableOfContentsItem } from "@fern-docs/mdx";
+
 import { bundleEditorMDX } from "@/app/[orgName]/(visual-editor)/editor/[docsUrl]/[branch]/[...slug]/bundleEditorMdx";
 import type { EncodedDocsUrl } from "@/utils/types";
 
 interface CacheEntry {
     code: string;
+    toc: TableOfContentsItem[];
     error?: string;
     timestamp: number;
 }
@@ -52,9 +55,10 @@ async function processBatch(
                 // Cache the successful result
                 bundleCache.set(request.mdx, {
                     code: result.code,
+                    toc: result.toc,
                     timestamp: Date.now()
                 });
-                request.resolve({ code: result.code });
+                request.resolve({ code: result.code, toc: result.toc });
             } else {
                 // Don't cache errors - they should be retried on next request
                 request.reject(new Error(result.error));
@@ -91,7 +95,7 @@ function evictStaleEntries(): void {
  * Cached version of bundleMDX that evicts entries older than 10 minutes
  * @param mdx The MDX source string to bundle
  * @param options Optional docsUrl and branch for loader context
- * @returns The bundled MDX code
+ * @returns The bundled MDX code and TOC
  * @throws Error if bundling fails
  */
 export async function cachedBundleMDX(
@@ -100,7 +104,7 @@ export async function cachedBundleMDX(
         docsUrl?: EncodedDocsUrl;
         branch?: string;
     }
-): Promise<{ code: string }> {
+): Promise<{ code: string; toc: TableOfContentsItem[] }> {
     // Check cache first without blocking
     const cachedEntry = bundleCache.get(mdx);
 
@@ -110,7 +114,7 @@ export async function cachedBundleMDX(
 
         // Only return cached successful results, not errors
         if (!cachedEntry.error) {
-            return { code: cachedEntry.code };
+            return { code: cachedEntry.code, toc: cachedEntry.toc };
         }
         // If cached entry has an error, treat it as a cache miss and retry
     }
@@ -137,7 +141,7 @@ export function getCacheSize(): number {
 
 interface PendingRequest {
     mdx: string;
-    resolve: (result: { code: string }) => void;
+    resolve: (result: { code: string; toc: TableOfContentsItem[] }) => void;
     reject: (error: Error) => void;
 }
 
@@ -159,7 +163,7 @@ const BATCH_WINDOW_MS = 10;
  * Batched version of bundleMDX that collects requests and processes them together
  * @param mdx The MDX source string to bundle
  * @param options Optional docsUrl and branch for loader context
- * @returns The bundled MDX code
+ * @returns The bundled MDX code and TOC
  */
 async function batchedBundleMDX(
     mdx: string,
@@ -167,7 +171,7 @@ async function batchedBundleMDX(
         docsUrl?: EncodedDocsUrl;
         branch?: string;
     }
-): Promise<{ code: string }> {
+): Promise<{ code: string; toc: TableOfContentsItem[] }> {
     return new Promise((resolve, reject) => {
         // Create a key for this batch context
         const batchKey = `${options?.docsUrl ?? "default"}_${options?.branch ?? "default"}`;

@@ -2,13 +2,15 @@
 
 import { createEditableDocsLoader } from "@fern-api/docs-loader";
 import type { DocsLoader } from "@fern-api/docs-server/docs-loader";
+import type { TableOfContentsItem } from "@fern-docs/mdx";
 
 import { getCurrentSession } from "@/app/services/auth0/getCurrentSession";
 import { bundleMDX as internalBundleMDX } from "@/editor/mdx/bundle";
+import { asToc, getMDXExport } from "@/editor/mdx/get-mdx-export";
 import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import type { EncodedDocsUrl } from "@/utils/types";
 
-type BundleResult = { ok: true; code: string } | { ok: false; error: string };
+type BundleResult = { ok: true; code: string; toc: TableOfContentsItem[] } | { ok: false; error: string };
 
 export async function bundleEditorMDX(
     sources: string[],
@@ -47,7 +49,12 @@ export async function bundleEditorMDX(
         sources.map(async (source) => {
             try {
                 const result = await internalBundleMDX(source, { loader });
-                return { ok: true as const, code: result.code };
+
+                // Extract TOC from MDX exports
+                const exports = getMDXExport({ code: result.code });
+                const toc = asToc(exports?.toc);
+
+                return { ok: true as const, code: result.code, toc };
             } catch (error) {
                 return {
                     ok: false as const,

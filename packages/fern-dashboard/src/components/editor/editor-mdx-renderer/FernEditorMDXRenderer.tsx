@@ -17,6 +17,7 @@ import { EditorComponentChildrenProvider } from "@/components/editor/editor-comp
 import { EditorComponentProvider } from "@/components/editor/editor-component/EditorComponentContext";
 import { ErrorBoundary } from "@/docs/components/error-boundary";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useTableOfContents } from "@/providers/TableOfContentsContext";
 import type { EncodedDocsUrl } from "@/utils/types";
 
 import { UnsupportedContent } from "../UnsupportedContent";
@@ -118,6 +119,7 @@ interface BundlingState {
 interface BundledState {
     type: "BUNDLED";
     code: string;
+    toc: import("@fern-docs/mdx").TableOfContentsItem[];
 }
 
 interface ErrorState {
@@ -165,6 +167,7 @@ const MDXRenderer = React.memo(({ mdx, docsUrl, branch }: MDXRendererProps) => {
         type: "BUNDLING"
     });
     const components = useMDXComponents();
+    const { setTableOfContents } = useTableOfContents();
 
     useEffect(() => {
         let cancelled = false;
@@ -173,7 +176,9 @@ const MDXRenderer = React.memo(({ mdx, docsUrl, branch }: MDXRendererProps) => {
             try {
                 const result = await cachedBundleMDX(mdx, { docsUrl, branch });
                 if (!cancelled) {
-                    setState({ type: "BUNDLED", code: result.code });
+                    setState({ type: "BUNDLED", code: result.code, toc: result.toc });
+                    // Update the TOC context with the extracted TOC
+                    setTableOfContents(result.toc);
                 }
             } catch (error) {
                 if (!cancelled) {
@@ -186,7 +191,7 @@ const MDXRenderer = React.memo(({ mdx, docsUrl, branch }: MDXRendererProps) => {
         return () => {
             cancelled = true;
         };
-    }, [mdx, docsUrl, branch]);
+    }, [mdx, docsUrl, branch, setTableOfContents]);
 
     if (state.type === "BUNDLING") {
         return <LoadingTerminalElement />;

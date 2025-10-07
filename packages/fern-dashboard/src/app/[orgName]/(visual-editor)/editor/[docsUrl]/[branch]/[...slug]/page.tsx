@@ -19,7 +19,8 @@ import { getHostFromHeaders } from "@/utils/getHostFromHeaders";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
 import type { EncodedDocsUrl } from "@/utils/types";
 
-import PageNode, { type PageNode as PageNodeNamespace } from "./PageNode";
+import type { PageNode as PageNodeNamespace } from "./PageNode";
+import PageWithToc from "./PageWithToc";
 
 export const experimental_ppr = true;
 
@@ -123,13 +124,10 @@ export default async function Page({
     }
 
     return (
-        // TODO: Currently, we are force-hiding the table of contents is within Fern Editor.
-        // This is a temporary solution, as I anticipate we will want the TOC to be dynamic based
-        // on the tiptap editor's content.
-        <AbstractLayoutEvaluatorContent tableOfContents={[]} frontmatter={undefined}>
-            <div className="flex w-full flex-col gap-2 py-12">
-                <PageNode pageDataDeps={pageDataDeps} fallbackFoundNode={serializableFoundNode} cssConfig={cssConfig} />
-            </div>
-        </AbstractLayoutEvaluatorContent>
+        <PageWithToc
+            pageDataDeps={pageDataDeps}
+            fallbackFoundNode={serializableFoundNode}
+            cssConfig={cssConfig}
+        />
     );
 }
