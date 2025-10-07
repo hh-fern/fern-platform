@@ -48,6 +48,7 @@
 
   .fern-sidebar-group {
     @apply list-none;
+    @apply space-y-px;
     @apply max-lg:-mx-4;
 
     .fern-sidebar-group {
