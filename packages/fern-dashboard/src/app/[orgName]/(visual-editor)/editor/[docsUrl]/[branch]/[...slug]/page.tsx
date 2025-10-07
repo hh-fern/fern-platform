@@ -145,23 +145,22 @@ export default async function Page({
             // Section has content or only client children - render it as a page
         }
 
-        // This is a server page (or section), get the page id and fetch data from the loader
-        const pageId = getPageId(serializableFoundNode.node);
-        const page = pageId ? await loader.getPage(pageId) : undefined;
+        // For sections, don't use pageDataDeps - just use fallbackFoundNode
+        // Sections are containers that may or may not have content
+        if (serializableFoundNode.node.type === "section") {
+            // Section will be rendered using only fallbackFoundNode
+            // If it has content (pageId), PageNode will handle loading it
+            // If it has no content, client pages will be injected via SidebarClientNavigationChildInjector
+            pageDataDeps = undefined;
+        } else {
+            // This is a regular page - get the page data from the loader
+            const pageId = getPageId(serializableFoundNode.node);
+            const page = pageId ? await loader.getPage(pageId) : undefined;
 
-        if (!page) {
-            // If no page data exists, this might be:
-            // 1. A section with no markdown content (just a container for client pages)
-            // 2. An unsupported node type
-            // For sections, we'll render them with just the fallbackFoundNode
-            if (serializableFoundNode.node.type === "section") {
-                // Section with no content - will be rendered as a container
-                // Client pages will be injected via SidebarClientNavigationChildInjector
-                pageDataDeps = undefined;
-            } else {
+            if (!page) {
                 throw new Error(`Node is not of type "page": "${serializableFoundNode.node.type}"`);
             }
-        } else {
+
             // TODO: if rawMarkdown is not available, show a warning to the user that they need to upgrade their CLI version
             const rawMarkdown = page.rawMarkdown ?? page.markdown;
 

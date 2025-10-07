@@ -1,5 +1,6 @@
 "use client";
 
+import * as FernNavigation from "@fern-api/fdr-sdk/navigation";
 import {
     type ClientPageDataDependencies,
     mergeFoundNodes,
@@ -97,6 +98,11 @@ export default function PageNode(props: PageNode.Props) {
         );
     }
 
+    // For sections with markdown content, we need to fetch and render it
+    // For sections without content, just show a placeholder
+    const isSectionWithContent =
+        found.node.type === "section" && FernNavigation.hasMarkdown(found.node) && !initialPageData;
+
     return (
         <>
             <SetCurrentNavigationNode
@@ -117,6 +123,11 @@ export default function PageNode(props: PageNode.Props) {
                         initialHtml={initialPageData.html}
                         initialFrontmatter={initialPageData.frontmatter}
                     />
+                ) : isSectionWithContent ? (
+                    <UnsupportedContent>
+                        Section pages are not yet supported in the editor. This section has markdown content that cannot
+                        be edited here.
+                    </UnsupportedContent>
                 ) : (
                     <UnsupportedContent>
                         This section has no content. Add pages to this section from the sidebar.
