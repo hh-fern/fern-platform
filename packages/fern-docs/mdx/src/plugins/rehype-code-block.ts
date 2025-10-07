@@ -29,22 +29,32 @@ export const rehypeCodeBlock: Unified.Plugin<[], HastRoot> = () => {
 
             // code groups are not currently supported for twoslash
             if (node.name === "CodeGroup") {
-                for (const child of node.children) {
-                    if (child == null || child.type !== "element" || child.tagName !== "pre") {
-                        return;
+                // Check if all non-text children are valid <pre><code> elements
+                const hasValidCodeBlocks = node.children.every((child) => {
+                    // Skip text nodes (whitespace)
+                    if (child.type === "text") {
+                        return true;
                     }
 
-                    const codeNode = child.children[0];
-                    if (codeNode == null || codeNode.type !== "element" || codeNode.tagName !== "code") {
-                        return;
+                    if (child.type !== "element" || child.tagName !== "pre") {
+                        return false;
                     }
+
+                    const codeNode = child.children?.[0];
+                    return codeNode != null && codeNode.type === "element" && codeNode.tagName === "code";
+                });
+
+                // If valid, skip processing (twoslash not supported for code groups)
+                if (hasValidCodeBlocks) {
+                    return;
                 }
-                return;
+                // Otherwise, continue to let individual <pre> tags get processed
             }
         });
 
         /**
          * Convert <pre><code>...</code></pre> to <CodeBlock>...</CodeBlock>
+         * Also processes code blocks nested inside MDX JSX elements
          */
         visit(tree, "element", (node, index, parent) => {
             if (node.tagName !== "pre" || parent == null || index == null) {
