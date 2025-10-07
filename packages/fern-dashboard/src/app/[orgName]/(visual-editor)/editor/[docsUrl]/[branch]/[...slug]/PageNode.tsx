@@ -9,11 +9,15 @@ import {
     type ServerPageDataDependencies,
     useNavigation
 } from "@fern-docs/components/navigation";
+import { constructEditorSlug } from "@fern-docs/components/navigation";
 import { SetCurrentNavigationNode, useDispatchSidebarAction } from "@fern-docs/components/state/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { CSSProvider } from "@/components/editor/extension-custom-element/CSSContext";
 import { UnsupportedContent } from "@/components/editor/UnsupportedContent";
 import { useCurrentPage } from "@/providers/CurrentPageContext";
+import type { EncodedDocsUrl } from "@/utils/types";
 
 import PageContents from "./PageContents";
 
@@ -33,6 +37,8 @@ export default function PageNode(props: PageNode.Props) {
     const { hydrated, resolveInitialPageData, registerPage, pageRegistry } = useNavigation();
     const { setCurrentFilename } = useCurrentPage();
     const dispatchSidebarAction = useDispatchSidebarAction();
+    const router = useRouter();
+    const params = useParams();
 
     // Store initial page data in a ref so we don't re-resolve it on every render
     const initialPageDataRef = useRef<ResolvedPageData | null>(null);
@@ -133,6 +139,63 @@ export default function PageNode(props: PageNode.Props) {
             </UnsupportedContent>
         );
     }
+
+    // For sections, redirect to first child page (prefer client pages)
+    const hasRedirectedToChild = useRef(false);
+    useEffect(() => {
+        if (hasRedirectedToChild.current || found.node.type !== "section") {
+            return;
+        }
+
+        // Find first client page child
+        const clientPageChild = pageRegistry
+            ? Object.values(pageRegistry).find((entry) => {
+                  return (
+                      entry.pageData.source === "client" &&
+                      !entry.isMarkedForDeletion &&
+                      entry.parentSectionId === found.node.id
+                  );
+              })
+            : undefined;
+
+        // Find first server page child
+        const sectionNode = found.node as FernNavigation.SectionNode;
+        const findFirstServerPageSlug = (node: FernNavigation.SectionNode): string | undefined => {
+            for (const child of node.children) {
+                if (child.type === "page") {
+                    return child.slug;
+                }
+                if (child.type === "section") {
+                    const childPageSlug = findFirstServerPageSlug(child);
+                    if (childPageSlug) {
+                        return childPageSlug;
+                    }
+                }
+            }
+            return undefined;
+        };
+        const serverPageSlug = findFirstServerPageSlug(sectionNode);
+
+        // Prefer client page, fallback to server page
+        const targetSlug = clientPageChild?.pageData.frontmatter?.slug || serverPageSlug;
+
+        if (targetSlug) {
+            hasRedirectedToChild.current = true;
+            const orgName = params.orgName as Auth0OrgName;
+            const docsUrl = params.docsUrl as EncodedDocsUrl;
+            const branch = params.branch as string;
+
+            router.push(
+                constructEditorSlug({
+                    orgName,
+                    docsUrl,
+                    branchName: branch,
+                    slug: targetSlug,
+                    query: clientPageChild ? { "client-page": true } : undefined
+                })
+            );
+        }
+    }, [found.node, pageRegistry, router, params]);
 
     // For sections with markdown content, we need to fetch and render it
     // For sections without content, just show a placeholder
