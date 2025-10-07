@@ -12,7 +12,7 @@ import {
 import { constructEditorSlug } from "@fern-docs/components/navigation";
 import { SetCurrentNavigationNode, useDispatchSidebarAction } from "@fern-docs/components/state/navigation";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import type { Auth0OrgName } from "@/app/services/auth0/types";
 import { CSSProvider } from "@/components/editor/extension-custom-element/CSSContext";
 import { UnsupportedContent } from "@/components/editor/UnsupportedContent";
@@ -142,6 +142,8 @@ export default function PageNode(props: PageNode.Props) {
 
     // For sections, redirect to first child page (prefer client pages)
     const hasRedirectedToChild = useRef(false);
+    const [isRedirecting, setIsRedirecting] = React.useState(false);
+
     useEffect(() => {
         if (hasRedirectedToChild.current || found.node.type !== "section") {
             return;
@@ -200,6 +202,7 @@ export default function PageNode(props: PageNode.Props) {
 
         if (targetSlug) {
             hasRedirectedToChild.current = true;
+            setIsRedirecting(true);
             const orgName = params.orgName as Auth0OrgName;
             const docsUrl = params.docsUrl as EncodedDocsUrl;
             const branch = params.branch as string;
@@ -215,6 +218,11 @@ export default function PageNode(props: PageNode.Props) {
             );
         }
     }, [found.node, pageRegistry, router, params]);
+
+    // If we're redirecting to a child page, show nothing (prevents flash of content)
+    if (isRedirecting) {
+        return null;
+    }
 
     // For sections with markdown content, we need to fetch and render it
     // For sections without content, just show a placeholder
