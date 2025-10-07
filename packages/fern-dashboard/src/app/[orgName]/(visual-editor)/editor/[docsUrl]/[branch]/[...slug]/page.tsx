@@ -23,24 +23,6 @@ import PageNode, { type PageNode as PageNodeNamespace } from "./PageNode";
 
 export const experimental_ppr = true;
 
-/**
- * Recursively finds the slug of the first page within a section node
- */
-function findFirstPageSlug(node: FernNavigation.SectionNode): string | undefined {
-    for (const child of node.children) {
-        if (child.type === "page") {
-            return child.slug;
-        }
-        if (child.type === "section") {
-            const childPageSlug = findFirstPageSlug(child);
-            if (childPageSlug) {
-                return childPageSlug;
-            }
-        }
-    }
-    return undefined;
-}
-
 export default async function Page({
     params,
     searchParams
@@ -120,24 +102,9 @@ export default async function Page({
         // Get a serializable copy of the found node to be passed over the wire to PageNode
         serializableFoundNode = getSerializableFoundNode(navigationNode);
 
-        // If this is a section node, redirect to first child page
-        if (serializableFoundNode.node.type === "section") {
-            // Try to redirect to the first child page (whether section has content or not)
-            const firstChildSlug = findFirstPageSlug(serializableFoundNode.node);
-            if (firstChildSlug) {
-                return redirect(
-                    constructEditorSlug({
-                        orgName,
-                        docsUrl,
-                        branchName: branch,
-                        slug: firstChildSlug
-                    })
-                );
-            }
-            // If no server child page found, the section might have client pages only
-            // Let PageNode handle this - it will show the section container with client pages
-            // via SidebarClientNavigationChildInjector
-        }
+        // If this is a section node, let PageNode handle the redirect client-side
+        // (PageNode can see both client and server pages, so it can prefer client pages)
+        // Server-side redirect is removed to allow client-side logic to take priority
 
         // For sections, don't use pageDataDeps - just use fallbackFoundNode
         // Sections are containers that may or may not have content
