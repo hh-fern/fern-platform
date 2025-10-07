@@ -1,6 +1,7 @@
 "use client";
 
-import { type SerializableFoundNode, getAllSectionsFromSidebarRootNode } from "@fern-docs/components/navigation";
+import type * as FernNavigation from "@fern-api/fdr-sdk/navigation";
+import { getAllSectionsFromSidebarRootNode } from "@fern-docs/components/navigation";
 
 import { DashboardTooltip } from "@/components/editor/DashboardTooltip";
 import { Icon } from "@/components/icon/Icon";
@@ -11,16 +12,16 @@ import { useGitPrInfo } from "@/providers/GitPRContext";
 import { CreateClientPage } from "./CreateClientPage";
 
 interface CreatePageButtonProps {
-    /** The base found node to create the page from */
-    baseFoundNode: SerializableFoundNode;
+    /** The sidebar root node to create the page from */
+    sidebarRoot: FernNavigation.SidebarRootNode;
 }
 
-export function CreatePageButton({ baseFoundNode }: CreatePageButtonProps) {
+export function CreatePageButton({ sidebarRoot }: CreatePageButtonProps) {
     const { prStatus } = useGitPrInfo();
     const isEditingDisabled = useEditingDisabled();
 
     // Check if there are sections available for creating pages
-    const allSections = baseFoundNode.sidebar ? getAllSectionsFromSidebarRootNode(baseFoundNode.sidebar) : [];
+    const allSections = getAllSectionsFromSidebarRootNode(sidebarRoot);
 
     return (
         allSections.length > 0 && (
@@ -33,7 +34,7 @@ export function CreatePageButton({ baseFoundNode }: CreatePageButtonProps) {
                           : undefined
                 }
             >
-                <CreateClientPage baseFoundNode={baseFoundNode} disabled={isEditingDisabled}>
+                <CreateClientPage sidebarRoot={sidebarRoot} disabled={isEditingDisabled}>
                     <Button
                         className="mb-2 flex w-full items-center justify-center gap-2 self-stretch rounded-lg border border-dashed border-[var(--grayscale-a6)] p-2 text-sm text-[var(--grayscale-a11)] hover:bg-[var(--grayscale-a3)] hover:text-[var(--grayscale-a12)]"
                         variant="ghost"

@@ -7,6 +7,8 @@ import { SidebarClientTabsRoot } from "@fern-docs/components/sidebar/SidebarClie
 import { SidebarTabsList } from "@fern-docs/components/sidebar/SidebarTabsList";
 import React, { useMemo } from "react";
 
+import { CreatePageButton } from "./CreatePageButton";
+
 interface PageSidebarProps {
     /** Maintains compat with existing docs sidebar API */
     prefetchedLoaderData: DangerousTransmittableDocsLoaderData;
@@ -38,6 +40,7 @@ const PageSidebar = React.memo(function PageSidebar({ prefetchedLoaderData }: Pa
                     <SidebarTabsList tabs={tabs} forceClientRender={true} />
                 </SidebarClientTabsRoot>
             )}
+            <CreatePageButton sidebarRoot={sidebarRoot} />
             <SidebarClientRootNode
                 root={sidebarRoot}
                 visibleNodeIds={undefined}

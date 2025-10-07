@@ -27,11 +27,11 @@ import type { EncodedDocsUrl } from "@/utils/types";
 interface CreateClientPageProps {
     children: React.ReactNode;
     disabled?: boolean;
-    /** The base found node to create the page from */
-    baseFoundNode: SerializableFoundNode;
+    /** The sidebar root node to create the page from */
+    sidebarRoot: import("@fern-api/fdr-sdk/navigation").SidebarRootNode;
 }
 
-export function CreateClientPage({ children, disabled = false, baseFoundNode }: CreateClientPageProps) {
+export function CreateClientPage({ children, disabled = false, sidebarRoot }: CreateClientPageProps) {
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [pageTitle, setPageTitle] = useState("");
     const [pageSlug, setPageSlug] = useState("");
@@ -41,13 +41,17 @@ export function CreateClientPage({ children, disabled = false, baseFoundNode }: 
     const router = useRouter();
     const params = useParams();
 
-    const { registeredPages, createClientPage } = useNavigation();
+    const { registeredPages, createClientPage, getPageBySlug } = useNavigation();
 
     // Get all sections from the navigation tree (including nested ones)
-    const allSections = useMemo(
-        () => (baseFoundNode.sidebar ? getAllSectionsFromSidebarRootNode(baseFoundNode.sidebar) : []),
-        [baseFoundNode.sidebar]
-    );
+    const allSections = useMemo(() => getAllSectionsFromSidebarRootNode(sidebarRoot), [sidebarRoot]);
+
+    // Create a minimal baseFoundNode from the first registered page we can find
+    // This is used to synthesize the new page's navigation context
+    const baseFoundNode = useMemo(() => {
+        const firstPage = Object.values(registeredPages)[0];
+        return firstPage?.pageData.foundNode;
+    }, [registeredPages]);
 
     // Set default section on first load
     useEffect(() => {
@@ -126,7 +130,7 @@ export function CreateClientPage({ children, disabled = false, baseFoundNode }: 
     const handleCreatePage = useCallback(async () => {
         setHasAttemptedSubmission(true);
 
-        if (blockSubmission || errors.pageTitle || errors.section || errors.slug) {
+        if (blockSubmission || errors.pageTitle || errors.section || errors.slug || !baseFoundNode) {
             return;
         }
 
