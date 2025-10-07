@@ -67,6 +67,29 @@ export default function PageNode(props: PageNode.Props) {
         return <UnsupportedContent>Failed to load page data: {pageDataErrorRef.current.message}</UnsupportedContent>;
     }
 
+    // For client pages, we need to wait for hydration and page resolution
+    const isClientPage = pageDataDeps?.source === "client";
+
+    if (isClientPage) {
+        // Client pages need hydration to complete before we can resolve them from the store
+        if (!hydrated) {
+            // Still hydrating, show loading
+            return null;
+        }
+
+        // Hydration complete - page data should be resolved now
+        if (!initialPageData) {
+            // Page doesn't exist in the navigation store
+            return (
+                <UnsupportedContent>
+                    Client page not found in navigation store: &ldquo;
+                    {pageDataDeps?.filename || "unknown"}
+                    &rdquo;
+                </UnsupportedContent>
+            );
+        }
+    }
+
     // For sections without content, use fallbackFoundNode directly
     if (!initialPageData && !fallbackFoundNode) {
         // TODO: show a loading state
@@ -74,7 +97,8 @@ export default function PageNode(props: PageNode.Props) {
     }
 
     const initialFoundNode = initialPageData?.foundNode;
-    const found = mergeFoundNodes(initialFoundNode, fallbackFoundNode);
+    // If we have initialFoundNode, merge with fallback; otherwise just use fallback
+    const found = initialFoundNode ? mergeFoundNodes(initialFoundNode, fallbackFoundNode) : fallbackFoundNode;
 
     if (!found) {
         return (
