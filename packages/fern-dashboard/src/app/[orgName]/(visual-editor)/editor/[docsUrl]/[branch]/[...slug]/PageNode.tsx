@@ -33,11 +33,20 @@ export default function PageNode(props: PageNode.Props) {
     const { setCurrentFilename } = useCurrentPage();
 
     // Store initial page data in a ref so we don't re-resolve it on every render
-    const initialPageDataRef = useRef<ResolvedPageData>(null);
-    const initialPageData =
-        hydrated && !initialPageDataRef.current
-            ? (initialPageDataRef.current = resolveInitialPageData(pageDataDeps))
-            : initialPageDataRef.current;
+    const initialPageDataRef = useRef<ResolvedPageData | null>(null);
+    const pageDataErrorRef = useRef<Error | null>(null);
+
+    // Try to resolve initial page data, catching errors to allow nav to still render
+    if (hydrated && !initialPageDataRef.current && !pageDataErrorRef.current) {
+        try {
+            initialPageDataRef.current = resolveInitialPageData(pageDataDeps);
+        } catch (error) {
+            pageDataErrorRef.current = error instanceof Error ? error : new Error(String(error));
+            console.error("Failed to resolve initial page data:", error);
+        }
+    }
+
+    const initialPageData = initialPageDataRef.current;
 
     const didRegisterPage = useRef(false);
     useEffect(() => {
@@ -51,6 +60,11 @@ export default function PageNode(props: PageNode.Props) {
             setCurrentFilename(initialPageData.filename);
         }
     }, [hydrated, initialPageData, registerPage, setCurrentFilename]);
+
+    // If there was an error resolving page data, show error message but don't crash
+    if (pageDataErrorRef.current) {
+        return <UnsupportedContent>Failed to load page data: {pageDataErrorRef.current.message}</UnsupportedContent>;
+    }
 
     if (!initialPageData) {
         // TODO: show a loading state

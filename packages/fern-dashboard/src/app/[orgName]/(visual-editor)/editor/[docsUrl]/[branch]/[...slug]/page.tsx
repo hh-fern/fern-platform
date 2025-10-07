@@ -23,6 +23,24 @@ import PageNode, { type PageNode as PageNodeNamespace } from "./PageNode";
 
 export const experimental_ppr = true;
 
+/**
+ * Recursively finds the slug of the first page within a section node
+ */
+function findFirstPageSlug(node: FernNavigation.SectionNode): string | undefined {
+    for (const child of node.children) {
+        if (child.type === "page") {
+            return child.slug;
+        }
+        if (child.type === "section") {
+            const childPageSlug = findFirstPageSlug(child);
+            if (childPageSlug) {
+                return childPageSlug;
+            }
+        }
+    }
+    return undefined;
+}
+
 export default async function Page({
     params,
     searchParams
@@ -101,6 +119,23 @@ export default async function Page({
 
         // Get a serializable copy of the found node to be passed over the wire to PageNode
         serializableFoundNode = getSerializableFoundNode(navigationNode);
+
+        // If this is a section node, redirect to the first child page
+        if (serializableFoundNode.node.type === "section") {
+            const firstChildSlug = findFirstPageSlug(serializableFoundNode.node);
+            if (firstChildSlug) {
+                return redirect(
+                    constructEditorSlug({
+                        orgName,
+                        docsUrl,
+                        branchName: branch,
+                        slug: firstChildSlug
+                    })
+                );
+            }
+            // If no child page found, show 404
+            notFound();
+        }
 
         // This is a server page, get the page id and fetch data from the loader
         const pageId = getPageId(serializableFoundNode.node);
