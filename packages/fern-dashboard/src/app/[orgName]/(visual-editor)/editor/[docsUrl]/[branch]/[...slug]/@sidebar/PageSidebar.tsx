@@ -25,10 +25,13 @@ const PageSidebar = React.memo(function PageSidebar({ prefetchedLoaderData, fall
         return prefetchedLoaderData.layout?.sidebarRoot;
     }, [prefetchedLoaderData.layout?.sidebarRoot?.id]);
 
-    // Get tabs from layout - memoized to prevent re-renders
+    // Get tabs from layout - memoized by stable tab IDs to prevent re-renders
+    // Using tab IDs instead of array reference prevents unnecessary re-renders
+    // when the array is recreated during server->client serialization
+    const tabIds = prefetchedLoaderData.layout?.tabs?.map((tab) => tab.id).join(",");
     const tabs = useMemo(() => {
         return prefetchedLoaderData.layout?.tabs;
-    }, [prefetchedLoaderData.layout?.tabs]);
+    }, [tabIds]);
 
     if (!sidebarRoot) {
         return null;
