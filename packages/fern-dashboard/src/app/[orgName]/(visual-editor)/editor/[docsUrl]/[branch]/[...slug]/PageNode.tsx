@@ -141,14 +141,10 @@ export default function PageNode(props: PageNode.Props) {
     }
 
     // For sections, redirect to first child page (prefer client pages)
+    // Do this early to avoid setting navigation state and triggering sidebar renders
     const hasRedirectedToChild = useRef(false);
-    const [isRedirecting, setIsRedirecting] = React.useState(false);
 
-    useEffect(() => {
-        if (hasRedirectedToChild.current || found.node.type !== "section") {
-            return;
-        }
-
+    if (found.node.type === "section" && !hasRedirectedToChild.current) {
         console.log("[PageNode] Section detected:", found.node.id, "title:", (found.node as any).title);
         console.log("[PageNode] pageRegistry:", pageRegistry);
 
@@ -202,12 +198,12 @@ export default function PageNode(props: PageNode.Props) {
 
         if (targetSlug) {
             hasRedirectedToChild.current = true;
-            setIsRedirecting(true);
             const orgName = params.orgName as Auth0OrgName;
             const docsUrl = params.docsUrl as EncodedDocsUrl;
             const branch = params.branch as string;
 
-            router.push(
+            // Use replace instead of push to avoid adding to history
+            router.replace(
                 constructEditorSlug({
                     orgName,
                     docsUrl,
@@ -216,12 +212,10 @@ export default function PageNode(props: PageNode.Props) {
                     query: clientPageChild ? { "client-page": true } : undefined
                 })
             );
-        }
-    }, [found.node, pageRegistry, router, params]);
 
-    // If we're redirecting to a child page, show nothing (prevents flash of content)
-    if (isRedirecting) {
-        return null;
+            // Return null immediately to prevent rendering
+            return null;
+        }
     }
 
     // For sections with markdown content, we need to fetch and render it
