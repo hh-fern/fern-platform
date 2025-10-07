@@ -152,6 +152,14 @@ export function migrateMeta(metastring: string): string {
         return metastring;
     }
 
+    // Check if metastring looks like a filename (has file extension)
+    // e.g. "docs.yml", "config.json", "src/index.tsx", ".env.local"
+    // This should be treated as filename= not title=
+    const filenamePattern = /^[a-zA-Z0-9_.\-/]+\.[a-zA-Z0-9]+$/;
+    if (filenamePattern.test(metastring)) {
+        return `filename="${metastring}"`;
+    }
+
     // migrate {1-3} to {[1, 2, 3]}
     // but do NOT migrate {1} to {[1]}
     metastring = metastring.replaceAll(/\{([0-9,\s-]+)\}/g, (original, expr) => {
