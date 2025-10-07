@@ -20,9 +20,9 @@ export function constructEditorSlug({
     branchName: string;
     slug: string;
     query?: {
-        clientPage?: boolean;
+        "client-page"?: boolean;
     };
 }) {
     const baseUrl = `/${orgName}/editor/${docsUrl}/${branchName}/${slug}`;
-    return query?.clientPage ? `${baseUrl}?client-page=true` : baseUrl;
+    return query?.["client-page"] ? `${baseUrl}?client-page=true` : baseUrl;
 }
