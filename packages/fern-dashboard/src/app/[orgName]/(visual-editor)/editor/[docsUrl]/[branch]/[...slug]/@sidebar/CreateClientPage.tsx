@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import type React from "react";
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useRouter } from "@bprogress/next/app";
 
@@ -38,11 +38,10 @@ export function CreateClientPage({ children, disabled = false, sidebarRoot }: Cr
     const [selectedSection, setSelectedSection] = useState<SectionNodeWithTraversalContext | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [hasAttemptedSubmission, setHasAttemptedSubmission] = useState(false);
-    const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const params = useParams();
 
-    const { registeredPages, createClientPage, getPageBySlug } = useNavigation();
+    const { registeredPages, createClientPage } = useNavigation();
 
     // Get all sections from the navigation tree (including nested ones)
     const allSections = useMemo(() => getAllSectionsFromSidebarRootNode(sidebarRoot), [sidebarRoot]);
@@ -161,20 +160,18 @@ export function CreateClientPage({ children, disabled = false, sidebarRoot }: Cr
                     targetSectionPath: selectedSection.sectionPath
                 });
 
-                // Navigate to the new page in a transition to avoid RSC errors
-                startTransition(() => {
-                    router.push(
-                        constructEditorSlug({
-                            orgName,
-                            docsUrl,
-                            branchName: branch,
-                            slug: finalSlug,
-                            query: {
-                                "client-page": true
-                            }
-                        })
-                    );
-                });
+                // Navigate to the new page
+                router.push(
+                    constructEditorSlug({
+                        orgName,
+                        docsUrl,
+                        branchName: branch,
+                        slug: finalSlug,
+                        query: {
+                            "client-page": true
+                        }
+                    })
+                );
             } catch (pageCreationError) {
                 console.error("Failed to create page in store:", pageCreationError);
                 throw new Error(
