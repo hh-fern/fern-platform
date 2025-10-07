@@ -134,8 +134,54 @@ class LocalStorage implements Storage {
 
     set(key: string, value: string): void {
         this.safeOperation(() => {
-            localStorage.setItem(this._storageKey + key, value);
+            try {
+                localStorage.setItem(this._storageKey + key, value);
+            } catch (error) {
+                // If QuotaExceededError, try to make space by removing old entries
+                if (error instanceof DOMException && error.name === "QuotaExceededError") {
+                    console.warn("LocalStorage quota exceeded, cleaning up old entries...");
+                    this.cleanupOldEntries();
+                    // Retry after cleanup
+                    try {
+                        localStorage.setItem(this._storageKey + key, value);
+                    } catch (retryError) {
+                        console.error("Failed to set item even after cleanup:", retryError);
+                        throw retryError;
+                    }
+                } else {
+                    throw error;
+                }
+            }
         }, undefined);
+    }
+
+    /**
+     * Clean up old navigation storage entries to free up space
+     * Keeps only the 5 most recent entries
+     */
+    private cleanupOldEntries(): void {
+        const keys = this.getAllKeys();
+
+        // Extract entries with timestamps from the key format: fern-navigation-storage:YYYY-MM-DD-username-xxx
+        const entries = keys
+            .map((key) => {
+                const withoutPrefix = key.replace(this._storageKey, "");
+                // Extract date from key (format: YYYY-MM-DD-...)
+                const dateMatch = withoutPrefix.match(/^(\d{4}-\d{2}-\d{2})/);
+                return {
+                    key,
+                    date: dateMatch ? new Date(dateMatch[1]) : new Date(0)
+                };
+            })
+            .sort((a, b) => b.date.getTime() - a.date.getTime()); // Sort by date descending
+
+        // Keep only the 5 most recent, remove the rest
+        const entriesToRemove = entries.slice(5);
+
+        console.log(`Removing ${entriesToRemove.length} old navigation storage entries`);
+        entriesToRemove.forEach((entry) => {
+            localStorage.removeItem(entry.key);
+        });
     }
 
     getAllKeys(): string[] {
