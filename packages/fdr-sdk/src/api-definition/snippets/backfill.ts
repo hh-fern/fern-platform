@@ -39,8 +39,8 @@ export async function backfillSnippets({
 }): Promise<ApiDefinition> {
     const snippetLanguages = createSnippetLanguages({
         isHttpSnippetsEnabled: typeof httpSnippets === "boolean" ? httpSnippets : httpSnippets?.length > 0,
-        snippetLanguages: Array.isArray(httpSnippets) ? httpSnippets : undefined,
-    })
+        snippetLanguages: Array.isArray(httpSnippets) ? httpSnippets : undefined
+    });
 
     return {
         ...apiDefinition,
@@ -52,7 +52,7 @@ export async function backfillSnippets({
                         baseUrl: "https://host.com"
                     });
                 }
-                
+
                 let dynamicGenerators: Record<string, any> = {};
                 if (dynamicIr) {
                     dynamicGenerators = createSnippetGenerators({ endpoint, dynamicIr });
@@ -356,18 +356,21 @@ function createSnippetGenerators({
     return generators;
 }
 
-function createSnippetLanguages({isHttpSnippetsEnabled, snippetLanguages}:{
-    isHttpSnippetsEnabled: boolean,
-    snippetLanguages: string[] | undefined
+function createSnippetLanguages({
+    isHttpSnippetsEnabled,
+    snippetLanguages
+}: {
+    isHttpSnippetsEnabled: boolean;
+    snippetLanguages: string[] | undefined;
 }): string[] {
     // if client-defined snippet list, do not assume we should include curl
     if (isHttpSnippetsEnabled && snippetLanguages) {
         return snippetLanguages.map((lang) => (lang === "typescript" ? "javascript" : lang));
-    } 
-    
+    }
+
     if (isHttpSnippetsEnabled) {
         return [...CLIENTS.map((language) => language.targetId), "curl"];
     }
-    
-    return ["curl"]
+
+    return ["curl"];
 }

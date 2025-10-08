@@ -17,6 +17,7 @@ import { getReturnToQueryParam } from "./return-to";
 import { getWebflowAuthorizationUrl } from "./webflow";
 import { getWorkosSSOAuthorizationUrl } from "./workos";
 import { handleWorkosAuth } from "./workos-handler";
+import { safeVerifyFernJWTConfig } from "./FernJWT";
 
 export type AuthPartner = "workos" | "ory" | "webflow" | "custom" | string;
 
@@ -115,7 +116,7 @@ export async function getAuthStateInternal({
 
     // check if the request is allowed to pass through without authentication
     if (authConfig.type === "basic_token_verification" || authConfig.type === "oauth2") {
-        const user = { roles: [] }
+        const user = await safeVerifyFernJWTConfig(fernToken, authConfig);
         const partner = authConfig.type === "oauth2" ? authConfig.partner : "custom";
         if (user) {
             return () => ({ authed: true, ok: true, user, partner });

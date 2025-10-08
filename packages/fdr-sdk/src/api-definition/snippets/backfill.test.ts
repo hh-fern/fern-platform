@@ -1317,7 +1317,7 @@ describe("backfillSnippets", () => {
 
         expect(example?.snippets).toMatchSnapshot();
     });
-    
+
     it("should backfill snippets with just ruby http snippets", async () => {
         const apiDefinition: ApiDefinition = {
             id: ApiDefinitionId("test-api"),
