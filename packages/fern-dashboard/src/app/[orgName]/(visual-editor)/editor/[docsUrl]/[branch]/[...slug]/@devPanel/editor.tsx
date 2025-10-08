@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function MonacoEditor({
     currentMarkdown,
@@ -9,18 +9,20 @@ export default function MonacoEditor({
     handleEditorDidMount: (editor: any, monacoInstance: any) => void;
     isEditingDisabled: boolean;
 }) {
-    const editorRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const editorInstanceRef = useRef<any>(null);
-    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
+        if (!containerRef.current) return;
+
+        let mounted = true;
+
         // Dynamically import monaco
         import("modern-monaco").then((monaco) => {
-            setIsLoaded(true);
-            if (!editorRef.current) return;
+            if (!mounted || !containerRef.current) return;
 
             // Create editor instance
-            const editor = monaco.editor.create(editorRef.current, {
+            const editor = monaco.editor.create(containerRef.current, {
                 value: currentMarkdown,
                 language: "markdown",
                 theme: "app-theme",
@@ -38,6 +40,7 @@ export default function MonacoEditor({
 
         // Cleanup on unmount
         return () => {
+            mounted = false;
             if (editorInstanceRef.current) {
                 editorInstanceRef.current.dispose();
             }
@@ -58,9 +61,5 @@ export default function MonacoEditor({
         }
     }, [isEditingDisabled]);
 
-    if (!isLoaded) {
-        return <div style={{ height: "100%", width: "100%" }} className="flex items-center justify-center">Loading editor...</div>;
-    }
-
-    return <div ref={editorRef} style={{ height: "100%", width: "100%" }} />;
+    return <div ref={containerRef} style={{ height: "100%", width: "100%" }} />;
 }

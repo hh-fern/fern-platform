@@ -128,18 +128,20 @@ function ModernMonacoEditor({
     onChange: (value: string) => void;
     height?: string;
 }) {
-    const editorRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const editorInstanceRef = useRef<any>(null);
-    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
+        if (!containerRef.current) return;
+
+        let mounted = true;
+
         // Dynamically import monaco
         import("modern-monaco").then((monaco) => {
-            setIsLoaded(true);
-            if (!editorRef.current) return;
+            if (!mounted || !containerRef.current) return;
 
             // Create editor instance
-            const editor = monaco.editor.create(editorRef.current, {
+            const editor = monaco.editor.create(containerRef.current, {
                 value,
                 language,
                 theme: "min-light",
@@ -163,6 +165,7 @@ function ModernMonacoEditor({
 
         // Cleanup on unmount
         return () => {
+            mounted = false;
             if (editorInstanceRef.current) {
                 editorInstanceRef.current.editor.dispose();
             }
@@ -186,11 +189,7 @@ function ModernMonacoEditor({
         }
     }, [language]);
 
-    if (!isLoaded) {
-        return <div style={{ height, width: "100%" }} className="flex items-center justify-center">Loading editor...</div>;
-    }
-
-    return <div ref={editorRef} style={{ height, width: "100%" }} />;
+    return <div ref={containerRef} style={{ height, width: "100%" }} />;
 }
 
 export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
