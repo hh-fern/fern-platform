@@ -2,9 +2,8 @@
 
 import { useNavigation } from "@fern-docs/components/navigation";
 
-import type { Monaco } from "@monaco-editor/react";
+import * as monaco from "modern-monaco";
 import { Code2 } from "lucide-react";
-import type monaco from "monaco-editor";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { WarningValidationToast } from "@/components/editor/EditorToasts";
@@ -24,7 +23,7 @@ export default function DevPanel() {
     const { registeredPages, updatePage, emitPageSaveEvent } = useNavigation();
     const isEditingDisabled = useEditingDisabled();
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const monacoRef = useRef<Monaco | null>(null);
+    const monacoRef = useRef<typeof monaco | null>(null);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     const LoadingIndicator = "<!-- Loading content... -->";
@@ -40,7 +39,7 @@ export default function DevPanel() {
         setHasUnsavedChanges(false);
     }, [currentMarkdown]);
 
-    function handleEditorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: Monaco) {
+    function handleEditorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) {
         editorRef.current = editorInstance;
         monacoRef.current = monacoInstance;
 

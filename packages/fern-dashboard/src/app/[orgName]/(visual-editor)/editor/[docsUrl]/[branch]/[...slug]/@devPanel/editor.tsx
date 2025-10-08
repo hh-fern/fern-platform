@@ -1,6 +1,5 @@
-import CodeEditor, { loader, type Monaco } from "@monaco-editor/react";
-import type monaco from "monaco-editor";
-import { useEffect, useState } from "react";
+import * as monaco from "modern-monaco";
+import { useEffect, useRef } from "react";
 
 export default function MonacoEditor({
     currentMarkdown,
@@ -8,36 +7,50 @@ export default function MonacoEditor({
     isEditingDisabled
 }: {
     currentMarkdown: string;
-    handleEditorDidMount: (editor: monaco.editor.IStandaloneCodeEditor, monaco: Monaco) => void;
+    handleEditorDidMount: (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => void;
     isEditingDisabled: boolean;
 }) {
-    const [isLoading, setIsLoading] = useState(true);
+    const editorRef = useRef<HTMLDivElement>(null);
+    const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+
     useEffect(() => {
-        if (typeof window !== "undefined") {
-            loader.init().then(() => {
-                setIsLoading(false);
-            });
-        }
+        if (!editorRef.current) return;
+
+        // Create editor instance
+        const editor = monaco.editor.create(editorRef.current, {
+            value: currentMarkdown,
+            language: "markdown",
+            theme: "app-theme",
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            wordWrap: "on",
+            readOnly: isEditingDisabled
+        });
+
+        editorInstanceRef.current = editor;
+
+        // Call the mount handler
+        handleEditorDidMount(editor, monaco);
+
+        // Cleanup on unmount
+        return () => {
+            editor.dispose();
+        };
     }, []);
 
-    // TODO: add a loading state
-    if (isLoading) {
-        return null;
-    }
+    // Update value when currentMarkdown changes
+    useEffect(() => {
+        if (editorInstanceRef.current && editorInstanceRef.current.getValue() !== currentMarkdown) {
+            editorInstanceRef.current.setValue(currentMarkdown);
+        }
+    }, [currentMarkdown]);
 
-    return (
-        <CodeEditor
-            height="100%"
-            language="markdown"
-            value={currentMarkdown}
-            onMount={handleEditorDidMount}
-            theme="app-theme"
-            options={{
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                wordWrap: "on",
-                readOnly: isEditingDisabled
-            }}
-        />
-    );
+    // Update readOnly option when isEditingDisabled changes
+    useEffect(() => {
+        if (editorInstanceRef.current) {
+            editorInstanceRef.current.updateOptions({ readOnly: isEditingDisabled });
+        }
+    }, [isEditingDisabled]);
+
+    return <div ref={editorRef} style={{ height: "100%", width: "100%" }} />;
 }

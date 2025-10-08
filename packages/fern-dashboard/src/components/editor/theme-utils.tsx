@@ -1,4 +1,4 @@
-import type { Monaco } from "@monaco-editor/react";
+import * as monaco from "modern-monaco";
 
 // Get CSS custom property value at runtime
 function getCSSCustomProperty(property: string, fallback: string): string {
@@ -15,7 +15,7 @@ function getCSSCustomProperty(property: string, fallback: string): string {
 }
 
 // Enhanced theme with blues and greens for better markdown readability
-export function defineAppTheme(monaco: Monaco) {
+export function defineAppTheme(monacoInstance: typeof monaco) {
     const primaryColor = getCSSCustomProperty("--primary", "green");
     const tealVariant = getCSSCustomProperty("--monaco-blue", "blue");
     const purpleVariant = getCSSCustomProperty("--monaco-purple", "purple");
@@ -23,7 +23,7 @@ export function defineAppTheme(monaco: Monaco) {
     const textMutedColor = getCSSCustomProperty("--muted-foreground", "#8B949E");
     const darkGreen = getCSSCustomProperty("--green-1200", "#17450a");
 
-    monaco.editor.defineTheme("app-theme", {
+    monacoInstance.editor.defineTheme("app-theme", {
         base: "vs",
         inherit: true,
         rules: [
