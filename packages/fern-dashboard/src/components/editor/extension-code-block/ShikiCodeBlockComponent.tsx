@@ -76,23 +76,14 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                     </div>
                 </div>
 
-                {/* Code content - overlay editable on top of preview */}
-                <div className="relative rounded-b-[inherit] overflow-hidden">
-                    {/* Preview layer */}
-                    <div className="pointer-events-none" aria-hidden="true">
-                        <FernSyntaxHighlighter
-                            language={language}
-                            code={code}
-                            highlightLines={[]}
-                            highlightStyle="highlight"
-                        />
-                    </div>
-
-                    {/* Editable layer */}
-                    <pre className="absolute inset-0 p-4 font-mono text-sm overflow-auto">
-                        <NodeViewContent as="code" className="block outline-none caret-gray-900" style={{ color: 'transparent', caretColor: '#111827' }} />
-                    </pre>
-                </div>
+                {/* Code content */}
+                <FernSyntaxHighlighter
+                    language={language}
+                    code={code}
+                    highlightLines={[]}
+                    highlightStyle="highlight"
+                    className="rounded-b-[inherit]"
+                />
             </div>
         </NodeViewWrapper>
     );
