@@ -1,56 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import type { ReactNodeViewProps } from "@tiptap/react";
 import { ChevronDown } from "lucide-react";
-import { bundledLanguages, createHighlighter, type BundledLanguage, type Highlighter } from "shiki";
+
+import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
+import { FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter";
 
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 
 import { allLanguages } from "./lowlight-languages";
 
-let highlighterInstance: Highlighter | null = null;
-
-async function getHighlighter(): Promise<Highlighter> {
-    if (!highlighterInstance) {
-        highlighterInstance = await createHighlighter({
-            themes: ["min-light", "material-theme-darker"],
-            langs: Object.keys(bundledLanguages) as BundledLanguage[]
-        });
-    }
-    return highlighterInstance;
-}
-
 export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     const defaultLanguage = props.node.attrs.language;
     const [searchTerm, setSearchTerm] = useState("");
-    const [highlightedHtml, setHighlightedHtml] = useState<string>("");
 
     const code = props.node.textContent;
-    const language = (defaultLanguage || "plaintext") as BundledLanguage;
-
-    useEffect(() => {
-        let cancelled = false;
-
-        void (async () => {
-            const highlighter = await getHighlighter();
-            if (!cancelled) {
-                try {
-                    const html = highlighter.codeToHtml(code, {
-                        lang: language,
-                        theme: "min-light" // Use light theme to match the docs
-                    });
-                    setHighlightedHtml(html);
-                } catch (error) {
-                    console.warn(`Failed to highlight code with language "${language}":`, error);
-                }
-            }
-        })();
-
-        return () => {
-            cancelled = true;
-        };
-    }, [code, language]);
+    const language = cleanLanguage(defaultLanguage || "plaintext");
 
     const languages = useMemo(() => {
         const filteredLanguages = searchTerm
@@ -100,18 +66,9 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                 </button>
             </SearchableDropdown>
 
-            {highlightedHtml ? (
-                <div
-                    className="shiki-code-block-rendered [&_pre]:m-0 [&_pre]:rounded-lg [&_pre]:border [&_pre]:border-gray-200 [&_pre]:bg-white [&_pre]:p-4 [&_pre]:shadow-sm"
-                    dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-                />
-            ) : (
-                <pre className="m-0 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                    <code className="text-gray-800">
-                        <NodeViewContent />
-                    </code>
-                </pre>
-            )}
+            <div className="shiki-code-block-rendered rounded-lg border border-gray-200 bg-white shadow-sm overflow-x-auto">
+                <FernSyntaxHighlighter language={language} code={code} highlightLines={[]} highlightStyle="highlight" />
+            </div>
         </NodeViewWrapper>
     );
 }
