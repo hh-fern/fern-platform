@@ -113,6 +113,41 @@ const INTERNAL_COMPONENTS = {
     Tabs: TabGroup
 };
 
+function Pre(props: ComponentProps<"pre">) {
+    try {
+        // Check if this is a code block with a className (language)
+        const children = React.Children.toArray(props.children);
+        const codeElement = children[0];
+
+        if (React.isValidElement<ComponentProps<"code">>(codeElement) && codeElement.type === "code") {
+            const { className, children: codeChildren } = codeElement.props;
+
+            if (typeof className === "string" && className.includes("language-")) {
+                const classNames = className.split(" ");
+                const language = classNames
+                    .find((cls: string) => cls.startsWith("language-"))
+                    ?.replace("language-", "");
+
+                // Extract code content
+                let code = "";
+                if (typeof codeChildren === "string") {
+                    code = codeChildren;
+                } else if (Array.isArray(codeChildren)) {
+                    code = codeChildren.map((child: any) => (typeof child === "string" ? child : "")).join("");
+                }
+
+                return <CodeBlock language={language} code={code.trim()} />;
+            }
+        }
+    } catch (error) {
+        // If there's any error parsing the code block, fall back to default pre rendering
+        console.warn("Error rendering code block, falling back to default pre:", error);
+    }
+
+    // Fallback to default pre element
+    return <pre {...props} />;
+}
+
 const HTML_COMPONENTS = {
     a: A,
     h1: (props: ComponentProps<"h1">) => HeadingRenderer(1, props),
@@ -125,6 +160,7 @@ const HTML_COMPONENTS = {
     li: Li,
     ol: Ol,
     p: "p",
+    pre: Pre,
     strong: Strong,
     table: Table,
     ul: Ul,
@@ -146,6 +182,7 @@ const ALIASED_HTML_COMPONENTS = {
     Image,
     Li,
     Ol,
+    Pre,
     Strong,
     Table,
     Ul,
