@@ -1627,6 +1627,99 @@ dataTask.resume()",
 }
 `;
 
+exports[`backfillSnippets > should backfill snippets with just ruby http snippets 1`] = `
+{
+  "curl": [
+    {
+      "code": "curl -X POST https://api.example.com/v1/ \\
+     -H "Content-Type: application/json" \\
+     -d '{
+  "RecordCount": 50,
+  "DocumentSearchParams": {
+    "SearchTerms": {
+      "All": [
+        "data security"
+      ],
+      "Any": [
+        "cyberattack",
+        "breach"
+      ],
+      "None": [
+        "ransomware"
+      ]
+    },
+    "DocumentDateRangeStart": "2023-01-01T00:00:00Z",
+    "DocumentDateRangeEnd": "2023-12-31T23:59:59Z"
+  }
+}'",
+      "description": undefined,
+      "generated": true,
+      "install": undefined,
+      "language": "curl",
+      "name": undefined,
+    },
+  ],
+  "ruby": [
+    {
+      "code": "require 'uri'
+require 'net/http'
+
+url = URI("https://api.example.com/v1/")
+
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+
+request = Net::HTTP::Post.new(url)
+request["Content-Type"] = 'application/json'
+request.body = "{\\n  \\"RecordCount\\": 50,\\n  \\"DocumentSearchParams\\": {\\n    \\"SearchTerms\\": {\\n      \\"All\\": [\\n        \\"data security\\"\\n      ],\\n      \\"Any\\": [\\n        \\"cyberattack\\",\\n        \\"breach\\"\\n      ],\\n      \\"None\\": [\\n        \\"ransomware\\"\\n      ]\\n    },\\n    \\"DocumentDateRangeStart\\": \\"2023-01-01T00:00:00Z\\",\\n    \\"DocumentDateRangeEnd\\": \\"2023-12-31T23:59:59Z\\"\\n  }\\n}"
+
+response = http.request(request)
+puts response.read_body",
+      "description": undefined,
+      "generated": true,
+      "install": undefined,
+      "language": "ruby",
+      "name": undefined,
+    },
+  ],
+}
+`;
+
+exports[`backfillSnippets > should backfill snippets with no http snippets 1`] = `
+{
+  "curl": [
+    {
+      "code": "curl -X POST https://api.example.com/v1/ \\
+     -H "Content-Type: application/json" \\
+     -d '{
+  "RecordCount": 50,
+  "DocumentSearchParams": {
+    "SearchTerms": {
+      "All": [
+        "data security"
+      ],
+      "Any": [
+        "cyberattack",
+        "breach"
+      ],
+      "None": [
+        "ransomware"
+      ]
+    },
+    "DocumentDateRangeStart": "2023-01-01T00:00:00Z",
+    "DocumentDateRangeEnd": "2023-12-31T23:59:59Z"
+  }
+}'",
+      "description": undefined,
+      "generated": true,
+      "install": undefined,
+      "language": "curl",
+      "name": undefined,
+    },
+  ],
+}
+`;
+
 exports[`backfillSnippets > should skip head method for dynamic snippets 1`] = `
 {
   "csharp": [

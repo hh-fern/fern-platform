@@ -26,14 +26,26 @@ const CLIENTS: HTTPSnippetClient[] = [
     { targetId: "swift", clientId: "nsurlsession" }
 ];
 
-export async function backfillSnippets(
-    apiDefinition: ApiDefinition,
-    dynamicIr: DynamicIRsByLanguage | undefined,
-    flags: {
-        isHttpSnippetsEnabled: boolean;
-        alwaysEnableJavaScriptFetch: boolean;
+export async function backfillSnippets({
+    apiDefinition,
+    dynamicIr,
+    httpSnippets,
+    alwaysEnableJavaScriptFetch
+}: {
+    apiDefinition: ApiDefinition;
+    dynamicIr: DynamicIRsByLanguage | undefined;
+    httpSnippets: boolean | string[] | undefined;
+    alwaysEnableJavaScriptFetch: boolean;
+}): Promise<ApiDefinition> {
+    let httpSnippetLanguages: string[] = [];
+    if (typeof httpSnippets === "boolean" && httpSnippets) {
+        httpSnippetLanguages = CLIENTS.flatMap((language) => language.targetId);
+    } else if (Array.isArray(httpSnippets)) {
+        httpSnippetLanguages = httpSnippets.map((lang) => 
+            lang === "typescript" ? "javascript" : lang
+        );
     }
-): Promise<ApiDefinition> {
+
     return {
         ...apiDefinition,
         endpoints: await Promise.all(
@@ -49,7 +61,14 @@ export async function backfillSnippets(
                         ...endpoint,
                         examples: await Promise.all(
                             endpoint.examples?.map((example) =>
-                                backfillSnippetsForExample(apiDefinition, dynamicGenerators, endpoint, example, flags)
+                                backfillSnippetsForExample({
+                                    apiDefinition,
+                                    dynamicGenerators,
+                                    endpoint,
+                                    example,
+                                    alwaysEnableJavaScriptFetch,
+                                    httpSnippetLanguages
+                                })
                             ) ?? []
                         )
                     }
@@ -59,19 +78,21 @@ export async function backfillSnippets(
     };
 }
 
-async function backfillSnippetsForExample(
-    apiDefinition: ApiDefinition,
-    dynamicGenerators: Record<string, any>,
-    endpoint: EndpointDefinition,
-    example: ExampleEndpointCall,
-    {
-        isHttpSnippetsEnabled,
-        alwaysEnableJavaScriptFetch
-    }: {
-        isHttpSnippetsEnabled: boolean;
-        alwaysEnableJavaScriptFetch: boolean;
-    }
-): Promise<ExampleEndpointCall> {
+async function backfillSnippetsForExample({
+    apiDefinition,
+    dynamicGenerators,
+    endpoint,
+    example,
+    alwaysEnableJavaScriptFetch,
+    httpSnippetLanguages
+}: {
+    apiDefinition: ApiDefinition;
+    dynamicGenerators: Record<string, any>;
+    endpoint: EndpointDefinition;
+    example: ExampleEndpointCall;
+    alwaysEnableJavaScriptFetch: boolean;
+    httpSnippetLanguages: string[];
+}): Promise<ExampleEndpointCall> {
     const snippets = { ...example.snippets };
 
     const pushSnippet = (snippet: CodeSnippet) => {
@@ -98,9 +119,13 @@ async function backfillSnippetsForExample(
         });
     }
 
-    if (isHttpSnippetsEnabled) {
+    if (httpSnippetLanguages.length > 0) {
         const snippet = new HTTPSnippet(getHarRequest(endpoint, example, apiDefinition.auths, example.requestBody));
         for (const { clientId, targetId } of CLIENTS) {
+            if (!httpSnippetLanguages.includes(targetId)) {
+                continue;
+            }
+
             /**
              * If the snippet already exists, skip it
              */

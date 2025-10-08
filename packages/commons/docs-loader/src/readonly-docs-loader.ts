@@ -475,7 +475,14 @@ const createGetPrunedApiCached = (domainKey: string, cacheConfig: Required<Cache
                     if (cached != null) {
                         const metadata = await getMetadata(cacheConfig)(domainKey);
                         const dynamicIr = await getDynamicIr(cacheConfig)(metadata.org, metadata.domain, id);
-                        return await backfillSnippets(cached, dynamicIr, await flagsPromise);
+                        const flags = await flagsPromise;
+                        const settings = await getSettings(cacheConfig)(domainKey);
+                        return await backfillSnippets({
+                            apiDefinition: cached,
+                            dynamicIr,
+                            httpSnippets: settings.httpSnippets ?? flags.isHttpSnippetsEnabled,
+                            alwaysEnableJavaScriptFetch: flags.alwaysEnableJavaScriptFetch
+                        });
                     }
                 }
             } catch (error) {
@@ -500,7 +507,14 @@ const createGetPrunedApiCached = (domainKey: string, cacheConfig: Required<Cache
             }
             const metadata = await getMetadata(cacheConfig)(domainKey);
             const dynamicIr = await getDynamicIr(cacheConfig)(metadata.org, metadata.domain, id);
-            return backfillSnippets(pruned, dynamicIr, await flagsPromise);
+            const settings = await getSettings(cacheConfig)(domainKey);
+            const flags = await flagsPromise;
+            return backfillSnippets({
+                apiDefinition: pruned,
+                dynamicIr,
+                httpSnippets: settings.httpSnippets ?? flags.isHttpSnippetsEnabled,
+                alwaysEnableJavaScriptFetch: flags.alwaysEnableJavaScriptFetch
+            });
         },
         [domainKey, cacheSeed(), cacheConfig.cacheKeySuffix],
         { tags: [domainKey, "api"] }
@@ -740,7 +754,7 @@ const getSettings = (cacheConfig: Required<CacheConfig>) =>
             disableFeedback: settings?.disableFeedback ?? false,
             disableSearch: settings?.disableSearch ?? false,
             hide404Page: settings?.hide404Page ?? false,
-            httpSnippets: settings?.httpSnippets ?? false,
+            httpSnippets: settings?.httpSnippets ?? undefined,
             searchText: settings?.searchText ?? "Search"
         };
     });
