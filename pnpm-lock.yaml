@@ -1344,7 +1344,7 @@ importers:
         specifier: ^0.33.5
         version: 0.33.5
       shiki:
-        specifier: ^3.2.1
+        specifier: 3.2.1
         version: 3.2.1
       sonner:
         specifier: ^2.0.3

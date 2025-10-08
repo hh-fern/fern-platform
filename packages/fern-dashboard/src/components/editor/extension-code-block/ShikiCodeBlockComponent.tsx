@@ -170,7 +170,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                             <div className="flex items-center gap-1 mr-1">
                                 {isEditing ? (
                                     <>
-                                        <Button onClick={handleSave} size="xs" variant="default">
+                                        <Button onClick={handleSave} size="xs" variant="secondary">
                                             <Check />
                                             Save
                                         </Button>
@@ -236,7 +236,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                 <div className="absolute right-2 top-2 z-20 flex items-center gap-2">
                     {isEditing ? (
                         <>
-                            <Button onClick={handleSave} size="xs" variant="default">
+                            <Button onClick={handleSave} size="xs" variant="secondary">
                                 <Check />
                                 Save
                             </Button>
