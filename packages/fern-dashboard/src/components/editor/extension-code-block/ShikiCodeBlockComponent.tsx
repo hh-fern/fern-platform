@@ -221,14 +221,15 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                                     <Maximize2 />
                                                 </Button>
                                             </DialogTrigger>
-                                            <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-                                                <DialogHeader>
-                                                    <DialogTitle className="flex items-center gap-2">
+                                            <DialogContent className="max-w-6xl w-[90vw] h-[85vh] p-0 flex flex-col gap-0">
+                                                <DialogHeader className="px-6 py-4 border-b">
+                                                    <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
                                                         {currentLanguage?.Icon && <currentLanguage.Icon className="size-5" />}
                                                         Edit Code Block
+                                                        <span className="text-sm font-normal text-gray-500">({currentLanguage?.label})</span>
                                                     </DialogTitle>
                                                 </DialogHeader>
-                                                <div className="flex-1 overflow-hidden border rounded-md">
+                                                <div className="flex-1 overflow-hidden">
                                                     <Editor
                                                         height="100%"
                                                         language={monacoLanguage}
@@ -236,7 +237,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                                         onChange={(value) => setExpandedCode(value || "")}
                                                         theme="vs"
                                                         options={{
-                                                            minimap: { enabled: false },
+                                                            minimap: { enabled: true },
                                                             fontSize: 14,
                                                             lineNumbers: "on",
                                                             scrollBeyondLastLine: false,
@@ -247,11 +248,12 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                                         }}
                                                     />
                                                 </div>
-                                                <div className="flex justify-end gap-2 mt-4">
-                                                    <Button onClick={() => setIsExpanded(false)} variant="ghost">
+                                                <div className="flex justify-end gap-2 px-6 py-4 border-t bg-gray-50">
+                                                    <Button onClick={() => setIsExpanded(false)} variant="ghost" size="sm">
                                                         Cancel
                                                     </Button>
-                                                    <Button onClick={handleExpandedSave} variant="secondary">
+                                                    <Button onClick={handleExpandedSave} variant="secondary" size="sm">
+                                                        <Check className="size-4" />
                                                         Save Changes
                                                     </Button>
                                                 </div>
@@ -259,11 +261,11 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                         </Dialog>
                                         <Button
                                             onClick={handleEdit}
-                                            size="xs"
+                                            size="iconSm"
                                             variant="secondary"
+                                            className="hover:text-white"
                                         >
                                             <Edit2 />
-                                            Edit
                                         </Button>
                                     </>
                                 )}
@@ -335,14 +337,15 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                         <Maximize2 />
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-                                    <DialogHeader>
-                                        <DialogTitle className="flex items-center gap-2">
+                                <DialogContent className="max-w-6xl w-[90vw] h-[85vh] p-0 flex flex-col gap-0">
+                                    <DialogHeader className="px-6 py-4 border-b">
+                                        <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
                                             {currentLanguage?.Icon && <currentLanguage.Icon className="size-5" />}
                                             Edit Code Block
+                                            <span className="text-sm font-normal text-gray-500">({currentLanguage?.label})</span>
                                         </DialogTitle>
                                     </DialogHeader>
-                                    <div className="flex-1 overflow-hidden border rounded-md">
+                                    <div className="flex-1 overflow-hidden">
                                         <Editor
                                             height="100%"
                                             language={monacoLanguage}
@@ -350,7 +353,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                             onChange={(value) => setExpandedCode(value || "")}
                                             theme="vs"
                                             options={{
-                                                minimap: { enabled: false },
+                                                minimap: { enabled: true },
                                                 fontSize: 14,
                                                 lineNumbers: "on",
                                                 scrollBeyondLastLine: false,
@@ -361,11 +364,12 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                             }}
                                         />
                                     </div>
-                                    <div className="flex justify-end gap-2 mt-4">
-                                        <Button onClick={() => setIsExpanded(false)} variant="ghost">
+                                    <div className="flex justify-end gap-2 px-6 py-4 border-t bg-gray-50">
+                                        <Button onClick={() => setIsExpanded(false)} variant="ghost" size="sm">
                                             Cancel
                                         </Button>
-                                        <Button onClick={handleExpandedSave} variant="secondary">
+                                        <Button onClick={handleExpandedSave} variant="secondary" size="sm">
+                                            <Check className="size-4" />
                                             Save Changes
                                         </Button>
                                     </div>
@@ -373,11 +377,11 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                             </Dialog>
                             <Button
                                 onClick={handleEdit}
-                                size="xs"
+                                size="iconSm"
                                 variant="secondary"
+                                className="hover:text-white"
                             >
                                 <Edit2 />
-                                Edit
                             </Button>
                             <SearchableDropdown
                                 items={languages}
