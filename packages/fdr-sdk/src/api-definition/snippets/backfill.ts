@@ -37,11 +37,14 @@ export async function backfillSnippets({
     httpSnippets: boolean | string[] | undefined;
     alwaysEnableJavaScriptFetch: boolean;
 }): Promise<ApiDefinition> {
-    let httpSnippetLanguages: string[] = [];
+    let snippetLanguages: string[] = [];
     if (typeof httpSnippets === "boolean" && httpSnippets) {
-        httpSnippetLanguages = CLIENTS.flatMap((language) => language.targetId);
+        snippetLanguages = CLIENTS.flatMap((language) => language.targetId);
+        snippetLanguages.push("curl");
     } else if (Array.isArray(httpSnippets)) {
-        httpSnippetLanguages = httpSnippets.map((lang) => (lang === "typescript" ? "javascript" : lang));
+        snippetLanguages = httpSnippets.map((lang) => (lang === "typescript" ? "javascript" : lang));
+    } else {
+        snippetLanguages.push("curl");
     }
 
     return {
@@ -72,7 +75,7 @@ export async function backfillSnippets({
                                     endpoint,
                                     example,
                                     alwaysEnableJavaScriptFetch,
-                                    httpSnippetLanguages
+                                    snippetLanguages
                                 })
                             ) ?? []
                         )
@@ -89,14 +92,14 @@ async function backfillSnippetsForExample({
     endpoint,
     example,
     alwaysEnableJavaScriptFetch,
-    httpSnippetLanguages
+    snippetLanguages
 }: {
     apiDefinition: ApiDefinition;
     dynamicGenerators: Record<string, any>;
     endpoint: EndpointDefinition;
     example: ExampleEndpointCall;
     alwaysEnableJavaScriptFetch: boolean;
-    httpSnippetLanguages: string[];
+    snippetLanguages: string[];
 }): Promise<ExampleEndpointCall> {
     const snippets = { ...example.snippets };
 
@@ -105,7 +108,7 @@ async function backfillSnippetsForExample({
     };
 
     // Check if curl snippet exists
-    if (!snippets.curl?.length) {
+    if (!snippets.curl?.length && snippetLanguages.includes("curl")) {
         const endpointAuth = endpoint.auth?.[0];
         const curlCode = convertToCurl(
             toSnippetHttpRequest(
@@ -124,10 +127,10 @@ async function backfillSnippetsForExample({
         });
     }
 
-    if (httpSnippetLanguages.length > 0) {
+    if (snippetLanguages.length > 0) {
         const snippet = new HTTPSnippet(getHarRequest(endpoint, example, apiDefinition.auths, example.requestBody));
         for (const { clientId, targetId } of CLIENTS) {
-            if (!httpSnippetLanguages.includes(targetId)) {
+            if (!snippetLanguages.includes(targetId)) {
                 continue;
             }
 
