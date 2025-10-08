@@ -59,6 +59,14 @@ let nextConfig: NextConfig = {
         ]
     },
     webpack: (config, { isServer }) => {
+        // Define process.env variables for browser bundle
+        config.plugins ??= [];
+        config.plugins.push(
+            new (isRspackEnabled ? rspack : webpack).DefinePlugin({
+                "process.env.VSCODE_TEXTMATE_DEBUG": JSON.stringify(process.env.VSCODE_TEXTMATE_DEBUG || false)
+            })
+        );
+
         config.externals.push(
             "sharp",
             // mongodb subdependencies are optional, and need to be externalized for rspack.
