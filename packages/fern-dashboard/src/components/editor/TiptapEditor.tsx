@@ -12,15 +12,12 @@ import {
     useCurrentEditor
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { createLowlight } from "lowlight";
 import { useEffect } from "react";
 
 import "@/components/editor/tiptap-node/node-focus/node-focus.scss";
 import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useEditor } from "@/providers/EditorContext";
 import { cn } from "@/utils/utils";
-import { createCodeBlockComponent } from "./extension-code-block/CodeBlockComponent";
-import type { LowlightInstance } from "./extension-code-block/types";
 import CustomElement from "./extension-custom-element";
 import { FVEAttributesExtension } from "./extension-fve-attributes";
 import FloatingMenu from "./FloatingMenu";
@@ -29,15 +26,11 @@ import TableNodeView from "./TableNodeView";
 import TextBubbleMenu from "./TextBubbleMenu";
 import TableHeaderNodeView from "./table/TableHeaderNodeView";
 import TableRowNodeView from "./table/TableRowNodeView";
-import { LowlightPlugin } from "./tiptap-node/lowlight/lowlight-plugin";
+import { ShikiPlugin } from "./tiptap-node/shiki/shiki-plugin";
 import {
     ConfiguredFileHandler,
     ConfiguredMediaUploadNode
 } from "./tiptap-node/media-upload-node/configured-upload-extensions";
-
-// We'll need to lazy-load the lowlight instance to avoid importing all the lowlight package dependencies, so
-// this is just an empty instance
-const lowlight: LowlightInstance = createLowlight();
 
 // These node types are the ones that will have data attributes set on them
 const dataAttributeNodeTypes = [
@@ -82,11 +75,8 @@ const extensions = [
         emptyNodeClass: "is-empty"
     }),
     CodeBlock.configure({ enableTabIndentation: true }).extend({
-        addNodeView() {
-            return ReactNodeViewRenderer(createCodeBlockComponent(lowlight));
-        },
         addProseMirrorPlugins() {
-            return [LowlightPlugin({ name: "codeBlock", lowlight, defaultLanguage: null })];
+            return [ShikiPlugin({ name: "codeBlock", defaultLanguage: null })];
         }
     }),
     Table.extend({
