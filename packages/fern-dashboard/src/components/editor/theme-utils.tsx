@@ -1,5 +1,3 @@
-import * as monaco from "modern-monaco";
-
 // Get CSS custom property value at runtime
 function getCSSCustomProperty(property: string, fallback: string): string {
     if (typeof window !== "undefined") {
@@ -15,7 +13,7 @@ function getCSSCustomProperty(property: string, fallback: string): string {
 }
 
 // Enhanced theme with blues and greens for better markdown readability
-export function defineAppTheme(monacoInstance: typeof monaco) {
+export function defineAppTheme(monacoInstance: any) {
     const primaryColor = getCSSCustomProperty("--primary", "green");
     const tealVariant = getCSSCustomProperty("--monaco-blue", "blue");
     const purpleVariant = getCSSCustomProperty("--monaco-purple", "purple");

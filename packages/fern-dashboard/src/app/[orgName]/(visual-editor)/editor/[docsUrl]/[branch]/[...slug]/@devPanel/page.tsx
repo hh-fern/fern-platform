@@ -2,7 +2,6 @@
 
 import { useNavigation } from "@fern-docs/components/navigation";
 
-import * as monaco from "modern-monaco";
 import { Code2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
@@ -22,8 +21,8 @@ export default function DevPanel() {
     const { currentFilename } = useCurrentPage();
     const { registeredPages, updatePage, emitPageSaveEvent } = useNavigation();
     const isEditingDisabled = useEditingDisabled();
-    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const monacoRef = useRef<typeof monaco | null>(null);
+    const editorRef = useRef<any>(null);
+    const monacoRef = useRef<any>(null);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     const LoadingIndicator = "<!-- Loading content... -->";
@@ -39,7 +38,7 @@ export default function DevPanel() {
         setHasUnsavedChanges(false);
     }, [currentMarkdown]);
 
-    function handleEditorDidMount(editorInstance: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) {
+    function handleEditorDidMount(editorInstance: any, monacoInstance: any) {
         editorRef.current = editorInstance;
         monacoRef.current = monacoInstance;
 

@@ -12,7 +12,6 @@ import {
     Terminal,
     Blocks
 } from "lucide-react";
-import * as monaco from "modern-monaco";
 
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter";
@@ -131,54 +130,65 @@ function ModernMonacoEditor({
 }) {
     const editorRef = useRef<HTMLDivElement>(null);
     const editorInstanceRef = useRef<any>(null);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        if (!editorRef.current) return;
+        // Dynamically import monaco
+        import("modern-monaco").then((monaco) => {
+            setIsLoaded(true);
+            if (!editorRef.current) return;
 
-        // Create editor instance
-        const editor = monaco.editor.create(editorRef.current, {
-            value,
-            language,
-            theme: "min-light",
-            minimap: { enabled: false },
-            fontSize: 14,
-            lineNumbers: "on",
-            scrollBeyondLastLine: false,
-            automaticLayout: true,
-            tabSize: 2,
-            wordWrap: "off",
-            padding: { top: 16, bottom: 16 }
-        });
+            // Create editor instance
+            const editor = monaco.editor.create(editorRef.current, {
+                value,
+                language,
+                theme: "min-light",
+                minimap: { enabled: false },
+                fontSize: 14,
+                lineNumbers: "on",
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                tabSize: 2,
+                wordWrap: "off",
+                padding: { top: 16, bottom: 16 }
+            });
 
-        editorInstanceRef.current = editor;
+            editorInstanceRef.current = { editor, monaco };
 
-        // Listen for content changes
-        editor.onDidChangeModelContent(() => {
-            onChange(editor.getValue());
+            // Listen for content changes
+            editor.onDidChangeModelContent(() => {
+                onChange(editor.getValue());
+            });
         });
 
         // Cleanup on unmount
         return () => {
-            editor.dispose();
+            if (editorInstanceRef.current) {
+                editorInstanceRef.current.editor.dispose();
+            }
         };
     }, []);
 
     // Update value when prop changes
     useEffect(() => {
-        if (editorInstanceRef.current && editorInstanceRef.current.getValue() !== value) {
-            editorInstanceRef.current.setValue(value);
+        if (editorInstanceRef.current && editorInstanceRef.current.editor.getValue() !== value) {
+            editorInstanceRef.current.editor.setValue(value);
         }
     }, [value]);
 
     // Update language when prop changes
     useEffect(() => {
         if (editorInstanceRef.current) {
-            const model = editorInstanceRef.current.getModel();
-            if (model) {
-                monaco.editor.setModelLanguage(model, language);
+            const model = editorInstanceRef.current.editor.getModel();
+            if (model && editorInstanceRef.current.monaco) {
+                editorInstanceRef.current.monaco.editor.setModelLanguage(model, language);
             }
         }
     }, [language]);
+
+    if (!isLoaded) {
+        return <div style={{ height, width: "100%" }} className="flex items-center justify-center">Loading editor...</div>;
+    }
 
     return <div ref={editorRef} style={{ height, width: "100%" }} />;
 }

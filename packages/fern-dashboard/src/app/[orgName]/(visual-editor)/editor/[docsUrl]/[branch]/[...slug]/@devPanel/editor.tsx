@@ -1,5 +1,4 @@
-import * as monaco from "modern-monaco";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function MonacoEditor({
     currentMarkdown,
@@ -7,34 +6,41 @@ export default function MonacoEditor({
     isEditingDisabled
 }: {
     currentMarkdown: string;
-    handleEditorDidMount: (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => void;
+    handleEditorDidMount: (editor: any, monacoInstance: any) => void;
     isEditingDisabled: boolean;
 }) {
     const editorRef = useRef<HTMLDivElement>(null);
-    const editorInstanceRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+    const editorInstanceRef = useRef<any>(null);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        if (!editorRef.current) return;
+        // Dynamically import monaco
+        import("modern-monaco").then((monaco) => {
+            setIsLoaded(true);
+            if (!editorRef.current) return;
 
-        // Create editor instance
-        const editor = monaco.editor.create(editorRef.current, {
-            value: currentMarkdown,
-            language: "markdown",
-            theme: "app-theme",
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            wordWrap: "on",
-            readOnly: isEditingDisabled
+            // Create editor instance
+            const editor = monaco.editor.create(editorRef.current, {
+                value: currentMarkdown,
+                language: "markdown",
+                theme: "app-theme",
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                wordWrap: "on",
+                readOnly: isEditingDisabled
+            });
+
+            editorInstanceRef.current = editor;
+
+            // Call the mount handler
+            handleEditorDidMount(editor, monaco);
         });
-
-        editorInstanceRef.current = editor;
-
-        // Call the mount handler
-        handleEditorDidMount(editor, monaco);
 
         // Cleanup on unmount
         return () => {
-            editor.dispose();
+            if (editorInstanceRef.current) {
+                editorInstanceRef.current.dispose();
+            }
         };
     }, []);
 
@@ -51,6 +57,10 @@ export default function MonacoEditor({
             editorInstanceRef.current.updateOptions({ readOnly: isEditingDisabled });
         }
     }, [isEditingDisabled]);
+
+    if (!isLoaded) {
+        return <div style={{ height: "100%", width: "100%" }} className="flex items-center justify-center">Loading editor...</div>;
+    }
 
     return <div ref={editorRef} style={{ height: "100%", width: "100%" }} />;
 }
