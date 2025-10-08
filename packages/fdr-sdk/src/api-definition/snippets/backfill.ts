@@ -3,7 +3,7 @@ import { HTTPSnippet, type TargetId } from "httpsnippet-lite";
 
 import { SnippetResolver } from "@fern-api/snippets";
 
-import type { DynamicIr } from "../../client/APIV1Write";
+import type { DynamicIr, EnvironmentId } from "../../client/APIV1Write";
 import type { ApiDefinition, CodeSnippet, EndpointDefinition, ExampleEndpointCall } from "../latest";
 import { toSnippetHttpRequest } from "./SnippetHttpRequest";
 import { convertToCurl } from "./curl";
@@ -48,6 +48,13 @@ export async function backfillSnippets({
         ...apiDefinition,
         endpoints: await Promise.all(
             Object.entries(apiDefinition.endpoints).map(async ([id, endpoint]) => {
+                if (endpoint.environments?.length === 0) {
+                    endpoint.environments?.push({
+                        id: "Default" as EnvironmentId,
+                        baseUrl: "https://host.com"
+                    });
+                }
+                
                 let dynamicGenerators: Record<string, any> = {};
                 if (dynamicIr) {
                     dynamicGenerators = createSnippetGenerators({ endpoint, dynamicIr });
