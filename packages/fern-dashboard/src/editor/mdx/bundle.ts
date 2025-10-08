@@ -37,7 +37,7 @@ export async function bundleMDX(
             const remarkPlugins = [
                 ...(options.remarkPlugins ?? []),
                 remarkFrontmatter,
-                [remarkMdxFrontmatter, { name: "frontmatter" }],
+                [remarkMdxFrontmatter, { name: "metadata" }],
                 remarkGfm,
                 remarkMath
             ];

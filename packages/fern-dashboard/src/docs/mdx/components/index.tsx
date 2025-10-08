@@ -124,6 +124,7 @@ const HTML_COMPONENTS = {
     img: "img",
     li: Li,
     ol: Ol,
+    p: "p",
     strong: Strong,
     table: Table,
     ul: Ul,
