@@ -9,8 +9,23 @@ import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter";
 
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
+import { Button } from "@/components/ui/button";
 
 import { allLanguages } from "./lowlight-languages";
+
+// Map language identifiers to Monaco-compatible language IDs
+function getMonacoLanguage(lang: string): string {
+    const languageMap: Record<string, string> = {
+        yml: "yaml",
+        ts: "typescript",
+        js: "javascript",
+        py: "python",
+        rb: "ruby",
+        sh: "shell",
+        bash: "shell"
+    };
+    return languageMap[lang] || lang;
+}
 
 export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     const defaultLanguage = props.node.attrs.language;
@@ -21,6 +36,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
 
     const code = props.node.textContent;
     const language = cleanLanguage(defaultLanguage || "plaintext");
+    const monacoLanguage = getMonacoLanguage(language);
 
     const handleEdit = () => {
         setEditedCode(code);
@@ -107,29 +123,25 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                             <div className="flex items-center gap-1 mr-1">
                                 {isEditing ? (
                                     <>
-                                        <button
-                                            onClick={handleSave}
-                                            className="flex items-center gap-1 rounded px-2 py-1 text-xs text-green-700 hover:bg-green-50"
-                                        >
-                                            <Check className="size-3.5" />
+                                        <Button onClick={handleSave} size="xs" variant="default">
+                                            <Check />
                                             Save
-                                        </button>
-                                        <button
-                                            onClick={handleCancel}
-                                            className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-700 hover:bg-red-50"
-                                        >
-                                            <X className="size-3.5" />
+                                        </Button>
+                                        <Button onClick={handleCancel} size="xs" variant="outline">
+                                            <X />
                                             Cancel
-                                        </button>
+                                        </Button>
                                     </>
                                 ) : (
-                                    <button
+                                    <Button
                                         onClick={handleEdit}
-                                        className="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-700 opacity-0 hover:bg-gray-100 group-hover:opacity-100"
+                                        size="xs"
+                                        variant="ghost"
+                                        className="opacity-0 group-hover:opacity-100"
                                     >
-                                        <Edit2 className="size-3.5" />
+                                        <Edit2 />
                                         Edit
-                                    </button>
+                                    </Button>
                                 )}
                             </div>
                         </div>
@@ -140,7 +152,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                         <div className="rounded-b-[inherit] overflow-hidden border-t">
                             <Editor
                                 height="300px"
-                                language={language}
+                                language={monacoLanguage}
                                 value={editedCode}
                                 onChange={(value) => setEditedCode(value || "")}
                                 theme="vs"
@@ -177,30 +189,26 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                 <div className="absolute right-2 top-2 z-20 flex items-center gap-2">
                     {isEditing ? (
                         <>
-                            <button
-                                onClick={handleSave}
-                                className="flex items-center gap-1 rounded border border-green-300 bg-white px-2 py-1 text-xs text-green-700 shadow-sm hover:bg-green-50"
-                            >
-                                <Check className="size-3.5" />
+                            <Button onClick={handleSave} size="xs" variant="default">
+                                <Check />
                                 Save
-                            </button>
-                            <button
-                                onClick={handleCancel}
-                                className="flex items-center gap-1 rounded border border-red-300 bg-white px-2 py-1 text-xs text-red-700 shadow-sm hover:bg-red-50"
-                            >
-                                <X className="size-3.5" />
+                            </Button>
+                            <Button onClick={handleCancel} size="xs" variant="outline">
+                                <X />
                                 Cancel
-                            </button>
+                            </Button>
                         </>
                     ) : (
                         <>
-                            <button
+                            <Button
                                 onClick={handleEdit}
-                                className="flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 opacity-0 shadow-sm backdrop-blur transition hover:bg-gray-50 group-hover:opacity-100"
+                                size="xs"
+                                variant="ghost"
+                                className="opacity-0 group-hover:opacity-100"
                             >
-                                <Edit2 className="size-3.5" />
+                                <Edit2 />
                                 Edit
-                            </button>
+                            </Button>
                             <SearchableDropdown
                                 items={languages}
                                 searchTerm={searchTerm}
@@ -237,7 +245,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                     <div className="rounded-[inherit] overflow-hidden">
                         <Editor
                             height="300px"
-                            language={language}
+                            language={monacoLanguage}
                             value={editedCode}
                             onChange={(value) => setEditedCode(value || "")}
                             theme="vs"
