@@ -38,10 +38,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                 try {
                     const html = highlighter.codeToHtml(code, {
                         lang: language,
-                        themes: {
-                            light: "min-light",
-                            dark: "material-theme-darker"
-                        }
+                        theme: "min-light" // Use light theme to match the docs
                     });
                     setHighlightedHtml(html);
                 } catch (error) {
@@ -97,7 +94,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                     </div>
                 )}
             >
-                <button className="border-border-default absolute right-2 top-2 z-10 flex cursor-pointer justify-between gap-3 rounded-md border bg-gray-800/90 px-2 py-1 text-xs text-white hover:bg-gray-700">
+                <button className="border-border-default absolute right-2 top-2 z-10 flex cursor-pointer justify-between gap-3 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm hover:bg-gray-50">
                     <span className="truncate">{currentLanguage?.label || "auto"}</span>
                     <ChevronDown className="size-4" />
                 </button>
@@ -105,12 +102,12 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
 
             {highlightedHtml ? (
                 <div
-                    className="shiki-code-block-rendered [&_pre]:m-0 [&_pre]:rounded-md [&_pre]:p-4"
+                    className="shiki-code-block-rendered [&_pre]:m-0 [&_pre]:rounded-lg [&_pre]:border [&_pre]:border-gray-200 [&_pre]:bg-white [&_pre]:p-4 [&_pre]:shadow-sm"
                     dangerouslySetInnerHTML={{ __html: highlightedHtml }}
                 />
             ) : (
-                <pre className="m-0 rounded-md bg-gray-900 p-4">
-                    <code className="text-gray-300">
+                <pre className="m-0 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                    <code className="text-gray-800">
                         <NodeViewContent />
                     </code>
                 </pre>
