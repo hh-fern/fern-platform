@@ -13,7 +13,8 @@ import {
     Database,
     Palette,
     Terminal,
-    Blocks
+    Blocks,
+    Maximize2
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
 
@@ -22,6 +23,13 @@ import { FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter"
 
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from "@/components/ui/dialog";
 
 import { allLanguages } from "./lowlight-languages";
 
@@ -77,6 +85,8 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [editedCode, setEditedCode] = useState("");
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [expandedCode, setExpandedCode] = useState("");
 
     const code = props.node.textContent;
     const language = cleanLanguage(defaultLanguage || "plaintext");
@@ -105,6 +115,26 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     const handleCancel = () => {
         setEditedCode("");
         setIsEditing(false);
+    };
+
+    const handleExpand = () => {
+        setExpandedCode(code);
+        setIsExpanded(true);
+    };
+
+    const handleExpandedSave = () => {
+        // Update the node content with the edited code
+        const { state } = props.editor;
+        const { tr } = state;
+        const from = props.getPos();
+        const to = from + props.node.nodeSize;
+
+        // Replace the content of the code block
+        tr.setNodeMarkup(from, undefined, props.node.attrs);
+        tr.insertText(expandedCode, from + 1, to - 1);
+
+        props.editor.view.dispatch(tr);
+        setIsExpanded(false);
     };
 
     const languages = useMemo(() => {
@@ -180,14 +210,62 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                         </Button>
                                     </>
                                 ) : (
-                                    <Button
-                                        onClick={handleEdit}
-                                        size="xs"
-                                        variant="secondary"
-                                    >
-                                        <Edit2 />
-                                        Edit
-                                    </Button>
+                                    <>
+                                        <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    onClick={handleExpand}
+                                                    size="xs"
+                                                    variant="ghost"
+                                                >
+                                                    <Maximize2 />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+                                                <DialogHeader>
+                                                    <DialogTitle className="flex items-center gap-2">
+                                                        {currentLanguage?.Icon && <currentLanguage.Icon className="size-5" />}
+                                                        Edit Code Block
+                                                    </DialogTitle>
+                                                </DialogHeader>
+                                                <div className="flex-1 overflow-hidden border rounded-md">
+                                                    <Editor
+                                                        height="100%"
+                                                        language={monacoLanguage}
+                                                        value={expandedCode}
+                                                        onChange={(value) => setExpandedCode(value || "")}
+                                                        theme="vs"
+                                                        options={{
+                                                            minimap: { enabled: false },
+                                                            fontSize: 14,
+                                                            lineNumbers: "on",
+                                                            scrollBeyondLastLine: false,
+                                                            automaticLayout: true,
+                                                            tabSize: 2,
+                                                            wordWrap: "off",
+                                                            padding: { top: 16, bottom: 16 }
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="flex justify-end gap-2 mt-4">
+                                                    <Button onClick={() => setIsExpanded(false)} variant="ghost">
+                                                        Cancel
+                                                    </Button>
+                                                    <Button onClick={handleExpandedSave} variant="secondary">
+                                                        Save Changes
+                                                    </Button>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                        <Button
+                                            onClick={handleEdit}
+                                            size="xs"
+                                            variant="secondary"
+                                        >
+                                            <Edit2 />
+                                            Edit
+                                        </Button>
+                                    </>
                                 )}
                             </div>
                         </div>
@@ -247,6 +325,52 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                         </>
                     ) : (
                         <>
+                            <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        onClick={handleExpand}
+                                        size="xs"
+                                        variant="ghost"
+                                    >
+                                        <Maximize2 />
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+                                    <DialogHeader>
+                                        <DialogTitle className="flex items-center gap-2">
+                                            {currentLanguage?.Icon && <currentLanguage.Icon className="size-5" />}
+                                            Edit Code Block
+                                        </DialogTitle>
+                                    </DialogHeader>
+                                    <div className="flex-1 overflow-hidden border rounded-md">
+                                        <Editor
+                                            height="100%"
+                                            language={monacoLanguage}
+                                            value={expandedCode}
+                                            onChange={(value) => setExpandedCode(value || "")}
+                                            theme="vs"
+                                            options={{
+                                                minimap: { enabled: false },
+                                                fontSize: 14,
+                                                lineNumbers: "on",
+                                                scrollBeyondLastLine: false,
+                                                automaticLayout: true,
+                                                tabSize: 2,
+                                                wordWrap: "off",
+                                                padding: { top: 16, bottom: 16 }
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-4">
+                                        <Button onClick={() => setIsExpanded(false)} variant="ghost">
+                                            Cancel
+                                        </Button>
+                                        <Button onClick={handleExpandedSave} variant="secondary">
+                                            Save Changes
+                                        </Button>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
                             <Button
                                 onClick={handleEdit}
                                 size="xs"
