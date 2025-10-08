@@ -20,6 +20,7 @@ import { useEditor } from "@/providers/EditorContext";
 import { cn } from "@/utils/utils";
 import CustomElement from "./extension-custom-element";
 import { ShikiCodeBlockComponent } from "./extension-code-block/ShikiCodeBlockComponent";
+import { ShikiPlugin } from "./tiptap-node/shiki/shiki-plugin";
 import { FVEAttributesExtension } from "./extension-fve-attributes";
 import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
@@ -77,6 +78,9 @@ const extensions = [
     CodeBlock.configure({ enableTabIndentation: true }).extend({
         addNodeView() {
             return ReactNodeViewRenderer(ShikiCodeBlockComponent);
+        },
+        addProseMirrorPlugins() {
+            return [ShikiPlugin({ name: "codeBlock", defaultLanguage: null })];
         }
     }),
     Table.extend({

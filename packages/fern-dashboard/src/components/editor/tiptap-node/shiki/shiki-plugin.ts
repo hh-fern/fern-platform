@@ -28,10 +28,10 @@ function parseShikiTokens(code: string, language: BundledLanguage, highlighter: 
     const tokens: ParsedToken[] = [];
 
     try {
-        // Use dark theme for better contrast on dark editor background
+        // Use light theme to match docs styling
         const highlighted = highlighter.codeToTokensBase(code, {
             lang: language,
-            theme: "material-theme-darker"
+            theme: "min-light"
         });
 
         for (const line of highlighted) {
