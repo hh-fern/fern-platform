@@ -139,31 +139,45 @@ function ModernMonacoEditor({
         let mounted = true;
 
         // Dynamically import monaco
-        import("modern-monaco").then((monaco) => {
-            if (!mounted || !containerRef.current) return;
+        import("modern-monaco")
+            .then((monacoModule) => {
+                if (!mounted || !containerRef.current) return;
 
-            // Create editor instance
-            const editor = monaco.editor.create(containerRef.current, {
-                value,
-                language,
-                theme: "min-light",
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: "on",
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                tabSize: 2,
-                wordWrap: "off",
-                padding: { top: 16, bottom: 16 }
+                // modern-monaco might export as default or as named export
+                const monaco = monacoModule.default || monacoModule;
+
+                console.log("Monaco loaded:", monaco);
+
+                if (!monaco?.editor?.create) {
+                    console.error("Monaco editor.create not found", monaco);
+                    return;
+                }
+
+                // Create editor instance
+                const editor = monaco.editor.create(containerRef.current, {
+                    value,
+                    language,
+                    theme: "min-light",
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    lineNumbers: "on",
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    tabSize: 2,
+                    wordWrap: "off",
+                    padding: { top: 16, bottom: 16 }
+                });
+
+                editorInstanceRef.current = { editor, monaco };
+
+                // Listen for content changes
+                editor.onDidChangeModelContent(() => {
+                    onChange(editor.getValue());
+                });
+            })
+            .catch((error) => {
+                console.error("Failed to load modern-monaco:", error);
             });
-
-            editorInstanceRef.current = { editor, monaco };
-
-            // Listen for content changes
-            editor.onDidChangeModelContent(() => {
-                onChange(editor.getValue());
-            });
-        });
 
         // Cleanup on unmount
         return () => {
