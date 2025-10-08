@@ -13,6 +13,7 @@ import {
     rehypeCodeBlock,
     rehypeMdxClassStyle,
     rehypeParamField,
+    rehypeSlug,
     rehypeSteps,
     rehypeTable,
     rehypeTabs
@@ -55,6 +56,7 @@ export async function bundleMDX(
                 rehypeTabs,
                 rehypeCards,
                 rehypeParamField,
+                [rehypeSlug, { additionalJsxElements: ["Step", "Accordion", "Tab", "ParamField"] }],
                 rehypeButtons,
                 // Add loader-dependent plugins if loader is available
                 ...(loader
