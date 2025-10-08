@@ -67,7 +67,17 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                     </button>
                 </SearchableDropdown>
 
-                <FernSyntaxHighlighter language={language} code={code} highlightLines={[]} highlightStyle="highlight" />
+                <div className="relative">
+                    {/* Shiki-highlighted preview layer */}
+                    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+                        <FernSyntaxHighlighter language={language} code={code} highlightLines={[]} highlightStyle="highlight" />
+                    </div>
+
+                    {/* Editable content layer */}
+                    <pre className="relative">
+                        <NodeViewContent as="code" className="opacity-0" />
+                    </pre>
+                </div>
             </div>
         </NodeViewWrapper>
     );
