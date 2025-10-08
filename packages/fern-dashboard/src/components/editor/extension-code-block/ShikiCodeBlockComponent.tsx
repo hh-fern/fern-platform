@@ -183,7 +183,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                     <Button
                                         onClick={handleEdit}
                                         size="xs"
-                                        variant="outline"
+                                        variant="secondary"
                                         className="opacity-0 group-hover:opacity-100"
                                     >
                                         <Edit2 />
@@ -250,7 +250,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                             <Button
                                 onClick={handleEdit}
                                 size="xs"
-                                variant="outline"
+                                variant="secondary"
                                 className="opacity-0 group-hover:opacity-100"
                             >
                                 <Edit2 />
