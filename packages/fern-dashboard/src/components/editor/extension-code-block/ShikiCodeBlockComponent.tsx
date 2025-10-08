@@ -3,6 +3,7 @@ import React, { useMemo, useState } from "react";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import type { ReactNodeViewProps } from "@tiptap/react";
 import { ChevronDown, Edit2, Check, X } from "lucide-react";
+import Editor from "@monaco-editor/react";
 
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter";
@@ -136,12 +137,24 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
 
                     {/* Code content */}
                     {isEditing ? (
-                        <textarea
-                            value={editedCode}
-                            onChange={(e) => setEditedCode(e.target.value)}
-                            className="w-full min-h-[200px] p-4 font-mono text-sm bg-white border-0 outline-none resize-vertical rounded-b-[inherit]"
-                            autoFocus
-                        />
+                        <div className="rounded-b-[inherit] overflow-hidden border-t">
+                            <Editor
+                                height="300px"
+                                language={language}
+                                value={editedCode}
+                                onChange={(value) => setEditedCode(value || "")}
+                                theme="vs"
+                                options={{
+                                    minimap: { enabled: false },
+                                    fontSize: 14,
+                                    lineNumbers: "on",
+                                    scrollBeyondLastLine: false,
+                                    automaticLayout: true,
+                                    tabSize: 2,
+                                    wordWrap: "off"
+                                }}
+                            />
+                        </div>
                     ) : (
                         <FernSyntaxHighlighter
                             language={language}
@@ -221,12 +234,24 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                 </div>
 
                 {isEditing ? (
-                    <textarea
-                        value={editedCode}
-                        onChange={(e) => setEditedCode(e.target.value)}
-                        className="w-full min-h-[200px] p-4 font-mono text-sm bg-white border-0 outline-none resize-vertical rounded-[inherit]"
-                        autoFocus
-                    />
+                    <div className="rounded-[inherit] overflow-hidden">
+                        <Editor
+                            height="300px"
+                            language={language}
+                            value={editedCode}
+                            onChange={(value) => setEditedCode(value || "")}
+                            theme="vs"
+                            options={{
+                                minimap: { enabled: false },
+                                fontSize: 14,
+                                lineNumbers: "on",
+                                scrollBeyondLastLine: false,
+                                automaticLayout: true,
+                                tabSize: 2,
+                                wordWrap: "off"
+                            }}
+                        />
+                    </div>
                 ) : (
                     <FernSyntaxHighlighter
                         language={language}
