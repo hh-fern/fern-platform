@@ -8,10 +8,12 @@ let highlighterInstance: Highlighter | null = null;
 
 async function getHighlighter(): Promise<Highlighter> {
     if (!highlighterInstance) {
+        console.log("[ShikiPlugin] Initializing Shiki highlighter...");
         highlighterInstance = await createHighlighter({
             themes: ["min-light", "material-theme-darker"],
             langs: Object.keys(bundledLanguages) as BundledLanguage[]
         });
+        console.log("[ShikiPlugin] Shiki highlighter initialized");
     }
     return highlighterInstance;
 }
@@ -26,9 +28,10 @@ function parseShikiTokens(code: string, language: BundledLanguage, highlighter: 
     const tokens: ParsedToken[] = [];
 
     try {
+        // Use dark theme for better contrast on dark editor background
         const highlighted = highlighter.codeToTokensBase(code, {
             lang: language,
-            theme: "min-light" // Use light theme tokens
+            theme: "material-theme-darker"
         });
 
         for (const line of highlighted) {
@@ -95,10 +98,16 @@ export function ShikiPlugin({
     defaultLanguage: string | null | undefined;
 }) {
     let highlighter: Highlighter | null = null;
+    let editorView: any = null;
 
-    // Initialize the highlighter
+    // Initialize the highlighter and trigger a re-render when ready
     void getHighlighter().then((h) => {
         highlighter = h;
+        console.log("[ShikiPlugin] Highlighter loaded, triggering re-decoration");
+        // Force re-decoration after highlighter loads
+        if (editorView) {
+            editorView.dispatch(editorView.state.tr.setMeta("forceUpdate", true));
+        }
     });
 
     const shikiPlugin = new Plugin({
@@ -156,6 +165,11 @@ export function ShikiPlugin({
             decorations(state) {
                 return shikiPlugin.getState(state);
             }
+        },
+
+        view(view) {
+            editorView = view;
+            return {};
         }
     });
 
