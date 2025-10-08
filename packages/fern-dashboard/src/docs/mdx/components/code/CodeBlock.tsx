@@ -55,8 +55,6 @@ export function CodeBlock(props: {
         tooltips: tooltipsProp
     } = props;
 
-    // Debug logging
-    console.log("[CodeBlock] Rendering with:", { language, code: code.substring(0, 50), title, filename });
     const isDarkCode = useIsDarkCode();
 
     // merge context templates with the ones passed in
