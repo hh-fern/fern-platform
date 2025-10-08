@@ -138,18 +138,16 @@ function ModernMonacoEditor({
 
         let mounted = true;
 
-        // Dynamically import monaco
+        // Dynamically import modern-monaco and initialize
         import("modern-monaco")
-            .then((monacoModule) => {
+            .then(async (monacoModule) => {
                 if (!mounted || !containerRef.current) return;
 
-                // modern-monaco might export as default or as named export
-                const monaco = monacoModule.default || monacoModule;
-
-                console.log("Monaco loaded:", monaco);
+                // Initialize modern-monaco to get the actual monaco instance
+                const monaco = await monacoModule.init();
 
                 if (!monaco?.editor?.create) {
-                    console.error("Monaco editor.create not found", monaco);
+                    console.error("Monaco editor.create not found after init", monaco);
                     return;
                 }
 

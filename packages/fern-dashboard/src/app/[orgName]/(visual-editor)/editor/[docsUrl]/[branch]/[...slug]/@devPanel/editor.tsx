@@ -19,26 +19,33 @@ export default function MonacoEditor({
 
         let mounted = true;
 
-        // Dynamically import monaco
-        import("modern-monaco").then((monaco) => {
-            if (!mounted || !containerRef.current) return;
+        // Dynamically import modern-monaco and initialize
+        import("modern-monaco")
+            .then(async (monacoModule) => {
+                if (!mounted || !containerRef.current) return;
 
-            // Create editor instance
-            const editor = monaco.editor.create(containerRef.current, {
-                value: currentMarkdown,
-                language: "markdown",
-                theme: "app-theme",
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                wordWrap: "on",
-                readOnly: isEditingDisabled
+                // Initialize modern-monaco to get the actual monaco instance
+                const monaco = await monacoModule.init();
+
+                // Create editor instance
+                const editor = monaco.editor.create(containerRef.current, {
+                    value: currentMarkdown,
+                    language: "markdown",
+                    theme: "app-theme",
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    wordWrap: "on",
+                    readOnly: isEditingDisabled
+                });
+
+                editorInstanceRef.current = editor;
+
+                // Call the mount handler
+                handleEditorDidMount(editor, monaco);
+            })
+            .catch((error) => {
+                console.error("Failed to load modern-monaco:", error);
             });
-
-            editorInstanceRef.current = editor;
-
-            // Call the mount handler
-            handleEditorDidMount(editor, monaco);
-        });
 
         // Cleanup on unmount
         return () => {
