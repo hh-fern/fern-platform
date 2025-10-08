@@ -1,7 +1,5 @@
 import { hastToMarkdown, toTree } from "@fern-docs/mdx";
-import { rehypeSlug } from "@fern-docs/mdx/plugins";
-
-import { rehypeTabs } from "./rehype-tabs";
+import { rehypeSlug, rehypeTabs } from "@fern-docs/mdx/plugins";
 
 const handleTabs = (rehypeTabs as any)();
 const handleSlug = (rehypeSlug as any)({

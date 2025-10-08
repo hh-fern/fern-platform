@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import type { ReactNodeViewProps } from "@tiptap/react";
@@ -13,8 +13,7 @@ import {
     Database,
     Palette,
     Terminal,
-    Blocks,
-    Maximize2
+    Blocks
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
 
@@ -22,14 +21,8 @@ import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter";
 
 import { SearchableDropdown } from "@/components/ui/SearchableDropdown";
+import { Mermaid } from "@/docs/mdx/components/mermaid";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
 
 import { allLanguages } from "./lowlight-languages";
 
@@ -42,9 +35,33 @@ function getMonacoLanguage(lang: string): string {
         py: "python",
         rb: "ruby",
         sh: "shell",
-        bash: "shell"
+        bash: "shell",
+        plaintext: "plaintext",
+        txt: "plaintext",
+        text: "plaintext"
     };
-    return languageMap[lang] || lang;
+
+    // Return mapped language or original if it's a valid Monaco language
+    const mapped = languageMap[lang.toLowerCase()];
+    if (mapped) {
+        return mapped;
+    }
+
+    // Common Monaco languages that don't need mapping
+    const validMonacoLanguages = [
+        "javascript", "typescript", "python", "java", "c", "cpp", "csharp",
+        "go", "rust", "php", "ruby", "swift", "kotlin", "dart", "scala",
+        "html", "css", "scss", "less", "json", "xml", "yaml", "markdown",
+        "sql", "shell", "powershell", "dockerfile", "makefile", "plaintext"
+    ];
+
+    if (validMonacoLanguages.includes(lang.toLowerCase())) {
+        return lang.toLowerCase();
+    }
+
+    // Default to plaintext if language is not recognized
+    console.log(`Unknown language for Monaco: ${lang}, defaulting to plaintext`);
+    return "plaintext";
 }
 
 // Get Lucide icon component for language
@@ -85,8 +102,6 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [editedCode, setEditedCode] = useState("");
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [expandedCode, setExpandedCode] = useState("");
 
     const code = props.node.textContent;
     const language = cleanLanguage(defaultLanguage || "plaintext");
@@ -115,26 +130,6 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     const handleCancel = () => {
         setEditedCode("");
         setIsEditing(false);
-    };
-
-    const handleExpand = () => {
-        setExpandedCode(code);
-        setIsExpanded(true);
-    };
-
-    const handleExpandedSave = () => {
-        // Update the node content with the edited code
-        const { state } = props.editor;
-        const { tr } = state;
-        const from = props.getPos();
-        const to = from + props.node.nodeSize;
-
-        // Replace the content of the code block
-        tr.setNodeMarkup(from, undefined, props.node.attrs);
-        tr.insertText(expandedCode, from + 1, to - 1);
-
-        props.editor.view.dispatch(tr);
-        setIsExpanded(false);
     };
 
     const languages = useMemo(() => {
@@ -200,70 +195,22 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                             <div className="flex items-center gap-1 mr-1">
                                 {isEditing ? (
                                     <>
-                                        <Button onClick={handleSave} size="xs" variant="secondary">
+                                        <Button onClick={handleSave} size="xs" variant="secondary" className="hover:bg-gray-300">
                                             <Check />
                                             Save
                                         </Button>
-                                        <Button onClick={handleCancel} size="xs" variant="ghost">
+                                        <Button onClick={handleCancel} size="xs" variant="ghost" className="hover:bg-gray-200">
                                             <X />
                                             Cancel
                                         </Button>
                                     </>
                                 ) : (
                                     <>
-                                        <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-                                            <DialogTrigger asChild>
-                                                <Button
-                                                    onClick={handleExpand}
-                                                    size="xs"
-                                                    variant="ghost"
-                                                >
-                                                    <Maximize2 />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="max-w-6xl w-[90vw] h-[85vh] p-0 flex flex-col gap-0">
-                                                <DialogHeader className="px-6 py-4 border-b">
-                                                    <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
-                                                        {currentLanguage?.Icon && <currentLanguage.Icon className="size-5" />}
-                                                        Edit Code Block
-                                                        <span className="text-sm font-normal text-gray-500">({currentLanguage?.label})</span>
-                                                    </DialogTitle>
-                                                </DialogHeader>
-                                                <div className="flex-1 overflow-hidden">
-                                                    <Editor
-                                                        height="100%"
-                                                        language={monacoLanguage}
-                                                        value={expandedCode}
-                                                        onChange={(value) => setExpandedCode(value || "")}
-                                                        theme="vs"
-                                                        options={{
-                                                            minimap: { enabled: true },
-                                                            fontSize: 14,
-                                                            lineNumbers: "on",
-                                                            scrollBeyondLastLine: false,
-                                                            automaticLayout: true,
-                                                            tabSize: 2,
-                                                            wordWrap: "off",
-                                                            padding: { top: 16, bottom: 16 }
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="flex justify-end gap-2 px-6 py-4 border-t bg-gray-50">
-                                                    <Button onClick={() => setIsExpanded(false)} variant="ghost" size="sm">
-                                                        Cancel
-                                                    </Button>
-                                                    <Button onClick={handleExpandedSave} variant="secondary" size="sm">
-                                                        <Check className="size-4" />
-                                                        Save Changes
-                                                    </Button>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
                                         <Button
                                             onClick={handleEdit}
                                             size="iconSm"
                                             variant="secondary"
-                                            className="hover:text-white"
+                                            className="hover:bg-gray-300 hover:text-gray-900 transition-colors"
                                         >
                                             <Edit2 />
                                         </Button>
@@ -281,7 +228,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                 language={monacoLanguage}
                                 value={editedCode}
                                 onChange={(value) => setEditedCode(value || "")}
-                                theme="vs"
+                                theme="vs-light"
                                 options={{
                                     minimap: { enabled: false },
                                     fontSize: 14,
@@ -293,6 +240,10 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                     padding: { top: 16, bottom: 16 }
                                 }}
                             />
+                        </div>
+                    ) : language === "mermaid" ? (
+                        <div className="p-6 rounded-b-[inherit]">
+                            <Mermaid>{code}</Mermaid>
                         </div>
                     ) : (
                         <FernSyntaxHighlighter
@@ -316,70 +267,22 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                 <div className="absolute right-2 top-2 z-20 flex items-center gap-2">
                     {isEditing ? (
                         <>
-                            <Button onClick={handleSave} size="xs" variant="secondary">
+                            <Button onClick={handleSave} size="xs" variant="secondary" className="hover:bg-gray-300">
                                 <Check />
                                 Save
                             </Button>
-                            <Button onClick={handleCancel} size="xs" variant="ghost">
+                            <Button onClick={handleCancel} size="xs" variant="ghost" className="hover:bg-gray-200">
                                 <X />
                                 Cancel
                             </Button>
                         </>
                     ) : (
                         <>
-                            <Dialog open={isExpanded} onOpenChange={setIsExpanded}>
-                                <DialogTrigger asChild>
-                                    <Button
-                                        onClick={handleExpand}
-                                        size="xs"
-                                        variant="ghost"
-                                    >
-                                        <Maximize2 />
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-6xl w-[90vw] h-[85vh] p-0 flex flex-col gap-0">
-                                    <DialogHeader className="px-6 py-4 border-b">
-                                        <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
-                                            {currentLanguage?.Icon && <currentLanguage.Icon className="size-5" />}
-                                            Edit Code Block
-                                            <span className="text-sm font-normal text-gray-500">({currentLanguage?.label})</span>
-                                        </DialogTitle>
-                                    </DialogHeader>
-                                    <div className="flex-1 overflow-hidden">
-                                        <Editor
-                                            height="100%"
-                                            language={monacoLanguage}
-                                            value={expandedCode}
-                                            onChange={(value) => setExpandedCode(value || "")}
-                                            theme="vs"
-                                            options={{
-                                                minimap: { enabled: true },
-                                                fontSize: 14,
-                                                lineNumbers: "on",
-                                                scrollBeyondLastLine: false,
-                                                automaticLayout: true,
-                                                tabSize: 2,
-                                                wordWrap: "off",
-                                                padding: { top: 16, bottom: 16 }
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="flex justify-end gap-2 px-6 py-4 border-t bg-gray-50">
-                                        <Button onClick={() => setIsExpanded(false)} variant="ghost" size="sm">
-                                            Cancel
-                                        </Button>
-                                        <Button onClick={handleExpandedSave} variant="secondary" size="sm">
-                                            <Check className="size-4" />
-                                            Save Changes
-                                        </Button>
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
                             <Button
                                 onClick={handleEdit}
                                 size="iconSm"
                                 variant="secondary"
-                                className="hover:text-white"
+                                className="hover:bg-gray-300 hover:text-gray-900 transition-colors"
                             >
                                 <Edit2 />
                             </Button>
@@ -424,7 +327,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                             language={monacoLanguage}
                             value={editedCode}
                             onChange={(value) => setEditedCode(value || "")}
-                            theme="vs"
+                            theme="vs-light"
                             options={{
                                 minimap: { enabled: false },
                                 fontSize: 14,
@@ -436,6 +339,10 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                 padding: { top: 16, bottom: 16 }
                             }}
                         />
+                    </div>
+                ) : language === "mermaid" ? (
+                    <div className="p-6 rounded-[inherit]">
+                        <Mermaid>{code}</Mermaid>
                     </div>
                 ) : (
                     <FernSyntaxHighlighter

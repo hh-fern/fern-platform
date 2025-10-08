@@ -1,6 +1,5 @@
 import { hastToMarkdown, toTree } from "@fern-docs/mdx";
-
-import { rehypeParamField } from "./rehype-param-field";
+import { rehypeParamField } from "@fern-docs/mdx/plugins";
 
 const handleParamField = (rehypeParamField as any)();
 
