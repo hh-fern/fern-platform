@@ -280,8 +280,8 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                     </div>
                                 )}
                             >
-                                <button className="flex cursor-pointer items-center gap-1.5 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 opacity-0 shadow-sm backdrop-blur transition hover:bg-gray-50 group-hover:opacity-100">
-                                    {currentLanguage?.Icon && <currentLanguage.Icon className="size-3.5" />}
+                                <button className="flex cursor-pointer items-center gap-1.5 rounded border border-gray-300 bg-white px-2 py-1 text-sm font-medium text-gray-900 shadow-sm backdrop-blur transition hover:bg-gray-50">
+                                    {currentLanguage?.Icon && <currentLanguage.Icon className="size-4" />}
                                     <span className="truncate max-w-[100px]">{currentLanguage?.label || "auto"}</span>
                                     <ChevronDown className="size-3.5 flex-shrink-0" />
                                 </button>
