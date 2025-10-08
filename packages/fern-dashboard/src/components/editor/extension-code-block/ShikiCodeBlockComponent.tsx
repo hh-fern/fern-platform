@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import type { ReactNodeViewProps } from "@tiptap/react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Edit2, Check, X } from "lucide-react";
 
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter";
@@ -15,9 +15,36 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     const defaultLanguage = props.node.attrs.language;
     const title = props.node.attrs.title;
     const [searchTerm, setSearchTerm] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedCode, setEditedCode] = useState("");
 
     const code = props.node.textContent;
     const language = cleanLanguage(defaultLanguage || "plaintext");
+
+    const handleEdit = () => {
+        setEditedCode(code);
+        setIsEditing(true);
+    };
+
+    const handleSave = () => {
+        // Update the node content with the edited code
+        const { state } = props.editor;
+        const { tr } = state;
+        const from = props.getPos();
+        const to = from + props.node.nodeSize;
+
+        // Replace the content of the code block
+        tr.setNodeMarkup(from, undefined, props.node.attrs);
+        tr.insertText(editedCode, from + 1, to - 1);
+
+        props.editor.view.dispatch(tr);
+        setIsEditing(false);
+    };
+
+    const handleCancel = () => {
+        setEditedCode("");
+        setIsEditing(false);
+    };
 
     const languages = useMemo(() => {
         const filteredLanguages = searchTerm
@@ -76,17 +103,54 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                     </div>
                                 </SearchableDropdown>
                             </div>
+                            <div className="flex items-center gap-1 mr-1">
+                                {isEditing ? (
+                                    <>
+                                        <button
+                                            onClick={handleSave}
+                                            className="flex items-center gap-1 rounded px-2 py-1 text-xs text-green-700 hover:bg-green-50"
+                                        >
+                                            <Check className="size-3.5" />
+                                            Save
+                                        </button>
+                                        <button
+                                            onClick={handleCancel}
+                                            className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-700 hover:bg-red-50"
+                                        >
+                                            <X className="size-3.5" />
+                                            Cancel
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={handleEdit}
+                                        className="flex items-center gap-1 rounded px-2 py-1 text-xs text-gray-700 opacity-0 hover:bg-gray-100 group-hover:opacity-100"
+                                    >
+                                        <Edit2 className="size-3.5" />
+                                        Edit
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
                     {/* Code content */}
-                    <FernSyntaxHighlighter
-                        language={language}
-                        code={code}
-                        highlightLines={[]}
-                        highlightStyle="highlight"
-                        className="rounded-b-[inherit]"
-                    />
+                    {isEditing ? (
+                        <textarea
+                            value={editedCode}
+                            onChange={(e) => setEditedCode(e.target.value)}
+                            className="w-full min-h-[200px] p-4 font-mono text-sm bg-white border-0 outline-none resize-vertical rounded-b-[inherit]"
+                            autoFocus
+                        />
+                    ) : (
+                        <FernSyntaxHighlighter
+                            language={language}
+                            code={code}
+                            highlightLines={[]}
+                            highlightStyle="highlight"
+                            className="rounded-b-[inherit]"
+                        />
+                    )}
                 </div>
             </NodeViewWrapper>
         );
@@ -96,41 +160,81 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     return (
         <NodeViewWrapper className="group relative mb-6 mt-4">
             <div className="bg-card-background border-card-border rounded-3 shadow-card-grayscale relative border">
-                <SearchableDropdown
-                    items={languages}
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
-                    onSelect={(language) => {
-                        if (!language.disabled) {
-                            props.updateAttributes({ language: language.value });
-                        }
-                    }}
-                    searchPlaceholder="Search languages..."
-                    emptyMessage="No languages found"
-                    getItemKey={(language) => language.value}
-                    renderItem={(language, onSelect) => (
-                        <div
-                            className={`flex w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-200 hover:transition-none focus:bg-gray-200 focus:outline-none ${
-                                language.disabled ? "cursor-not-allowed opacity-50" : ""
-                            }`}
-                            onClick={() => !language.disabled && onSelect()}
-                        >
-                            {language.label}
-                        </div>
+                {/* Action buttons */}
+                <div className="absolute right-2 top-2 z-20 flex items-center gap-2">
+                    {isEditing ? (
+                        <>
+                            <button
+                                onClick={handleSave}
+                                className="flex items-center gap-1 rounded border border-green-300 bg-white px-2 py-1 text-xs text-green-700 shadow-sm hover:bg-green-50"
+                            >
+                                <Check className="size-3.5" />
+                                Save
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                className="flex items-center gap-1 rounded border border-red-300 bg-white px-2 py-1 text-xs text-red-700 shadow-sm hover:bg-red-50"
+                            >
+                                <X className="size-3.5" />
+                                Cancel
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button
+                                onClick={handleEdit}
+                                className="flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 opacity-0 shadow-sm backdrop-blur transition hover:bg-gray-50 group-hover:opacity-100"
+                            >
+                                <Edit2 className="size-3.5" />
+                                Edit
+                            </button>
+                            <SearchableDropdown
+                                items={languages}
+                                searchTerm={searchTerm}
+                                onSearchChange={setSearchTerm}
+                                onSelect={(language) => {
+                                    if (!language.disabled) {
+                                        props.updateAttributes({ language: language.value });
+                                    }
+                                }}
+                                searchPlaceholder="Search languages..."
+                                emptyMessage="No languages found"
+                                getItemKey={(language) => language.value}
+                                renderItem={(language, onSelect) => (
+                                    <div
+                                        className={`flex w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-200 hover:transition-none focus:bg-gray-200 focus:outline-none ${
+                                            language.disabled ? "cursor-not-allowed opacity-50" : ""
+                                        }`}
+                                        onClick={() => !language.disabled && onSelect()}
+                                    >
+                                        {language.label}
+                                    </div>
+                                )}
+                            >
+                                <button className="flex cursor-pointer items-center gap-1.5 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 opacity-0 shadow-sm backdrop-blur transition hover:bg-gray-50 group-hover:opacity-100">
+                                    <span className="truncate max-w-[100px]">{currentLanguage?.label || "auto"}</span>
+                                    <ChevronDown className="size-3.5 flex-shrink-0" />
+                                </button>
+                            </SearchableDropdown>
+                        </>
                     )}
-                >
-                    <button className="absolute right-2 top-2 z-20 flex cursor-pointer items-center gap-1.5 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 opacity-0 shadow-sm backdrop-blur transition hover:bg-gray-50 group-hover:opacity-100">
-                        <span className="truncate max-w-[100px]">{currentLanguage?.label || "auto"}</span>
-                        <ChevronDown className="size-3.5 flex-shrink-0" />
-                    </button>
-                </SearchableDropdown>
+                </div>
 
-                <FernSyntaxHighlighter
-                    language={language}
-                    code={code}
-                    highlightLines={[]}
-                    highlightStyle="highlight"
-                />
+                {isEditing ? (
+                    <textarea
+                        value={editedCode}
+                        onChange={(e) => setEditedCode(e.target.value)}
+                        className="w-full min-h-[200px] p-4 font-mono text-sm bg-white border-0 outline-none resize-vertical rounded-[inherit]"
+                        autoFocus
+                    />
+                ) : (
+                    <FernSyntaxHighlighter
+                        language={language}
+                        code={code}
+                        highlightLines={[]}
+                        highlightStyle="highlight"
+                    />
+                )}
             </div>
         </NodeViewWrapper>
     );
