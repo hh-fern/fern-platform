@@ -41,9 +41,7 @@ export async function backfillSnippets({
     if (typeof httpSnippets === "boolean" && httpSnippets) {
         httpSnippetLanguages = CLIENTS.flatMap((language) => language.targetId);
     } else if (Array.isArray(httpSnippets)) {
-        httpSnippetLanguages = httpSnippets.map((lang) => 
-            lang === "typescript" ? "javascript" : lang
-        );
+        httpSnippetLanguages = httpSnippets.map((lang) => (lang === "typescript" ? "javascript" : lang));
     }
 
     return {

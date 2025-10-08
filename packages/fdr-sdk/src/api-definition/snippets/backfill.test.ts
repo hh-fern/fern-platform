@@ -1036,7 +1036,7 @@ describe("backfillSnippets", () => {
 
         expect(example?.snippets).toMatchSnapshot();
     });
-    
+
     it("should backfill snippets with no http snippets", async () => {
         const apiDefinition: ApiDefinition = {
             id: ApiDefinitionId("test-api"),
@@ -1161,7 +1161,7 @@ describe("backfillSnippets", () => {
         const curlSnippets = snippets?.curl;
         expect(curlSnippets).toBeDefined();
         expect(curlSnippets).toHaveLength(1);
-        
+
         const typescriptSnippets = snippets?.typescript;
         expect(typescriptSnippets).toBeUndefined();
 
@@ -1175,7 +1175,7 @@ describe("backfillSnippets", () => {
 
         expect(example?.snippets).toMatchSnapshot();
     });
-    
+
     it("should backfill snippets with just ruby http snippets", async () => {
         const apiDefinition: ApiDefinition = {
             id: ApiDefinitionId("test-api"),
@@ -1299,10 +1299,10 @@ describe("backfillSnippets", () => {
         const curlSnippets = snippets?.curl;
         expect(curlSnippets).toBeDefined();
         expect(curlSnippets).toHaveLength(1);
-        
+
         const typescriptSnippets = snippets?.typescript;
         expect(typescriptSnippets).toBeUndefined();
-        
+
         const rubySnippets = snippets?.ruby;
         expect(rubySnippets).toBeDefined();
         expect(rubySnippets).toHaveLength(1);
