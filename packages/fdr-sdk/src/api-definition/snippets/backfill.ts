@@ -356,6 +356,7 @@ function createSnippetGenerators({
     return generators;
 }
 
+// create the list of languages we should backfill snippets for
 function createSnippetLanguages({
     isHttpSnippetsEnabled,
     snippetLanguages
