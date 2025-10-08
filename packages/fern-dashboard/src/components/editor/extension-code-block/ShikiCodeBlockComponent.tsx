@@ -184,7 +184,6 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                         onClick={handleEdit}
                                         size="xs"
                                         variant="secondary"
-                                        className="opacity-0 group-hover:opacity-100"
                                     >
                                         <Edit2 />
                                         Edit
@@ -252,7 +251,6 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                 onClick={handleEdit}
                                 size="xs"
                                 variant="secondary"
-                                className="opacity-0 group-hover:opacity-100"
                             >
                                 <Edit2 />
                                 Edit
