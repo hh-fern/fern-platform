@@ -49,10 +49,35 @@ function getMonacoLanguage(lang: string): string {
 
     // Common Monaco languages that don't need mapping
     const validMonacoLanguages = [
-        "javascript", "typescript", "python", "java", "c", "cpp", "csharp",
-        "go", "rust", "php", "ruby", "swift", "kotlin", "dart", "scala",
-        "html", "css", "scss", "less", "json", "xml", "yaml", "markdown",
-        "sql", "shell", "powershell", "dockerfile", "makefile", "plaintext"
+        "javascript",
+        "typescript",
+        "python",
+        "java",
+        "c",
+        "cpp",
+        "csharp",
+        "go",
+        "rust",
+        "php",
+        "ruby",
+        "swift",
+        "kotlin",
+        "dart",
+        "scala",
+        "html",
+        "css",
+        "scss",
+        "less",
+        "json",
+        "xml",
+        "yaml",
+        "markdown",
+        "sql",
+        "shell",
+        "powershell",
+        "dockerfile",
+        "makefile",
+        "plaintext"
     ];
 
     if (validMonacoLanguages.includes(lang.toLowerCase())) {
@@ -195,11 +220,21 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                             <div className="flex items-center gap-1 mr-1">
                                 {isEditing ? (
                                     <>
-                                        <Button onClick={handleSave} size="xs" variant="secondary" className="hover:bg-gray-300">
+                                        <Button
+                                            onClick={handleSave}
+                                            size="xs"
+                                            variant="secondary"
+                                            className="hover:bg-gray-300"
+                                        >
                                             <Check />
                                             Save
                                         </Button>
-                                        <Button onClick={handleCancel} size="xs" variant="ghost" className="hover:bg-gray-200">
+                                        <Button
+                                            onClick={handleCancel}
+                                            size="xs"
+                                            variant="ghost"
+                                            className="hover:bg-gray-200"
+                                        >
                                             <X />
                                             Cancel
                                         </Button>

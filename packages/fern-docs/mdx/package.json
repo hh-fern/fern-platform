@@ -21,9 +21,7 @@
       "require": "./dist/js/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "clean": "rm -rf ./lib ./dist",
     "compile": "pnpm compile:js && pnpm compile:types",

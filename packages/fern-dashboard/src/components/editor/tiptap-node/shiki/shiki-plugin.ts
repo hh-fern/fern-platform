@@ -90,13 +90,7 @@ function getDecorations({
     return DecorationSet.create(doc, decorations);
 }
 
-export function ShikiPlugin({
-    name,
-    defaultLanguage
-}: {
-    name: string;
-    defaultLanguage: string | null | undefined;
-}) {
+export function ShikiPlugin({ name, defaultLanguage }: { name: string; defaultLanguage: string | null | undefined }) {
     let highlighter: Highlighter | null = null;
     let editorView: any = null;
 
