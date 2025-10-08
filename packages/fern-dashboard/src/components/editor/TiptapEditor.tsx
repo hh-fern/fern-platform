@@ -19,6 +19,7 @@ import { useEditingDisabled } from "@/hooks/useEditingDisabled";
 import { useEditor } from "@/providers/EditorContext";
 import { cn } from "@/utils/utils";
 import CustomElement from "./extension-custom-element";
+import { ShikiCodeBlockComponent } from "./extension-code-block/ShikiCodeBlockComponent";
 import { FVEAttributesExtension } from "./extension-fve-attributes";
 import FloatingMenu from "./FloatingMenu";
 import NodeHoverHandle from "./NodeHoverHandle";
@@ -26,7 +27,6 @@ import TableNodeView from "./TableNodeView";
 import TextBubbleMenu from "./TextBubbleMenu";
 import TableHeaderNodeView from "./table/TableHeaderNodeView";
 import TableRowNodeView from "./table/TableRowNodeView";
-import { ShikiPlugin } from "./tiptap-node/shiki/shiki-plugin";
 import {
     ConfiguredFileHandler,
     ConfiguredMediaUploadNode
@@ -75,8 +75,8 @@ const extensions = [
         emptyNodeClass: "is-empty"
     }),
     CodeBlock.configure({ enableTabIndentation: true }).extend({
-        addProseMirrorPlugins() {
-            return [ShikiPlugin({ name: "codeBlock", defaultLanguage: null })];
+        addNodeView() {
+            return ReactNodeViewRenderer(ShikiCodeBlockComponent);
         }
     }),
     Table.extend({
