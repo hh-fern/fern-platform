@@ -27,6 +27,38 @@ function getMonacoLanguage(lang: string): string {
     return languageMap[lang] || lang;
 }
 
+// Get emoji/icon for language
+function getLanguageIcon(lang: string): string {
+    const iconMap: Record<string, string> = {
+        javascript: "🟨",
+        typescript: "🔷",
+        python: "🐍",
+        java: "☕",
+        ruby: "💎",
+        rust: "🦀",
+        go: "🐹",
+        php: "🐘",
+        swift: "🍎",
+        kotlin: "🟣",
+        csharp: "🔵",
+        cpp: "⚙️",
+        c: "⚙️",
+        shell: "💻",
+        bash: "💻",
+        yaml: "📋",
+        yml: "📋",
+        json: "📦",
+        xml: "📄",
+        html: "🌐",
+        css: "🎨",
+        scss: "🎨",
+        sql: "🗃️",
+        markdown: "📝",
+        plaintext: "📄"
+    };
+    return iconMap[lang.toLowerCase()] || "📄";
+}
+
 export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
     const defaultLanguage = props.node.attrs.language;
     const title = props.node.attrs.title;
@@ -69,11 +101,12 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
             : allLanguages;
 
         return [
-            { value: "null", label: "auto" },
-            { value: "disabled", label: "—", disabled: true },
+            { value: "null", label: "auto", icon: "🔤" },
+            { value: "disabled", label: "—", disabled: true, icon: "" },
             ...filteredLanguages.map((lang: string) => ({
                 value: lang,
-                label: lang
+                label: lang,
+                icon: getLanguageIcon(lang)
             }))
         ];
     }, [searchTerm]);
@@ -103,17 +136,19 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                     getItemKey={(language) => language.value}
                                     renderItem={(language, onSelect) => (
                                         <div
-                                            className={`flex w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-200 hover:transition-none focus:bg-gray-200 focus:outline-none ${
+                                            className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-200 hover:transition-none focus:bg-gray-200 focus:outline-none ${
                                                 language.disabled ? "cursor-not-allowed opacity-50" : ""
                                             }`}
                                             onClick={() => !language.disabled && onSelect()}
                                         >
-                                            {language.label}
+                                            {language.icon && <span className="text-base">{language.icon}</span>}
+                                            <span>{language.label}</span>
                                         </div>
                                     )}
                                 >
                                     <div className="flex items-center px-3 py-1.5 cursor-pointer">
                                         <span className="text-(color:--grayscale-a11) rounded-1 text-sm font-semibold flex items-center gap-1.5">
+                                            {currentLanguage?.icon && <span className="text-base">{currentLanguage.icon}</span>}
                                             {title || currentLanguage?.label || "auto"}
                                             <ChevronDown className="size-3.5 flex-shrink-0 opacity-60" />
                                         </span>
@@ -127,7 +162,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                             <Check />
                                             Save
                                         </Button>
-                                        <Button onClick={handleCancel} size="xs" variant="outline">
+                                        <Button onClick={handleCancel} size="xs" variant="ghost">
                                             <X />
                                             Cancel
                                         </Button>
@@ -136,7 +171,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                     <Button
                                         onClick={handleEdit}
                                         size="xs"
-                                        variant="ghost"
+                                        variant="outline"
                                         className="opacity-0 group-hover:opacity-100"
                                     >
                                         <Edit2 />
@@ -193,7 +228,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                 <Check />
                                 Save
                             </Button>
-                            <Button onClick={handleCancel} size="xs" variant="outline">
+                            <Button onClick={handleCancel} size="xs" variant="ghost">
                                 <X />
                                 Cancel
                             </Button>
@@ -203,7 +238,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                             <Button
                                 onClick={handleEdit}
                                 size="xs"
-                                variant="ghost"
+                                variant="outline"
                                 className="opacity-0 group-hover:opacity-100"
                             >
                                 <Edit2 />
@@ -223,16 +258,18 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                 getItemKey={(language) => language.value}
                                 renderItem={(language, onSelect) => (
                                     <div
-                                        className={`flex w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-200 hover:transition-none focus:bg-gray-200 focus:outline-none ${
+                                        className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-gray-200 hover:transition-none focus:bg-gray-200 focus:outline-none ${
                                             language.disabled ? "cursor-not-allowed opacity-50" : ""
                                         }`}
                                         onClick={() => !language.disabled && onSelect()}
                                     >
-                                        {language.label}
+                                        {language.icon && <span className="text-base">{language.icon}</span>}
+                                        <span>{language.label}</span>
                                     </div>
                                 )}
                             >
                                 <button className="flex cursor-pointer items-center gap-1.5 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 opacity-0 shadow-sm backdrop-blur transition hover:bg-gray-50 group-hover:opacity-100">
+                                    {currentLanguage?.icon && <span className="text-base">{currentLanguage.icon}</span>}
                                     <span className="truncate max-w-[100px]">{currentLanguage?.label || "auto"}</span>
                                     <ChevronDown className="size-3.5 flex-shrink-0" />
                                 </button>
