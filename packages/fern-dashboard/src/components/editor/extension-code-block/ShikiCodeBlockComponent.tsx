@@ -196,7 +196,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
 
                     {/* Code content */}
                     {isEditing ? (
-                        <div className="rounded-b-[inherit] overflow-hidden border-t">
+                        <div className="rounded-b-[inherit] overflow-hidden border-t pt-4">
                             <Editor
                                 height="300px"
                                 language={monacoLanguage}
@@ -210,7 +210,8 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                     scrollBeyondLastLine: false,
                                     automaticLayout: true,
                                     tabSize: 2,
-                                    wordWrap: "off"
+                                    wordWrap: "off",
+                                    padding: { top: 16, bottom: 16 }
                                 }}
                             />
                         </div>
@@ -291,7 +292,7 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                 </div>
 
                 {isEditing ? (
-                    <div className="rounded-[inherit] overflow-hidden">
+                    <div className="rounded-[inherit] overflow-hidden pt-4">
                         <Editor
                             height="300px"
                             language={monacoLanguage}
@@ -305,7 +306,8 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                 scrollBeyondLastLine: false,
                                 automaticLayout: true,
                                 tabSize: 2,
-                                wordWrap: "off"
+                                wordWrap: "off",
+                                padding: { top: 16, bottom: 16 }
                             }}
                         />
                     </div>
