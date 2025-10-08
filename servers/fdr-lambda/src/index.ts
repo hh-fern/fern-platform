@@ -21,6 +21,10 @@ interface GetMetadataForUrlRequest {
     url: string;
 }
 
+interface AlgoliaWhitelistRequest {
+    domain: string;
+}
+
 class DomainNotRegisteredError extends Error {
     constructor() {
         super("Domain not registered");
@@ -119,6 +123,84 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
                     "Access-Control-Allow-Origin": "*"
                 },
                 body: JSON.stringify(metadata)
+            };
+        }
+
+        // Route: POST /v2/registry/docs/algolia-preview-whitelist/add
+        if (path === "/v2/registry/docs/algolia-preview-whitelist/add" && method === "POST") {
+            const body: AlgoliaWhitelistRequest = JSON.parse(event.body || "{}");
+
+            if (!body.domain) {
+                return {
+                    statusCode: 400,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*"
+                    },
+                    body: JSON.stringify({
+                        message: "Missing required field: domain",
+                        requestId: context.awsRequestId
+                    })
+                };
+            }
+
+            await pool.query(
+                `INSERT INTO "algolia_preview_domain_whitelist" ("domain") VALUES ($1) ON CONFLICT ("domain") DO NOTHING`,
+                [body.domain]
+            );
+
+            return {
+                statusCode: 204,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: ""
+            };
+        }
+
+        // Route: POST /v2/registry/docs/algolia-preview-whitelist/remove
+        if (path === "/v2/registry/docs/algolia-preview-whitelist/remove" && method === "POST") {
+            const body: AlgoliaWhitelistRequest = JSON.parse(event.body || "{}");
+
+            if (!body.domain) {
+                return {
+                    statusCode: 400,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*"
+                    },
+                    body: JSON.stringify({
+                        message: "Missing required field: domain",
+                        requestId: context.awsRequestId
+                    })
+                };
+            }
+
+            await pool.query(`DELETE FROM "algolia_preview_domain_whitelist" WHERE "domain" = $1`, [body.domain]);
+
+            return {
+                statusCode: 204,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: ""
+            };
+        }
+
+        // Route: GET /v2/registry/docs/algolia-preview-whitelist/list
+        if (path === "/v2/registry/docs/algolia-preview-whitelist/list" && method === "GET") {
+            const result = await pool.query(`SELECT "domain" FROM "algolia_preview_domain_whitelist"`);
+            const domains = result.rows.map((row) => row.domain);
+
+            return {
+                statusCode: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: JSON.stringify({ domains })
             };
         }
 

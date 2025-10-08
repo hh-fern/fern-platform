@@ -330,4 +330,103 @@ describe("Lambda Handler", () => {
             });
         });
     });
+
+    describe("POST /v2/registry/docs/algolia-preview-whitelist/add", () => {
+        it("should add a domain to the algolia whitelist", async () => {
+            mockQuery.mockResolvedValueOnce({ rows: [] });
+
+            const event = createMockEvent("/v2/registry/docs/algolia-preview-whitelist/add", "POST", {
+                domain: "preview.example.com"
+            });
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(204);
+            expect(mockQuery).toHaveBeenCalledWith(
+                expect.stringContaining('INSERT INTO "algolia_preview_domain_whitelist"'),
+                ["preview.example.com"]
+            );
+        });
+
+        it("should return 400 when domain is missing", async () => {
+            const event = createMockEvent("/v2/registry/docs/algolia-preview-whitelist/add", "POST", {});
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(400);
+            expect(JSON.parse(result.body)).toEqual({
+                message: "Missing required field: domain",
+                requestId: "test-request-id"
+            });
+        });
+    });
+
+    describe("POST /v2/registry/docs/algolia-preview-whitelist/remove", () => {
+        it("should remove a domain from the algolia whitelist", async () => {
+            mockQuery.mockResolvedValueOnce({ rows: [] });
+
+            const event = createMockEvent("/v2/registry/docs/algolia-preview-whitelist/remove", "POST", {
+                domain: "preview.example.com"
+            });
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(204);
+            expect(mockQuery).toHaveBeenCalledWith(
+                expect.stringContaining('DELETE FROM "algolia_preview_domain_whitelist"'),
+                ["preview.example.com"]
+            );
+        });
+
+        it("should return 400 when domain is missing", async () => {
+            const event = createMockEvent("/v2/registry/docs/algolia-preview-whitelist/remove", "POST", {});
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(400);
+            expect(JSON.parse(result.body)).toEqual({
+                message: "Missing required field: domain",
+                requestId: "test-request-id"
+            });
+        });
+    });
+
+    describe("GET /v2/registry/docs/algolia-preview-whitelist/list", () => {
+        it("should list all domains in the algolia whitelist", async () => {
+            mockQuery.mockResolvedValueOnce({
+                rows: [{ domain: "preview1.example.com" }, { domain: "preview2.example.com" }]
+            });
+
+            const event = createMockEvent("/v2/registry/docs/algolia-preview-whitelist/list", "GET");
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(200);
+            expect(JSON.parse(result.body)).toEqual({
+                domains: ["preview1.example.com", "preview2.example.com"]
+            });
+            expect(mockQuery).toHaveBeenCalledWith(
+                expect.stringContaining('SELECT "domain" FROM "algolia_preview_domain_whitelist"')
+            );
+        });
+
+        it("should return empty array when no domains in whitelist", async () => {
+            mockQuery.mockResolvedValueOnce({ rows: [] });
+
+            const event = createMockEvent("/v2/registry/docs/algolia-preview-whitelist/list", "GET");
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(200);
+            expect(JSON.parse(result.body)).toEqual({
+                domains: []
+            });
+        });
+    });
 });
