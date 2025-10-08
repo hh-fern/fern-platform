@@ -2,7 +2,19 @@ import React, { useMemo, useState } from "react";
 
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import type { ReactNodeViewProps } from "@tiptap/react";
-import { ChevronDown, Edit2, Check, X } from "lucide-react";
+import {
+    ChevronDown,
+    Edit2,
+    Check,
+    X,
+    Code2,
+    FileJson,
+    FileText,
+    Database,
+    Palette,
+    Terminal,
+    Blocks
+} from "lucide-react";
 import Editor from "@monaco-editor/react";
 
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
@@ -27,36 +39,36 @@ function getMonacoLanguage(lang: string): string {
     return languageMap[lang] || lang;
 }
 
-// Get emoji/icon for language
-function getLanguageIcon(lang: string): string {
-    const iconMap: Record<string, string> = {
-        javascript: "🟨",
-        typescript: "🔷",
-        python: "🐍",
-        java: "☕",
-        ruby: "💎",
-        rust: "🦀",
-        go: "🐹",
-        php: "🐘",
-        swift: "🍎",
-        kotlin: "🟣",
-        csharp: "🔵",
-        cpp: "⚙️",
-        c: "⚙️",
-        shell: "💻",
-        bash: "💻",
-        yaml: "📋",
-        yml: "📋",
-        json: "📦",
-        xml: "📄",
-        html: "🌐",
-        css: "🎨",
-        scss: "🎨",
-        sql: "🗃️",
-        markdown: "📝",
-        plaintext: "📄"
+// Get Lucide icon component for language
+function getLanguageIcon(lang: string): React.ComponentType<any> {
+    const iconMap: Record<string, React.ComponentType<any>> = {
+        javascript: Code2,
+        typescript: Code2,
+        python: Code2,
+        java: Code2,
+        ruby: Code2,
+        rust: Code2,
+        go: Code2,
+        php: Code2,
+        swift: Code2,
+        kotlin: Code2,
+        csharp: Code2,
+        cpp: Code2,
+        c: Code2,
+        shell: Terminal,
+        bash: Terminal,
+        yaml: FileText,
+        yml: FileText,
+        json: FileJson,
+        xml: FileText,
+        html: Blocks,
+        css: Palette,
+        scss: Palette,
+        sql: Database,
+        markdown: FileText,
+        plaintext: FileText
     };
-    return iconMap[lang.toLowerCase()] || "📄";
+    return iconMap[lang.toLowerCase()] || FileText;
 }
 
 export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
@@ -101,12 +113,12 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
             : allLanguages;
 
         return [
-            { value: "null", label: "auto", icon: "🔤" },
-            { value: "disabled", label: "—", disabled: true, icon: "" },
+            { value: "null", label: "auto", Icon: Code2 },
+            { value: "disabled", label: "—", disabled: true },
             ...filteredLanguages.map((lang: string) => ({
                 value: lang,
                 label: lang,
-                icon: getLanguageIcon(lang)
+                Icon: getLanguageIcon(lang)
             }))
         ];
     }, [searchTerm]);
@@ -141,14 +153,14 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                             }`}
                                             onClick={() => !language.disabled && onSelect()}
                                         >
-                                            {language.icon && <span className="text-base">{language.icon}</span>}
+                                            {language.Icon && <language.Icon className="size-4 text-gray-600" />}
                                             <span>{language.label}</span>
                                         </div>
                                     )}
                                 >
                                     <div className="flex items-center px-3 py-1.5 cursor-pointer">
                                         <span className="text-(color:--grayscale-a11) rounded-1 text-sm font-semibold flex items-center gap-1.5">
-                                            {currentLanguage?.icon && <span className="text-base">{currentLanguage.icon}</span>}
+                                            {currentLanguage?.Icon && <currentLanguage.Icon className="size-4" />}
                                             {title || currentLanguage?.label || "auto"}
                                             <ChevronDown className="size-3.5 flex-shrink-0 opacity-60" />
                                         </span>
@@ -263,13 +275,13 @@ export function ShikiCodeBlockComponent(props: ReactNodeViewProps) {
                                         }`}
                                         onClick={() => !language.disabled && onSelect()}
                                     >
-                                        {language.icon && <span className="text-base">{language.icon}</span>}
+                                        {language.Icon && <language.Icon className="size-4 text-gray-600" />}
                                         <span>{language.label}</span>
                                     </div>
                                 )}
                             >
                                 <button className="flex cursor-pointer items-center gap-1.5 rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 opacity-0 shadow-sm backdrop-blur transition hover:bg-gray-50 group-hover:opacity-100">
-                                    {currentLanguage?.icon && <span className="text-base">{currentLanguage.icon}</span>}
+                                    {currentLanguage?.Icon && <currentLanguage.Icon className="size-3.5" />}
                                     <span className="truncate max-w-[100px]">{currentLanguage?.label || "auto"}</span>
                                     <ChevronDown className="size-3.5 flex-shrink-0" />
                                 </button>
