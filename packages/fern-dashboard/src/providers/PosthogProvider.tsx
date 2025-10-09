@@ -40,10 +40,18 @@ export function PostHogProvider({ session, children }: PostHogProvider.Props) {
             posthog.opt_out_capturing();
         }
 
+        // Identify user immediately after initialization to prevent anonymous UUID sessions
+        if (session?.user != null) {
+            posthog.identify(session.user.sub, {
+                email: session.user.email,
+                name: session.user.name
+            });
+        }
+
         posthog.setPersonPropertiesForFlags({
             email: session?.user.email
         });
-    }, [isPosthogTrackingEnabled, session?.user.email]);
+    }, [isPosthogTrackingEnabled, session?.user.email, session?.user.sub, session?.user.name]);
 
     useEffect(() => {
         if (isPosthogTrackingEnabled && orgName) {
