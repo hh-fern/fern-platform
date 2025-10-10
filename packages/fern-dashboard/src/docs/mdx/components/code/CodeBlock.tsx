@@ -1,13 +1,29 @@
+import { useEffect, useRef, useState } from "react";
 import type React from "react";
 
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { CopyToClipboardButton } from "@fern-docs/components/CopyToClipboardButton";
 import { cn } from "@fern-docs/components/cn";
-import { CodeBlockWithClipboardButton, FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter";
 
 import { useIsDarkCode } from "@/docs/state/dark-code";
 
 import { applyTemplates, useTemplate } from "./Template";
+
+// Helper function to find the code element that TipTap is managing
+// This searches for a pre > code element that contains the iframe
+function findCodeElementForIframe(iframe: HTMLIFrameElement): HTMLElement | null {
+    // Walk up the DOM tree from the iframe to find the nearest pre > code element
+    let parent = iframe.parentElement;
+    while (parent) {
+        // Check if this parent has a pre > code sibling or is itself a code container
+        const codeElement = parent.querySelector("pre > code");
+        if (codeElement instanceof HTMLElement) {
+            return codeElement;
+        }
+        parent = parent.parentElement;
+    }
+    return null;
+}
 
 export function CodeBlock(props: {
     className?: string;
@@ -52,17 +68,59 @@ export function CodeBlock(props: {
         filename,
         language = "plaintext",
         template: templateProp,
-        tooltips: tooltipsProp
+        maxLines = 20
     } = props;
     const isDarkCode = useIsDarkCode();
 
     // merge context templates with the ones passed in
     const template = { ...useTemplate().template, ...templateProp };
-    const tooltips = { ...useTemplate().tooltips, ...tooltipsProp };
+
+    // Track editable code from iframe
+    const [editableCode, setEditableCode] = useState(code);
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    useEffect(() => {
+        // Listen for messages from the iframe
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data?.type === "monaco-value-change") {
+                const newCode = event.data.value;
+                setEditableCode(newCode);
+
+                // Find the code element in the DOM that corresponds to this CodeBlock
+                // and update it so TipTap can detect the change
+                if (iframeRef.current) {
+                    const codeElement = findCodeElementForIframe(iframeRef.current);
+                    if (codeElement) {
+                        codeElement.textContent = newCode;
+                        // Trigger input event to notify TipTap of the change
+                        const inputEvent = new Event("input", { bubbles: true });
+                        codeElement.dispatchEvent(inputEvent);
+                    }
+                }
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+
+        return () => {
+            window.removeEventListener("message", handleMessage);
+        };
+    }, []);
 
     if (!code) {
         return null;
     }
+
+    const processedCode = applyTemplates(editableCode, template);
+    const cleanedLanguage = cleanLanguage(language);
+
+    // Calculate height based on maxLines
+    const lineCount = code.split("\n").length;
+    const displayLines = Math.min(lineCount, maxLines);
+    const height = Math.max(displayLines * 22 + 40, 100); // 22px per line + padding, min 100px
+
+    const theme = isDarkCode ? "material-theme-darker" : "min-light";
+    const iframeSrc = `/api/monaco-editor?code=${encodeURIComponent(code)}&language=${cleanedLanguage}&theme=${theme}&readOnly=false`;
 
     if (title || filename) {
         return (
@@ -81,39 +139,30 @@ export function CodeBlock(props: {
                                 </span>
                             </div>
                         </div>
-                        <CopyToClipboardButton className="ml-2 mr-1" content={() => applyTemplates(code, template)} />
+                        <CopyToClipboardButton className="ml-2 mr-1" content={() => processedCode} />
                     </div>
                 </div>
-                <FernSyntaxHighlighter
-                    {...toSyntaxHighlighterProps({ ...props, template, tooltips })}
-                    className="rounded-b-[inherit]"
+                <iframe
+                    ref={iframeRef}
+                    src={iframeSrc}
+                    className="w-full rounded-b-[inherit] border-0"
+                    style={{ height: `${height}px` }}
+                    title={`Code editor for ${cleanedLanguage}`}
                 />
             </div>
         );
     }
 
     return (
-        <CodeBlockWithClipboardButton
-            code={() => applyTemplates(code, template)}
-            className={cn({ "bg-card-solid dark": isDarkCode }, className)}
-        >
-            <FernSyntaxHighlighter {...toSyntaxHighlighterProps({ ...props, template, tooltips })} />
-        </CodeBlockWithClipboardButton>
+        <div className={cn("relative", { "bg-card-solid dark": isDarkCode }, className)}>
+            <CopyToClipboardButton className="absolute right-2 top-2 z-10" content={() => processedCode} />
+            <iframe
+                ref={iframeRef}
+                src={iframeSrc}
+                className="w-full rounded border-0"
+                style={{ height: `${height}px` }}
+                title={`Code editor for ${cleanedLanguage}`}
+            />
+        </div>
     );
-}
-
-export function toSyntaxHighlighterProps(
-    props: React.ComponentProps<typeof CodeBlock>
-): React.ComponentProps<typeof FernSyntaxHighlighter> {
-    const highlight = props.highlight ?? props.focus ?? [];
-    return {
-        language: cleanLanguage(props.language ?? "plaintext"),
-        highlightLines: typeof highlight === "number" ? [highlight] : highlight,
-        highlightStyle: props.focus != null ? "focus" : "highlight",
-        code: props.code ?? "",
-        maxLines: props.maxLines ?? 20,
-        wordWrap: props.wordWrap,
-        template: props.template,
-        tooltips: props.tooltips
-    };
 }

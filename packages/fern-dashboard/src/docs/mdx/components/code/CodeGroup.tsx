@@ -6,7 +6,6 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { cleanLanguage } from "@fern-api/fdr-sdk/api-definition";
 import { CopyToClipboardButton } from "@fern-docs/components/CopyToClipboardButton";
 import { cn } from "@fern-docs/components/cn";
-import { FernSyntaxHighlighter } from "@fern-docs/components/syntax-highlighter";
 
 import { HorizontalOverflowMask } from "@/docs/components/HorizontalOverflowMask";
 import { getLanguageDisplayName } from "@/docs/components/api-reference/examples/code-example";
@@ -14,8 +13,21 @@ import { unwrapChildren } from "@/docs/mdx/common/unwrap-children";
 import { useIsDarkCode } from "@/docs/state/dark-code";
 import { useProgrammingLanguage } from "@/docs/state/language";
 
-import { CodeBlock, toSyntaxHighlighterProps } from "./CodeBlock";
+import { CodeBlock } from "./CodeBlock";
 import { Template, applyTemplates, useTemplate } from "./Template";
+
+// Helper function to find the code element that TipTap is managing
+function findCodeElementForIframe(iframe: HTMLIFrameElement): HTMLElement | null {
+    let parent = iframe.parentElement;
+    while (parent) {
+        const codeElement = parent.querySelector("pre > code");
+        if (codeElement instanceof HTMLElement) {
+            return codeElement;
+        }
+        parent = parent.parentElement;
+    }
+    return null;
+}
 
 export function CodeGroup({
     children,
@@ -36,6 +48,44 @@ export function CodeGroup({
     const [selectedLanguage, setSelectedLanguage] = useProgrammingLanguage();
     const itemsRef = useRef(items);
     itemsRef.current = items;
+
+    // Track editable state for each tab
+    const [editableCodes, setEditableCodes] = useState<string[]>(items.map((item) => item.props.code ?? ""));
+
+    const iframeRefs = useRef<(HTMLIFrameElement | null)[]>([]);
+
+    useEffect(() => {
+        // Listen for messages from iframes
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data?.type === "monaco-value-change") {
+                const newCode = event.data.value;
+
+                // Update the code for the currently selected tab
+                setEditableCodes((prev) => {
+                    const newCodes = [...prev];
+                    newCodes[selectedTabIndex] = newCode;
+                    return newCodes;
+                });
+
+                // Find and update the code element in the DOM for TipTap
+                const currentIframe = iframeRefs.current[selectedTabIndex];
+                if (currentIframe) {
+                    const codeElement = findCodeElementForIframe(currentIframe);
+                    if (codeElement) {
+                        codeElement.textContent = newCode;
+                        const inputEvent = new Event("input", { bubbles: true });
+                        codeElement.dispatchEvent(inputEvent);
+                    }
+                }
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+
+        return () => {
+            window.removeEventListener("message", handleMessage);
+        };
+    }, [selectedTabIndex]);
 
     useEffect(() => {
         if (selectedLanguage) {
@@ -98,6 +148,12 @@ export function CodeGroup({
         );
     }
 
+    const selectedItem = items[selectedTabIndex];
+    const code = editableCodes[selectedTabIndex] ?? "";
+    const processedCode = applyTemplates(code, template);
+
+    const theme = isDarkCode ? "material-theme-darker" : "min-light";
+
     return (
         <Tabs.Root
             className={cn(
@@ -128,23 +184,37 @@ export function CodeGroup({
                         </HorizontalOverflowMask>
                     </Tabs.List>
 
-                    <CopyToClipboardButton
-                        className="ml-2 mr-1"
-                        content={() => applyTemplates(items[selectedTabIndex]?.props.code ?? "", template)}
-                    />
+                    <CopyToClipboardButton className="ml-2 mr-1" content={() => processedCode} />
                 </div>
             </div>
-            {items.map((item, idx) => (
-                <Tabs.Content value={idx.toString()} key={idx} className="rounded-b-[inherit] rounded-t-none" asChild>
-                    <FernSyntaxHighlighter
-                        {...toSyntaxHighlighterProps({
-                            ...item.props,
-                            template,
-                            tooltips
-                        })}
-                    />
-                </Tabs.Content>
-            ))}
+            {items.map((item, idx) => {
+                const itemCode = editableCodes[idx] ?? item.props.code ?? "";
+                const itemLanguage = cleanLanguage(item.props.language ?? "plaintext");
+                const itemMaxLines = item.props.maxLines ?? 20;
+                const itemLineCount = itemCode.split("\n").length;
+                const itemDisplayLines = Math.min(itemLineCount, itemMaxLines);
+                const itemHeight = Math.max(itemDisplayLines * 22 + 40, 100);
+
+                const iframeSrc = `/api/monaco-editor?code=${encodeURIComponent(item.props.code ?? "")}&language=${itemLanguage}&theme=${theme}&readOnly=false`;
+
+                return (
+                    <Tabs.Content
+                        value={idx.toString()}
+                        key={idx}
+                        className="rounded-b-[inherit] rounded-t-none"
+                    >
+                        <iframe
+                            ref={(el) => {
+                                iframeRefs.current[idx] = el;
+                            }}
+                            src={iframeSrc}
+                            className="w-full rounded-b-[inherit] border-0"
+                            style={{ height: `${itemHeight}px` }}
+                            title={`Code editor for ${itemLanguage}`}
+                        />
+                    </Tabs.Content>
+                );
+            })}
         </Tabs.Root>
     );
 }

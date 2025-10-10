@@ -11,7 +11,6 @@ import { getAuthenticatedSessionOrRedirect } from "@/app/services/dal/organizati
 import { DocsSiteOverviewCard } from "@/components/docs-page/DocsSiteOverviewCard";
 import { FernCliVersionDisplay } from "@/components/docs-page/FernCliVersionDisplay";
 import { type GithubAuthState, GithubSource } from "@/components/docs-page/GithubSource";
-import { ModernMonacoPlayground } from "@/components/docs-page/ModernMonacoPlayground";
 import { VisualEditorSection } from "@/components/docs-page/visual-editor-section/VisualEditorSection";
 import { getDocsSiteUrl } from "@/utils/getDocsSiteUrl";
 import { parseDocsUrlParam } from "@/utils/parseDocsUrlParam";
@@ -140,7 +139,6 @@ export default async function Page(props: {
                     </div>
                 }
             />
-            <ModernMonacoPlayground />
             <VisualEditorSection
                 docsUrl={docsUrl}
                 session={session}
