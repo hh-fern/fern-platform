@@ -1,0 +1,10 @@
+{
+  "extends": "@fern-platform/configs/tsconfig/react-library.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "moduleResolution": "bundler",
+    "target": "ES2020"
+  },
+  "include": ["./src/**/*"]
+}

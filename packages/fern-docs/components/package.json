@@ -83,6 +83,7 @@
     "@fern-api/docs-server": "workspace:*",
     "@fern-api/docs-utils": "workspace:*",
     "@fern-api/fdr-sdk": "workspace:*",
+    "@fern-api/syntax-highlighter": "workspace:*",
     "@fern-api/ui-core-utils": "workspace:*",
     "@fern-docs/mdx": "workspace:*",
     "@fern-ui/react-commons": "workspace:*",
