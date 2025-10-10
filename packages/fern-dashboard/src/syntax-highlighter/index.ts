@@ -4,4 +4,3 @@
  */
 
 export * from "./fernShiki";
-export * from "./HastToJsx";
