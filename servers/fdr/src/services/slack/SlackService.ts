@@ -12,6 +12,7 @@ export interface FailedToRegisterDocsNotification {
 export interface FailedToRevalidatePathsNotification {
     domain: string;
     paths: RevalidatedPathsResponse;
+    err?: unknown;
 }
 
 export interface FailedToDeleteIndexSegment {
@@ -95,12 +96,26 @@ export class SlackServiceImpl implements SlackService {
                     text: failedUrlsMessage,
                     thread_ts: ts
                 });
+                if (request.err) {
+                    await this.client.chat.postMessage({
+                        channel: "#docs-notifs",
+                        text: `Error details: ${stringifyError(request.err)}`,
+                        thread_ts: ts
+                    });
+                }
             } else if (request.paths.revalidationFailed) {
-                await this.client.chat.postMessage({
+                const { ts } = await this.client.chat.postMessage({
                     channel: "#docs-notifs",
                     text: `:rotating_light: \`${request.domain}\` revalidation *completely* failed.`,
                     blocks: []
                 });
+                if (request.err) {
+                    await this.client.chat.postMessage({
+                        channel: "#docs-notifs",
+                        text: `Error details: ${stringifyError(request.err)}`,
+                        thread_ts: ts
+                    });
+                }
             }
         } catch (err) {
             this.logger.debug("Failed to send slack message: ", err);

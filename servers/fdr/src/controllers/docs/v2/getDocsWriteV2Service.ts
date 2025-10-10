@@ -338,26 +338,67 @@ export function getDocsWriteV2Service(app: FdrApplication): DocsV2WriteService {
           }
         }
 
+        let revalidationError: unknown = undefined;
         try {
-          await Promise.all(
-            urls.map(async (baseUrl) => {
-              const results = await app.services.revalidator.revalidate({
-                baseUrl,
-                app,
-                authHeader,
-              });
-              if (results.failed.length === 0 && !results.revalidationFailed) {
-                app.logger.info(
-                  `Successfully revalidated ${results.successful.length} paths.`
-                );
-              } else {
-                await app.services.slack.notifyFailedToRevalidatePaths({
-                  domain: baseUrl.getFullUrl(),
-                  paths: results,
+          // First revalidation pass
+          try {
+            await Promise.all(
+              urls.map(async (baseUrl) => {
+                const results = await app.services.revalidator.revalidate({
+                  baseUrl,
+                  app,
+                  authHeader,
                 });
-              }
-            })
-          );
+                if (results.failed.length === 0 && !results.revalidationFailed) {
+                  app.logger.info(
+                    `First pass: Successfully revalidated ${results.successful.length} paths.`
+                  );
+                } else {
+                  await app.services.slack.notifyFailedToRevalidatePaths({
+                    domain: baseUrl.getFullUrl(),
+                    paths: results,
+                  });
+                }
+              })
+            );
+          } catch (e) {
+            revalidationError = e;
+            app.logger.error(
+              `First revalidation pass failed for ${docsRegistrationInfo.fernUrl}`,
+              e
+            );
+          }
+
+          // Second revalidation pass
+          try {
+            await Promise.all(
+              urls.map(async (baseUrl) => {
+                const results = await app.services.revalidator.revalidate({
+                  baseUrl,
+                  app,
+                  authHeader,
+                });
+                if (results.failed.length === 0 && !results.revalidationFailed) {
+                  app.logger.info(
+                    `Second pass: Successfully revalidated ${results.successful.length} paths.`
+                  );
+                } else {
+                  await app.services.slack.notifyFailedToRevalidatePaths({
+                    domain: baseUrl.getFullUrl(),
+                    paths: results,
+                    err: revalidationError,
+                  });
+                }
+              })
+            );
+          } catch (e) {
+            revalidationError = e;
+            app.logger.error(
+              `Second revalidation pass failed for ${docsRegistrationInfo.fernUrl}`,
+              e
+            );
+            throw e;
+          }
         } catch (e) {
           app.logger.error(
             `Error while trying to revalidate docs for ${docsRegistrationInfo.fernUrl}`,
