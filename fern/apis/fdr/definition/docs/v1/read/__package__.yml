@@ -122,6 +122,7 @@ types:
       # css and js
       css: optional<commons.CssConfig>
       js: optional<commons.JsConfig>
+      react: optional<commons.ReactConfig>
 
       # ai chat
       aiChatConfig: optional<commons.AIChatConfig>

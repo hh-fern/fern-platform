@@ -356,6 +356,11 @@ types:
       - beforeInteractive
       - afterInteractive # default
       - lazyOnload
+      
+  ReactConfig:
+    properties:
+      paths: list<string>
+      dependencies: optional<map<string, string>>
 
   IntegrationsConfig:
     properties:
