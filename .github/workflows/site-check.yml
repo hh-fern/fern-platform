@@ -8,6 +8,8 @@ on:
 jobs:
   test-syntax:
     runs-on: Seed
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
     steps:
       - uses: actions/checkout@v4
         with:
@@ -15,6 +17,12 @@ jobs:
       - name: Install
         uses: ./.github/actions/install
 
-      - name: Increase Node.js memory limit
-        run: |
-          echo "NODE_OPTIONS=--max-old-space-size=8192" >> $GITHUB_ENV
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Install Prisma CLI
+        run: npm install --global prisma@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
