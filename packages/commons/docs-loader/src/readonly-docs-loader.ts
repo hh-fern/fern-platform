@@ -125,50 +125,48 @@ function assertDocsDomain(domainKey: string) {
 
 const setMonitor = new Semaphore(10);
 
-function kvSet(domainKey: string, key: string, value: unknown, ttl?: number, cacheKeySuffix?: string) {
+async function kvSet(domainKey: string, key: string, value: unknown, ttl?: number, cacheKeySuffix?: string) {
     if (isLocal() || isSelfHosted()) {
         return;
     }
 
     const finalKey = cacheKeySuffix ? `${key}:${cacheKeySuffix}` : key;
 
-    console.debug(`[Upstash] SET operation - domain: ${domainKey}, key: ${finalKey}, ttl: ${ttl || "none"}`);
+    console.debug(`[Upstash] SET operation (BLOCKING) - domain: ${domainKey}, key: ${finalKey}, ttl: ${ttl || "none"}`);
 
-    after(async () => {
-        await setMonitor.acquire();
-        const start = Date.now();
-        try {
-            if (ttl && ttl > 0) {
-                await kv.hset(domainKey, { [finalKey]: value });
-                // Set expiration for the hash field (note: Redis doesn't support per-field TTL in hashes)
-                // So we'll use a separate key for TTL tracking
-                await kv.setex(`${domainKey}:ttl:${finalKey}`, ttl, Date.now() + ttl * 1000);
-            } else {
-                await kv.hset(domainKey, { [finalKey]: value });
-            }
-            const duration = Date.now() - start;
-            console.debug(`[Upstash] SET completed - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`);
-
-            // Disabled PostHog tracking for performance reasons
-            // track("upstash_cache_set", {
-            //   domain: domainKey,
-            //   cacheKey: finalKey,
-            //   hasTtl: Boolean(ttl && ttl > 0),
-            //   ttl: ttl,
-            //   duration,
-            // });
-        } catch (error) {
-            console.warn(`[Upstash] SET failed - domain: ${domainKey}, key: ${finalKey}`, error);
-            // Disabled PostHog tracking for performance reasons
-            // track("upstash_cache_set_error", {
-            //   domain: domainKey,
-            //   cacheKey: finalKey,
-            //   error: String(error),
-            // });
-        } finally {
-            setMonitor.release();
+    await setMonitor.acquire();
+    const start = Date.now();
+    try {
+        if (ttl && ttl > 0) {
+            await kv.hset(domainKey, { [finalKey]: value });
+            // Set expiration for the hash field (note: Redis doesn't support per-field TTL in hashes)
+            // So we'll use a separate key for TTL tracking
+            await kv.setex(`${domainKey}:ttl:${finalKey}`, ttl, Date.now() + ttl * 1000);
+        } else {
+            await kv.hset(domainKey, { [finalKey]: value });
         }
-    });
+        const duration = Date.now() - start;
+        console.debug(`[Upstash] SET completed (BLOCKING) - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`);
+
+        // Disabled PostHog tracking for performance reasons
+        // track("upstash_cache_set", {
+        //   domain: domainKey,
+        //   cacheKey: finalKey,
+        //   hasTtl: Boolean(ttl && ttl > 0),
+        //   ttl: ttl,
+        //   duration,
+        // });
+    } catch (error) {
+        console.warn(`[Upstash] SET failed (BLOCKING) - domain: ${domainKey}, key: ${finalKey}`, error);
+        // Disabled PostHog tracking for performance reasons
+        // track("upstash_cache_set_error", {
+        //   domain: domainKey,
+        //   cacheKey: finalKey,
+        //   error: String(error),
+        // });
+    } finally {
+        setMonitor.release();
+    }
 }
 
 const getMonitor = new Semaphore(10);
