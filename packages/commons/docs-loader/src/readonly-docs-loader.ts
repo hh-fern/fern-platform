@@ -3,7 +3,6 @@ import type { AuthEdgeConfig } from "@fern-api/docs-auth";
 import {
     type AuthState,
     loadWithUrl as cachedLoadWithUrl,
-    cacheSeed,
     cleanBasePath,
     createGetAuthState,
     type DynamicIRsByLanguage,
@@ -56,7 +55,6 @@ import { getAuthEdgeConfig, getEdgeFlags } from "@fern-docs/edge-config";
 import { kv } from "@vercel/kv";
 import { createHash } from "crypto";
 import { mapValues, Semaphore } from "es-toolkit";
-import { unstable_cache, unstable_cacheTag } from "next/cache";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { cache } from "react";
@@ -375,8 +373,6 @@ export const getMetadataFromResponse = async (
 
 export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string): Promise<DocsMetadata> => {
-        "use cache";
-        unstable_cacheTag(domainKey, "getMetadata");
         assertDocsDomain(domainKey);
 
         try {
@@ -399,9 +395,6 @@ export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
 
 const getFiles = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domain: string): Promise<Record<string, FileData>> => {
-        "use cache";
-        unstable_cacheTag(domain, "getFiles");
-
         try {
             const cached = await kvGet<Record<string, FileData>>(domain, "files", cacheConfig.cacheKeySuffix);
             if (cached) {
@@ -440,8 +433,6 @@ const getFiles = (cacheConfig: Required<CacheConfig>) =>
 
 // the api reference may be too large to cache, so we don't cache it in the KV store
 const getApi = async (domainKey: string, id: string) => {
-    "use cache";
-    unstable_cacheTag(domainKey, "getApi", id);
     const response = await loadWithUrl(domainKey);
     const latest = response.definition.apisV2[ApiDefinitionId(id)];
     if (latest != null) {
@@ -462,47 +453,43 @@ const getApi = async (domainKey: string, id: string) => {
 };
 
 const createGetPrunedApiCached = (domainKey: string, cacheConfig: Required<CacheConfig>) =>
-    unstable_cache(
-        async (id: string, ...nodes: PruningNodeType[]): Promise<ApiDefinition.ApiDefinition> => {
-            const flagsPromise = cachedGetEdgeFlags(domainKey);
-            // if there is only one node, and it's an endpoint, try to load from cache
-            try {
-                if (nodes.length === 1 && nodes[0]) {
-                    const key = `api:${id}:${createEndpointCacheKey(nodes[0])}`;
-                    const cached = await kvGet<ApiDefinition.ApiDefinition>(domainKey, key, cacheConfig.cacheKeySuffix);
-                    if (cached != null) {
-                        const metadata = await getMetadata(cacheConfig)(domainKey);
-                        const dynamicIr = await getDynamicIr(cacheConfig)(metadata.org, metadata.domain, id);
-                        return await backfillSnippets(cached, dynamicIr, await flagsPromise);
-                    }
-                }
-            } catch (error) {
-                console.warn(`Failed to get pruned api for ${domainKey}:${id}, fallback to uncached`, error);
-            }
-
-            const api = await getApi(domainKey, id);
-            const pruned = prune(api, ...nodes);
-            for (const endpointK of Object.keys(pruned.endpoints)) {
-                if (pruned.endpoints[EndpointId(endpointK)]?.environments?.length === 0) {
-                    console.debug(`${endpointK} has empty environments, adding default URL.`);
-                    pruned.endpoints[EndpointId(endpointK)]?.environments?.push({
-                        id: "Default" as EnvironmentId,
-                        baseUrl: "https://host.com"
-                    });
-                }
-            }
-            // if there is only one node, and it's an endpoint, try to cache the result
+    async (id: string, ...nodes: PruningNodeType[]): Promise<ApiDefinition.ApiDefinition> => {
+        const flagsPromise = cachedGetEdgeFlags(domainKey);
+        // if there is only one node, and it's an endpoint, try to load from cache
+        try {
             if (nodes.length === 1 && nodes[0]) {
                 const key = `api:${id}:${createEndpointCacheKey(nodes[0])}`;
-                kvSet(domainKey, key, pruned, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+                const cached = await kvGet<ApiDefinition.ApiDefinition>(domainKey, key, cacheConfig.cacheKeySuffix);
+                if (cached != null) {
+                    const metadata = await getMetadata(cacheConfig)(domainKey);
+                    const dynamicIr = await getDynamicIr(cacheConfig)(metadata.org, metadata.domain, id);
+                    return await backfillSnippets(cached, dynamicIr, await flagsPromise);
+                }
             }
-            const metadata = await getMetadata(cacheConfig)(domainKey);
-            const dynamicIr = await getDynamicIr(cacheConfig)(metadata.org, metadata.domain, id);
-            return backfillSnippets(pruned, dynamicIr, await flagsPromise);
-        },
-        [domainKey, cacheSeed(), cacheConfig.cacheKeySuffix],
-        { tags: [domainKey, "api"] }
-    );
+        } catch (error) {
+            console.warn(`Failed to get pruned api for ${domainKey}:${id}, fallback to uncached`, error);
+        }
+
+        const api = await getApi(domainKey, id);
+        const pruned = prune(api, ...nodes);
+        for (const endpointK of Object.keys(pruned.endpoints)) {
+            if (pruned.endpoints[EndpointId(endpointK)]?.environments?.length === 0) {
+                console.debug(`${endpointK} has empty environments, adding default URL.`);
+                pruned.endpoints[EndpointId(endpointK)]?.environments?.push({
+                    id: "Default" as EnvironmentId,
+                    baseUrl: "https://host.com"
+                });
+            }
+        }
+        // if there is only one node, and it's an endpoint, try to cache the result
+        if (nodes.length === 1 && nodes[0]) {
+            const key = `api:${id}:${createEndpointCacheKey(nodes[0])}`;
+            kvSet(domainKey, key, pruned, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        }
+        const metadata = await getMetadata(cacheConfig)(domainKey);
+        const dynamicIr = await getDynamicIr(cacheConfig)(metadata.org, metadata.domain, id);
+        return backfillSnippets(pruned, dynamicIr, await flagsPromise);
+    };
 
 export function createEndpointCacheKey(pruneType: PruningNodeType) {
     switch (pruneType.type) {
@@ -545,9 +532,6 @@ const getEndpointById = async ({
     authSchemes: AuthScheme[];
     types: Record<TypeId, TypeDefinition>;
 }> => {
-    "use cache";
-    unstable_cacheTag(domainKey, "getEndpointById", apiDefinitionId, endpointId);
-
     const api = await createGetPrunedApiCached(domainKey, cacheConfig)(apiDefinitionId, {
         type: "endpoint",
         endpointId
@@ -659,28 +643,22 @@ const unsafe_getFullRoot = async (domainKey: string) => {
 
 const unsafe_getRootCached = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string) => {
-        return await unstable_cache(
-            async (domainKey: string) => {
-                try {
-                    const cached = await kvGet<FernNavigation.RootNode>(domainKey, "root", cacheConfig.cacheKeySuffix);
-                    if (cached != null) {
-                        return cached;
-                    }
-                } catch (error) {
-                    console.warn(`Failed to get full root for ${domainKey}, fallback to uncached`, error);
-                }
+        try {
+            const cached = await kvGet<FernNavigation.RootNode>(domainKey, "root", cacheConfig.cacheKeySuffix);
+            if (cached != null) {
+                return cached;
+            }
+        } catch (error) {
+            console.warn(`Failed to get full root for ${domainKey}, fallback to uncached`, error);
+        }
 
-                // Get fresh data
-                const root = await unsafe_getFullRoot(domainKey);
+        // Get fresh data
+        const root = await unsafe_getFullRoot(domainKey);
 
-                // Cache the result
-                kvSet(domainKey, "root", root, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        // Cache the result
+        kvSet(domainKey, "root", root, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
 
-                return root;
-            },
-            ["unsafe_getRoot", cacheSeed(), cacheConfig.cacheKeySuffix],
-            { tags: [domainKey, "unsafe_getRoot"] }
-        )(domainKey);
+        return root;
     });
 
 const getRoot = async (
@@ -699,12 +677,7 @@ const getRoot = async (
 
 const getRootCached = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string, authState: AuthState, authConfig: AuthEdgeConfig | undefined) => {
-        return await unstable_cache(
-            (domainKey: string, authState: AuthState, authConfig: AuthEdgeConfig | undefined) =>
-                getRoot(domainKey, authState, authConfig, cacheConfig),
-            [domainKey, cacheSeed(), cacheConfig.cacheKeySuffix],
-            { tags: [domainKey, "getRoot"] }
-        )(domainKey, authState, authConfig);
+        return await getRoot(domainKey, authState, authConfig, cacheConfig);
     });
 
 const getNavigationNode = (cacheConfig: Required<CacheConfig>) =>
@@ -721,9 +694,6 @@ const getNavigationNode = (cacheConfig: Required<CacheConfig>) =>
 
 const getSettings = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string) => {
-        "use cache";
-        unstable_cacheTag(domainKey, "getSettings");
-
         const config = await getConfig(cacheConfig)(domainKey);
         if (!config) {
             console.error("Could not find config for domainKey", domainKey);
@@ -817,9 +787,6 @@ const getPage = (cacheConfig: Required<CacheConfig>) =>
 
 const getMdxBundlerFiles = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string) => {
-        "use cache";
-        unstable_cacheTag(domainKey, "getMdxBundlerFiles");
-
         try {
             const cached = await kvGet<Record<string, string>>(
                 domainKey,
@@ -841,9 +808,6 @@ const getMdxBundlerFiles = (cacheConfig: Required<CacheConfig>) =>
 
 const getColors = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string) => {
-        "use cache";
-        unstable_cacheTag(domainKey, "getColors");
-
         try {
             const cached = await kvGet<{
                 light: FernColorTheme | undefined;
@@ -924,9 +888,6 @@ const getColors = (cacheConfig: Required<CacheConfig>) =>
 
 const getFonts = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string) => {
-        "use cache";
-        unstable_cacheTag(domainKey, "getFonts");
-
         try {
             const cached = await kvGet<FernFonts>(domainKey, "fonts", cacheConfig.cacheKeySuffix);
             if (cached != null) {
@@ -944,9 +905,6 @@ const getFonts = (cacheConfig: Required<CacheConfig>) =>
 
 const getLayout = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domainKey: string) => {
-        "use cache";
-        unstable_cacheTag(domainKey, "getLayout");
-
         const config = await getConfig(cacheConfig)(domainKey);
         if (!config) {
             console.error("Could not find config for domainKey", domainKey);
@@ -1064,9 +1022,6 @@ const getAuthConfig = getAuthEdgeConfig;
 
 const getAskAiEnabledForDocs = (cacheConfig: Required<CacheConfig>) =>
     cache(async (domain: string) => {
-        "use cache";
-        unstable_cacheTag(domain, "askAiEnabled");
-
         if (isLocal() || isSelfHosted()) {
             return false;
         }
@@ -1166,13 +1121,8 @@ export const createCachedDocsLoader = async (
                 cacheConfig: config
             })
         ),
-        getEndpointByLocator: cache(
-            unstable_cache(
-                (method: HttpMethod, path: string, example?: string) =>
-                    getEndpointByLocator(domainKey, method, path, example),
-                [domainKey, cacheSeed(), config.cacheKeySuffix],
-                { tags: [domainKey, "endpointByLocator"] }
-            )
+        getEndpointByLocator: cache((method: HttpMethod, path: string, example?: string) =>
+            getEndpointByLocator(domainKey, method, path, example)
         ),
         getRoot: async () => getRootCached(config)(domainKey, await getAuthState(), await authConfig),
         getNavigationNode: async (id: string) =>
