@@ -25,38 +25,40 @@ export default async function getDocsGithubUrl({
     url: string;
     token: string;
 }): Promise<GetDocsGithubUrlResult> {
-    const docsUrlMetadata = await getDocsUrlMetadata({
-        url: decodeURIComponent(url),
-        token: fernToken_admin() ?? token
-    });
-    if (!docsUrlMetadata.ok) {
-        // the docs url is user-supplied (parsed from the page url) so it's ok if it
+    let docsUrlMetadata;
+    try {
+        docsUrlMetadata = await getDocsUrlMetadata({
+            url: decodeURIComponent(url),
+            token: fernToken_admin() ?? token
+        });
+    } catch (error) {
+            // the docs url is user-supplied (parsed from the page url) so it's ok if it
         // doesn't exist
-        if (docsUrlMetadata.error.error === "DomainNotRegisteredError") {
+        if (error instanceof Error && error.message === "DomainNotRegisteredError") {
             // Don't cache this failure, so throw to skip cache
             return { success: false, error: { type: "DOMAIN_NOT_REGISTERED" } };
         }
 
-        console.error("Failed to load docs URL metadata", JSON.stringify(docsUrlMetadata.error));
+        console.error("Failed to load docs URL metadata", error);
         return {
             success: false,
             error: { type: "MALFORMED_GITHUB_URL", url: decodeURIComponent(url) }
         };
     }
 
-    if (docsUrlMetadata.body.gitUrl == null) {
+    if (docsUrlMetadata.gitUrl == null) {
         // Don't cache this failure, so throw to skip cache
         return { success: false, error: { type: "REPO_NOT_CONNECTED" } };
     }
 
-    const [owner, repo] = docsUrlMetadata.body.gitUrl.split("/").slice(-2);
+    const [owner, repo] = docsUrlMetadata.gitUrl.split("/").slice(-2);
     if (owner == null || repo == null) {
         // Don't cache this failure, so throw to skip cache
         return {
             success: false,
-            error: { type: "MALFORMED_GITHUB_URL", url: docsUrlMetadata.body.gitUrl }
+            error: { type: "MALFORMED_GITHUB_URL", url: docsUrlMetadata.gitUrl }
         };
     }
 
-    return { success: true, githubUrl: docsUrlMetadata.body.gitUrl };
+    return { success: true, githubUrl: docsUrlMetadata.gitUrl };
 }
