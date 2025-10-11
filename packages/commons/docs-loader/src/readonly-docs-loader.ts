@@ -128,7 +128,17 @@ function assertDocsDomain(domainKey: string) {
 
 const setMonitor = new Semaphore(10);
 
-function kvSet(domainKey: string, key: string, value: unknown, ttl?: number, cacheKeySuffix?: string) {
+/**
+ * Sets a value in the KV cache. Returns a Promise that resolves when the set operation completes.
+ *
+ * @param domainKey - The domain key to use as the hash key
+ * @param key - The field key within the hash
+ * @param value - The value to store
+ * @param ttl - Optional TTL in seconds
+ * @param cacheKeySuffix - Optional suffix to append to the key
+ * @returns Promise that resolves when the set operation completes, or void in local/self-hosted environments
+ */
+async function kvSet(domainKey: string, key: string, value: unknown, ttl?: number, cacheKeySuffix?: string): Promise<void> {
     if (isLocal() || isSelfHosted()) {
         return;
     }
@@ -137,41 +147,39 @@ function kvSet(domainKey: string, key: string, value: unknown, ttl?: number, cac
 
     console.debug(`[Upstash] SET operation - domain: ${domainKey}, key: ${finalKey}, ttl: ${ttl || "none"}`);
 
-    after(async () => {
-        await setMonitor.acquire();
-        const start = Date.now();
-        try {
-            if (ttl && ttl > 0) {
-                await kv.hset(domainKey, { [finalKey]: value });
-                // Set expiration for the hash field (note: Redis doesn't support per-field TTL in hashes)
-                // So we'll use a separate key for TTL tracking
-                await kv.setex(`${domainKey}:ttl:${finalKey}`, ttl, Date.now() + ttl * 1000);
-            } else {
-                await kv.hset(domainKey, { [finalKey]: value });
-            }
-            const duration = Date.now() - start;
-            console.debug(`[Upstash] SET completed - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`);
-
-            // Disabled PostHog tracking for performance reasons
-            // track("upstash_cache_set", {
-            //   domain: domainKey,
-            //   cacheKey: finalKey,
-            //   hasTtl: Boolean(ttl && ttl > 0),
-            //   ttl: ttl,
-            //   duration,
-            // });
-        } catch (error) {
-            console.warn(`[Upstash] SET failed - domain: ${domainKey}, key: ${finalKey}`, error);
-            // Disabled PostHog tracking for performance reasons
-            // track("upstash_cache_set_error", {
-            //   domain: domainKey,
-            //   cacheKey: finalKey,
-            //   error: String(error),
-            // });
-        } finally {
-            setMonitor.release();
+    await setMonitor.acquire();
+    const start = Date.now();
+    try {
+        if (ttl && ttl > 0) {
+            await kv.hset(domainKey, { [finalKey]: value });
+            // Set expiration for the hash field (note: Redis doesn't support per-field TTL in hashes)
+            // So we'll use a separate key for TTL tracking
+            await kv.setex(`${domainKey}:ttl:${finalKey}`, ttl, Date.now() + ttl * 1000);
+        } else {
+            await kv.hset(domainKey, { [finalKey]: value });
         }
-    });
+        const duration = Date.now() - start;
+        console.debug(`[Upstash] SET completed - domain: ${domainKey}, key: ${finalKey}, duration: ${duration}ms`);
+
+        // Disabled PostHog tracking for performance reasons
+        // track("upstash_cache_set", {
+        //   domain: domainKey,
+        //   cacheKey: finalKey,
+        //   hasTtl: Boolean(ttl && ttl > 0),
+        //   ttl: ttl,
+        //   duration,
+        // });
+    } catch (error) {
+        console.warn(`[Upstash] SET failed - domain: ${domainKey}, key: ${finalKey}`, error);
+        // Disabled PostHog tracking for performance reasons
+        // track("upstash_cache_set_error", {
+        //   domain: domainKey,
+        //   cacheKey: finalKey,
+        //   error: String(error),
+        // });
+    } finally {
+        setMonitor.release();
+    }
 }
 
 const getMonitor = new Semaphore(10);
@@ -392,8 +400,11 @@ export const getMetadata = (cacheConfig: Required<CacheConfig>) =>
         }
 
         const metadata = await getMetadataFromResponse(domainKey, loadWithUrl(domainKey));
-        kvSet(domainKey, "metadata", metadata, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        const kvSetPromise = kvSet(domainKey, "metadata", metadata, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
         console.debug("[getMetadata] cache miss:", metadata);
+        // Wait for cache to be set to avoid race conditions where concurrent requests
+        // both miss cache and set stale data
+        await kvSetPromise;
         return metadata;
     });
 
@@ -434,7 +445,8 @@ const getFiles = (cacheConfig: Required<CacheConfig>) =>
             throw new UnreachableCaseError(file);
         });
 
-        kvSet(domain, "files", files, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        // Set cache and wait to avoid race conditions
+        await kvSet(domain, "files", files, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
         return files;
     });
 
@@ -491,14 +503,25 @@ const createGetPrunedApiCached = (domainKey: string, cacheConfig: Required<Cache
                     });
                 }
             }
-            // if there is only one node, and it's an endpoint, try to cache the result
+
+            // Start caching early if this is a single endpoint
+            let kvSetPromise: Promise<void> | undefined;
             if (nodes.length === 1 && nodes[0]) {
                 const key = `api:${id}:${createEndpointCacheKey(nodes[0])}`;
-                kvSet(domainKey, key, pruned, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+                kvSetPromise = kvSet(domainKey, key, pruned, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
             }
+
+            // Do other async work in parallel with cache set
             const metadata = await getMetadata(cacheConfig)(domainKey);
             const dynamicIr = await getDynamicIr(cacheConfig)(metadata.org, metadata.domain, id);
-            return backfillSnippets(pruned, dynamicIr, await flagsPromise);
+            const backfilled = await backfillSnippets(pruned, dynamicIr, await flagsPromise);
+
+            // Wait for cache to complete before returning to avoid race conditions
+            if (kvSetPromise) {
+                await kvSetPromise;
+            }
+
+            return backfilled;
         },
         [domainKey, cacheSeed(), cacheConfig.cacheKeySuffix],
         { tags: [domainKey, "api"] }
@@ -673,8 +696,8 @@ const unsafe_getRootCached = (cacheConfig: Required<CacheConfig>) =>
                 // Get fresh data
                 const root = await unsafe_getFullRoot(domainKey);
 
-                // Cache the result
-                kvSet(domainKey, "root", root, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+                // Cache the result and wait to avoid race conditions
+                await kvSet(domainKey, "root", root, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
 
                 return root;
             },
@@ -774,8 +797,10 @@ const getConfig = (cacheConfig: Required<CacheConfig>) =>
         const { navigation, root, ...config } = response.definition.config;
 
         // Store in both Upstash and in-memory cache
-        kvSet(domainKey, "config", config, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        // Set in-memory cache immediately (synchronous)
         setInMemoryCache(cacheKey, config);
+        // Wait for KV cache to avoid race conditions
+        await kvSet(domainKey, "config", config, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
 
         return config;
     });
@@ -805,7 +830,8 @@ const getPage = (cacheConfig: Required<CacheConfig>) =>
             notFound();
         }
 
-        kvSet(domainKey, `page:${pageId}`, page, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        // Cache the page and wait to avoid race conditions
+        await kvSet(domainKey, `page:${pageId}`, page, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
         return {
             filename: pageId,
             markdown: page.markdown,
@@ -835,7 +861,8 @@ const getMdxBundlerFiles = (cacheConfig: Required<CacheConfig>) =>
 
         const response = await loadWithUrl(domainKey);
         const files = response.definition.jsFiles ?? {};
-        kvSet(domainKey, "mdx-bundler-files", files, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        // Cache and wait to avoid race conditions
+        await kvSet(domainKey, "mdx-bundler-files", files, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
         return files;
     });
 
@@ -918,7 +945,8 @@ const getColors = (cacheConfig: Required<CacheConfig>) =>
                 : undefined
         };
 
-        kvSet(domainKey, "colors", colors, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        // Cache and wait to avoid race conditions
+        await kvSet(domainKey, "colors", colors, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
         return colors;
     });
 
@@ -938,7 +966,8 @@ const getFonts = (cacheConfig: Required<CacheConfig>) =>
 
         const response = await loadWithUrl(domainKey);
         const fonts = generateFonts(response.definition.config.typographyV2, await getFiles(cacheConfig)(domainKey));
-        kvSet(domainKey, "fonts", fonts, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+        // Cache and wait to avoid race conditions
+        await kvSet(domainKey, "fonts", fonts, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
         return fonts;
     });
 
@@ -1013,7 +1042,8 @@ const getDynamicIr = (cacheConfig: Required<CacheConfig>) =>
 
         if (response) {
             console.debug(`Caching dynamic IR for ${orgId}:${apiName}`);
-            kvSet(
+            // Cache and wait to avoid race conditions
+            await kvSet(
                 domain,
                 `dynamicIr:${orgId}:${apiName}:${configHash}`,
                 response,
@@ -1090,7 +1120,8 @@ const getAskAiEnabledForDocs = (cacheConfig: Required<CacheConfig>) =>
                 }).settings.getDocsSettings({ domain })
             ).ask_ai_enabled;
 
-            kvSet(domain, "askAiEnabled", result, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
+            // Cache and wait to avoid race conditions
+            await kvSet(domain, "askAiEnabled", result, cacheConfig.kvTtl, cacheConfig.cacheKeySuffix);
         } catch (error) {
             console.warn(`Failed to fetch askAiEnabled for ${domain}`, error);
         }
