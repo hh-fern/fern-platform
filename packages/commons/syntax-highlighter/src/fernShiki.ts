@@ -102,11 +102,10 @@ export function trimCode(code: string): string {
 }
 
 export function parseLang(lang: string): string {
-    lang = lang.trim();
-
     if (lang == null) {
         return "txt";
     }
+    lang = lang.trim();
     lang = lang.toLowerCase();
     if (Object.keys(bundledLanguages).includes(lang as BundledLanguage)) {
         return lang as BundledLanguage;
