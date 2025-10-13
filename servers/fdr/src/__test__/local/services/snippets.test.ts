@@ -1,6 +1,5 @@
-import { expect, inject, it } from "vitest";
-
 import { DocsV1Write, FdrAPI } from "@fern-api/fdr-sdk";
+import { expect, inject, it } from "vitest";
 
 import { DEFAULT_SNIPPETS_PAGE_SIZE } from "../../../db/snippets/SnippetsDao";
 import { createApiDefinition, getAPIResponse, getClient } from "../util";
@@ -80,7 +79,8 @@ it("get snippets", async () => {
                     javaSdk: undefined,
                     csharpSdk: undefined,
                     phpSdk: undefined,
-                    swiftSdk: undefined
+                    swiftSdk: undefined,
+                    rustSdk: undefined
                 }
             })
         })
@@ -247,7 +247,8 @@ it("get Go snippets", async () => {
                     rubySdk: undefined,
                     csharpSdk: undefined,
                     phpSdk: undefined,
-                    swiftSdk: undefined
+                    swiftSdk: undefined,
+                    rustSdk: undefined
                 }
             })
         })
@@ -411,7 +412,8 @@ it("get Ruby snippets", async () => {
                     goSdk: undefined,
                     csharpSdk: undefined,
                     phpSdk: undefined,
-                    swiftSdk: undefined
+                    swiftSdk: undefined,
+                    rustSdk: undefined
                 }
             })
         })
@@ -825,7 +827,8 @@ it("no snippets generated when dynamicIR is present", async () => {
                     javaSdk: undefined,
                     csharpSdk: undefined,
                     phpSdk: undefined,
-                    swiftSdk: undefined
+                    swiftSdk: undefined,
+                    rustSdk: undefined
                 }
             }),
             dynamicIRs: {
@@ -998,7 +1001,8 @@ it("no snippets generated when dynamicIR is present with regular definition", as
                     rubySdk: undefined,
                     csharpSdk: undefined,
                     phpSdk: undefined,
-                    swiftSdk: undefined
+                    swiftSdk: undefined,
+                    rustSdk: undefined
                 }
             }),
             dynamicIRs: {

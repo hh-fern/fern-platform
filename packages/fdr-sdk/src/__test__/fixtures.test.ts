@@ -1,13 +1,12 @@
+import isPlainObject from "@fern-api/ui-core-utils/isPlainObject";
 import fs from "fs";
 import path from "path";
-
-import isPlainObject from "@fern-api/ui-core-utils/isPlainObject";
 
 import { FernNavigation } from "..";
 import * as ApiDefinition from "../api-definition";
 import { ApiDefinitionV1ToLatest } from "../api-definition/migrators/v1ToV2";
-import { NodeCollector } from "../navigation/NodeCollector";
 import { FernNavigationV1ToLatest } from "../navigation/migrators/v1ToV2";
+import { NodeCollector } from "../navigation/NodeCollector";
 import { collectPageIds } from "../navigation/utils/collectPageIds";
 import { readFixture } from "./readFixtures";
 
@@ -18,12 +17,7 @@ function testNavigationConfigConverter(fixtureName: string): void {
     const v1 = FernNavigation.V1.toRootNode(fixture);
     const latest = FernNavigationV1ToLatest.create().root(v1);
 
-    const v2Apis = Object.values(fixture.definition.apis).map((api) =>
-        ApiDefinitionV1ToLatest.from(api, {
-            useJavaScriptAsTypeScript: false,
-            alwaysEnableJavaScriptFetch: false
-        }).migrate()
-    );
+    const v2Apis = Object.values(fixture.definition.apis).map((api) => ApiDefinitionV1ToLatest.from(api).migrate());
 
     // eslint-disable-next-line vitest/valid-title
     describe(fixtureName, () => {

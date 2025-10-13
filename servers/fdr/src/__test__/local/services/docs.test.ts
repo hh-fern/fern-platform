@@ -1,7 +1,6 @@
+import { DocsV1Write, FdrAPI } from "@fern-api/fdr-sdk";
 import { uniqueId } from "es-toolkit/compat";
 import { expect, inject } from "vitest";
-
-import { DocsV1Write, FdrAPI } from "@fern-api/fdr-sdk";
 
 import { createApiDefinition, getAPIResponse, getClient } from "../util";
 
@@ -309,7 +308,8 @@ it("no snippets generated when dynamicIR is present", async () => {
                     javaSdk: undefined,
                     csharpSdk: undefined,
                     phpSdk: undefined,
-                    swiftSdk: undefined
+                    swiftSdk: undefined,
+                    rustSdk: undefined
                 }
             }),
             dynamicIRs: {

@@ -12,22 +12,17 @@ import { isLocal } from "./isLocal";
 import { isSelfHosted } from "./isSelfHosted";
 
 const EDGE_FLAGS = [
-    "api-scrolling-disabled" as const,
     "whitelabeled" as const,
     "seo-disabled" as const,
     "seo-enabled" as const,
-    "toc-default-enabled" as const,
     "http-snippets-enabled" as const,
     "inline-feedback-enabled" as const,
     "dark-code-enabled" as const,
     "disable-proxy" as const,
     "image-zoom-disabled" as const,
-    "use-javascript-as-typescript" as const,
-    "always-enable-javascript-fetch" as const,
     "batch-stream-toggle-disabled" as const,
     "audio-file-download-span-summary" as const,
     "audio-example-internal" as const,
-    "binary-octet-stream-audio-player" as const,
     "cohere-theme" as const,
     "hide-404-page" as const,
     "grpc-endpoints" as const,
@@ -57,31 +52,19 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
             throw new Error("Failed to fetch edge config");
         }
 
-        const isApiScrollingDisabled = checkDomainMatchesCustomers(domain, config["api-scrolling-disabled"]);
         const isWhitelabeled = checkDomainMatchesCustomers(domain, config.whitelabeled);
         const isSeoDisabled = checkDomainMatchesCustomers(domain, config["seo-disabled"]);
         const isSeoEnabled = checkDomainMatchesCustomers(domain, config["seo-enabled"]);
-        const isTocDefaultEnabled = checkDomainMatchesCustomers(domain, config["toc-default-enabled"]);
         const isHttpSnippetsEnabled = checkDomainMatchesCustomers(domain, config["http-snippets-enabled"]);
         const isInlineFeedbackEnabled = checkDomainMatchesCustomers(domain, config["inline-feedback-enabled"]);
         const isDarkCodeEnabled = checkDomainMatchesCustomers(domain, config["dark-code-enabled"]);
-        const isProxyDisabled = checkDomainMatchesCustomers(domain, config["disable-proxy"]);
         const isImageZoomDisabled = checkDomainMatchesCustomers(domain, config["image-zoom-disabled"]);
-        const useJavaScriptAsTypeScript = checkDomainMatchesCustomers(domain, config["use-javascript-as-typescript"]);
-        const alwaysEnableJavaScriptFetch = checkDomainMatchesCustomers(
-            domain,
-            config["always-enable-javascript-fetch"]
-        );
         const isBatchStreamToggleDisabled = checkDomainMatchesCustomers(domain, config["batch-stream-toggle-disabled"]);
         const isAudioFileDownloadSpanSummary = checkDomainMatchesCustomers(
             domain,
             config["audio-file-download-span-summary"]
         );
         const isAudioExampleInternal = checkDomainMatchesCustomers(domain, config["audio-example-internal"]);
-        const isBinaryOctetStreamAudioPlayer = checkDomainMatchesCustomers(
-            domain,
-            config["binary-octet-stream-audio-player"]
-        );
         const isCohereTheme = checkDomainMatchesCustomers(domain, config["cohere-theme"]);
         const is404PageHidden = checkDomainMatchesCustomers(domain, config["hide-404-page"]);
         const isAuthenticatedPagesDiscoverable = checkDomainMatchesCustomers(
@@ -94,21 +77,15 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
         const isNextMdxRef = checkDomainMatchesCustomers(domain, config["next-mdx-ref"]);
         const isLlmsTxtDisabled = checkDomainMatchesCustomers(domain, config["llms-txt-disabled"]);
         return {
-            isApiScrollingDisabled,
             isWhitelabeled,
             isSeoDisabled: (!isCustomDomain(domain) && !isSeoEnabled) || isSeoDisabled,
-            isTocDefaultEnabled,
             isHttpSnippetsEnabled,
             isInlineFeedbackEnabled,
             isDarkCodeEnabled,
-            isProxyDisabled,
             isImageZoomDisabled,
-            useJavaScriptAsTypeScript,
-            alwaysEnableJavaScriptFetch,
             isBatchStreamToggleDisabled,
             isAudioFileDownloadSpanSummary,
             isAudioExampleInternal,
-            isBinaryOctetStreamAudioPlayer,
             isCohereTheme,
             is404PageHidden,
             isAuthenticatedPagesDiscoverable,
@@ -121,21 +98,15 @@ export async function getEdgeFlags(domain: string): Promise<EdgeFlags> {
     } catch (e) {
         console.error(`[get-edge-flags] ${JSON.stringify(e)}`);
         return {
-            isApiScrollingDisabled: false,
             isWhitelabeled: false,
             isSeoDisabled: !isCustomDomain(domain),
-            isTocDefaultEnabled: false,
             isHttpSnippetsEnabled: false,
             isInlineFeedbackEnabled: isFern(domain),
             isDarkCodeEnabled: false,
-            isProxyDisabled: false,
             isImageZoomDisabled: false,
-            useJavaScriptAsTypeScript: false,
-            alwaysEnableJavaScriptFetch: false,
             isBatchStreamToggleDisabled: false,
             isAudioFileDownloadSpanSummary: false,
             isAudioExampleInternal: false,
-            isBinaryOctetStreamAudioPlayer: false,
             isCohereTheme: false,
             is404PageHidden: false,
             isAuthenticatedPagesDiscoverable: false,

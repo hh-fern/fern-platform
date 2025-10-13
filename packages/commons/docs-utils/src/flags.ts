@@ -1,19 +1,13 @@
 export interface EdgeFlags {
-    isApiScrollingDisabled: boolean;
     isWhitelabeled: boolean;
     isSeoDisabled: boolean;
-    isTocDefaultEnabled: boolean;
     isHttpSnippetsEnabled: boolean;
     isInlineFeedbackEnabled: boolean;
     isDarkCodeEnabled: boolean;
-    isProxyDisabled: boolean;
     isImageZoomDisabled: boolean;
-    useJavaScriptAsTypeScript: boolean;
-    alwaysEnableJavaScriptFetch: boolean;
     isBatchStreamToggleDisabled: boolean;
     isAudioFileDownloadSpanSummary: boolean;
     isAudioExampleInternal: boolean;
-    isBinaryOctetStreamAudioPlayer: boolean;
     isCohereTheme: boolean;
     is404PageHidden: boolean;
     isAuthenticatedPagesDiscoverable: boolean;
@@ -25,21 +19,15 @@ export interface EdgeFlags {
 }
 
 export const DEFAULT_EDGE_FLAGS: EdgeFlags = {
-    isApiScrollingDisabled: false,
     isWhitelabeled: false,
     isSeoDisabled: false,
-    isTocDefaultEnabled: false,
     isHttpSnippetsEnabled: false,
     isInlineFeedbackEnabled: false,
     isDarkCodeEnabled: false,
-    isProxyDisabled: false,
     isImageZoomDisabled: false,
-    useJavaScriptAsTypeScript: false,
-    alwaysEnableJavaScriptFetch: false,
     isBatchStreamToggleDisabled: false,
     isAudioFileDownloadSpanSummary: false,
     isAudioExampleInternal: false,
-    isBinaryOctetStreamAudioPlayer: false,
     isCohereTheme: false,
     is404PageHidden: false,
     isAuthenticatedPagesDiscoverable: false,

@@ -1,10 +1,21 @@
-import { Turbopuffer } from "@turbopuffer/turbopuffer";
-
 import type { FacetFilter } from "@fern-docs/search-keyword";
+import { Turbopuffer } from "@turbopuffer/turbopuffer";
 
 import type { TurbopufferRecord } from "../types";
 import { buildQueryFilters } from "./query-filters";
 import { reciprocalRankFusion } from "./reciprocal-rank-fusion";
+
+export interface TurbopufferAuthError {
+    error: "unauthorized";
+    message: string;
+    requiresAuth: true;
+}
+
+export type TurbopufferQueryResult = TurbopufferRecord[] | TurbopufferAuthError;
+
+export function isAuthError(result: TurbopufferQueryResult): result is TurbopufferAuthError {
+    return Array.isArray(result) === false && "error" in result && result.error === "unauthorized";
+}
 
 interface SemanticSearchOptions {
     vectorizer: (text: string) => Promise<number[]>;
@@ -26,6 +37,7 @@ interface SemanticSearchOptions {
 
     // include only these specific documents
     documentUrls?: string[];
+    userIsAuthed: boolean;
 }
 
 export async function queryTurbopuffer(
@@ -40,9 +52,10 @@ export async function queryTurbopuffer(
         mode = "hybrid",
         documentIdsToIgnore = [],
         urlsToIgnore = [],
-        documentUrls
+        documentUrls,
+        userIsAuthed
     }: SemanticSearchOptions
-): Promise<TurbopufferRecord[]> {
+): Promise<TurbopufferQueryResult> {
     const tpuf = new Turbopuffer({
         apiKey,
         baseUrl: "https://gcp-us-east4.turbopuffer.com"
@@ -56,7 +69,8 @@ export async function queryTurbopuffer(
         explodedRoles,
         documentIdsToIgnore,
         urlsToIgnore,
-        documentUrls
+        documentUrls,
+        userIsAuthed
     });
 
     if (documentUrls?.length) {

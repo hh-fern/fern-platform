@@ -2,7 +2,7 @@
 import * as cdk from "aws-cdk-lib";
 import "source-map-support/register";
 
-import { EnvironmentType, type Environments } from "@fern-fern/fern-cloud-sdk/api/resources/environments";
+import { type Environments, EnvironmentType } from "@fern-fern/fern-cloud-sdk/api/resources/environments";
 
 import { FaiDiscordDeployStack } from "../src/deploy-stack";
 
@@ -36,6 +36,7 @@ async function main() {
                         SLACK_CLIENT_ID: getEnvVarOrThrow("SLACK_CLIENT_ID"),
                         SLACK_CLIENT_SECRET: getEnvVarOrThrow("SLACK_CLIENT_SECRET"),
                         SLACK_SIGNING_SECRET: getEnvVarOrThrow("SLACK_SIGNING_SECRET"),
+                        ASK_FERN_SLACK_BOT_TOKEN: getEnvVarOrThrow("ASK_FERN_SLACK_BOT_TOKEN"),
                         DISCORD_BOT_TOKEN: getEnvVarOrThrow("DISCORD_BOT_TOKEN"),
                         DISCORD_OAUTH_URL: getEnvVarOrThrow("DISCORD_OAUTH_URL"),
                         KV_REST_API_TOKEN: getEnvVarOrThrow("KV_REST_API_TOKEN"),
@@ -67,6 +68,7 @@ async function main() {
                         SLACK_CLIENT_ID: getEnvVarOrThrow("SLACK_CLIENT_ID"),
                         SLACK_CLIENT_SECRET: getEnvVarOrThrow("SLACK_CLIENT_SECRET"),
                         SLACK_SIGNING_SECRET: getEnvVarOrThrow("SLACK_SIGNING_SECRET"),
+                        ASK_FERN_SLACK_BOT_TOKEN: getEnvVarOrThrow("ASK_FERN_SLACK_BOT_TOKEN"),
                         DISCORD_BOT_TOKEN: getEnvVarOrThrow("DISCORD_BOT_TOKEN"),
                         DISCORD_OAUTH_URL: getEnvVarOrThrow("DISCORD_OAUTH_URL"),
                         KV_REST_API_TOKEN: getEnvVarOrThrow("KV_REST_API_TOKEN"),
@@ -98,6 +100,7 @@ async function main() {
                         SLACK_CLIENT_ID: getEnvVarOrThrow("SLACK_CLIENT_ID"),
                         SLACK_CLIENT_SECRET: getEnvVarOrThrow("SLACK_CLIENT_SECRET"),
                         SLACK_SIGNING_SECRET: getEnvVarOrThrow("SLACK_SIGNING_SECRET"),
+                        ASK_FERN_SLACK_BOT_TOKEN: getEnvVarOrThrow("ASK_FERN_SLACK_BOT_TOKEN"),
                         DISCORD_BOT_TOKEN: getEnvVarOrThrow("DISCORD_BOT_TOKEN"),
                         DISCORD_OAUTH_URL: getEnvVarOrThrow("DISCORD_OAUTH_URL"),
                         KV_REST_API_TOKEN: getEnvVarOrThrow("KV_REST_API_TOKEN"),

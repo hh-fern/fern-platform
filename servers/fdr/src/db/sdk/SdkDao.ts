@@ -1,6 +1,5 @@
-import { Language, type Prisma, type PrismaClient } from "@prisma/client";
-
 import type { APIV1Write } from "@fern-api/fdr-sdk";
+import { Language, type Prisma, type PrismaClient } from "@prisma/client";
 
 import { LOGGER } from "../../app/FdrApplication";
 import { SdkIdFactory } from "../snippets/SdkIdFactory";
@@ -18,6 +17,7 @@ export interface SdkIdForPackage {
     rubySdk?: APIV1Write.RubyGem & { sdkId: string };
     javaSdk?: APIV1Write.JavaCoordinate & { sdkId: string };
     csharpSdk?: APIV1Write.NugetPackage & { sdkId: string };
+    rustSdk?: APIV1Write.CratesPackage & { sdkId: string };
 }
 
 interface SdkPackageRequest {
@@ -148,6 +148,16 @@ export class SdkDaoImpl implements SdkDao {
             });
             if (sdkId != null) {
                 result.csharpSdk = { ...snippetConfig.csharpSdk, sdkId };
+            }
+        }
+        if (snippetConfig.rustSdk != null) {
+            const sdkId = await this.getSdkIdForPackage({
+                sdkPackage: snippetConfig.rustSdk.package,
+                language: Language.RUST,
+                version: snippetConfig.rustSdk.version
+            });
+            if (sdkId != null) {
+                result.rustSdk = { ...snippetConfig.rustSdk, sdkId };
             }
         }
 

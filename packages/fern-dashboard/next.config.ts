@@ -8,18 +8,19 @@ import withRspack from "next-rspack";
 import webpack from "webpack";
 
 const isRspackEnabled = process.env.NODE_ENV === "development";
+const isSentryEnabled = process.env.NODE_ENV === "production";
 
 const CSP_HEADER = `
-  default-src 'self' esm.sh;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usepylon.com *.posthog.com *.pusher.com d3vl36l12sfx26.cloudfront.net cdn.jsdelivr.net esm.sh va.vercel-scripts.com;
-  worker-src 'self' blob: esm.sh;
-  connect-src 'self' * ws: esm.sh;
-  style-src 'self' 'unsafe-inline' *.usepylon.com *.posthog.com cdn.jsdelivr.net cdnjs.cloudflare.com esm.sh;
-  font-src 'self' pylon-avatars.s3.us-west-1.amazonaws.com *.usepylon.com *.buildwithfern.com cdn.jsdelivr.net esm.sh;
-  img-src 'self' * esm.sh;
-  frame-src 'self' * esm.sh;
-  object-src 'self' * esm.sh;
-  media-src 'self' * esm.sh;
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' *;
+  worker-src 'self' blob:;
+  connect-src 'self' * ws:;
+  style-src 'self' 'unsafe-inline' *;
+  font-src 'self' *;
+  img-src 'self' *;
+  frame-src 'self' *;
+  object-src 'self' *;
+  media-src 'self' *;
 `.replace(/\n/g, "");
 
 let nextConfig: NextConfig = {
@@ -57,7 +58,8 @@ let nextConfig: NextConfig = {
                 port: "",
                 pathname: "/**"
             }
-        ]
+        ],
+        qualities: [75, 100]
     },
     webpack: (config, { isServer }) => {
         config.externals.push(
@@ -193,7 +195,8 @@ if (isRspackEnabled) {
     nextConfig = withRspack(nextConfig);
 }
 
-if (process.env.NODE_ENV === "production") {
+// only use sentry in production
+if (isSentryEnabled) {
     nextConfig = withSentryConfig(nextConfig, {
         // For all available options, see:
         // https://www.npmjs.com/package/@sentry/webpack-plugin#options

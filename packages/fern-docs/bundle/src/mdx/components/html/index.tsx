@@ -1,8 +1,7 @@
-import React from "react";
-
 import { cn } from "@fern-docs/components/cn";
-import { FernLink } from "@fern-docs/components/FernLink";
 import { NoZoom } from "@fern-docs/components/contexts/NoZoom";
+import { FernLink } from "@fern-docs/components/FernLink";
+import React from "react";
 
 import { DisableFernAnchor, FernAnchor } from "@/components/FernAnchor";
 
@@ -34,7 +33,7 @@ export function Ul({ className, ...rest }: React.ComponentProps<"ul">) {
             {...rest}
             className={cn(
                 className,
-                "[&>li]:before:text-(color:--grayscale-a10) mb-3 list-none pl-3 [&>li]:pl-3 [&>li]:before:absolute [&>li]:before:ml-[-22px] [&>li]:before:mt-[-1px] [&>li]:before:content-['-']"
+                "[&>li]:before:text-(color:--grayscale-a10) mb-3 list-none pl-3 [&>li]:pl-3 [&>li]:before:absolute [&>li]:before:ml-[-22px] [&>li]:before:mt-[-1px] [&>li]:before:content-['⦁'] [&>li]:before:self-center"
             )}
         />
     );

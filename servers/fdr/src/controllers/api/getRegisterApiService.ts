@@ -1,7 +1,6 @@
+import { type APIV1Db, type APIV1Write, convertAPIDefinitionToDb, FdrAPI, SDKSnippetHolder } from "@fern-api/fdr-sdk";
 import urlJoin from "url-join";
 import { v4 as uuidv4 } from "uuid";
-
-import { type APIV1Db, type APIV1Write, FdrAPI, SDKSnippetHolder, convertAPIDefinitionToDb } from "@fern-api/fdr-sdk";
 
 import { APIV1WriteService } from "../../api";
 import type { SdkRequest } from "../../api/generated/api";
@@ -62,7 +61,8 @@ export function getRegisterApiService(app: FdrApplication): APIV1WriteService {
                 rubySdk: undefined,
                 csharpSdk: undefined,
                 phpSdk: undefined,
-                swiftSdk: undefined
+                swiftSdk: undefined,
+                rustSdk: undefined
             };
 
             const snippetsConfigurationWithSdkIds = await app.dao.sdks().getSdkIdsForPackages(snippetsConfiguration);
@@ -86,6 +86,9 @@ export function getRegisterApiService(app: FdrApplication): APIV1WriteService {
             }
             if (snippetsConfigurationWithSdkIds.csharpSdk != null) {
                 sdkIds.push(snippetsConfigurationWithSdkIds.csharpSdk.sdkId);
+            }
+            if (snippetsConfigurationWithSdkIds.rustSdk != null) {
+                sdkIds.push(snippetsConfigurationWithSdkIds.rustSdk.sdkId);
             }
 
             let snippetsBySdkId = {};
