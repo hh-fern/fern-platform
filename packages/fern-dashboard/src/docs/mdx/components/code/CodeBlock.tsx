@@ -79,6 +79,11 @@ export function CodeBlock(props: {
     const [editableCode, setEditableCode] = useState(code);
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
+    // Sync editableCode when the code prop changes (e.g., from TipTap undo/redo)
+    useEffect(() => {
+        setEditableCode(code);
+    }, [code]);
+
     useEffect(() => {
         // Listen for messages from the iframe
         const handleMessage = (event: MessageEvent) => {
@@ -115,12 +120,12 @@ export function CodeBlock(props: {
     const cleanedLanguage = cleanLanguage(language);
 
     // Calculate height based on maxLines
-    const lineCount = code.split("\n").length;
+    const lineCount = editableCode.split("\n").length;
     const displayLines = Math.min(lineCount, maxLines);
     const height = Math.max(displayLines * 22 + 40, 100); // 22px per line + padding, min 100px
 
     const theme = isDarkCode ? "material-theme-darker" : "min-light";
-    const iframeSrc = `/api/monaco-editor?code=${encodeURIComponent(code)}&language=${cleanedLanguage}&theme=${theme}&readOnly=false`;
+    const iframeSrc = `/api/monaco-editor?code=${encodeURIComponent(editableCode)}&language=${cleanedLanguage}&theme=${theme}&readOnly=false`;
 
     if (title || filename) {
         return (
@@ -143,6 +148,7 @@ export function CodeBlock(props: {
                     </div>
                 </div>
                 <iframe
+                    key={`${cleanedLanguage}-titled`}
                     ref={iframeRef}
                     src={iframeSrc}
                     className="w-full rounded-b-[inherit] border-0"
@@ -157,6 +163,7 @@ export function CodeBlock(props: {
         <div className={cn("relative", { "bg-card-solid dark": isDarkCode }, className)}>
             <CopyToClipboardButton className="absolute right-2 top-2 z-10" content={() => processedCode} />
             <iframe
+                key={`${cleanedLanguage}-untitled`}
                 ref={iframeRef}
                 src={iframeSrc}
                 className="w-full rounded border-0"

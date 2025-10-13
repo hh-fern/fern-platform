@@ -54,6 +54,11 @@ export function CodeGroup({
 
     const iframeRefs = useRef<(HTMLIFrameElement | null)[]>([]);
 
+    // Sync editableCodes when items change (e.g., from TipTap undo/redo)
+    useEffect(() => {
+        setEditableCodes(items.map((item) => item.props.code ?? ""));
+    }, [items.map((item) => item.props.code).join(",")]);
+
     useEffect(() => {
         // Listen for messages from iframes
         const handleMessage = (event: MessageEvent) => {
@@ -195,7 +200,7 @@ export function CodeGroup({
                 const itemDisplayLines = Math.min(itemLineCount, itemMaxLines);
                 const itemHeight = Math.max(itemDisplayLines * 22 + 40, 100);
 
-                const iframeSrc = `/api/monaco-editor?code=${encodeURIComponent(item.props.code ?? "")}&language=${itemLanguage}&theme=${theme}&readOnly=false`;
+                const iframeSrc = `/api/monaco-editor?code=${encodeURIComponent(itemCode)}&language=${itemLanguage}&theme=${theme}&readOnly=false`;
 
                 return (
                     <Tabs.Content
@@ -204,6 +209,7 @@ export function CodeGroup({
                         className="rounded-b-[inherit] rounded-t-none"
                     >
                         <iframe
+                            key={`${itemLanguage}-${idx}`}
                             ref={(el) => {
                                 iframeRefs.current[idx] = el;
                             }}
