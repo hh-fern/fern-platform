@@ -188,7 +188,7 @@
     "depcheck": "catalog:",
     "glslify-import": "^3.1.0",
     "glslify-loader": "^2.0.0",
-    "jsdom": "^24.0.0",
+    "jsdom": "^27.0.0",
     "raw-loader": "^4.0.2",
     "sass": "^1.74.1",
     "storybook": "^8.6.12",
