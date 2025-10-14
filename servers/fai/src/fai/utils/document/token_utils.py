@@ -37,35 +37,3 @@ def _split_on_token_sync(
         chunks.append(chunk_text)
 
     return chunks
-
-
-# Legacy sync functions for backwards compatibility (deprecated)
-def count_tokens(text: str, model: str = CONFIG.DEFAULT_EMBEDDING_MODEL.model_name) -> int:
-    """Count the number of tokens in a text using tiktoken.
-
-    DEPRECATED: This is a blocking operation. Use maybe_chunk_document() instead.
-
-    Args:
-        text: The text to count tokens for
-        model: The model to use for tokenization (default: text-embedding-3-large)
-
-    Returns:
-        The number of tokens in the text
-    """
-    return _count_tokens_sync(text, model)
-
-
-def split_on_token(text: str, token_length: int, model: str = CONFIG.DEFAULT_EMBEDDING_MODEL.model_name) -> list[str]:
-    """Split text into chunks where each chunk has at most token_length tokens.
-
-    DEPRECATED: This is a blocking operation. Use maybe_chunk_document() instead.
-
-    Args:
-        text: The text to split
-        token_length: The maximum number of tokens per chunk
-        model: The model to use for tokenization (default: text-embedding-3-large)
-
-    Returns:
-        A list of text chunks, each with at most token_length tokens
-    """
-    return _split_on_token_sync(text, token_length, model)
