@@ -35,6 +35,11 @@ jobs:
       - name: 📥 Install
         uses: ./.github/actions/install
 
+      - name: 🔨 Build dependencies
+        run: |
+          # Build fdr-sdk first so tests can import it
+          pnpm --filter=@fern-api/fdr-sdk build
+
       - name: 🧪 Run Tests
         run: |
           cd servers/fdr-lambda
