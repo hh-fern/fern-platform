@@ -56,7 +56,7 @@ async def index_reference_md(
     LOGGER.info(f"Indexing GitHub repository at {body.url} for domain {domain}")
     try:
         gh_client = GitHubClient()
-        result = gh_client.retrieve_reference_md_source(body)
+        result = await gh_client.retrieve_reference_md_source(body)
 
         if not result:
             LOGGER.info(f"No reference.md file found for {body.url}")

@@ -2,7 +2,7 @@ import base64
 import re
 from urllib.parse import urlparse
 
-import requests
+import httpx
 
 from fai.models.api.connectors.github_api import (
     GitHubFileInfo,
@@ -48,44 +48,45 @@ class GitHubClient:
 
         return owner, repo
 
-    def _get_file_content(self, owner: str, repo: str, file_path: str) -> GitHubFileInfo | None:
+    async def _get_file_content(self, owner: str, repo: str, file_path: str) -> GitHubFileInfo | None:
         """Get the content of a specific file from the repository."""
         url = f"{self.api_base_url}/repos/{owner}/{repo}/contents/{file_path}"
         try:
-            response = requests.get(url, headers=self.headers)
-            response.raise_for_status()
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, headers=self.headers)
+                response.raise_for_status()
 
-            file_data = response.json()
+                file_data = response.json()
 
-            # Handle files that are too large or binary
-            if file_data.get("size", 0) == 0:
-                return None
+                # Handle files that are too large or binary
+                if file_data.get("size", 0) == 0:
+                    return None
 
-            # Decode base64 content
-            content_b64 = file_data.get("content", "")
-            if not content_b64:
-                return None
+                # Decode base64 content
+                content_b64 = file_data.get("content", "")
+                if not content_b64:
+                    return None
 
-            try:
-                content_bytes = base64.b64decode(content_b64)
-                content = content_bytes.decode("utf-8")
-                encoding = "utf-8"
-            except UnicodeDecodeError:
-                # Handle binary files
-                content = f"[Binary file: {file_data.get('size', 0)} bytes]"
-                encoding = "binary"
+                try:
+                    content_bytes = base64.b64decode(content_b64)
+                    content = content_bytes.decode("utf-8")
+                    encoding = "utf-8"
+                except UnicodeDecodeError:
+                    # Handle binary files
+                    content = f"[Binary file: {file_data.get('size', 0)} bytes]"
+                    encoding = "binary"
 
-            return GitHubFileInfo(
-                name=file_data.get("name", ""),
-                html_url=file_data.get("html_url", ""),
-                type=file_data.get("type", "file"),
-                path=file_path,
-                content=content,
-                size=file_data.get("size", 0),
-                encoding=encoding,
-            )
+                return GitHubFileInfo(
+                    name=file_data.get("name", ""),
+                    html_url=file_data.get("html_url", ""),
+                    type=file_data.get("type", "file"),
+                    path=file_path,
+                    content=content,
+                    size=file_data.get("size", 0),
+                    encoding=encoding,
+                )
 
-        except requests.RequestException as e:
+        except httpx.HTTPError as e:
             LOGGER.warning(f"Failed to fetch file {file_path}: {e}")
             return None
 
@@ -160,11 +161,11 @@ class GitHubClient:
             method_header=method_header, description=description, usage=usage, parameters=parameters, language=language
         )
 
-    def retrieve_reference_md_source(self, request: GitHubFileInfoRequest) -> GitHubFileInfo | None:
+    async def retrieve_reference_md_source(self, request: GitHubFileInfoRequest) -> GitHubFileInfo | None:
         """Retrieve reference.md file from a GitHub repository."""
         try:
             owner, repo = self._parse_github_url(str(request.url))
-            return self._get_file_content(owner, repo, self.reference_md_file_name)
+            return await self._get_file_content(owner, repo, self.reference_md_file_name)
         except Exception as e:
             LOGGER.error(f"Failed to retrieve reference.md file: {e}")
             raise

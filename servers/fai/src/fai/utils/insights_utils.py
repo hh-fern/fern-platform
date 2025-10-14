@@ -1,14 +1,9 @@
-from concurrent.futures import (
-    ThreadPoolExecutor,
-    as_completed,
-)
+import asyncio
+from functools import partial
 
 import numpy as np
 import pandas as pd
-from openai import (
-    AsyncOpenAI,
-    OpenAI,
-)
+from openai import AsyncOpenAI
 from sklearn.cluster import KMeans
 
 from fai.models.api.analytics_api import GetInsightsResponse
@@ -28,10 +23,18 @@ from fai.settings import (
 async def get_insights_from_queries(domain: str, queries: list[Query]) -> GetInsightsResponse:
     df = pd.DataFrame([{"text": query.text, "conversation_id": query.conversation_id} for query in queries])
     df["embedding"] = await get_embeddings(df["text"].tolist())
-    df["cluster"], kmeans = cluster_embeddings(df["embedding"].tolist())
 
-    top_cluster_ids = select_top_clusters(df, kmeans)
-    summaries = summarize_clusters_parallel(domain, df, top_cluster_ids)
+    # Run CPU-intensive clustering in thread pool
+    loop = asyncio.get_event_loop()
+    df["cluster"], kmeans = await loop.run_in_executor(
+        None, partial(_cluster_embeddings_sync, df["embedding"].tolist())
+    )
+
+    # Run CPU-intensive cluster selection in thread pool
+    top_cluster_ids = await loop.run_in_executor(None, partial(_select_top_clusters_sync, df, kmeans))
+
+    # Run summarization in parallel using asyncio
+    summaries = await summarize_clusters_async(domain, df, top_cluster_ids)
 
     insights = []
     for cluster_id in top_cluster_ids:
@@ -72,14 +75,16 @@ async def get_embeddings(texts: list[str]) -> list[list[float]]:
         return embeddings
 
 
-def cluster_embeddings(embeddings: list[list[float]]) -> tuple[np.ndarray, KMeans]:
+def _cluster_embeddings_sync(embeddings: list[list[float]]) -> tuple[np.ndarray, KMeans]:
+    """Synchronous clustering operation. Run in thread pool to avoid blocking."""
     embedding_matrix = np.array(embeddings)
     kmeans = KMeans(n_clusters=CONFIG.INSIGHTS_NUM_CLUSTERS, random_state=42)
     clusters = kmeans.fit_predict(embedding_matrix)
     return clusters, kmeans
 
 
-def select_top_clusters(df: pd.DataFrame, kmeans: KMeans) -> list[int]:
+def _select_top_clusters_sync(df: pd.DataFrame, kmeans: KMeans) -> list[int]:
+    """Synchronous cluster selection. Run in thread pool to avoid blocking."""
     cluster_stddevs = {}
     embedding_matrix = np.array(df["embedding"].tolist())
 
@@ -93,44 +98,48 @@ def select_top_clusters(df: pd.DataFrame, kmeans: KMeans) -> list[int]:
     return [cluster_id for cluster_id, _ in sorted_clusters[: CONFIG.INSIGHTS_NUM_CLUSTERS]]
 
 
-def summarize_cluster(cluster_id: int, domain: str, filtered_df: pd.DataFrame) -> tuple[int, Insight]:
+async def summarize_cluster_async(cluster_id: int, domain: str, filtered_df: pd.DataFrame) -> tuple[int, Insight]:
+    """Async version of summarize_cluster using AsyncOpenAI."""
     LOGGER.info(f"Processing cluster {cluster_id}...")
-    openai_client = OpenAI(api_key=VARIABLES.OPENAI_API_KEY)
-    try:
-        inputs = filtered_df[filtered_df["cluster"] == cluster_id]["text"].head(CONFIG.INSIGHTS_MAX_EXAMPLES).tolist()
-        cluster_text = "\n".join(f"{i+1}. {x}" for i, x in enumerate(inputs))
+    async with AsyncOpenAI(api_key=VARIABLES.OPENAI_API_KEY) as openai_client:
+        try:
+            inputs = (
+                filtered_df[filtered_df["cluster"] == cluster_id]["text"].head(CONFIG.INSIGHTS_MAX_EXAMPLES).tolist()
+            )
+            cluster_text = "\n".join(f"{i+1}. {x}" for i, x in enumerate(inputs))
 
-        prompt = (
-            f"You are an API and developer experience expert analyzing common queries users have "
-            f"about the documentation site {domain}. Here are text examples from a semantic cluster. "
-            "Your task is to extract a clear, actionable suggestion for how the developer documentation "
-            "could be improved to reduce confusion and better serve developers. "
-            "Focus on identifying gaps, unclear explanations, missing examples, or structural improvements. "
-            "Be concise (1 sentence) and specific about what change should be made to the documentation. "
-            "Cite any examples from the cluster that are particularly relevant to the suggestion.\n\n"
-            f"{cluster_text}\n\n"
-            "Return your response as JSON with fields:\n"
-            "  'insightText' (string): a clear suggestion for improving the documentation\n"
-            "  'examples' (list of strings): representative queries that motivated this suggestion"
-        )
+            prompt = (
+                f"You are an API and developer experience expert analyzing common queries users have "
+                f"about the documentation site {domain}. Here are text examples from a semantic cluster. "
+                "Your task is to extract a clear, actionable suggestion for how the developer documentation "
+                "could be improved to reduce confusion and better serve developers. "
+                "Focus on identifying gaps, unclear explanations, missing examples, or structural improvements. "
+                "Be concise (1 sentence) and specific about what change should be made to the documentation. "
+                "Cite any examples from the cluster that are particularly relevant to the suggestion.\n\n"
+                f"{cluster_text}\n\n"
+                "Return your response as JSON with fields:\n"
+                "  'insightText' (string): a clear suggestion for improving the documentation\n"
+                "  'examples' (list of strings): representative queries that motivated this suggestion"
+            )
 
-        response = openai_client.responses.parse(
-            model="gpt-4.1-2025-04-14",
-            input=[{"role": "user", "content": prompt}],
-            text_format=Insight,
-        )
-        parsed_response: Insight = response.output_parsed
-        return (cluster_id, parsed_response)
+            response = await openai_client.responses.parse(
+                model="gpt-4.1-2025-04-14",
+                input=[{"role": "user", "content": prompt}],
+                text_format=Insight,
+            )
+            parsed_response: Insight = response.output_parsed
+            return (cluster_id, parsed_response)
 
-    except Exception as e:
-        raise e
+        except Exception as e:
+            raise e
 
 
-def summarize_clusters_parallel(domain: str, df: pd.DataFrame, cluster_ids: list[int]) -> dict[int, Insight]:
+async def summarize_clusters_async(domain: str, df: pd.DataFrame, cluster_ids: list[int]) -> dict[int, Insight]:
+    """Parallel async summarization using asyncio.gather instead of ThreadPoolExecutor."""
+    tasks = [summarize_cluster_async(cluster_id, domain, df) for cluster_id in cluster_ids]
+    results_list = await asyncio.gather(*tasks)
+
     results = {}
-    with ThreadPoolExecutor(max_workers=CONFIG.INSIGHTS_NUM_CLUSTERS) as executor:
-        futures = {executor.submit(summarize_cluster, cluster_id, domain, df): cluster_id for cluster_id in cluster_ids}
-        for future in as_completed(futures):
-            cluster_id, insight = future.result()
-            results[cluster_id] = insight
+    for cluster_id, insight in results_list:
+        results[cluster_id] = insight
     return results
