@@ -1,11 +1,9 @@
 import type { APIGatewayProxyEvent, Context } from "aws-lambda";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Import handler after mock is configured
-import { handler } from "../index";
-
-// Use vi.hoisted to ensure mock is set up before module imports
+// Use vi.hoisted to ensure mocks are set up before module imports
 const mockQuery = vi.hoisted(() => vi.fn());
+const mockGetPresignedUrl = vi.hoisted(() => vi.fn());
 
 vi.mock("pg", () => {
     return {
@@ -15,11 +13,22 @@ vi.mock("pg", () => {
     };
 });
 
+vi.mock("../utils/s3", () => ({
+    initializeS3: vi.fn(),
+    getPresignedDocsAssetsDownloadUrl: mockGetPresignedUrl
+}));
+
+// Import handler after mocks are configured
+import { handler } from "../index";
+
 describe("Lambda Handler", () => {
     beforeEach(() => {
         // Reset mocks before each test
         vi.clearAllMocks();
         mockQuery.mockReset();
+        mockGetPresignedUrl.mockReset();
+        // Default S3 mock to return a URL
+        mockGetPresignedUrl.mockResolvedValue("https://s3.example.com/file.png");
     });
 
     const createMockEvent = (path: string, method: string, body?: any): APIGatewayProxyEvent => {
@@ -292,6 +301,234 @@ describe("Lambda Handler", () => {
             expect(body.gitUrl).toBeUndefined();
             expect(body.isPreviewUrl).toBe(true);
             expect(body.enableAlgoliaOnPreview).toBe(false);
+        });
+    });
+
+    describe("POST /load-docs-for-url", () => {
+        it("should return docs for a valid URL", async () => {
+            const mockDocsDefinition = Buffer.from(
+                JSON.stringify({
+                    type: "v3",
+                    pages: {},
+                    config: {
+                        navigation: { items: [] },
+                        colorsV3: { type: "light" }
+                    },
+                    files: {
+                        "file-1": {
+                            type: "url",
+                            s3Key: "test/file.png"
+                        }
+                    },
+                    referencedApis: []
+                })
+            );
+
+            // Mock DocsV2 query
+            mockQuery
+                .mockResolvedValueOnce({
+                    rows: [
+                        {
+                            orgID: "test-org",
+                            domain: "docs.example.com",
+                            path: "",
+                            docsDefinition: mockDocsDefinition,
+                            docsConfigInstanceId: "config-123",
+                            authType: "PUBLIC",
+                            hasPublicS3Assets: true
+                        }
+                    ]
+                })
+                // Mock empty API definitions queries
+                .mockResolvedValueOnce({ rows: [] })
+                .mockResolvedValueOnce({ rows: [] });
+
+            const event = createMockEvent("/load-docs-for-url", "POST", {
+                url: "https://docs.example.com"
+            });
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(200);
+            const body = JSON.parse(result.body);
+            expect(body.orgId).toBe("test-org");
+            expect(body.baseUrl.domain).toBe("docs.example.com");
+            expect(body.definition).toBeDefined();
+        });
+
+        it("should handle /v2/registry/docs/load-docs-for-url path", async () => {
+            const mockDocsDefinition = Buffer.from(
+                JSON.stringify({
+                    type: "v3",
+                    pages: {},
+                    config: {
+                        navigation: { items: [] },
+                        colorsV3: { type: "dark" }
+                    },
+                    files: {},
+                    referencedApis: []
+                })
+            );
+
+            mockQuery
+                .mockResolvedValueOnce({
+                    rows: [
+                        {
+                            orgID: "test-org-2",
+                            domain: "docs.test.com",
+                            path: "/api",
+                            docsDefinition: mockDocsDefinition,
+                            docsConfigInstanceId: null,
+                            authType: "PUBLIC",
+                            hasPublicS3Assets: false
+                        }
+                    ]
+                })
+                .mockResolvedValueOnce({ rows: [] })
+                .mockResolvedValueOnce({ rows: [] });
+
+            const event = createMockEvent("/v2/registry/docs/load-docs-for-url", "POST", {
+                url: "docs.test.com"
+            });
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(200);
+            const body = JSON.parse(result.body);
+            expect(body.orgId).toBe("test-org-2");
+            expect(body.baseUrl.domain).toBe("docs.test.com");
+            expect(body.baseUrl.basePath).toBe("/api");
+            expect(body.lightModeEnabled).toBe(false);
+        });
+
+        it("should return 400 when url is missing", async () => {
+            const event = createMockEvent("/load-docs-for-url", "POST", {});
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(400);
+            expect(JSON.parse(result.body)).toEqual({
+                message: "Missing required field: url",
+                requestId: "test-request-id"
+            });
+        });
+
+        it("should return 400 for invalid URL", async () => {
+            const event = createMockEvent("/load-docs-for-url", "POST", {
+                url: "not a valid url!!!"
+            });
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(400);
+            const body = JSON.parse(result.body);
+            expect(body.error).toBe("InvalidUrlError");
+        });
+
+        it("should return 404 when domain is not registered", async () => {
+            // Mock empty DocsV2 result and empty V1 Docs result (fallback)
+            mockQuery
+                .mockResolvedValueOnce({ rows: [] })  // Empty DocsV2 query
+                .mockResolvedValueOnce({ rows: [] }); // Empty V1 Docs query
+
+            const event = createMockEvent("/load-docs-for-url", "POST", {
+                url: "https://unknown.example.com"
+            });
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(404);
+            expect(JSON.parse(result.body)).toEqual({
+                error: "DomainNotRegisteredError",
+                message: "Domain not registered",
+                requestId: "test-request-id"
+            });
+        });
+
+        it("should handle docs with API definitions", async () => {
+            const mockDocsDefinition = Buffer.from(
+                JSON.stringify({
+                    type: "v3",
+                    pages: {},
+                    config: {
+                        navigation: { items: [] },
+                        colorsV3: { type: "light" }
+                    },
+                    files: {},
+                    referencedApis: ["api-1", "api-2"]
+                })
+            );
+
+            const mockApiDefinition = Buffer.from(
+                JSON.stringify({
+                    rootPackage: {
+                        endpoints: [],
+                        types: [],
+                        webhooks: [],
+                        websockets: [],
+                        subpackages: [],
+                        pointsTo: null
+                    },
+                    subpackages: {},
+                    navigation: null,
+                    auth: null
+                })
+            );
+
+            mockQuery
+                // DocsV2 query
+                .mockResolvedValueOnce({
+                    rows: [
+                        {
+                            orgID: "test-org",
+                            domain: "docs.example.com",
+                            path: "",
+                            docsDefinition: mockDocsDefinition,
+                            docsConfigInstanceId: "config-123",
+                            authType: "PUBLIC",
+                            hasPublicS3Assets: true
+                        }
+                    ]
+                })
+                // ApiDefinitionsV2 query
+                .mockResolvedValueOnce({
+                    rows: [
+                        {
+                            apiDefinitionId: "api-1",
+                            definition: mockApiDefinition
+                        }
+                    ]
+                })
+                // ApiDefinitionsLatest query
+                .mockResolvedValueOnce({
+                    rows: [
+                        {
+                            apiDefinitionId: "api-2",
+                            definition: mockApiDefinition
+                        }
+                    ]
+                });
+
+            const event = createMockEvent("/load-docs-for-url", "POST", {
+                url: "https://docs.example.com"
+            });
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            // Log the error if test fails
+            if (result.statusCode !== 200) {
+                console.error("Error response:", JSON.parse(result.body));
+            }
+
+            expect(result.statusCode).toBe(200);
+            const body = JSON.parse(result.body);
+            expect(body.definition).toBeDefined();
         });
     });
 

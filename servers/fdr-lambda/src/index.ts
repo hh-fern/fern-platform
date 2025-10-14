@@ -1,5 +1,8 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { Pool } from "pg";
+import { getDocsForUrl } from "./services/getDocsForUrl";
+import { DomainNotRegisteredError, getMetadataForUrl, InvalidUrlError } from "./services/getMetadataForUrl";
+import { initializeS3 } from "./utils/s3";
 
 // Create connection pool outside handler for connection reuse
 const pool = new Pool({
@@ -9,75 +12,23 @@ const pool = new Pool({
     connectionTimeoutMillis: 60000 // 60 seconds - enough for RDS Proxy cold start
 });
 
-interface DocsUrlMetadata {
-    url: string;
-    org: string;
-    isPreviewUrl: boolean;
-    gitUrl?: string;
-    enableAlgoliaOnPreview: boolean;
-}
+// Initialize S3 with environment variables
+initializeS3({
+    publicDocsCDNUrl: process.env.PUBLIC_DOCS_CDN_URL || "",
+    publicDocsS3BucketName: process.env.PUBLIC_DOCS_S3_BUCKET_NAME || "",
+    publicDocsS3BucketRegion: process.env.PUBLIC_DOCS_S3_BUCKET_REGION || "us-east-1",
+    privateDocsS3BucketName: process.env.PRIVATE_DOCS_S3_BUCKET_NAME || "",
+    privateDocsS3BucketRegion: process.env.PRIVATE_DOCS_S3_BUCKET_REGION || "us-east-1",
+    awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+});
 
 interface GetMetadataForUrlRequest {
     url: string;
 }
 
-class DomainNotRegisteredError extends Error {
-    constructor() {
-        super("Domain not registered");
-        this.name = "DomainNotRegisteredError";
-    }
-}
-
-class InvalidUrlError extends Error {
-    constructor(url: string, originalError: Error) {
-        super(`Invalid URL: ${url}`);
-        this.name = "InvalidUrlError";
-        this.cause = originalError;
-    }
-}
-
-async function getMetadataForUrl(url: string): Promise<DocsUrlMetadata | null> {
-    // Parse the URL to get the hostname
-    // Coerce URL by adding https:// prefix if missing (similar to ParsedBaseUrl in FDR)
-    let parsedUrl: URL;
-    try {
-        let urlWithProtocol = url;
-        if (!/^https?:\/\//i.test(url)) {
-            urlWithProtocol = "https://" + url;
-        }
-        parsedUrl = new URL(urlWithProtocol);
-    } catch (error) {
-        throw new InvalidUrlError(url, error as Error);
-    }
-    const hostname = parsedUrl.hostname;
-
-    // Query the database for the docs metadata
-    const result = await pool.query(
-        `SELECT "orgID", "isPreview", "domain", "path", "githubUrl"
-     FROM "DocsV2"
-     WHERE "domain" = $1
-     ORDER BY "updatedTime" DESC
-     LIMIT 1`,
-        [hostname]
-    );
-
-    if (result.rows.length === 0) {
-        return null;
-    }
-
-    const whitelistResult = await pool.query(
-        `SELECT "domain" FROM "algolia_preview_domain_whitelist" WHERE "domain" = $1 LIMIT 1`,
-        [hostname]
-    );
-
-    const row = result.rows[0];
-    return {
-        url,
-        org: row.orgID,
-        isPreviewUrl: row.isPreview,
-        gitUrl: row.githubUrl ?? undefined,
-        enableAlgoliaOnPreview: whitelistResult.rows.length > 0
-    };
+interface LoadDocsForUrlRequest {
+    url: string;
 }
 
 export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
@@ -106,7 +57,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
                 };
             }
 
-            const metadata = await getMetadataForUrl(body.url);
+            const metadata = await getMetadataForUrl(body.url, pool);
 
             if (metadata === null) {
                 throw new DomainNotRegisteredError();
@@ -119,6 +70,48 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
                     "Access-Control-Allow-Origin": "*"
                 },
                 body: JSON.stringify(metadata)
+            };
+        }
+
+        // Route: POST /v2/registry/docs/load-docs-for-url or POST /load-docs-for-url
+        if ((path === "/v2/registry/docs/load-docs-for-url" || path === "/load-docs-for-url") && method === "POST") {
+            const body: LoadDocsForUrlRequest = JSON.parse(event.body || "{}");
+
+            if (!body.url) {
+                return {
+                    statusCode: 400,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*"
+                    },
+                    body: JSON.stringify({
+                        message: "Missing required field: url",
+                        requestId: context.awsRequestId
+                    })
+                };
+            }
+
+            // Parse the URL
+            let parsedUrl: URL;
+            try {
+                let urlWithProtocol = body.url;
+                if (!/^https?:\/\//i.test(body.url)) {
+                    urlWithProtocol = "https://" + body.url;
+                }
+                parsedUrl = new URL(urlWithProtocol);
+            } catch (error) {
+                throw new InvalidUrlError(body.url, error as Error);
+            }
+
+            const docsResponse = await getDocsForUrl(parsedUrl, pool);
+
+            return {
+                statusCode: 200,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: JSON.stringify(docsResponse)
             };
         }
 
