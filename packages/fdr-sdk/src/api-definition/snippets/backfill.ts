@@ -97,7 +97,7 @@ async function backfillSnippetsForExample(
             description: undefined
         });
     }
-    
+
     for (const [language, generator] of Object.entries(dynamicGenerators)) {
         if (!generator || endpoint.method === "HEAD") {
             continue;
@@ -217,8 +217,6 @@ async function backfillSnippetsForExample(
             }
         }
     }
-
-    
 
     return { ...example, snippets };
 }
