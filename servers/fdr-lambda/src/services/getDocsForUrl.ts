@@ -11,17 +11,28 @@ import {
 } from "@fern-api/fdr-sdk";
 import { AuthType } from "@prisma/client";
 import type { Pool } from "pg";
+import { DomainNotRegisteredError, UnauthorizedError } from "../errors";
+import { checkUserBelongsToOrg } from "../utils/auth";
 import { getPresignedDocsAssetsDownloadUrl } from "../utils/s3";
 import { readBuffer } from "../utils/serde";
-import { DomainNotRegisteredError } from "./getMetadataForUrl";
 
 const DOCS_DOMAIN_REGX = /^([^.\s]+)/;
 
-export async function getDocsForUrl(url: URL, pool: Pool): Promise<DocsV2Read.LoadDocsForUrlResponse> {
+export async function getDocsForUrl(
+    url: URL,
+    pool: Pool,
+    authHeader: string | undefined
+): Promise<DocsV2Read.LoadDocsForUrlResponse> {
     // Try to load from DocsV2
     const dbDocs = await loadDocsForURLFromDatabase(url, pool);
 
     if (dbDocs != null) {
+        // Check authorization - user must belong to the org that owns these docs
+        await checkUserBelongsToOrg({
+            authHeader,
+            orgId: dbDocs.orgId
+        });
+
         // Fetch API definitions referenced by the docs
         const apiDefinitions = await fetchApiDefinitions(dbDocs.docsDefinition.referencedApis, pool);
 
@@ -58,6 +69,12 @@ export async function getDocsForUrl(url: URL, pool: Pool): Promise<DocsV2Read.Lo
         throw new DomainNotRegisteredError();
     }
 
+    // V1 docs don't have org IDs, but still require valid auth
+    // We can't check org membership, but we ensure user is authenticated
+    if (authHeader == null) {
+        throw new UnauthorizedError("Authorization header is required");
+    }
+
     return {
         orgId: FdrAPI.OrgId("dummy"), // V1 doesn't have org IDs
         baseUrl: {
@@ -79,10 +96,7 @@ interface LoadDocsDefinitionByUrlResponse {
     hasPublicS3Assets: boolean;
 }
 
-async function loadDocsForURLFromDatabase(
-    url: URL,
-    pool: Pool
-): Promise<LoadDocsDefinitionByUrlResponse | undefined> {
+async function loadDocsForURLFromDatabase(url: URL, pool: Pool): Promise<LoadDocsDefinitionByUrlResponse | undefined> {
     const result = await pool.query(
         `SELECT "orgID", "domain", "path", "docsDefinition", "docsConfigInstanceId",
                 "authType", "hasPublicS3Assets"

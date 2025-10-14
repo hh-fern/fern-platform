@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Use vi.hoisted to ensure mocks are set up before module imports
 const mockQuery = vi.hoisted(() => vi.fn());
 const mockGetPresignedUrl = vi.hoisted(() => vi.fn());
+const mockIsMember = vi.hoisted(() => vi.fn());
 
 vi.mock("pg", () => {
     return {
@@ -18,6 +19,17 @@ vi.mock("../utils/s3", () => ({
     getPresignedDocsAssetsDownloadUrl: mockGetPresignedUrl
 }));
 
+vi.mock("@fern-api/venus-api-sdk", () => ({
+    FernVenusApiClient: vi.fn(() => ({
+        organization: {
+            isMember: mockIsMember
+        }
+    })),
+    FernVenusApi: {
+        OrganizationId: (id: string) => id
+    }
+}));
+
 // Import handler after mocks are configured
 import { handler } from "../index";
 
@@ -27,16 +39,26 @@ describe("Lambda Handler", () => {
         vi.clearAllMocks();
         mockQuery.mockReset();
         mockGetPresignedUrl.mockReset();
+        mockIsMember.mockReset();
         // Default S3 mock to return a URL
         mockGetPresignedUrl.mockResolvedValue("https://s3.example.com/file.png");
+        // Default Venus mock to allow access (member of fern org)
+        mockIsMember.mockResolvedValue({ ok: true, body: true });
+        // Set VENUS_URL for tests
+        process.env.VENUS_URL = "https://venus.buildwithfern.com";
     });
 
-    const createMockEvent = (path: string, method: string, body?: any): APIGatewayProxyEvent => {
+    const createMockEvent = (
+        path: string,
+        method: string,
+        body?: any,
+        headers?: Record<string, string>
+    ): APIGatewayProxyEvent => {
         return {
             path,
             httpMethod: method,
             body: body ? JSON.stringify(body) : null,
-            headers: {},
+            headers: headers || {},
             multiValueHeaders: {},
             isBase64Encoded: false,
             pathParameters: null,
@@ -305,7 +327,7 @@ describe("Lambda Handler", () => {
     });
 
     describe("POST /load-docs-for-url", () => {
-        it("should return docs for a valid URL", async () => {
+        it("should return docs for a valid URL with auth", async () => {
             const mockDocsDefinition = Buffer.from(
                 JSON.stringify({
                     type: "v3",
@@ -343,9 +365,16 @@ describe("Lambda Handler", () => {
                 .mockResolvedValueOnce({ rows: [] })
                 .mockResolvedValueOnce({ rows: [] });
 
-            const event = createMockEvent("/load-docs-for-url", "POST", {
-                url: "https://docs.example.com"
-            });
+            const event = createMockEvent(
+                "/load-docs-for-url",
+                "POST",
+                {
+                    url: "https://docs.example.com"
+                },
+                {
+                    Authorization: "Bearer test-token"
+                }
+            );
             const context = createMockContext();
 
             const result = await handler(event, context);
@@ -388,9 +417,16 @@ describe("Lambda Handler", () => {
                 .mockResolvedValueOnce({ rows: [] })
                 .mockResolvedValueOnce({ rows: [] });
 
-            const event = createMockEvent("/v2/registry/docs/load-docs-for-url", "POST", {
-                url: "docs.test.com"
-            });
+            const event = createMockEvent(
+                "/v2/registry/docs/load-docs-for-url",
+                "POST",
+                {
+                    url: "docs.test.com"
+                },
+                {
+                    Authorization: "Bearer test-token"
+                }
+            );
             const context = createMockContext();
 
             const result = await handler(event, context);
@@ -429,15 +465,110 @@ describe("Lambda Handler", () => {
             expect(body.error).toBe("InvalidUrlError");
         });
 
+        it("should return 401 when authorization header is missing", async () => {
+            const mockDocsDefinition = Buffer.from(
+                JSON.stringify({
+                    type: "v3",
+                    pages: {},
+                    config: {
+                        navigation: { items: [] },
+                        colorsV3: { type: "light" }
+                    },
+                    files: {},
+                    referencedApis: []
+                })
+            );
+
+            mockQuery.mockResolvedValueOnce({
+                rows: [
+                    {
+                        orgID: "test-org",
+                        domain: "docs.example.com",
+                        path: "",
+                        docsDefinition: mockDocsDefinition,
+                        docsConfigInstanceId: "config-123",
+                        authType: "PUBLIC",
+                        hasPublicS3Assets: true
+                    }
+                ]
+            });
+
+            const event = createMockEvent("/load-docs-for-url", "POST", {
+                url: "https://docs.example.com"
+            }); // No auth header
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(401);
+            expect(JSON.parse(result.body).error).toBe("UnauthorizedError");
+        });
+
+        it("should return 403 when user is not in the org", async () => {
+            const mockDocsDefinition = Buffer.from(
+                JSON.stringify({
+                    type: "v3",
+                    pages: {},
+                    config: {
+                        navigation: { items: [] },
+                        colorsV3: { type: "light" }
+                    },
+                    files: {},
+                    referencedApis: []
+                })
+            );
+
+            mockQuery.mockResolvedValueOnce({
+                rows: [
+                    {
+                        orgID: "test-org",
+                        domain: "docs.example.com",
+                        path: "",
+                        docsDefinition: mockDocsDefinition,
+                        docsConfigInstanceId: "config-123",
+                        authType: "PUBLIC",
+                        hasPublicS3Assets: true
+                    }
+                ]
+            });
+
+            // Mock Venus to deny access (not in fern org, not in specific org)
+            mockIsMember.mockResolvedValue({ ok: true, body: false });
+
+            const event = createMockEvent(
+                "/load-docs-for-url",
+                "POST",
+                {
+                    url: "https://docs.example.com"
+                },
+                {
+                    Authorization: "Bearer test-token"
+                }
+            );
+            const context = createMockContext();
+
+            const result = await handler(event, context);
+
+            expect(result.statusCode).toBe(403);
+            expect(JSON.parse(result.body).error).toBe("UserNotInOrgError");
+        });
+
         it("should return 404 when domain is not registered", async () => {
             // Mock empty DocsV2 result and empty V1 Docs result (fallback)
             mockQuery
-                .mockResolvedValueOnce({ rows: [] })  // Empty DocsV2 query
+                .mockResolvedValueOnce({ rows: [] }) // Empty DocsV2 query
                 .mockResolvedValueOnce({ rows: [] }); // Empty V1 Docs query
 
-            const event = createMockEvent("/load-docs-for-url", "POST", {
-                url: "https://unknown.example.com"
-            });
+            const event = createMockEvent(
+                "/load-docs-for-url",
+                "POST",
+                {
+                    url: "https://unknown.example.com"
+                },
+                {
+                    Authorization: "Bearer test-token"
+                }
+            );
             const context = createMockContext();
 
             const result = await handler(event, context);
@@ -514,9 +645,16 @@ describe("Lambda Handler", () => {
                     ]
                 });
 
-            const event = createMockEvent("/load-docs-for-url", "POST", {
-                url: "https://docs.example.com"
-            });
+            const event = createMockEvent(
+                "/load-docs-for-url",
+                "POST",
+                {
+                    url: "https://docs.example.com"
+                },
+                {
+                    Authorization: "Bearer test-token"
+                }
+            );
             const context = createMockContext();
 
             const result = await handler(event, context);

@@ -1,7 +1,8 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { Pool } from "pg";
+import { DomainNotRegisteredError, InvalidUrlError, UnauthorizedError, UserNotInOrgError } from "./errors";
 import { getDocsForUrl } from "./services/getDocsForUrl";
-import { DomainNotRegisteredError, getMetadataForUrl, InvalidUrlError } from "./services/getMetadataForUrl";
+import { getMetadataForUrl } from "./services/getMetadataForUrl";
 import { initializeS3 } from "./utils/s3";
 
 // Create connection pool outside handler for connection reuse
@@ -13,14 +14,13 @@ const pool = new Pool({
 });
 
 // Initialize S3 with environment variables
+// Note: AWS credentials are not provided - Lambda will use its IAM role
 initializeS3({
     publicDocsCDNUrl: process.env.PUBLIC_DOCS_CDN_URL || "",
     publicDocsS3BucketName: process.env.PUBLIC_DOCS_S3_BUCKET_NAME || "",
     publicDocsS3BucketRegion: process.env.PUBLIC_DOCS_S3_BUCKET_REGION || "us-east-1",
     privateDocsS3BucketName: process.env.PRIVATE_DOCS_S3_BUCKET_NAME || "",
-    privateDocsS3BucketRegion: process.env.PRIVATE_DOCS_S3_BUCKET_REGION || "us-east-1",
-    awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    privateDocsS3BucketRegion: process.env.PRIVATE_DOCS_S3_BUCKET_REGION || "us-east-1"
 });
 
 interface GetMetadataForUrlRequest {
@@ -103,7 +103,14 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
                 throw new InvalidUrlError(body.url, error as Error);
             }
 
-            const docsResponse = await getDocsForUrl(parsedUrl, pool);
+            // Extract Authorization header (case-insensitive)
+            const authHeader =
+                event.headers?.Authorization ||
+                event.headers?.authorization ||
+                event.headers?.["x-fern-token"] ||
+                event.headers?.["X-Fern-Token"];
+
+            const docsResponse = await getDocsForUrl(parsedUrl, pool, authHeader);
 
             return {
                 statusCode: 200,
@@ -168,6 +175,38 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
                 body: JSON.stringify({
                     error: "DomainNotRegisteredError",
                     message: "Domain not registered",
+                    requestId: context.awsRequestId
+                })
+            };
+        }
+
+        // Handle UnauthorizedError
+        if (error instanceof UnauthorizedError) {
+            return {
+                statusCode: 401,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: JSON.stringify({
+                    error: "UnauthorizedError",
+                    message: error.message,
+                    requestId: context.awsRequestId
+                })
+            };
+        }
+
+        // Handle UserNotInOrgError
+        if (error instanceof UserNotInOrgError) {
+            return {
+                statusCode: 403,
+                headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: JSON.stringify({
+                    error: "UserNotInOrgError",
+                    message: error.message,
                     requestId: context.awsRequestId
                 })
             };

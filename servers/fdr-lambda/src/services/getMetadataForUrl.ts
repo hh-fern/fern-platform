@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import { DomainNotRegisteredError, InvalidUrlError } from "../errors";
 
 export interface DocsUrlMetadata {
     url: string;
@@ -6,21 +7,6 @@ export interface DocsUrlMetadata {
     isPreviewUrl: boolean;
     gitUrl?: string;
     enableAlgoliaOnPreview: boolean;
-}
-
-export class DomainNotRegisteredError extends Error {
-    constructor() {
-        super("Domain not registered");
-        this.name = "DomainNotRegisteredError";
-    }
-}
-
-export class InvalidUrlError extends Error {
-    constructor(url: string, originalError: Error) {
-        super(`Invalid URL: ${url}`);
-        this.name = "InvalidUrlError";
-        this.cause = originalError;
-    }
 }
 
 export async function getMetadataForUrl(url: string, pool: Pool): Promise<DocsUrlMetadata | null> {

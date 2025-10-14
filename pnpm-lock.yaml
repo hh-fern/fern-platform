@@ -3366,6 +3366,9 @@ importers:
       '@fern-api/fdr-sdk':
         specifier: workspace:*
         version: link:../../packages/fdr-sdk
+      '@fern-api/venus-api-sdk':
+        specifier: ^0.19.5
+        version: 0.19.5
       '@types/aws-lambda':
         specifier: ^8.10.143
         version: 8.10.153

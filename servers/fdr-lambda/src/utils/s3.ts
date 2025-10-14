@@ -21,12 +21,13 @@ let s3Config: S3Config | undefined;
 export function initializeS3(config: S3Config): void {
     s3Config = config;
 
-    const credentials = config.awsAccessKeyId && config.awsSecretAccessKey
-        ? {
-            accessKeyId: config.awsAccessKeyId,
-            secretAccessKey: config.awsSecretAccessKey
-        }
-        : undefined;
+    const credentials =
+        config.awsAccessKeyId && config.awsSecretAccessKey
+            ? {
+                  accessKeyId: config.awsAccessKeyId,
+                  secretAccessKey: config.awsSecretAccessKey
+              }
+            : undefined;
 
     publicDocsS3Client = new S3Client({
         region: config.publicDocsS3BucketRegion,
