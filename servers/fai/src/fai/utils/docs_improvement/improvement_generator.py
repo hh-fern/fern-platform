@@ -156,7 +156,10 @@ class ImprovementGenerator:
             async with AsyncAnthropic(api_key=self.anthropic_api_key) as client:
                 # Generate the improvement
                 prompt = IMPROVEMENT_PROMPT.format(
-                    question=question, ideal_response=ideal_response, current_content=current_content
+                    question=question,
+                    ideal_response=ideal_response,
+                    current_content=current_content,
+                    incorrect_response=incorrect_response or "N/A",
                 )
 
                 response = await client.messages.create(
