@@ -211,6 +211,7 @@ class GitHubPRCreator:
         pr_title: str | None = None,
         pr_body: str | None = None,
         base_branch: str = "main",
+        incorrect_response: str | None = None,
     ) -> PRResult:
         """Create a complete PR for a docs improvement.
 
@@ -229,6 +230,7 @@ class GitHubPRCreator:
             summary: Summary of the improvement
             slack_context_id: ID of the slack context
             base_branch: Base branch to branch from (default: main)
+            incorrect_response: Optional incorrect response that was given
 
         Returns:
             PRResult with PR details
@@ -264,13 +266,20 @@ class GitHubPRCreator:
 
             # Step 3: Create PR
             final_title = pr_title if pr_title is not None else f"docs: {summary}"
-            final_body = (
-                pr_body
-                if pr_body is not None
-                else (
-                    f"""{summary}\n\n**Question:** {question}\n\n**File:** `{file_path}`\n**Source:** Slack Context `{slack_context_id}`\n"""
-                )
-            )
+            if pr_body is not None:
+                final_body = pr_body
+            else:
+                # Build a comprehensive default body
+                body_parts: list[str] = [
+                    f"{summary}",
+                    f"\n\n**Question:** {question}",
+                ]
+                if incorrect_response:
+                    body_parts.append(f"\n\n**Incorrect Response:**\n{incorrect_response}")
+                body_parts.append(f"\n\n**Ideal Response:**\n{ideal_response}")
+                body_parts.append(f"\n\n**File:** `{file_path}`")
+                body_parts.append(f"\n**Source:** Slack Context `{slack_context_id}`")
+                final_body = "".join(body_parts)
 
             return self.create_pull_request(
                 repo_owner, repo_name, final_title, final_body, branch_name, base_branch

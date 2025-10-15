@@ -128,6 +128,7 @@ async def create_pr_for_slack_context(
             slack_context_id=slack_context_id,
             pr_title=explicit_pr_title,
             pr_body=explicit_pr_body,
+            incorrect_response=incorrect_response,
         )
 
         if pr_result.success:

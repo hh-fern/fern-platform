@@ -122,44 +122,12 @@ You are analyzing documentation changes to create a clear change summary.
 ```
 
 **Task:**
-Provide a concise summary. Make it as concise as is helpful to a busy software developer, probably 1-3 sentences. Have it cover:
+Provide a concise summary (1-3 sentences) covering:
 1. What information was added or clarified
 2. What was removed or restructured (if significant)
 3. The overall improvement to user experience
 
 Summary:
-"""
-
-
-PR_METADATA_PROMPT = """
-You are helping create a high-quality GitHub pull request for documentation changes.
-
-Provide a concise PR title and a helpful PR description based on the following inputs.
-
-Constraints:
-- Title must start with the conventional prefix "docs:" and be under 72 characters if possible.
-- Description should be concise and scannable for busy reviewers.
-- Do not include implementation details unrelated to docs content.
-
-Inputs:
-**Question:**
-{question}
-
-**Ideal Answer:**
-{ideal_response}
-
-**Original Content (truncated):**
-```markdown
-{original_content}
-```
-
-**Improved Content (truncated):**
-```markdown
-{improved_content}
-```
-
-Required Output (strict JSON with keys title, description):
-{"title": "...", "description": "..."}
 """
 
 
@@ -186,27 +154,9 @@ class ImprovementGenerator:
         """
         try:
             async with AsyncAnthropic(api_key=self.anthropic_api_key) as client:
-                # Build context about incorrect response if provided
-                if incorrect_response:
-                    incorrect_context = (
-                        f" The system initially gave an incorrect or incomplete response, "
-                        f"and we need to update the docs so this doesn't happen again."
-                    )
-                    incorrect_section = f"""**Incorrect Response Given:**
-{incorrect_response}
-
-"""
-                else:
-                    incorrect_context = " We now have the ideal answer, and need to naturally incorporate this information into the existing documentation."
-                    incorrect_section = ""
-
                 # Generate the improvement
                 prompt = IMPROVEMENT_PROMPT.format(
-                    question=question,
-                    ideal_response=ideal_response,
-                    current_content=current_content,
-                    incorrect_context=incorrect_context,
-                    incorrect_section=incorrect_section,
+                    question=question, ideal_response=ideal_response, current_content=current_content
                 )
 
                 response = await client.messages.create(
