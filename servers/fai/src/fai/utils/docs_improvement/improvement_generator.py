@@ -131,6 +131,38 @@ Summary:
 """
 
 
+PR_METADATA_PROMPT = """
+You are helping create a high-quality GitHub pull request for documentation changes.
+
+Provide a concise PR title and a helpful PR description based on the following inputs.
+
+Constraints:
+- Title must start with the conventional prefix "docs:" and be under 72 characters if possible.
+- Description should be concise and scannable for busy reviewers.
+- Do not include implementation details unrelated to docs content.
+
+Inputs:
+**Question:**
+{question}
+
+**Ideal Answer:**
+{ideal_response}
+
+**Original Content (truncated):**
+```markdown
+{original_content}
+```
+
+**Improved Content (truncated):**
+```markdown
+{improved_content}
+```
+
+Required Output (strict JSON with keys title, description):
+{{"title": "...", "description": "..."}}
+"""
+
+
 class ImprovementGenerator:
     """Generates improved docs content using LLM."""
 
@@ -292,6 +324,9 @@ class ImprovementGenerator:
 
                 # Try to parse strict JSON; if it fails, attempt to heuristically extract
                 import json
+
+                title_str: str | None
+                desc_str: str | None
 
                 try:
                     data = json.loads(raw_text)
