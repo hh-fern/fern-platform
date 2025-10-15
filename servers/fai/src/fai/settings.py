@@ -33,11 +33,16 @@ class Variables:
     KV_REST_API_READ_ONLY_TOKEN: str | None = os.environ.get("KV_REST_API_READ_ONLY_TOKEN")
     KV_REST_API_URL: str | None = os.environ.get("KV_REST_API_URL")
 
+    GITHUB_TOKEN: str | None = os.environ.get("GITHUB_TOKEN")
+
     @classmethod
     def validate_env_variables(cls) -> None:
+        # Optional environment variables that won't cause startup failure
+        optional_vars = {"GITHUB_TOKEN"}
+
         for attr_name, attr_value in vars(cls).items():
             if not attr_name.startswith("_") and isinstance(attr_value, str | type(None)):
-                if attr_value is None:
+                if attr_value is None and attr_name not in optional_vars:
                     raise ValueError(f"Setup: Environment variable {attr_name} is not set.")
 
 

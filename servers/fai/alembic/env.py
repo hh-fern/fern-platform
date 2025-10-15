@@ -1,9 +1,9 @@
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy.engine import Connection
 
+from alembic import context
 from fai.db import (
     Base,
     engine,
@@ -13,6 +13,7 @@ from fai.models.db.discord_integration_db import DiscordIntegrationDb  # noqa: F
 from fai.models.db.discord_message_cache_db import DiscordMessageCacheDb  # noqa: F401
 from fai.models.db.document_db import DocumentDb  # noqa: F401
 from fai.models.db.feedback_db import FeedbackDb  # noqa: F401
+from fai.models.db.fern_scribe_db import FernScribeDb  # noqa: F401
 from fai.models.db.guidance_db import GuidanceDb  # noqa: F401
 from fai.models.db.insight_db import InsightDb  # noqa: F401
 from fai.models.db.job_db import JobDb  # noqa: F401

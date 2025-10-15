@@ -4,6 +4,7 @@ from sqlalchemy import (
     DateTime,
     String,
 )
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from fai.db import Base
 from fai.models.types.slack_context_types import SlackContext
@@ -28,6 +29,7 @@ class SlackContextDb(Base):
     domain = Column(String, nullable=False)
     question = Column(String, nullable=False)
     ideal_response = Column(String, nullable=False)
+    citations = Column(ARRAY(String), nullable=True)  # URLs from RAG responses
     created_at = Column(DateTime(timezone=True), nullable=False)
     updated_at = Column(DateTime(timezone=True), nullable=False)
 
@@ -37,6 +39,7 @@ class SlackContextDb(Base):
             domain=self.domain,
             question=self.question,
             ideal_response=self.ideal_response,
+            citations=self.citations,
             created_at=self.created_at,
             updated_at=self.updated_at,
         )

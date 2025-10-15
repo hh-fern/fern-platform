@@ -254,7 +254,9 @@ async def log_query_to_db(
         return None
 
 
-async def save_slack_context_to_db(question: str, ideal_response: str, domain: str) -> str | None:
+async def save_slack_context_to_db(
+    question: str, ideal_response: str, domain: str, citations: list[str] | None = None
+) -> str | None:
     try:
         slack_context_id = str(uuid4())
         now = datetime.now(UTC)
@@ -265,6 +267,7 @@ async def save_slack_context_to_db(question: str, ideal_response: str, domain: s
                 domain=domain,
                 question=question,
                 ideal_response=ideal_response,
+                citations=citations,
                 created_at=now,
                 updated_at=now,
             )
@@ -487,10 +490,24 @@ async def handle_slack_message(
             response_text = "I encountered an error while trying to help you index this content. Please try again."
 
         if context_data:
+            # Get citations - either from search tool or fetch separately
+            citations = context_data.get("citations")
+
+            # If no citations from search tool, fetch them separately
+            if not citations or len(citations) == 0:
+                LOGGER.info("No citations from search tool, fetching separately...")
+                from fai.utils.docs_improvement.citation_fetcher import fetch_citations_for_question
+
+                citations = await fetch_citations_for_question(
+                    question=context_data["question"], domain=domain_to_use, top_k=5
+                )
+                LOGGER.info(f"Fetched {len(citations)} citations for question")
+
             slack_context_id = await save_slack_context_to_db(
                 question=context_data["question"],
                 ideal_response=context_data["ideal_response"],
                 domain=domain_to_use,
+                citations=citations,
             )
             if slack_context_id:
                 LOGGER.info(f"Successfully saved and synced SlackContext: {slack_context_id}")
