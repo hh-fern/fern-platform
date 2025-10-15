@@ -511,6 +511,22 @@ async def handle_slack_message(
             )
             if slack_context_id:
                 LOGGER.info(f"Successfully saved and synced SlackContext: {slack_context_id}")
+
+                # Check if user requested PR creation
+                if context_data.get("create_pr"):
+                    LOGGER.info(f"User requested PR creation for slack_context_id: {slack_context_id}")
+                    # Import here to avoid circular dependency
+                    from fai.utils.docs_improvement.pr_workflow import create_pr_for_slack_context
+
+                    try:
+                        pr_result = await create_pr_for_slack_context(slack_context_id, domain_to_use)
+                        if pr_result.get("success"):
+                            response_text += f"\n\n✅ PR created successfully: {pr_result.get('pr_url')}"
+                        else:
+                            response_text += f"\n\n⚠️ Failed to create PR: {pr_result.get('error')}"
+                    except Exception as e:
+                        LOGGER.error(f"Error creating PR: {e}")
+                        response_text += f"\n\n⚠️ Failed to create PR: {str(e)}"
             else:
                 LOGGER.error("Failed to save SlackContext to database")
                 response_text += "\n\n⚠️ Note: There was an error saving the context. Please try again."

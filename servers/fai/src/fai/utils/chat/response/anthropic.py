@@ -142,13 +142,36 @@ async def get_anthropic_index_response(
                         "ideal_response": tool_use.input["ideal_response"],
                         "citations": citations,
                     }
+                    # Store the context_data so message_handler can save it and get the ID
+                    # The ID will be available for subsequent open_docs_pr calls
                     tool_results.append(
                         {
                             "type": "tool_result",
                             "tool_use_id": tool_use.id,
-                            "content": "Context saved successfully.",
+                            "content": "Context saved successfully. You can now call open_docs_pr if the user requests it.",
                         }
                     )
+                elif tool_use.name == "open_docs_pr":
+                    # This tool will be handled by creating a marker in context_data
+                    # The actual PR creation will happen in the message handler after we have the saved ID
+                    if context_data is None:
+                        tool_results.append(
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": tool_use.id,
+                                "content": "Error: Cannot create PR before saving context. Please call save_slack_context first.",
+                            }
+                        )
+                    else:
+                        # Mark that a PR should be created
+                        context_data["create_pr"] = True
+                        tool_results.append(
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": tool_use.id,
+                                "content": "PR creation initiated. The documentation will be updated shortly.",
+                            }
+                        )
                 elif tool_use.name == "search":
                     tool_use_id, search_rag_records, search_citations = await _handle_anthropic_tool_use(tool_use, domain)
                     tool_results.append(
