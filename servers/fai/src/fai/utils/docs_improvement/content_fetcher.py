@@ -12,6 +12,7 @@ from fai.settings import (
     VARIABLES,
 )
 from fai.utils.connectors.github.client import GitHubClient
+from fai.utils.docs_improvement.url_mapper import DocsUrlMapper
 
 
 @dataclass
@@ -204,12 +205,12 @@ class DocsContentFetcher:
             LOGGER.error(f"Error fetching file content from {repo_owner}/{repo_name}/{file_path}: {e}")
             return None
 
-    def fetch_content_from_url(self, docs_url: str, domain: str) -> DocsFileContent | None:
+    async def fetch_content_from_url(self, docs_url: str, domain: str) -> DocsFileContent | None:
         """Fetch docs content from a URL.
 
         This is the main entry point that combines all the steps:
         1. Get repo from domain
-        2. Find MDX file from URL
+        2. Use URL mapper to find MDX file path
         3. Fetch file content
 
         Args:
@@ -220,19 +221,32 @@ class DocsContentFetcher:
             DocsFileContent or None if any step fails
         """
         try:
-            # Step 1: Get repo from domain
-            repo_info = self.get_repo_from_domain(domain)
-            if not repo_info:
-                LOGGER.error(f"Could not find repo for domain {domain}")
-                return None
+            # For buildwithfern.com, use hardcoded repo
+            if "buildwithfern.com" in domain:
+                repo_owner = "fern-api"
+                repo_name = "docs"
+                LOGGER.info(f"Using hardcoded repo for buildwithfern.com: {repo_owner}/{repo_name}")
+            else:
+                # Step 1: Get repo from domain metadata
+                repo_info = self.get_repo_from_domain(domain)
+                if not repo_info:
+                    LOGGER.error(f"Could not find repo for domain {domain}")
+                    return None
+                repo_owner, repo_name = repo_info
 
-            repo_owner, repo_name = repo_info
+            # Step 2: Use URL mapper to find file path
+            LOGGER.info(f"Mapping URL {docs_url} to file path...")
+            url_mapper = DocsUrlMapper(
+                github_token=self.github_client.github_token, owner=repo_owner, repo=repo_name
+            )
+            await url_mapper.load_url_mappings()
 
-            # Step 2: Find MDX file from URL
-            file_path = self.find_mdx_file_from_url(docs_url, repo_owner, repo_name)
+            file_path = url_mapper.get_file_path_for_url(docs_url)
             if not file_path:
-                LOGGER.error(f"Could not find MDX file for URL {docs_url}")
+                LOGGER.error(f"Could not map URL {docs_url} to file path")
                 return None
+
+            LOGGER.info(f"Mapped {docs_url} to {file_path}")
 
             # Step 3: Fetch file content
             content = self.fetch_file_content(repo_owner, repo_name, file_path)

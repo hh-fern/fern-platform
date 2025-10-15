@@ -14,7 +14,9 @@ from fai.utils.docs_improvement.improvement_generator import ImprovementGenerato
 from fai.utils.docs_improvement.pr_creator import GitHubPRCreator
 
 
-async def create_pr_for_slack_context(slack_context_id: str, domain: str) -> dict:
+async def create_pr_for_slack_context(
+    slack_context_id: str, domain: str, incorrect_response: str | None = None
+) -> dict[str, bool | str | None]:
     """Create a PR for a saved slack context.
 
     This is a helper function that encapsulates the entire PR creation workflow.
@@ -22,6 +24,7 @@ async def create_pr_for_slack_context(slack_context_id: str, domain: str) -> dic
     Args:
         slack_context_id: ID of the slack context
         domain: The docs domain
+        incorrect_response: Optional incorrect response that was originally given
 
     Returns:
         Dict with success status, pr_url, and error message
@@ -79,6 +82,7 @@ async def create_pr_for_slack_context(slack_context_id: str, domain: str) -> dic
             current_content=docs_content.content,
             question=slack_context.question,
             ideal_response=slack_context.ideal_response,
+            incorrect_response=incorrect_response,
         )
 
         if not improvement_result.success:

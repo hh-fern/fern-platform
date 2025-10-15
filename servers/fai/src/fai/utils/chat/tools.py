@@ -12,6 +12,7 @@ class SaveSlackContextToolInput(BaseModel):
 
 class OpenDocsPRToolInput(BaseModel):
     slack_context_id: str
+    incorrect_response: str | None = None
 
 
 SEARCH_TOOL_ANTHROPIC = {
@@ -38,7 +39,9 @@ OPEN_DOCS_PR_TOOL_ANTHROPIC = {
         "Use this when the user explicitly asks to create/open a PR, update the docs via PR, "
         "or make a pull request to update documentation. "
         "This should ONLY be called AFTER save_slack_context has been called in the same conversation. "
-        "The slack_context_id is returned from the save_slack_context tool call."
+        "The slack_context_id is returned from the save_slack_context tool call. "
+        "Optionally provide incorrect_response if the system initially gave a wrong answer, "
+        "which helps the LLM understand what part of the docs needs fixing."
     ),
     "input_schema": OpenDocsPRToolInput.model_json_schema(),
 }

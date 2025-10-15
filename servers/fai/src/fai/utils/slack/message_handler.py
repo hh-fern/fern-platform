@@ -490,18 +490,14 @@ async def handle_slack_message(
             response_text = "I encountered an error while trying to help you index this content. Please try again."
 
         if context_data:
-            # Get citations - either from search tool or fetch separately
-            citations = context_data.get("citations")
+            # Fetch citations for the question using semantic search
+            LOGGER.info("Fetching citations for the saved question...")
+            from fai.utils.docs_improvement.citation_fetcher import fetch_citations_for_question
 
-            # If no citations from search tool, fetch them separately
-            if not citations or len(citations) == 0:
-                LOGGER.info("No citations from search tool, fetching separately...")
-                from fai.utils.docs_improvement.citation_fetcher import fetch_citations_for_question
-
-                citations = await fetch_citations_for_question(
-                    question=context_data["question"], domain=domain_to_use, top_k=5
-                )
-                LOGGER.info(f"Fetched {len(citations)} citations for question")
+            citations = await fetch_citations_for_question(
+                question=context_data["question"], domain=domain_to_use, top_k=5
+            )
+            LOGGER.info(f"Fetched {len(citations)} citations for question")
 
             slack_context_id = await save_slack_context_to_db(
                 question=context_data["question"],
@@ -519,7 +515,11 @@ async def handle_slack_message(
                     from fai.utils.docs_improvement.pr_workflow import create_pr_for_slack_context
 
                     try:
-                        pr_result = await create_pr_for_slack_context(slack_context_id, domain_to_use)
+                        # Extract incorrect_response if provided
+                        incorrect_response = context_data.get("incorrect_response")
+                        pr_result = await create_pr_for_slack_context(
+                            slack_context_id, domain_to_use, incorrect_response
+                        )
                         if pr_result.get("success"):
                             response_text += f"\n\n✅ PR created successfully: {pr_result.get('pr_url')}"
                         else:

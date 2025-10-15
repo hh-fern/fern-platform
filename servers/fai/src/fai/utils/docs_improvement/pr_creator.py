@@ -2,6 +2,7 @@
 
 import base64
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 import requests
 
@@ -36,7 +37,9 @@ class GitHubPRCreator:
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
-    def create_branch(self, repo_owner: str, repo_name: str, branch_name: str, base_branch: str = "main") -> bool:
+    def create_branch(
+        self, repo_owner: str, repo_name: str, branch_name: str, base_branch: str = "main"
+    ) -> bool | str:
         """Create a new branch in the repository.
 
         Args:
@@ -46,7 +49,7 @@ class GitHubPRCreator:
             base_branch: Base branch to branch from (default: main)
 
         Returns:
-            True if successful, False otherwise
+            True if successful with original name, new branch name if retried with timestamp, False otherwise
         """
         try:
             # Get the SHA of the base branch
@@ -68,6 +71,20 @@ class GitHubPRCreator:
             if create_response.status_code == 201:
                 LOGGER.info(f"Created branch {branch_name} in {repo_owner}/{repo_name}")
                 return True
+            elif create_response.status_code == 422:
+                # Branch already exists - append timestamp
+                timestamp = datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+                new_branch_name = f"{branch_name}-{timestamp}"
+                LOGGER.info(f"Branch {branch_name} exists, retrying with {new_branch_name}")
+                create_data["ref"] = f"refs/heads/{new_branch_name}"
+                retry_response = requests.post(create_ref_url, headers=self.headers, json=create_data, timeout=30)
+                if retry_response.status_code == 201:
+                    LOGGER.info(f"Created branch {new_branch_name} in {repo_owner}/{repo_name}")
+                    # Update the branch_name for caller to use
+                    return new_branch_name
+                else:
+                    LOGGER.error(f"Failed to create branch with timestamp: {retry_response.text}")
+                    return False
             else:
                 LOGGER.error(f"Failed to create branch: {create_response.text}")
                 return False
@@ -219,7 +236,8 @@ class GitHubPRCreator:
             branch_name = f"askfern/improve-docs-{slack_context_id[:8]}"
 
             # Step 1: Create branch
-            if not self.create_branch(repo_owner, repo_name, branch_name, base_branch):
+            branch_result = self.create_branch(repo_owner, repo_name, branch_name, base_branch)
+            if branch_result is False:
                 return PRResult(
                     success=False,
                     pr_url=None,
@@ -227,6 +245,9 @@ class GitHubPRCreator:
                     branch_name=branch_name,
                     error="Failed to create branch",
                 )
+            elif isinstance(branch_result, str):
+                # Branch was retried with timestamp
+                branch_name = branch_result
 
             # Step 2: Update file
             commit_message = "docs: improve content based on Ask Fern feedback"

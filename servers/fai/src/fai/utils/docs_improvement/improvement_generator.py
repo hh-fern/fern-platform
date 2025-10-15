@@ -25,13 +25,12 @@ IMPROVEMENT_PROMPT = """You are a technical documentation editor specializing in
 Your task is to improve an existing documentation page by incorporating new information that was found to be missing.
 
 **Context:**
-A user asked a question that our docs didn't adequately answer. We now have the ideal answer,
-and need to naturally incorporate this information into the existing documentation.
+A user asked a question that our docs didn't adequately answer.{incorrect_context}
 
 **Question Asked:**
 {question}
 
-**Ideal Answer:**
+{incorrect_section}**Ideal Answer:**
 {ideal_response}
 
 **Current Documentation Content:**
@@ -82,7 +81,7 @@ class ImprovementGenerator:
         self.model = "claude-4-sonnet-20250514"
 
     async def generate_improvement(
-        self, current_content: str, question: str, ideal_response: str
+        self, current_content: str, question: str, ideal_response: str, incorrect_response: str | None = None
     ) -> ImprovementResult:
         """Generate improved documentation content.
 
@@ -90,15 +89,34 @@ class ImprovementGenerator:
             current_content: The current MDX content of the docs page
             question: The user's question that exposed the gap
             ideal_response: The ideal response that should be incorporated
+            incorrect_response: Optional incorrect response that was originally given
 
         Returns:
             ImprovementResult with the improved content and summary
         """
         try:
             async with AsyncAnthropic(api_key=self.anthropic_api_key) as client:
+                # Build context about incorrect response if provided
+                if incorrect_response:
+                    incorrect_context = (
+                        f" The system initially gave an incorrect or incomplete response, "
+                        f"and we need to update the docs so this doesn't happen again."
+                    )
+                    incorrect_section = f"""**Incorrect Response Given:**
+{incorrect_response}
+
+"""
+                else:
+                    incorrect_context = " We now have the ideal answer, and need to naturally incorporate this information into the existing documentation."
+                    incorrect_section = ""
+
                 # Generate the improvement
                 prompt = IMPROVEMENT_PROMPT.format(
-                    question=question, ideal_response=ideal_response, current_content=current_content
+                    question=question,
+                    ideal_response=ideal_response,
+                    current_content=current_content,
+                    incorrect_context=incorrect_context,
+                    incorrect_section=incorrect_section,
                 )
 
                 response = await client.messages.create(
