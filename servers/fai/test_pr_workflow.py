@@ -104,7 +104,7 @@ async def test_pr_workflow(
 
     # Step 2: Generate improved content
     print("\n" + "-" * 80)
-    print("STEP 2: Generating improved content with LLM")
+    print("STEP 2: Generating improved content")
     print("-" * 80)
 
     try:

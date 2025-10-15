@@ -60,7 +60,7 @@ async def create_pr_for_slack_context(
             return {"success": False, "pr_url": None, "error": "No valid citations found after ranking."}
 
         target_docs_url = ranked_citations[0]  # Use the top-ranked citation
-        LOGGER.info(f"Target docs URL: {target_docs_url}")
+        LOGGER.info(f"Identified target docs URL: {target_docs_url}")
 
         # Step 3: Fetch the current content from GitHub
         content_fetcher = DocsContentFetcher(github_token=VARIABLES.GITHUB_TOKEN)
@@ -79,8 +79,9 @@ async def create_pr_for_slack_context(
                 return {"success": False, "pr_url": None, "error": f"Failed to find GitHub repo for domain {domain}"}
             repo_owner, repo_name = repo_info
 
-        # Step 4: Generate improved content using LLM
+        # Step 4: Generate improved content
         improvement_generator = ImprovementGenerator()
+        LOGGER.info("Generating improved documentation content (calling Claude)")
         improvement_result = await improvement_generator.generate_improvement(
             current_content=docs_content.content,
             question=slack_context.question,
@@ -120,6 +121,7 @@ async def create_pr_for_slack_context(
             f"\n\n**Source:** Created via Ask Fern Slack app (context `{slack_context_id}`)\n"
         )
 
+        LOGGER.info("Creating GitHub pull request for docs changes")
         pr_result = pr_creator.create_improvement_pr(
             repo_owner=repo_owner,
             repo_name=repo_name,

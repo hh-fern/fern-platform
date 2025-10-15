@@ -137,7 +137,7 @@ You are helping create a high-quality GitHub pull request for documentation chan
 Provide a concise PR title and a helpful PR description based on the following inputs.
 
 Constraints:
-- Title must start with the conventional prefix "docs:" and be under 72 characters if possible.
+- Title must start with the conventional prefix "docs:" and be under 50 characters.
 - Description should be concise and scannable for busy reviewers.
 - Do not include implementation details unrelated to docs content.
 
@@ -186,6 +186,8 @@ class ImprovementGenerator:
         """
         try:
             async with AsyncAnthropic(api_key=self.anthropic_api_key) as client:
+                # Log that we're about to call Claude to generate improved content
+                LOGGER.info("Calling Claude to draft improved documentation content")
                 # Generate the improvement
                 prompt = IMPROVEMENT_PROMPT.format(
                     question=question,
@@ -208,7 +210,7 @@ class ImprovementGenerator:
                         pr_title=None,
                         pr_description=None,
                         success=False,
-                        error="No response from LLM",
+                        error="No response from Claude",
                     )
 
                 improved_content = response.content[0].text
@@ -265,6 +267,7 @@ class ImprovementGenerator:
             improved_truncated = improved_content[:max_length]
 
             async with AsyncAnthropic(api_key=self.anthropic_api_key) as client:
+                LOGGER.info("Calling Claude to summarize documentation changes")
                 prompt = SUMMARY_PROMPT.format(
                     original_content=orig_truncated, improved_content=improved_truncated
                 )
@@ -304,6 +307,7 @@ class ImprovementGenerator:
             improved_truncated = improved_content[:max_length]
 
             async with AsyncAnthropic(api_key=self.anthropic_api_key) as client:
+                LOGGER.info("Calling Claude to generate PR title and description")
                 prompt = PR_METADATA_PROMPT.format(
                     question=question,
                     ideal_response=ideal_response,
@@ -337,13 +341,29 @@ class ImprovementGenerator:
                     title_str = f"docs: {summary}" if summary else None
                     desc_str = summary or None
 
-                # Final validation and trimming
+                # Final validation, de-duplication, and trimming
                 if title_str:
-                    title_str = title_str if title_str.startswith("docs:") else f"docs: {title_str}"
-                    if len(title_str) > 120:
-                        title_str = title_str[:117] + "..."
+                    # Avoid duplicating description
+                    if desc_str and title_str.strip().lower() == desc_str.strip().lower():
+                        title_str = summary or title_str
 
-                return title_str or None, desc_str or None
+                    # Prefer "docs:" prefix if it still fits within 50 characters
+                    preferred_prefix = "docs: "
+                    if not title_str.startswith(preferred_prefix):
+                        candidate = preferred_prefix + title_str
+                        title_str = candidate if len(candidate) <= 50 else title_str
+
+                    # Enforce 50 character limit, trim on word boundary when possible
+                    max_len = 50
+                    if len(title_str) > max_len:
+                        trimmed = title_str[:max_len].rstrip()
+                        # try to cut at last space for readability
+                        last_space = trimmed.rfind(" ")
+                        if last_space >= 20:  # keep at least some context
+                            trimmed = trimmed[:last_space]
+                        title_str = trimmed
+
+                return (title_str or None), (desc_str or None)
 
         except Exception as e:
             LOGGER.warning(f"Error generating PR metadata: {e}")

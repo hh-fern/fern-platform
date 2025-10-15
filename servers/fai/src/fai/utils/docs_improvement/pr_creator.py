@@ -266,6 +266,15 @@ class GitHubPRCreator:
 
             # Step 3: Create PR
             final_title = pr_title if pr_title is not None else f"docs: {summary}"
+            # Enforce concise title (<= 50 chars) as final safeguard
+            if final_title:
+                max_len = 50
+                if len(final_title) > max_len:
+                    trimmed = final_title[:max_len].rstrip()
+                    last_space = trimmed.rfind(" ")
+                    if last_space >= 20:
+                        trimmed = trimmed[:last_space]
+                    final_title = trimmed
             if pr_body is not None:
                 final_body = pr_body
             else:
