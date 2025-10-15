@@ -515,8 +515,16 @@ async def handle_slack_message(
                     from fai.utils.docs_improvement.pr_workflow import create_pr_for_slack_context
 
                     try:
-                        # Extract incorrect_response if provided
+                        # Extract incorrect_response if provided, otherwise find bot's first response in history
                         incorrect_response = context_data.get("incorrect_response")
+                        if not incorrect_response and message_history:
+                            # Find the first assistant response in the conversation
+                            for msg in message_history:
+                                if msg.get("role") == "assistant":
+                                    incorrect_response = msg.get("content")
+                                    LOGGER.info("Using first bot response as incorrect_response for PR")
+                                    break
+
                         pr_result = await create_pr_for_slack_context(
                             slack_context_id, domain_to_use, incorrect_response
                         )

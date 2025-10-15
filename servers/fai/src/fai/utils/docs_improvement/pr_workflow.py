@@ -64,17 +64,20 @@ async def create_pr_for_slack_context(
 
         # Step 3: Fetch the current content from GitHub
         content_fetcher = DocsContentFetcher(github_token=VARIABLES.GITHUB_TOKEN)
-        docs_content = content_fetcher.fetch_content_from_url(target_docs_url, domain)
+        docs_content = await content_fetcher.fetch_content_from_url(target_docs_url, domain)
 
         if not docs_content:
             return {"success": False, "pr_url": None, "error": f"Failed to fetch content from {target_docs_url}"}
 
-        # Extract repo info
-        repo_info = content_fetcher.get_repo_from_domain(domain)
-        if not repo_info:
-            return {"success": False, "pr_url": None, "error": f"Failed to find GitHub repo for domain {domain}"}
-
-        repo_owner, repo_name = repo_info
+        # Extract repo info - hardcode for buildwithfern.com
+        if "buildwithfern.com" in domain:
+            repo_owner = "fern-api"
+            repo_name = "docs"
+        else:
+            repo_info = content_fetcher.get_repo_from_domain(domain)
+            if not repo_info:
+                return {"success": False, "pr_url": None, "error": f"Failed to find GitHub repo for domain {domain}"}
+            repo_owner, repo_name = repo_info
 
         # Step 4: Generate improved content using LLM
         improvement_generator = ImprovementGenerator()
