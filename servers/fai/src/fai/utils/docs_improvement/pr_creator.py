@@ -209,6 +209,7 @@ class GitHubPRCreator:
         summary: str,
         slack_context_id: str,
         base_branch: str = "main",
+        incorrect_response: str | None = None,
     ) -> PRResult:
         """Create a complete PR for a docs improvement.
 
@@ -227,6 +228,7 @@ class GitHubPRCreator:
             summary: Summary of the improvement
             slack_context_id: ID of the slack context
             base_branch: Base branch to branch from (default: main)
+            incorrect_response: Optional incorrect response that was given
 
         Returns:
             PRResult with PR details
@@ -261,14 +263,21 @@ class GitHubPRCreator:
                 )
 
             # Step 3: Create PR
-            pr_title = f"docs: {summary}"
-            pr_body = f"""{summary}
+            # Extract file slug from path (e.g., "fern/docs/pages/slack-app.mdx" -> "slack-app")
+            file_slug = file_path.split("/")[-1].replace(".mdx", "").replace(".md", "")
+            pr_title = f"Improvements to {file_slug}"
 
-**Question:** {question}
+            # Build PR body
+            pr_body_parts = [f"**Question:** {question}"]
 
-**File:** `{file_path}`
-**Source:** Slack Context `{slack_context_id}`
-"""
+            if incorrect_response:
+                pr_body_parts.append(f"\n**Incorrect Response:**\n{incorrect_response}")
+
+            pr_body_parts.append(f"\n**Ideal Response:**\n{ideal_response}")
+            pr_body_parts.append(f"\n**File:** `{file_path}`")
+            pr_body_parts.append(f"**Source:** Slack Context `{slack_context_id}`")
+
+            pr_body = "\n".join(pr_body_parts)
 
             return self.create_pull_request(repo_owner, repo_name, pr_title, pr_body, branch_name, base_branch)
 

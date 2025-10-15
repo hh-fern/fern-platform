@@ -152,27 +152,12 @@ class ImprovementGenerator:
         """
         try:
             async with AsyncAnthropic(api_key=self.anthropic_api_key) as client:
-                # Build context about incorrect response if provided
-                if incorrect_response:
-                    incorrect_context = (
-                        f" The system initially gave an incorrect or incomplete response, "
-                        f"and we need to update the docs so this doesn't happen again."
-                    )
-                    incorrect_section = f"""**Incorrect Response Given:**
-{incorrect_response}
-
-"""
-                else:
-                    incorrect_context = " We now have the ideal answer, and need to naturally incorporate this information into the existing documentation."
-                    incorrect_section = ""
-
                 # Generate the improvement
                 prompt = IMPROVEMENT_PROMPT.format(
                     question=question,
                     ideal_response=ideal_response,
                     current_content=current_content,
-                    incorrect_context=incorrect_context,
-                    incorrect_section=incorrect_section,
+                    incorrect_response=incorrect_response or "N/A",
                 )
 
                 response = await client.messages.create(

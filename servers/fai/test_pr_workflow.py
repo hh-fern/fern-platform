@@ -183,6 +183,7 @@ async def test_pr_workflow(
             ideal_response=ideal_response,
             summary=improvement_result.summary,
             slack_context_id="test-" + docs_content.content_hash[:8],
+            incorrect_response=incorrect_response,
         )
 
         if pr_result.success:
