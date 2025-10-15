@@ -21,16 +21,24 @@ class ImprovementResult:
     error: str | None = None
 
 
-IMPROVEMENT_PROMPT = """You are a technical documentation editor specializing in API documentation.
-Your task is to improve an existing documentation page by incorporating new information that was found to be missing.
+IMPROVEMENT_PROMPT = """
+You are a technical documentation editor specializing in developer documentation.
+Your task is to improve an existing documentation page by addressing a content gap.
 
 **Context:**
-A user asked a question that our docs didn't adequately answer.{incorrect_context}
+A user asked a question that our docs didn't adequately answer. You now have 
+both the incorrect answer that was initially provided and the ideal answer. 
+Use this context to understand what was missing and incorporate the correct 
+information into the existing documentation to create the best possible 
+resource for future readers.
 
 **Question Asked:**
 {question}
 
-{incorrect_section}**Ideal Answer:**
+**Incorrect Answer:**
+{incorrect_response}
+
+**Ideal Answer:**
 {ideal_response}
 
 **Current Documentation Content:**
@@ -38,27 +46,68 @@ A user asked a question that our docs didn't adequately answer.{incorrect_contex
 {current_content}
 ```
 
-**Your Task:**
-Improve the documentation by naturally incorporating the information from the ideal answer. Follow these guidelines:
+**Your Mission:**
+Transform this documentation into the definitive resource that would have 
+perfectly answered the user's question. You have complete editorial authority.
 
-1. **Maintain Style**: Keep the existing tone, style, and formatting conventions
-2. **Preserve Structure**: Keep the existing document structure, headings, and organization
-3. **Natural Integration**: Don't just append the answer - weave it into the appropriate section(s)
-4. **Keep Frontmatter**: If there's YAML frontmatter at the top (between `---` markers), preserve it exactly
-5. **MDX Components**: Preserve any MDX/JSX components exactly as they are (e.g., `<Callout>`, `<CodeBlock>`)
-6. **Accuracy**: Only add information that directly addresses the gap revealed by the question
-7. **Clarity**: Ensure the improved content flows naturally and improves clarity
-8. **Brevity**: Add what's needed, but don't be unnecessarily verbose
+**Guidelines:**
+
+**Content Quality:**
+- **Stay focused**: Only edit content directly related to the question and answer pair
+- **Edit strategically**: Rewrite sections that caused the incorrect answer to be given
+- **Remove selectively**: Only cut information that conflicts with or obscures the ideal answer
+- **Add purposefully**: Incorporate the ideal answer where it makes the most sense
+- **Preserve unrelated content**: Leave other sections unchanged even if they could be improved
+- **Learn from mistakes**: Use the incorrect answer to identify what was confusing or missing
+
+**Structure & Organization:**
+- **Restructure if needed**: Rearrange sections to improve logical flow (only for relevant content)
+- **Use clear headings**: Make content scannable with descriptive section titles
+- **Lead with essentials**: Put the most important information first
+- **Group related content**: Keep similar concepts together
+
+**Fern Components (use when they add value):**
+- `<Callout intent="info|warn|error|success">` - Highlight critical information
+- `<CodeBlock title="filename.ext">` - Provide syntax-highlighted code examples
+- `<Accordion title="...">` - Hide advanced/optional details
+- `<Steps>` with `<Step title="...">` - Document sequential processes
+- `<Cards>` with `<Card title="...">` - Present options or related topics
+- `<Tabs>` with `<Tab title="...">` - Show alternative approaches/languages
+- Full reference: https://buildwithfern.com/learn/docs/writing-content/components/llms.txt
+
+**Style:**
+- **Be concise**: Every sentence should earn its place
+- **Be specific**: Use concrete examples over abstract explanations
+- **Be consistent**: Match the existing tone and terminology
+- **Be developer-friendly**: Write for busy engineers who need to get things done
+
+**Constraints:**
+- Preserve YAML frontmatter exactly (content between `---` markers)
+- Maintain existing MDX/JSX component syntax
+- Keep links and references functional
+- Don't invent information beyond the ideal answer
+- Don't fix unrelated issues in the documentation
+
+**Quality Checklist:**
+Before finalizing, verify:
+- [ ] Would this page fully answer the user's original question?
+- [ ] Is the new information easy to find and understand?
+- [ ] Have you removed anything confusing or incorrect?
+- [ ] Are code examples clear and complete?
+- [ ] Does the content flow naturally?
+- [ ] Does it prevent the incorrect answer from being given again?
+- [ ] Have you left unrelated content unchanged?
 
 **Output Format:**
-Respond with ONLY the complete improved markdown content.
-Do not include explanations, comments, or meta-discussion - just the improved documentation.
+Respond with ONLY the improved markdown content - no explanations, comments, 
+or preamble. Start immediately with the documentation.
 
-Begin your response with the improved documentation:"""
+---
+"""
 
 
-SUMMARY_PROMPT = """You are analyzing changes made to a documentation page.
-Provide a concise 1-2 sentence summary of what changed.
+SUMMARY_PROMPT = """
+You are analyzing documentation changes to create a clear change summary.
 
 **Original Content:**
 ```markdown
@@ -70,7 +119,14 @@ Provide a concise 1-2 sentence summary of what changed.
 {improved_content}
 ```
 
-Provide a brief summary of the key improvements made (1-2 sentences):"""
+**Task:**
+Provide a concise summary (1-3 sentences) covering:
+1. What information was added or clarified
+2. What was removed or restructured (if significant)
+3. The overall improvement to user experience
+
+Summary:
+"""
 
 
 class ImprovementGenerator:
