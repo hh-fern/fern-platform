@@ -208,6 +208,8 @@ class GitHubPRCreator:
         ideal_response: str,
         summary: str,
         slack_context_id: str,
+        pr_title: str | None = None,
+        pr_body: str | None = None,
         base_branch: str = "main",
     ) -> PRResult:
         """Create a complete PR for a docs improvement.
@@ -261,16 +263,18 @@ class GitHubPRCreator:
                 )
 
             # Step 3: Create PR
-            pr_title = f"docs: {summary}"
-            pr_body = f"""{summary}
+            final_title = pr_title if pr_title is not None else f"docs: {summary}"
+            final_body = (
+                pr_body
+                if pr_body is not None
+                else (
+                    f"""{summary}\n\n**Question:** {question}\n\n**File:** `{file_path}`\n**Source:** Slack Context `{slack_context_id}`\n"""
+                )
+            )
 
-**Question:** {question}
-
-**File:** `{file_path}`
-**Source:** Slack Context `{slack_context_id}`
-"""
-
-            return self.create_pull_request(repo_owner, repo_name, pr_title, pr_body, branch_name, base_branch)
+            return self.create_pull_request(
+                repo_owner, repo_name, final_title, final_body, branch_name, base_branch
+            )
 
         except Exception as e:
             error_msg = str(e)

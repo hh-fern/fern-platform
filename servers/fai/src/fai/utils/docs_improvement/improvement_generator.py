@@ -17,6 +17,8 @@ class ImprovementResult:
     original_content: str
     improved_content: str
     summary: str
+    pr_title: str | None
+    pr_description: str | None
     success: bool
     error: str | None = None
 
@@ -120,12 +122,44 @@ You are analyzing documentation changes to create a clear change summary.
 ```
 
 **Task:**
-Provide a concise summary (1-3 sentences) covering:
+Provide a concise summary. Make it as concise as is helpful to a busy software developer, probably 1-3 sentences. Have it cover:
 1. What information was added or clarified
 2. What was removed or restructured (if significant)
 3. The overall improvement to user experience
 
 Summary:
+"""
+
+
+PR_METADATA_PROMPT = """
+You are helping create a high-quality GitHub pull request for documentation changes.
+
+Provide a concise PR title and a helpful PR description based on the following inputs.
+
+Constraints:
+- Title must start with the conventional prefix "docs:" and be under 72 characters if possible.
+- Description should be concise and scannable for busy reviewers.
+- Do not include implementation details unrelated to docs content.
+
+Inputs:
+**Question:**
+{question}
+
+**Ideal Answer:**
+{ideal_response}
+
+**Original Content (truncated):**
+```markdown
+{original_content}
+```
+
+**Improved Content (truncated):**
+```markdown
+{improved_content}
+```
+
+Required Output (strict JSON with keys title, description):
+{"title": "...", "description": "..."}
 """
 
 
@@ -186,6 +220,8 @@ class ImprovementGenerator:
                         original_content=current_content,
                         improved_content=current_content,
                         summary="",
+                        pr_title=None,
+                        pr_description=None,
                         success=False,
                         error="No response from LLM",
                     )
@@ -195,12 +231,23 @@ class ImprovementGenerator:
                 # Generate a summary of changes
                 summary = await self._generate_summary(current_content, improved_content)
 
+                # Generate PR title and description
+                pr_title, pr_description = await self._generate_pr_metadata(
+                    question=question,
+                    ideal_response=ideal_response,
+                    original_content=current_content,
+                    improved_content=improved_content,
+                    summary=summary,
+                )
+
                 LOGGER.info(f"Successfully generated improvement. Summary: {summary}")
 
                 return ImprovementResult(
                     original_content=current_content,
                     improved_content=improved_content,
                     summary=summary,
+                    pr_title=pr_title,
+                    pr_description=pr_description,
                     success=True,
                 )
 
@@ -210,6 +257,8 @@ class ImprovementGenerator:
                 original_content=current_content,
                 improved_content=current_content,
                 summary="",
+                pr_title=None,
+                pr_description=None,
                 success=False,
                 error=str(e),
             )
@@ -249,3 +298,65 @@ class ImprovementGenerator:
         except Exception as e:
             LOGGER.warning(f"Error generating summary: {e}")
             return "Updated documentation content"
+
+    async def _generate_pr_metadata(
+        self,
+        *,
+        question: str,
+        ideal_response: str,
+        original_content: str,
+        improved_content: str,
+        summary: str,
+    ) -> tuple[str | None, str | None]:
+        """Generate a PR title and description using the LLM.
+
+        Returns a tuple of (title, description). If generation fails, returns (None, None).
+        """
+        try:
+            # Truncate large contents to keep prompt compact
+            max_length = 2500
+            orig_truncated = original_content[:max_length]
+            improved_truncated = improved_content[:max_length]
+
+            async with AsyncAnthropic(api_key=self.anthropic_api_key) as client:
+                prompt = PR_METADATA_PROMPT.format(
+                    question=question,
+                    ideal_response=ideal_response,
+                    original_content=orig_truncated,
+                    improved_content=improved_truncated,
+                )
+
+                response = await client.messages.create(
+                    model=self.model,
+                    max_tokens=300,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+
+                if not response.content or len(response.content) == 0:
+                    return None, None
+
+                raw_text = response.content[0].text.strip()
+
+                # Try to parse strict JSON; if it fails, attempt to heuristically extract
+                import json
+
+                try:
+                    data = json.loads(raw_text)
+                    title_str = str(data.get("title", "")).strip()
+                    desc_str = str(data.get("description", "")).strip()
+                except Exception:
+                    # Fallback: build from summary
+                    title_str = f"docs: {summary}" if summary else None
+                    desc_str = summary or None
+
+                # Final validation and trimming
+                if title_str:
+                    title_str = title_str if title_str.startswith("docs:") else f"docs: {title_str}"
+                    if len(title_str) > 120:
+                        title_str = title_str[:117] + "..."
+
+                return title_str or None, desc_str or None
+
+        except Exception as e:
+            LOGGER.warning(f"Error generating PR metadata: {e}")
+            return None, None

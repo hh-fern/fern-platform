@@ -94,6 +94,29 @@ async def create_pr_for_slack_context(
 
         # Step 5: Create GitHub PR
         pr_creator = GitHubPRCreator(github_token=VARIABLES.GITHUB_TOKEN)
+        # Prefer LLM-generated PR title/description and fall back to summary-based defaults
+        explicit_pr_title = (
+            improvement_result.pr_title
+            if improvement_result.pr_title
+            else "(docs): improvement from the Ask Fern Slack app"
+        )
+        # Prepare base description (prefer LLM); we'll add Slack link/footer below
+        base_description = (
+            improvement_result.pr_description
+            if improvement_result.pr_description
+            else "This documentation change originated from a thread in Slack."
+        )
+
+        # If we have a stored Slack permalink, include it
+        slack_link_line = ""
+        if getattr(slack_context, "slack_permalink", None):
+            slack_link_line = f"\n\nSlack thread: {slack_context.slack_permalink}"
+
+        # Always add explicit provenance note about Ask Fern Slack app
+        explicit_pr_body = base_description.rstrip() + slack_link_line + (
+            f"\n\n**Source:** Created via Ask Fern Slack app (context `{slack_context_id}`)\n"
+        )
+
         pr_result = pr_creator.create_improvement_pr(
             repo_owner=repo_owner,
             repo_name=repo_name,
@@ -103,6 +126,8 @@ async def create_pr_for_slack_context(
             ideal_response=slack_context.ideal_response,
             summary=improvement_result.summary,
             slack_context_id=slack_context_id,
+            pr_title=explicit_pr_title,
+            pr_body=explicit_pr_body,
         )
 
         if pr_result.success:

@@ -30,6 +30,9 @@ class SlackContextDb(Base):
     question = Column(String, nullable=False)
     ideal_response = Column(String, nullable=False)
     citations = Column(ARRAY(String), nullable=True)  # URLs from RAG responses
+    channel = Column(String, nullable=True)
+    thread_ts = Column(String, nullable=True)
+    slack_permalink = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False)
     updated_at = Column(DateTime(timezone=True), nullable=False)
 

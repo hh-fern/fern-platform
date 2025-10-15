@@ -255,7 +255,13 @@ async def log_query_to_db(
 
 
 async def save_slack_context_to_db(
-    question: str, ideal_response: str, domain: str, citations: list[str] | None = None
+    question: str,
+    ideal_response: str,
+    domain: str,
+    citations: list[str] | None = None,
+    channel: str | None = None,
+    thread_ts: str | None = None,
+    slack_permalink: str | None = None,
 ) -> str | None:
     try:
         slack_context_id = str(uuid4())
@@ -268,6 +274,9 @@ async def save_slack_context_to_db(
                 question=question,
                 ideal_response=ideal_response,
                 citations=citations,
+                channel=channel,
+                thread_ts=thread_ts,
+                slack_permalink=slack_permalink,
                 created_at=now,
                 updated_at=now,
             )
@@ -499,11 +508,25 @@ async def handle_slack_message(
             )
             LOGGER.info(f"Fetched {len(citations)} citations for question")
 
+            # Try to fetch a Slack permalink for the thread/message
+            permalink: str | None = None
+            try:
+                if integration.slack_bot_token and context.channel and context.thread_ts:
+                    client = AsyncWebClient(token=integration.slack_bot_token)
+                    result = await client.chat_getPermalink(channel=context.channel, message_ts=context.thread_ts)
+                    if result.get("ok") and result.get("permalink"):
+                        permalink = str(result["permalink"])  # type: ignore[index]
+            except Exception as e:
+                LOGGER.warning(f"Failed to fetch Slack permalink: {e}")
+
             slack_context_id = await save_slack_context_to_db(
                 question=context_data["question"],
                 ideal_response=context_data["ideal_response"],
                 domain=domain_to_use,
                 citations=citations,
+                channel=context.channel,
+                thread_ts=context.thread_ts,
+                slack_permalink=permalink,
             )
             if slack_context_id:
                 LOGGER.info(f"Successfully saved and synced SlackContext: {slack_context_id}")
