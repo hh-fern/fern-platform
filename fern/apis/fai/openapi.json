@@ -92,9 +92,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -177,9 +175,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -252,9 +248,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/analytics/insights/trigger_scheduled": {
@@ -272,9 +266,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/analytics/scheduler/status": {
@@ -292,9 +284,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/chat/{domain}": {
@@ -344,9 +334,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -400,9 +388,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -447,9 +433,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -471,9 +455,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/document/{domain}/create": {
@@ -527,9 +509,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -592,9 +572,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -658,9 +636,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -712,9 +688,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -769,9 +743,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -830,9 +802,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -913,9 +883,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -960,9 +928,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -1017,9 +983,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/feedback/{domain}/{conversation_id}": {
@@ -1068,9 +1032,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -1125,9 +1087,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -1191,9 +1151,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -1245,9 +1203,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -1299,9 +1255,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -1382,9 +1336,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -1407,9 +1359,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/index/{domain}/reconstruct": {
@@ -1449,9 +1399,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -1506,9 +1454,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -1553,9 +1499,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/mcp/semantic/{domain}": {
@@ -1605,9 +1549,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -1662,9 +1604,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -1719,9 +1659,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -1877,9 +1815,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -1925,9 +1861,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/settings/ask-ai/docs": {
@@ -1968,9 +1902,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/settings/ask-ai/toggle": {
@@ -2030,9 +1962,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -2087,9 +2017,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -2135,9 +2063,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ],
+        "x-fern-audiences": ["internal"],
         "security": [
           {
             "bearerAuth": []
@@ -2180,9 +2106,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/slack/integrations": {
@@ -2221,9 +2145,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/slack/events": {
@@ -2240,9 +2162,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/slack/slash-commands": {
@@ -2259,9 +2179,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/slack/interactions": {
@@ -2278,9 +2196,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/slack/oauth/callback": {
@@ -2334,9 +2250,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/slack/get-install": {
@@ -2374,9 +2288,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "customers"
-        ],
+        "x-fern-audiences": ["customers"],
         "security": [
           {
             "bearerAuth": []
@@ -2419,9 +2331,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     },
     "/slack/get-install/{integration_id}": {
@@ -2459,9 +2369,7 @@
             }
           }
         },
-        "x-fern-audiences": [
-          "internal"
-        ]
+        "x-fern-audiences": ["internal"]
       }
     }
   },
@@ -2471,10 +2379,7 @@
         "properties": {
           "role": {
             "type": "string",
-            "enum": [
-              "user",
-              "assistant"
-            ],
+            "enum": ["user", "assistant"],
             "title": "Role"
           },
           "content": {
@@ -2483,10 +2388,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "role",
-          "content"
-        ],
+        "required": ["role", "content"],
         "title": "ChatMessage"
       },
       "Conversation": {
@@ -2509,11 +2411,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "conversation_id",
-          "created_at",
-          "turns"
-        ],
+        "required": ["conversation_id", "created_at", "turns"],
         "title": "Conversation"
       },
       "ConversationTurn": {
@@ -2543,11 +2441,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "role",
-          "text",
-          "created_at"
-        ],
+        "required": ["role", "text", "created_at"],
         "title": "ConversationTurn"
       },
       "ConversationTurnFeedback": {
@@ -2569,9 +2463,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "is_helpful"
-        ],
+        "required": ["is_helpful"],
         "title": "ConversationTurnFeedback"
       },
       "CreateDocumentRequest": {
@@ -2670,9 +2562,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "document"
-        ],
+        "required": ["document"],
         "title": "CreateDocumentRequest"
       },
       "CreateDocumentResponse": {
@@ -2684,9 +2574,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "document_id"
-        ],
+        "required": ["document_id"],
         "title": "CreateDocumentResponse"
       },
       "CreateFeedbackRequest": {
@@ -2737,14 +2625,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "conversation_id",
-          "query_id",
-          "domain",
-          "is_helpful",
-          "feedback_message",
-          "user_email"
-        ],
+        "required": ["conversation_id", "query_id", "domain", "is_helpful", "feedback_message", "user_email"],
         "title": "CreateFeedbackRequest"
       },
       "CreateFeedbackResponse": {
@@ -2756,9 +2637,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "feedback_id"
-        ],
+        "required": ["feedback_id"],
         "title": "CreateFeedbackResponse"
       },
       "CreateGuidanceRequest": {
@@ -2778,10 +2657,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "context",
-          "document"
-        ],
+        "required": ["context", "document"],
         "title": "CreateGuidanceRequest"
       },
       "CreateGuidanceResponse": {
@@ -2793,9 +2669,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "guidance_id"
-        ],
+        "required": ["guidance_id"],
         "title": "CreateGuidanceResponse"
       },
       "CreateQueryResponse": {
@@ -2807,9 +2681,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "query_id"
-        ],
+        "required": ["query_id"],
         "title": "CreateQueryResponse"
       },
       "CreateSlackIntegration": {
@@ -2820,9 +2692,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "domain"
-        ],
+        "required": ["domain"],
         "title": "CreateSlackIntegration"
       },
       "DeleteDocumentRequest": {
@@ -2834,9 +2704,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "document_id"
-        ],
+        "required": ["document_id"],
         "title": "DeleteDocumentRequest"
       },
       "DeleteDocumentResponse": {
@@ -2848,9 +2716,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "success"
-        ],
+        "required": ["success"],
         "title": "DeleteDocumentResponse"
       },
       "DeleteGuidanceResponse": {
@@ -2862,9 +2728,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "success"
-        ],
+        "required": ["success"],
         "title": "DeleteGuidanceResponse"
       },
       "DiscordIntegrationResponse": {
@@ -2875,9 +2739,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "integration_url"
-        ],
+        "required": ["integration_url"],
         "title": "DiscordIntegrationResponse"
       },
       "Document": {
@@ -2979,14 +2841,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "document_id",
-          "domain",
-          "chunk",
-          "document",
-          "created_at",
-          "updated_at"
-        ],
+        "required": ["document_id", "domain", "chunk", "document", "created_at", "updated_at"],
         "title": "Document"
       },
       "Feedback": {
@@ -3036,13 +2891,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "query_id",
-          "conversation_id",
-          "domain",
-          "is_helpful",
-          "created_at"
-        ],
+        "required": ["query_id", "conversation_id", "domain", "is_helpful", "created_at"],
         "title": "Feedback"
       },
       "GetConversationResponse": {
@@ -3053,9 +2902,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "conversation"
-        ],
+        "required": ["conversation"],
         "title": "GetConversationResponse"
       },
       "GetDocumentResponse": {
@@ -3066,9 +2913,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "document"
-        ],
+        "required": ["document"],
         "title": "GetDocumentResponse"
       },
       "GetDocumentsResponse": {
@@ -3087,10 +2932,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "documents",
-          "pagination"
-        ],
+        "required": ["documents", "pagination"],
         "title": "GetDocumentsResponse"
       },
       "GetFeedbackResponse": {
@@ -3101,9 +2943,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "feedback"
-        ],
+        "required": ["feedback"],
         "title": "GetFeedbackResponse"
       },
       "GetGuidanceResponse": {
@@ -3114,9 +2954,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "guidance"
-        ],
+        "required": ["guidance"],
         "title": "GetGuidanceResponse"
       },
       "GetGuidancesResponse": {
@@ -3135,10 +2973,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "guidances",
-          "pagination"
-        ],
+        "required": ["guidances", "pagination"],
         "title": "GetGuidancesResponse"
       },
       "GetHistogramAnalyticsResponse": {
@@ -3153,9 +2988,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "bars"
-        ],
+        "required": ["bars"],
         "title": "GetHistogramAnalyticsResponse"
       },
       "GetInsightsResponse": {
@@ -3170,9 +3003,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "insights"
-        ],
+        "required": ["insights"],
         "title": "GetInsightsResponse"
       },
       "GetMcpBmfQueryRequest": {
@@ -3184,9 +3015,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "keywords"
-        ],
+        "required": ["keywords"],
         "title": "GetMcpBmfQueryRequest"
       },
       "GetMcpBmfQueryResponse": {
@@ -3201,9 +3030,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "documents"
-        ],
+        "required": ["documents"],
         "title": "GetMcpBmfQueryResponse"
       },
       "GetMcpSemanticQueryRequest": {
@@ -3215,9 +3042,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "semantic_query"
-        ],
+        "required": ["semantic_query"],
         "title": "GetMcpSemanticQueryRequest"
       },
       "GetMcpSemanticQueryResponse": {
@@ -3232,9 +3057,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "documents"
-        ],
+        "required": ["documents"],
         "title": "GetMcpSemanticQueryResponse"
       },
       "GetQueriesResponse": {
@@ -3253,10 +3076,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "queries",
-          "pagination"
-        ],
+        "required": ["queries", "pagination"],
         "title": "GetQueriesResponse"
       },
       "GetSettingsResponse": {
@@ -3280,18 +3100,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "ask_ai_enabled"
-        ],
+        "required": ["ask_ai_enabled"],
         "title": "GetSettingsResponse"
       },
       "GroupBy": {
         "type": "string",
-        "enum": [
-          "DAY",
-          "WEEK",
-          "MONTH"
-        ],
+        "enum": ["DAY", "WEEK", "MONTH"],
         "title": "GroupBy"
       },
       "Guidance": {
@@ -3327,14 +3141,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "domain",
-          "context",
-          "document",
-          "guidance_id",
-          "created_at",
-          "updated_at"
-        ],
+        "required": ["domain", "context", "document", "guidance_id", "created_at", "updated_at"],
         "title": "Guidance"
       },
       "HTTPValidationError": {
@@ -3395,10 +3202,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "query",
-          "conversationId"
-        ],
+        "required": ["query", "conversationId"],
         "title": "InsightExample"
       },
       "InsightWithMetadata": {
@@ -3420,11 +3224,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "insightText",
-          "numberOfQueries",
-          "examples"
-        ],
+        "required": ["insightText", "numberOfQueries", "examples"],
         "title": "InsightWithMetadata"
       },
       "JobStatusResponse": {
@@ -3497,19 +3297,12 @@
           }
         },
         "type": "object",
-        "required": [
-          "job_id",
-          "status",
-          "created_at"
-        ],
+        "required": ["job_id", "status", "created_at"],
         "title": "JobStatusResponse"
       },
       "LanguageModel": {
         "type": "string",
-        "enum": [
-          "claude-4-sonnet-20250514",
-          "command-a-03-2025"
-        ],
+        "enum": ["claude-4-sonnet-20250514", "command-a-03-2025"],
         "title": "LanguageModel"
       },
       "PaginationResponse": {
@@ -3528,11 +3321,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "total",
-          "page",
-          "limit"
-        ],
+        "required": ["total", "page", "limit"],
         "title": "PaginationResponse"
       },
       "PostChatCompletionRequest": {
@@ -3570,9 +3359,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "messages"
-        ],
+        "required": ["messages"],
         "title": "PostChatCompletionRequest"
       },
       "PostChatCompletionResponse": {
@@ -3595,10 +3382,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "turns",
-          "citations"
-        ],
+        "required": ["turns", "citations"],
         "title": "PostChatCompletionResponse"
       },
       "Query": {
@@ -3645,15 +3429,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "query_id",
-          "conversation_id",
-          "domain",
-          "text",
-          "role",
-          "source",
-          "created_at"
-        ],
+        "required": ["query_id", "conversation_id", "domain", "text", "role", "source", "created_at"],
         "title": "Query"
       },
       "ReconstructIndexResponse": {
@@ -3665,9 +3441,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "success"
-        ],
+        "required": ["success"],
         "title": "ReconstructIndexResponse"
       },
       "SlackIntegrationResponse": {
@@ -3721,11 +3495,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "integration_id",
-          "domain",
-          "created_at"
-        ],
+        "required": ["integration_id", "domain", "created_at"],
         "title": "SlackIntegrationResponse"
       },
       "SyncIndexRequest": {
@@ -3737,9 +3507,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "index_name"
-        ],
+        "required": ["index_name"],
         "title": "SyncIndexRequest"
       },
       "SyncIndexResponse": {
@@ -3751,9 +3519,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "job_id"
-        ],
+        "required": ["job_id"],
         "title": "SyncIndexResponse"
       },
       "ToggleAskAiResponse": {
@@ -3782,10 +3548,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "success",
-          "ask_ai_enabled"
-        ],
+        "required": ["success", "ask_ai_enabled"],
         "title": "ToggleAskAiResponse"
       },
       "ToggleStatusResponse": {
@@ -3814,10 +3577,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "status",
-          "ask_ai_enabled"
-        ],
+        "required": ["status", "ask_ai_enabled"],
         "title": "ToggleStatusResponse"
       },
       "UpdateDocumentRequest": {
@@ -3933,9 +3693,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "document"
-        ],
+        "required": ["document"],
         "title": "UpdateDocumentResponse"
       },
       "UpdateGuidanceRequest": {
@@ -3979,9 +3737,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "guidance"
-        ],
+        "required": ["guidance"],
         "title": "UpdateGuidanceResponse"
       },
       "UpstashCallbackRequest": {
@@ -4090,10 +3846,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "status",
-          "sourceMessageId"
-        ],
+        "required": ["status", "sourceMessageId"],
         "title": "UpstashCallbackRequest",
         "description": "Callback payload from Upstash QStash when a queued job completes."
       },
@@ -4123,11 +3876,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
+        "required": ["loc", "msg", "type"],
         "title": "ValidationError"
       }
     },
