@@ -63,7 +63,7 @@ export default function WebAnalyticsPage({ docsUrl }: WebAnalyticsPageProps) {
                     size="sm"
                     onClick={() => refreshMutation.mutate()}
                     disabled={refreshMutation.isPending}
-                    className="gap-2"
+                    className="gap-2 px-3 py-1.5"
                 >
                     <RefreshCwIcon className={`size-4 ${refreshMutation.isPending ? "animate-spin" : ""}`} />
                     Refresh
