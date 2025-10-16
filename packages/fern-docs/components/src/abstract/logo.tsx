@@ -10,37 +10,8 @@ export interface AbstractLogoProps {
     onError?: (theme: "light" | "dark", src: string) => void;
 }
 
-function getLogoCacheKey(theme: "light" | "dark"): string {
-    if (typeof window === "undefined") {
-        return "";
-    }
-    return `fern-logo-cache-${theme}-${window.location.host}`;
-}
-
-function getCachedLogo(theme: "light" | "dark"): string | null {
-    if (typeof window === "undefined" || typeof localStorage === "undefined") {
-        return null;
-    }
-    try {
-        return localStorage.getItem(getLogoCacheKey(theme));
-    } catch {
-        return null;
-    }
-}
-
-function cacheLogo(theme: "light" | "dark", src: string): void {
-    if (typeof window === "undefined" || typeof localStorage === "undefined") {
-        return;
-    }
-    try {
-        localStorage.setItem(getLogoCacheKey(theme), src);
-    } catch {}
-}
-
 export function AbstractLogo({ logo, alt, onError }: AbstractLogoProps) {
     const { light, dark, height } = logo;
-    const [lightSrc, setLightSrc] = React.useState(light?.src);
-    const [darkSrc, setDarkSrc] = React.useState(dark?.src);
     const [revalidationTriggered, setRevalidationTriggered] = React.useState(false);
 
     const style = {
@@ -48,30 +19,11 @@ export function AbstractLogo({ logo, alt, onError }: AbstractLogoProps) {
         width: "auto"
     };
 
-    React.useEffect(() => {
-        if (light?.src) {
-            cacheLogo("light", light.src);
-        }
-    }, [light?.src]);
-
-    React.useEffect(() => {
-        if (dark?.src) {
-            cacheLogo("dark", dark.src);
-        }
-    }, [dark?.src]);
-
     const handleLogoError = React.useCallback(
         (theme: "light" | "dark", src: string) => {
             onError?.(theme, src);
 
-            const cachedSrc = getCachedLogo(theme);
-            if (cachedSrc && cachedSrc !== src) {
-                if (theme === "light") {
-                    setLightSrc(cachedSrc);
-                } else {
-                    setDarkSrc(cachedSrc);
-                }
-            } else if (!revalidationTriggered) {
+            if (!revalidationTriggered) {
                 setRevalidationTriggered(true);
                 triggerRevalidation();
             }
@@ -87,7 +39,7 @@ export function AbstractLogo({ logo, alt, onError }: AbstractLogoProps) {
                         "block dark:hidden": !!dark
                     })}
                     alt={alt ?? light.alt ?? "Logo"}
-                    src={lightSrc ?? light.src}
+                    src={light.src}
                     height={light.height}
                     width={light.width}
                     blurDataURL={light.blurDataURL}
@@ -104,7 +56,7 @@ export function AbstractLogo({ logo, alt, onError }: AbstractLogoProps) {
                         "hidden dark:block": !!light
                     })}
                     alt={alt ?? dark.alt ?? "Logo"}
-                    src={darkSrc ?? dark.src}
+                    src={dark.src}
                     height={dark.height}
                     width={dark.width}
                     blurDataURL={dark.blurDataURL}
