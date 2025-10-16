@@ -76,7 +76,9 @@ jobs:
         uses: ./.github/actions/install
 
       - name: run build:tsup:cjs
-        run: pnpm --filter @fern-platform/mdx-bundler run build:tsup:cjs
+        run: |
+          pnpm install --recursive --ignore-scripts=false
+          pnpm --filter @fern-platform/mdx-bundler run build:tsup:cjs
 
       - name: Build container
         run: docker build -f servers/mdx-bundler/Dockerfile -t mdx-bundler:local .
