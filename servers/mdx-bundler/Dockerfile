@@ -14,6 +14,8 @@ RUN npm install
 COPY servers/mdx-bundler/cjs/server.cjs .
 COPY servers/mdx-bundler/scripts/run-server.sh .
 
+RUN apk upgrade --no-cache
+
 # Make the wrapper script executable
 RUN chmod +x ./run-server.sh
 
