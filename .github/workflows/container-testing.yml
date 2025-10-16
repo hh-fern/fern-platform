@@ -57,3 +57,41 @@ jobs:
     # Cleanup needed locally but not in CI
     # - name: cleanup
     #   run: docker compose -f servers/fdr/docker-compose.ete.yml down -v
+
+  mdx-bundler:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    timeout-minutes: 10
+    env:
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install
+        uses: ./.github/actions/install
+
+      - name: run build:tsup:cjs
+        run: npm run build:tsup:cjs
+        working-directory: servers/mdx-bundler
+
+      - name: Build container
+        run: docker build -f servers/mdx-bundler/Dockerfile -t mdx-bundler:local .
+
+      #TODO: Figure out some test to run on container
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "arn:aws:iam::985111089818:role/github-ci"
+          aws-region: "us-east-1"
+
+      - name: Push to ECR for scanning
+        run: |-
+          aws sts get-caller-identity
+          docker tag mdx-bundler:local 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/mdx-bundler-internal:$BRANCH_NAME-${{ github.sha }}
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 985111089818.dkr.ecr.us-east-1.amazonaws.com
+          docker push 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/mdx-bundler-internal:$BRANCH_NAME-${{ github.sha }}
