@@ -77,7 +77,7 @@ jobs:
 
       - name: run build:tsup:cjs
         run: |
-          pnpm install --recursive run build
+          pnpm build
           pnpm --filter @fern-platform/mdx-bundler run build:tsup:cjs
 
       - name: Build container
