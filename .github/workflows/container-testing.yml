@@ -77,8 +77,8 @@ jobs:
       - name: run build:tsup:cjs
         working-directory: servers/mdx-bundler
         run: |
-          pnpm install
-          npm run build:tsup:cjs
+          pnpm install --recursive --ignore-scripts=false
+          pnpm run build:tsup:cjs
 
       - name: Build container
         run: docker build -f servers/mdx-bundler/Dockerfile -t mdx-bundler:local .
