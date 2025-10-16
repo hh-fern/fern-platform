@@ -75,5 +75,8 @@
     "viem": "^2.29.0",
     "vitest": "catalog:",
     "yaml": "^2.3.1"
+  },
+  "overrides": {
+    "esbuild": "catalog:"
   }
 }
