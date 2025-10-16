@@ -34,8 +34,7 @@ function cacheLogo(theme: "light" | "dark", src: string): void {
     }
     try {
         localStorage.setItem(getLogoCacheKey(theme), src);
-    } catch {
-    }
+    } catch {}
 }
 
 export function AbstractLogo({ logo, alt, onError }: AbstractLogoProps) {
