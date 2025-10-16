@@ -83,7 +83,7 @@ jobs:
       - name: Build container
         run: docker build -f servers/mdx-bundler/Dockerfile -t mdx-bundler:local .
 
-      - name: Standup test cluster
+      - name: Standup test container
         run: docker compose -f servers/mdx-builder/docker-compose.yml up -d --wait
 
       - name: Configure AWS Credentials

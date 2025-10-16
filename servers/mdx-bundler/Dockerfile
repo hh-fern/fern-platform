@@ -11,6 +11,7 @@ RUN echo '{"name": "mdx-bundler-server", "dependencies": {"typescript": "^5", "e
 RUN npm install
 
 FROM node:22.16-alpine3.20 AS runtime
+RUN apk upgrade --no-cache
 
 WORKDIR /mdx-bundler
 COPY --from=builder /mdx-bundler/node_modules ./node_modules
