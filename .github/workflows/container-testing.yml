@@ -50,9 +50,10 @@ jobs:
       - name: Push to ECR for scanning
         run: |-
           aws sts get-caller-identity
-          docker tag fern-definition-registry:local 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/fdr-internal:$BRANCH_NAME-${{ github.sha }}
+          SANITIZED_BRANCH="${BRANCH_NAME//\//-}"
+          docker tag fern-definition-registry:local 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/fdr-internal:$SANITIZED_BRANCH-${{ github.sha }}
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 985111089818.dkr.ecr.us-east-1.amazonaws.com
-          docker push 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/fdr-internal:$BRANCH_NAME-${{ github.sha }}
+          docker push 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/fdr-internal:$SANITIZED_BRANCH-${{ github.sha }}
 
     # Cleanup needed locally but not in CI
     # - name: cleanup
@@ -94,6 +95,7 @@ jobs:
       - name: Push to ECR for scanning
         run: |-
           aws sts get-caller-identity
-          docker tag mdx-bundler:local 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/mdx-bundler-internal:$BRANCH_NAME-${{ github.sha }}
+          SANITIZED_BRANCH="${BRANCH_NAME//\//-}"
+          docker tag mdx-bundler:local 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/mdx-bundler-internal:$SANITIZED_BRANCH-${{ github.sha }}
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 985111089818.dkr.ecr.us-east-1.amazonaws.com
-          docker push 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/mdx-bundler-internal:$BRANCH_NAME-${{ github.sha }}
+          docker push 985111089818.dkr.ecr.us-east-1.amazonaws.com/dev/mdx-bundler-internal:$SANITIZED_BRANCH-${{ github.sha }}
