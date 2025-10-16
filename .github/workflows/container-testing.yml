@@ -7,6 +7,7 @@ on:
   pull_request:
     paths:
       - "servers/fdr/**"
+      - "servers/mdx-bundler/**"
       - ".github/workflows/container-testing.yml"
 
   workflow_dispatch:
