@@ -54,7 +54,7 @@ export default function WebAnalyticsPage({ docsUrl }: WebAnalyticsPageProps) {
     });
 
     return (
-        <div className="flex w-full flex-col gap-6">
+        <div className="flex w-full flex-col gap-4">
             {/* Date Range and Refresh Button */}
             <div className="flex items-center gap-2">
                 <SelectDate value={dateRange} onChange={setDateRange} />
