@@ -71,7 +71,7 @@ export default function WebAnalyticsPage({ docsUrl }: WebAnalyticsPageProps) {
             </div>
 
             {/* Metrics Cards using CSS Grid for equal 1/2 spacing */}
-            <div className="flex justify-between">
+            <div className="flex gap-4">
                 <MetricsCard title="Visitors" value={data?.metrics.visitors ?? 0} isLoading={isLoading} error={error} />
                 <MetricsCard
                     title="Page views"
