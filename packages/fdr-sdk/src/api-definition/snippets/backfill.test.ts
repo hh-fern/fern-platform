@@ -104,12 +104,12 @@ describe("backfillSnippets", () => {
 
         const snippets = example?.snippets;
         expect(snippets).toBeDefined();
-        
+
         expect(snippets?.curl).toBeDefined();
         expect(snippets?.curl).toHaveLength(1);
         expect(snippets?.python).toBeDefined();
         expect(snippets?.python).toHaveLength(1);
-        
+
         expect(snippets?.javascript).toBeUndefined();
         expect(snippets?.go).toBeUndefined();
         expect(snippets?.ruby).toBeUndefined();
@@ -201,7 +201,7 @@ describe("backfillSnippets", () => {
 
         const snippets = example?.snippets;
         expect(snippets).toBeDefined();
-        
+
         expect(snippets?.curl).toBeUndefined();
         expect(snippets?.python).toBeDefined();
         expect(snippets?.python).toHaveLength(1);
@@ -209,7 +209,7 @@ describe("backfillSnippets", () => {
         expect(snippets?.javascript).toHaveLength(1);
         expect(snippets?.go).toBeDefined();
         expect(snippets?.go).toHaveLength(1);
-        
+
         expect(snippets?.ruby).toBeUndefined();
         expect(snippets?.java).toBeUndefined();
         expect(snippets?.php).toBeUndefined();

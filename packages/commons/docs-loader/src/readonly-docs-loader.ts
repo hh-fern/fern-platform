@@ -475,7 +475,10 @@ const createGetPrunedApiCached = (domainKey: string, cacheConfig: Required<Cache
                         const settings = await getSettings(cacheConfig)(domainKey);
                         const edgeFlags = await flagsPromise;
                         const flags = {
-                            httpSnippets: settings.httpSnippets !== false ? (settings.httpSnippets || edgeFlags.isHttpSnippetsEnabled) : false,
+                            httpSnippets:
+                                settings.httpSnippets !== false
+                                    ? settings.httpSnippets || edgeFlags.isHttpSnippetsEnabled
+                                    : false,
                             alwaysEnableJavaScriptFetch: settings.useJavascriptAsTypescript
                         };
                         return await backfillSnippets(cached, dynamicIr, flags);
@@ -506,7 +509,8 @@ const createGetPrunedApiCached = (domainKey: string, cacheConfig: Required<Cache
             const settings = await getSettings(cacheConfig)(domainKey);
             const edgeFlags = await flagsPromise;
             const flags = {
-                httpSnippets: settings.httpSnippets !== false ? (settings.httpSnippets || edgeFlags.isHttpSnippetsEnabled) : false,
+                httpSnippets:
+                    settings.httpSnippets !== false ? settings.httpSnippets || edgeFlags.isHttpSnippetsEnabled : false,
                 alwaysEnableJavaScriptFetch: settings.useJavascriptAsTypescript
             };
             return backfillSnippets(pruned, dynamicIr, flags);
