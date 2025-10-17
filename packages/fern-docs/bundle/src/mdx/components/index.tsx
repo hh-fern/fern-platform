@@ -39,6 +39,7 @@ import { Icon } from "./icon/Icon";
 import { If } from "./if";
 import { IFrame } from "./iframe/IFrame";
 import { Json } from "./json";
+import { Link } from "./link";
 import { Mermaid } from "./mermaid";
 import { ParamField } from "./parameters/ParamField";
 import { RunnableEndpoint } from "./runnable-endpoint";
@@ -79,6 +80,7 @@ const FERN_COMPONENTS = {
     Icon,
     If,
     Json,
+    Link,
     Mermaid,
     ParamField,
     RunnableEndpoint,
