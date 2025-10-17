@@ -3,7 +3,7 @@ import { join } from "path";
 import { describe, expect, it } from "vitest";
 
 import { type ApiDefinition, ApiDefinitionId, EndpointId, EnvironmentId, PropertyKey } from "../latest";
-import { backfillSnippets } from "./backfill";
+import { backfillSnippets, type HttpSnippetLanguage } from "./backfill";
 
 // Load actual fixtures at runtime
 const fixturesDir = join(__dirname, "fixtures", "demo");
@@ -88,7 +88,7 @@ describe("backfillSnippets", () => {
         };
 
         const flags = {
-            httpSnippets: ["curl", "python"],
+            httpSnippets: ["curl", "python"] as HttpSnippetLanguage[],
             alwaysEnableJavaScriptFetch: true
         };
 
