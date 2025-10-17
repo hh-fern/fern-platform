@@ -16,11 +16,18 @@ function escapeCSVField(value: string): string {
 }
 
 export function exportToCSV(queries: FernAI.Query[], filename: string = "queries-export") {
-    const headers = ["Conversation ID", "Date", "Role", "Query"];
+    const headers = ["Conversation ID", "Date", "Role", "Location", "Query"];
 
     const rows = queries.map((query) => {
         const isoDate = new Date(query.created_at).toISOString();
-        return [escapeCSVField(query.conversation_id), isoDate, escapeCSVField(query.role), escapeCSVField(query.text)];
+        const location = query.source === "SLACK" ? "Slack" : query.source === "CHAT" ? "Docs" : query.source;
+        return [
+            escapeCSVField(query.conversation_id),
+            isoDate,
+            escapeCSVField(query.role),
+            escapeCSVField(location),
+            escapeCSVField(query.text)
+        ];
     });
 
     const csvContent = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");

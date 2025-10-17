@@ -18,6 +18,15 @@ export const columns: ColumnDef<FernAI.Query>[] = [
         }
     },
     {
+        accessorKey: "source",
+        header: "Location",
+        cell: ({ row }) => {
+            const source = row.getValue("source") as string | undefined;
+            const displayText = source === "SLACK" ? "Slack" : source === "CHAT" ? "Docs" : source;
+            return <div className="text-left">{displayText}</div>;
+        }
+    },
+    {
         accessorKey: "created_at",
         header: "",
         cell: ({ row }) => {
