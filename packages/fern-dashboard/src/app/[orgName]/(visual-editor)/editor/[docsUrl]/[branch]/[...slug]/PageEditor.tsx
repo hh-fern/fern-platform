@@ -89,6 +89,13 @@ export default function PageEditor({ className, filename, initialHtml }: PageEdi
 
     function onTiptapEditorUpdate(props: EditorEvents["update"]) {
         const html = props.editor.getHTML();
+
+        const { transaction } = props;
+        const isDrop = transaction?.getMeta("uiEvent") === "drop";
+        if (isDrop) {
+            return
+        }
+        
         handleEditorUpdate(html, props.transaction);
     }
 
