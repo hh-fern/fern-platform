@@ -26,11 +26,22 @@ const CLIENTS: HTTPSnippetClient[] = [
     { targetId: "swift", clientId: "nsurlsession" }
 ];
 
+export type HttpSnippetLanguage =
+    | "curl"
+    | "python"
+    | "javascript"
+    | "go"
+    | "ruby"
+    | "java"
+    | "php"
+    | "csharp"
+    | "swift";
+
 export async function backfillSnippets(
     apiDefinition: ApiDefinition,
     dynamicIr: DynamicIRsByLanguage | undefined,
     flags: {
-        isHttpSnippetsEnabled: boolean;
+        httpSnippets: boolean | HttpSnippetLanguage[];
         alwaysEnableJavaScriptFetch: boolean;
     }
 ): Promise<ApiDefinition> {
@@ -65,10 +76,10 @@ async function backfillSnippetsForExample(
     endpoint: EndpointDefinition,
     example: ExampleEndpointCall,
     {
-        isHttpSnippetsEnabled,
+        httpSnippets,
         alwaysEnableJavaScriptFetch
     }: {
-        isHttpSnippetsEnabled: boolean;
+        httpSnippets: boolean | HttpSnippetLanguage[];
         alwaysEnableJavaScriptFetch: boolean;
     }
 ): Promise<ExampleEndpointCall> {
@@ -78,8 +89,19 @@ async function backfillSnippetsForExample(
         (snippets[snippet.language] ??= []).push(snippet);
     };
 
-    // Check if curl snippet exists
-    if (!snippets.curl?.length) {
+    const isHttpSnippetsEnabled = httpSnippets !== false;
+    const httpSnippetLanguages = Array.isArray(httpSnippets) ? httpSnippets : null;
+
+    // Check if a language should be included in HTTP snippets
+    const shouldIncludeLanguage = (language: string): boolean => {
+        if (!isHttpSnippetsEnabled) {
+            return false;
+        }
+        return httpSnippetLanguages === null || httpSnippetLanguages.includes(language as HttpSnippetLanguage);
+    };
+
+    // Check if curl snippet exists and should be generated
+    if (!snippets.curl?.length && shouldIncludeLanguage("curl")) {
         const endpointAuth = endpoint.auth?.[0];
         const curlCode = convertToCurl(
             toSnippetHttpRequest(
@@ -176,24 +198,19 @@ async function backfillSnippetsForExample(
     if (isHttpSnippetsEnabled) {
         const snippet = new HTTPSnippet(getHarRequest(endpoint, example, apiDefinition.auths, example.requestBody));
         for (const { clientId, targetId } of CLIENTS) {
-            /**
-             * If the snippet already exists, skip it
-             */
             if (snippets[targetId]?.length) {
                 continue;
             }
 
-            /**
-             * If dynamic snippets are available for this language, skip generating HTTP snippets
-             */
             if (dynamicGenerators[targetId === "javascript" ? "typescript" : targetId]) {
                 continue;
             }
 
-            /**
-             * If alwaysEnableJavaScriptFetch is disabled, skip generating JavaScript snippets if TypeScript snippets are available
-             */
             if (targetId === "javascript" && snippets.typescript?.length && !alwaysEnableJavaScriptFetch) {
+                continue;
+            }
+
+            if (!shouldIncludeLanguage(targetId)) {
                 continue;
             }
 
