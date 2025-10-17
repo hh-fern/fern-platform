@@ -1,0 +1,165 @@
+---
+title: Link Component Test Page
+description: Test page for the Link component with various examples
+---
+
+# Link Component Test Page
+
+This page demonstrates various uses of the Link component for creating anchor links within documentation.
+
+## Basic Usage
+
+Here's a simple example of the Link component:
+
+<Link id="basic-example">This text has an anchor link</Link>
+
+You can click on the link icon that appears when you hover over the text to copy the URL with the anchor.
+
+---
+
+## Link in Paragraph
+
+Sometimes you need to <Link id="inline-link">create an anchor link inline</Link> within a paragraph of text. This is useful for referencing specific parts of documentation.
+
+---
+
+## Link Inside Card
+
+<Card title="Card with Link">
+  This card contains a <Link id="link-in-card">linkable section</Link> that you can reference from other parts of your documentation. Cards are commonly used to highlight important information.
+</Card>
+
+---
+
+## Link Inside CardGroup
+
+<CardGroup cols={2}>
+  <Card title="First Card">
+    This is the <Link id="first-card-link">first card's linkable content</Link>.
+  </Card>
+  <Card title="Second Card">
+    This is the <Link id="second-card-link">second card's linkable content</Link>.
+  </Card>
+</CardGroup>
+
+---
+
+## Link Inside Callout
+
+<Callout intent="info">
+  **Important Information**: <Link id="callout-link">This section in the callout</Link> contains important details you may want to reference later.
+</Callout>
+
+<Warning>
+  **Warning**: Make sure to read <Link id="warning-link">this warning section</Link> carefully.
+</Warning>
+
+---
+
+## Link Inside Accordion
+
+<AccordionGroup>
+  <Accordion title="First Accordion Item">
+    <Link id="accordion-item-1">Content in the first accordion</Link> can also be linked.
+  </Accordion>
+  <Accordion title="Second Accordion Item">
+    <Link id="accordion-item-2">Content in the second accordion</Link> is also linkable.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Link Inside Tabs
+
+<TabGroup>
+  <Tab title="Tab 1">
+    <Link id="tab-1-content">This is the content in tab 1</Link>
+  </Tab>
+  <Tab title="Tab 2">
+    <Link id="tab-2-content">This is the content in tab 2</Link>
+  </Tab>
+</TabGroup>
+
+---
+
+## Link Inside Steps
+
+<StepGroup>
+  <Step title="Step 1">
+    First, <Link id="step-1">complete this step</Link>.
+  </Step>
+  <Step title="Step 2">
+    Then, <Link id="step-2">move on to this step</Link>.
+  </Step>
+  <Step title="Step 3">
+    Finally, <Link id="step-3">finish with this step</Link>.
+  </Step>
+</StepGroup>
+
+---
+
+## Multiple Links in Same Paragraph
+
+You can have <Link id="first-link">multiple</Link> links in the <Link id="second-link">same paragraph</Link> and each will have its own <Link id="third-link">unique anchor</Link>.
+
+---
+
+## Link Inside Table
+
+| Feature | Description | Link |
+|---------|-------------|------|
+| Feature A | <Link id="feature-a">Description of feature A</Link> | [Docs](#feature-a) |
+| Feature B | <Link id="feature-b">Description of feature B</Link> | [Docs](#feature-b) |
+| Feature C | <Link id="feature-c">Description of feature C</Link> | [Docs](#feature-c) |
+
+---
+
+## Nested Components
+
+<Card title="Complex Nested Example">
+  <Callout intent="success">
+    This callout is inside a card and contains a <Link id="nested-link">linkable section</Link>.
+    
+    <StepGroup>
+      <Step title="Nested Step">
+        Even in nested steps, you can <Link id="deeply-nested">link to specific content</Link>.
+      </Step>
+    </StepGroup>
+  </Callout>
+</Card>
+
+---
+
+## Link with Code
+
+You can combine links with code blocks:
+
+<Link id="code-example">When using the API</Link>, make sure to include the proper headers:
+
+```typescript
+const response = await fetch('https://api.example.com/data', {
+  headers: {
+    'Authorization': 'Bearer token'
+  }
+});
+```
+
+---
+
+## Long Content Example
+
+<Link id="long-content">
+This is a longer piece of text that spans multiple lines and demonstrates how the Link component handles wrapping text. The entire section is linkable and will scroll to center when the anchor is clicked.
+</Link>
+
+---
+
+## Testing Scroll Behavior
+
+Scroll down to see more content...
+
+<div style={{ height: '100vh' }}></div>
+
+<Link id="bottom-link">This link is at the bottom of the page</Link> to test the scroll-to-center behavior.
+
+When you click on an anchor link from the top of the page, it should smoothly scroll to center this element in the viewport.
