@@ -216,7 +216,7 @@ export default function TiptapEditor({
                     return false;
                   },
                 },
-              }}
+              }
             }}
             parseOptions={{
                 // Required to preserve formatting in custom element previews
